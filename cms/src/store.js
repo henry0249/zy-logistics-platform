@@ -48,6 +48,9 @@ const store = new Vuex.Store({
         context.commit('setUser', {})
       }
     },
+    async refleshToken(context, payload){
+      
+    },
     async logout(context, payload) {
       await ajax.get('/logout')
       context.commit('logout')

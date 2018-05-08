@@ -1,21 +1,6 @@
 <template>
   <div class="tl" style="background:#fff">
-    <v-data-table hide-actions v-model="selected" :headers="headers" :items="items" select-all :pagination.sync="pagination" item-key="name" class="elevation-1">
-      <tr slot="headers" slot-scope="props">
-        <th v-for="header in props.headers" :key="header.text" :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']" @click="changeSort(header.value)">
-          <v-icon small>arrow_upward</v-icon>
-          {{ header.text }}
-        </th>
-      </tr>
-      <tr slot="items" slot-scope="props" :active="props.selected" @click="props.selected = !props.selected">
-        <td>{{ props.item.name }}</td>
-        <td class="text-xs-right">{{ props.item.calories }}</td>
-        <td class="text-xs-right">{{ props.item.fat }}</td>
-        <td class="text-xs-right">{{ props.item.carbs }}</td>
-        <td class="text-xs-right">{{ props.item.protein }}</td>
-        <td class="text-xs-right">{{ props.item.iron }}</td>
-      </tr>
-    </v-data-table>
+    
   </div>
 </template>
 

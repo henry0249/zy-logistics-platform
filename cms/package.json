@@ -13,6 +13,7 @@
     "axios": "^0.18.0",
     "compression-webpack-plugin": "^1.1.11",
     "cube-ui": "^1.8.0",
+    "dayjs": "^1.5.22",
     "element-ui": "^2.3.6",
     "js-md5": "^0.7.3",
     "material-design-icons-iconfont": "^3.0.3",

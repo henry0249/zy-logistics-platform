@@ -1,7 +1,8 @@
 const Service = require('egg').Service;
+const exp = Math.floor(Date.now() / 1000) + (2 * 60 * 60);
 
 class jwtService extends Service {
-  async sign(user, exp = Math.floor(Date.now() / 1000) + (2 * 60 * 60)) {
+  async sign(user) {
     const {
       ctx
     } = this;
@@ -9,7 +10,7 @@ class jwtService extends Service {
     let uaObj = ctx.helper.ua();
     let tokenData = await ctx.model.Jwt.findOne({
       user: user._id
-    })
+    });
     if (tokenData) {
       await tokenData.update({
         ...token,
@@ -53,9 +54,9 @@ class jwtService extends Service {
     if (!user) {
       ctx.throw(401, '登录已失效,请尝试重新登录');
     }
-    return user
+    return user;
   }
-  async reflesh(){
+  async reflesh() {
     const {
       ctx
     } = this;
@@ -66,13 +67,21 @@ class jwtService extends Service {
     let token = header.authorization || body.token;
     let hasToken = await ctx.model.Jwt.findOne({
       value: token
-    })
+    });
     if (!hasToken) {
-      ctx.throw(401, '您长时间没有操作系统,请重新登录');
+      ctx.throw(401, '登录已失效,请尝试重新登录');
     }
     let dayjs = require('dayjs');
-    let refleshTimeRange = dayjs(hasToken.expAt).diff(dayjs(),'minute');
-    return refleshTimeRange
+    let refleshRange = dayjs(hasToken.expAt).diff(dayjs(), 'second');
+    if (refleshRange > 0 && refleshRange <= 600) {
+      let user = await ctx.helper.jwtVerify(token);
+      return await this.sign(user);
+    }
+    return {
+      refleshRange:refleshRange,
+      value: hasToken.value,
+      expAt: hasToken.expAt
+    };
   }
 }
 module.exports = jwtService;

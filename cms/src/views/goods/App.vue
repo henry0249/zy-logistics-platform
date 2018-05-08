@@ -1,6 +1,6 @@
 <template>
   <div class="g-goods flex">
-    <button @click="test">测试</button>
+    <button @click="test">{{'测试'|init}}</button>
     <div v-sticky="{stickyTop:40}" class="g-goods-nav">
       <div style="padding:1px">
         <div @click="activeIndex=index" v-ripple class="nav-item flex ac" v-for="(item,index) in nav" :key="index">
@@ -8,12 +8,6 @@
             {{item.name}}
           </div>
           <div class="f1"></div>
-          <div style="padding-right:10px">
-            <v-badge small :color="item.color" v-if="item.icon">
-              <span v-if="item.count!==undefined" style="font-size:10px" slot="badge">{{item.count}}</span>
-              <v-icon small :color="item.color">{{item.icon}}</v-icon>
-            </v-badge>
-          </div>
           <div class="active-border" v-if="activeIndex === index">
           </div>
         </div>
