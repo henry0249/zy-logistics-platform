@@ -1,0 +1,37 @@
+<template>
+  <div>
+    <message></message>
+    <my-header v-sticky="{stickyTop:0}" style="border-bottom:1px solid #f3f4f5"></my-header>
+    <keep-alive>
+      <router-view v-if="$route.meta.keepAlive" class="g-continor">
+        <!-- 这里是会被缓存的视图组件-->
+      </router-view>
+    </keep-alive>
+    <router-view v-if="!$route.meta.keepAlive" class="g-continor">
+      <!-- 这里是不被缓存的视图组件-->
+    </router-view>
+  </div>
+</template>
+
+<script>
+import MyHeader from "./views/common/Header.vue";
+export default {
+  components: {
+    MyHeader
+  },
+  mounted(){
+    this.$store.commit('getLocalUser')
+  }
+};
+</script>
+
+<style>
+  html,
+  body {
+    min-width: 1024px;
+  }
+  .g-continor{
+    width:100%
+    /* padding: 0 5% */
+  }
+</style>

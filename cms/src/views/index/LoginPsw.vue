@@ -1,0 +1,203 @@
+<template>
+  <div style="position:relative" class="col-flex jc" v-loading="loadingText" :element-loading-text="loadingText" element-loading-spinner="el-icon-loading" element-loading-background="rgba(255, 255, 255, 0.7)">
+    <div>
+      <div style="color:#aaa;font-size:13px">手机号*</div>
+      <div>
+        <input v-model="mobile" class="my-input" type="text">
+      </div>
+    </div>
+    <div style="padding-top:20px">
+      <div class="flex ac">
+        <div style="color:#aaa;font-size:13px">密码*</div>
+        <div class="f1"></div>
+        <div v-if="password" @click="showPsw = !showPsw" class="pointer" style="color:#546E7A;">
+          <i style="font-size:16px" class="material-icons" v-if="showPsw">visibility</i>
+          <i style="font-size:16px" class="material-icons" v-else>visibility_off</i>
+        </div>
+      </div>
+      <div>
+        <input :type="showPsw?'text':'password'" v-model="password" class="my-input">
+      </div>
+    </div>
+    <div style="padding-top:30px;width:100%">
+      <div v-ripple class="login-btn" @click="login">立即登录</div>
+      <div class="flex ac" style="padding-top:30px;color:#aaa;font-size:13px">
+        <!-- <i class="material-icons" style="font-size:16px">arrow_back</i> -->
+        <div class="pointer" @click="sheet=!sheet">第三方登录</div>
+        <div class="f1"></div>
+        <div class="pointer" style="color:#EF9A9A" @click="$router.push('/login/resetPsw')">重设密码</div>
+      </div>
+    </div>
+    <div class="reg-tip triangle-topright">
+    </div>
+    <div class="reg-tip reg-tip-text" @click="$router.push('/login/reg')">
+      注册
+    </div>
+    <v-bottom-sheet v-model="sheet">
+      <v-list>
+        <v-subheader>选择登录方式</v-subheader>
+        <v-list-tile v-for="tile in tiles" :key="tile.title" @click="sheet = false">
+          <!-- <v-list-tile-avatar> -->
+            <!-- <v-avatar size="30px" tile> -->
+              <img :src="tile.img" style="width:25px;margin:0 10px;height:auto" :style="tile.style" :alt="tile.title">
+            <!-- </v-avatar> -->
+          <!-- </v-list-tile-avatar> -->
+          <v-list-tile-title>{{ tile.title }}</v-list-tile-title>
+        </v-list-tile>
+      </v-list>
+    </v-bottom-sheet>
+  </div>
+</template>
+
+<script>
+import md5 from "js-md5";
+export default {
+  data() {
+    return {
+      loadingText: "",
+      mobile: "",
+      code: "",
+      psw: "",
+      password: "",
+      showPsw: false,
+      sendSmsInterval: 0,
+      sheet: false,
+      tiles: [
+        {
+          img:
+            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-%E5%BE%AE%E4%BF%A1.png",
+          title: "微信"
+        },
+        {
+          img:
+            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-1b5b65183acb4566a5a4c639fc8cc1f3.png",
+          title: "钉钉",
+          style: { width: "23.5px" }
+        },
+        {
+          img:
+            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-8f18b4ec7aaed05e0beb66af005fce92.png",
+          title: "QQ",
+          style: { width: "20px", marginRight: "14px" }
+        },
+        {
+          img:
+            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-02-%E6%B7%98%E5%AE%9D.png",
+          title: "淘宝"
+        },
+        {
+          img:
+            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-social-weibo.png",
+          title: "微博"
+        },
+        {
+          img:
+            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-github-2.png",
+          title: "github"
+        },
+        {
+          img:
+            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-twitter.png",
+          title: "twitter"
+        },
+        {
+          img:
+            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-google_plus.png",
+          title: "google+"
+        }
+      ]
+    };
+  },
+  watch: {
+    sendSmsInterval(val) {
+      if (val !== 0) {
+        setTimeout(() => {
+          this.sendSmsInterval--;
+        }, 1000);
+      }
+    }
+  },
+  methods: {
+    async login() {
+      if (!this.mobile) {
+        this.$message.warn("请先填写手机号");
+        return false;
+      }
+      var reg = /^1[345789][0-9]{9}$/;
+      if (!reg.test(this.mobile)) {
+        this.$message.error("手机号格式错误");
+        return false;
+      }
+      if (!this.password) {
+        this.$message.error("密码不能为空");
+        return false;
+      }
+      if (this.password.length < 6) {
+        this.$message.error("密码长度至少6位");
+        return false;
+      }
+      this.loadingText = "正在登录";
+      try {
+        let res = await this.$api.login_local({
+          username: this.mobile,
+          password: md5(this.password)
+        });
+        this.$message.success("登录成功");
+        this.$store.commit('setUser', res);
+        this.$router.push("/home");
+        this.loadingText = "";
+      } catch (error) {
+        this.loadingText = "";
+        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
+      }
+    }
+  }
+};
+</script>
+
+<style scoped>
+.my-input {
+  outline: none;
+  padding-top: 10px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #aaa;
+  width: 200px;
+}
+.my-input:focus {
+  border-bottom: 1px solid #42a5f5;
+}
+.login-btn {
+  color: #fff;
+  background-image: linear-gradient(
+    45deg,
+    #ff9a9e 0%,
+    #fad0c4 99%,
+    #fad0c4 100%
+  );
+  box-shadow: 0 0 10px #fad0c4;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  line-height: 40px;
+  border-radius: 40px;
+}
+.triangle-topright {
+  width: 0;
+  height: 0;
+  border-top: 50px solid #ff9a9e;
+  border-left: 50px solid transparent;
+}
+.reg-tip {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+}
+.reg-tip-text {
+  top: 5px;
+  right: 2px;
+  color: #fff;
+  transform: rotate(45deg);
+}
+</style>
