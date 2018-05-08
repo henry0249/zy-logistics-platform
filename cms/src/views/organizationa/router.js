@@ -6,20 +6,17 @@ import User from './User.vue';
 
 export default [{
   path: '/organizationa',
-  redirect: '/organizationa/platform',
+  redirect: '/organizationa/index',
   component: App,
   meta: {
     keepAlive: true, // 需要被缓存
   },
   children: [{
     path: 'index',
-    component: Index,
+    component: Platform,
     // meta: {
     //   keepAlive: true, // 需要被缓存
     // },
-  },{
-    path: 'platform',
-    component: Platform
   },{
     path: 'company',
     component: Company
