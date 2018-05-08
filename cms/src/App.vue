@@ -19,7 +19,7 @@ export default {
   components: {
     MyHeader
   },
-  mounted(){
+  created(){
     this.$store.commit('getLocalUser')
   }
 };
