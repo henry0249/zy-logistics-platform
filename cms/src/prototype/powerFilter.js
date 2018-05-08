@@ -31,13 +31,11 @@ let powerIO = {
   companyIo: false,
 }
 
-function filter(data) {
-  if (Array.isArray(data)) {
-
-  } else {
+function powerFilter(data) {
+  if (Array.isArray(data)) {} else {
     for (let index = 0; index < keyArr.length; index++) {
       for (let i = 0; i < data.role.length; i++) {
-        if (keyArr[index].key == data.role[i].value) {
+        if (keyArr[index].key == data.role[i]) {
           io = true
           for (const k in keyArr[index].IO) {
             if (keyArr[index].IO.hasOwnProperty(k)) {
@@ -58,4 +56,4 @@ function filter(data) {
     return powerIO
   }
 }
-Vue.prototype.$powerFilter = filter
+export default powerFilter

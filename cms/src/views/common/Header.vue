@@ -60,7 +60,7 @@
           },
           {
             name: "组织架构",
-            path: "/organizationa/index",
+            path: "/organizationa/platform",
             icon: "supervisor_account"
           }
         ]

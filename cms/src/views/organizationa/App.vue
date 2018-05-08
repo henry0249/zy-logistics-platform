@@ -2,16 +2,13 @@
   <div class="g-goods flex">
     <div v-sticky="{stickyTop:40}" class="g-goods-nav">
       <div style="padding:1px">
-        <div @click="active(item,index)" v-ripple class="nav-item flex ac" v-for="(item,index) in nav" :key="index">
+        <div @click="active(item,index)" v-if="item.io" v-ripple class="nav-item flex ac" v-for="(item,index) in nav" :key="index">
           <div>
             {{item.name}}
           </div>
           <div class="f1"></div>
           <div style="padding-right:10px">
-            <v-badge small :color="item.color" v-if="item.icon">
-              <span v-if="item.count!==undefined" style="font-size:10px" slot="badge">{{item.count}}</span>
-              <v-icon small :color="item.color">{{item.icon}}</v-icon>
-            </v-badge>
+            <span v-if="item.count!==undefined" style="font-size:10px" slot="badge">{{item.count}}</span>
           </div>
           <div class="active-border" v-if="activeIndex === index">
           </div>
@@ -45,35 +42,76 @@
           color: 'red',
           icon: 'pages',
           path: '/organizationa/platform',
+          io: false,
+          key: 'platformIo'
         }, {
           name: '公司管理',
           color: 'orange',
           path: '/organizationa/company',
           icon: 'question_answer',
-          // count: 10,
+          io: false,
+          key: 'companyIo'
         }, {
           name: '用户管理',
           icon: 'group',
           path: '/organizationa/user',
           color: 'green',
+          io: false,
+          key: 'userIo'
         }]
+      }
+    },
+    watch: {
+      $route(val) {
+        let io = true
+        console.log(val);
+        this.nav.forEach((item, index) => {
+          if (val.path == item.path) {
+            this.activeIndex = index
+            io = false
+          }
+        });
+        if (io) {
+          this.activeIndex = null
+        }
       }
     },
     methods: {
       active(item, index) {
+        console.log(index);
         this.activeIndex = index
         this.$router.push({
           path: item.path,
+          params: {
+            index: index
+          }
         })
+        console.log(this.$route);
       },
       getProps(data) {
         console.log(data);
+      },
+      getpower() {
+        let res = this.powerFilter(this.user)
+        this.nav.forEach(item => {
+          for (const k in res) {
+            if (res.hasOwnProperty(k)) {
+              if (item.key == k) {
+                item.io = res[k]
+              }
+            }
+          }
+        });
+        console.log(this.nav);
       }
     },
     created() {
-      this.$router.push({
-        path: this.nav[0].path
-      })
+      this.getpower()
+      this.nav.forEach((item, index) => {
+        if (item.path == this.$route.path) {
+          this.activeIndex = index
+        }
+      });
     }
   }
 </script>
@@ -81,7 +119,7 @@
 <style scoped>
   .g-goods {
     min-height: 100vh;
-    width:calc(100% - 10%);
+    width: calc(100% - 10%);
     padding: 0 5%;
     background: #f5f5f5;
     padding-top: 20px;
