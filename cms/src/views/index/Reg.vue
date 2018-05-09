@@ -11,7 +11,7 @@
         <div style="color:#aaa">验证码*</div>
         <div class="f1"></div>
         <div class="ac pointer" v-ripple style="border-radius:30px;color:#64B5F6;padding:3px 5px">
-          <icon size="15">e1</icon>
+          <icon size="15">yanzhengma</icon>
           <div v-if="sendSmsInterval===0" @click="sendSms">获取验证码</div>
           <div style="cursor: not-allowed" v-if="sendSmsInterval>0">
             {{sendSmsInterval}}秒后获取
@@ -28,7 +28,6 @@
         <div class="f1"></div>
         <div v-if="password" @click="showPsw = !showPsw" class="pointer" style="color:#546E7A;">
           <icon size="16">{{showPsw?'e1':'eed'}}</icon>
-          <!-- <icon v-if="!showPsw">eed</icon> -->
         </div>
       </div>
       <div>
@@ -137,8 +136,9 @@ export default {
   outline: none;
   padding-top: 10px;
   padding-bottom: 2px;
-  border-bottom: 1px solid #aaa;
   width: 200px;
+   border: none;
+  border-bottom: 1px solid #eee;
 }
 .my-input:focus {
   border-bottom: 1px solid #42a5f5;

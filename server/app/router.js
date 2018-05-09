@@ -11,21 +11,20 @@ module.exports = app => {
   } = app;
   const checkToken = middleware.jwtVerify;
   router
-    .post('/login/local', 'user.loginLocal')
-    .post('/register/mobile', 'user.registerMobile')
-    .get('/user', checkToken(), 'user.info')
-    .all('/refleshToken', checkToken(), 'user.refleshToken')
-    .all('/logout', 'user.logout')
-    .post('/sms/send', 'lib.smsSend')
-    .post('/sms/validate', 'lib.smsValidate')
-    .post('/yixiu/sms/send', 'lib.yixiuSmsSend')
-    .post('/yixiu/sms/validate', 'lib.yixiuSmsValidate')
+    .post('/login/local', 'user.loginLocal')//密码登录
+    .post('/sms/send', 'lib.smsSend')//发送验证码
+    .post('/sms/validate', 'lib.smsValidate')//验证验证码
+    .post('/register/mobile', 'user.registerMobile')//手机号注册
+    .get('/user', checkToken(), 'user.info')//获取用户信息
+    .get('/field', checkToken(), 'field.index')//获取数据库字段信息
+    .all('/refleshToken', checkToken(), 'user.refleshToken')//刷新token
+    .all('/logout', 'user.logout')//注销
 
-    .get('/', 'static.views')
-    .get(/views/, 'static.views')
-    .get(/zylp/, 'static.zylp')
+    .get('/', 'static.views') //根路径匹配
+    .get(/views/, 'static.views')//根views页面
+    .get(/zylp/, 'static.zylp')//匹配zylp页面
 
-    .all('/:model/:curdType', checkToken(), 'curd.index')
+    .all('/:model/:curdType', checkToken(), 'curd.index')//通用增删改查接口
 
-    .all('*', 'notfound.index');
+    .all('*', 'notfound.index');//404处理
 };

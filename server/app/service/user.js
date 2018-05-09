@@ -97,6 +97,13 @@ class UserService extends Service {
     }
     return '成功注销';
   }
+  async power() {
+    const {
+      ctx
+    } = this;
+    let models = require('../field')('ALL');
+    return models
+  }
 
 }
 module.exports = UserService;

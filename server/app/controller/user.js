@@ -33,6 +33,12 @@ class UserController extends Controller {
     } = this;
     ctx.body = await ctx.service.jwt.reflesh()
   }
+  async power(){
+    const {
+      ctx
+    } = this;
+    ctx.body = await ctx.service.user.power()
+  }
 }
 
 module.exports = UserController;

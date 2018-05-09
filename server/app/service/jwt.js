@@ -15,20 +15,22 @@ class jwtService extends Service {
       await tokenData.update({
         ...token,
         $addToSet: {
-          info: uaObj
+          ualist: uaObj
         },
+        ua: uaObj,
         loginAt: new Date()
       })
     } else {
       let newTokenData = new ctx.model.Jwt({
         ...token,
         user: user._id,
+        ua: uaObj,
         loginAt: new Date()
       })
       await newTokenData.save();
       await newTokenData.update({
         $addToSet: {
-          info: uaObj
+          ualist: uaObj
         }
       });
     }
@@ -43,16 +45,26 @@ class jwtService extends Service {
       body,
     } = ctx.request;
     let token = header.authorization || body.token;
-    await ctx.helper.jwtVerify(token)
+    await ctx.helper.jwtVerify(token);
     let hasToken = await ctx.model.Jwt.findOne({
       value: token
-    })
+    });
     if (!hasToken) {
       ctx.throw(401, '登录已失效,请尝试重新登录');
     }
-    let user = await ctx.model.User.findById(hasToken.user)
+    let user = await ctx.model.User.findById(hasToken.user);
     if (!user) {
       ctx.throw(401, '登录已失效,请尝试重新登录');
+    }
+    let dayjs = require('dayjs');
+    let refleshRange = dayjs(hasToken.expAt).diff(dayjs(), 'second');
+    if (refleshRange > 0 && refleshRange <= 600) {
+      let newToken = await this.sign(user);
+      ctx.set({
+        refleshRange,
+        refleshtoken: newToken.value,
+        tokenexp: newToken.expAt
+      });
     }
     return user;
   }
@@ -78,7 +90,7 @@ class jwtService extends Service {
       return await this.sign(user);
     }
     return {
-      refleshRange:refleshRange,
+      refleshRange: refleshRange,
       value: hasToken.value,
       expAt: hasToken.expAt
     };

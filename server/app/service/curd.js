@@ -2,14 +2,16 @@ const Service = require('egg').Service;
 
 class CurdService extends Service {
   async index() {
-    const ctx = this.ctx
+    const {
+      ctx
+    } = this;
     let {
       method,
       params
     } = ctx;
     let acceptObj = {
-      'GET': ['find', 'findOne'],
-      'POST': ['set', 'find', 'findOne', 'update', 'delete'],
+      'GET': ['find', 'findOne', 'findById'],
+      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete'],
       'PUT': ['update'],
       'DELETE': ['delete']
     }
@@ -27,13 +29,10 @@ class CurdService extends Service {
     }
 
     const modelName = params.model.substring(0, 1).toUpperCase() + params.model.substring(1);
-
-    const model = this.ctx.model[modelName];
-
+    const model = ctx.model[modelName];
     if (!model) {
       flag = false;
     }
-
     if (!flag) {
       ctx.throw(404, '无效的请求路径', {
         method,
@@ -46,10 +45,27 @@ class CurdService extends Service {
     } else {
       curdParam = ctx.request.body;
     }
-    if (this.app.controller[params.model] && this.app.controller[params.model][params.curdType]) {
-      await this.app.controller[params.model][params.curdType];
+    if (ctx.service[params.model] && ctx.service[params.model][params.curdType]) {
+      await ctx.service[params.model][params.curdType];
     }
-    return await this[params.curdType](model, curdParam);
+    let data = await this[params.curdType](model, curdParam);
+    if (!curdParam.withoutLog && modelName !== 'CurdLog') {
+      let ua = ctx.helper.ua();
+      let logParms = {
+        method,
+        ...params,
+        body: curdParam,
+        ...ua
+      };
+      if (ctx.user) {
+        logParms.user = ctx.user._id;
+      }
+      if (curdParam.logRemark) {
+        logParms.remark = curdParam.logRemark
+      }
+      await this.log(ctx.model.CurdLog, logParms);
+    }
+    return data;
   }
 
   async set(model, param) {
@@ -86,8 +102,19 @@ class CurdService extends Service {
       return modelDate;
     }
   }
-  async update(param) {
-
+  async update(model, param) {
+    let multi = param.multi || false;
+    delete param.multi;
+    if (!param.find || JSON.stringify(param.find) === '{}') {
+      ctx.throw(400, '查询条件不能为空', param);
+    }
+    if (!param.update || JSON.stringify(param.update) === '{}') {
+      ctx.throw(400, '更新内容不能为空', param);
+    }
+    await model.update(param.find, param.update, {
+      multi
+    });
+    return '更新成功';
   }
   async find(model, param, findType = 'find') {
     let limit = isNaN(Number(param.limit)) ? 10 : Number(param.limit),
@@ -124,8 +151,19 @@ class CurdService extends Service {
     }
     return await this.findOne(model, param, 'findById')
   }
-  async delete(param) {
-
+  async delete(model, param) {
+    let multi = param.multi || false;
+    delete param.multi;
+    if (!param || JSON.stringify(param) === '{}') {
+      ctx.throw(400, '删除条件不能为空', param);
+    }
+    await model.remove(option, {
+      multi
+    });
+    return '删除成功';
+  }
+  async log(model, param) {
+    await this.add(model, param)
   }
 }
 module.exports = CurdService;

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
+import store from '../store';
 
 function getCookie(name) {
   var strcookie = document.cookie; //获取cookie字符串
@@ -35,6 +36,9 @@ ajax.interceptors.request.use(async config => {
 })
 // 注册响应拦截器
 ajax.interceptors.response.use(response => {
+  if (response.headers.refleshtoken) {
+    store.commit('refleshToken',response.headers)
+  }
   return Promise.resolve(response.data)
 }, err => {
   $message.show({

@@ -4,15 +4,15 @@
       <div class="flex">
         <div class="box-img">
           <img :src="boxImg" alt="">
-          <div style="margin:6px 10px">
+          <div style="margin:6px 5px">
             <div style="padding-top:10px;font-size:20px">
               中源物流
             </div>
             <div style="margin:10px 0;width:20px;height:1px;background:#fff">
             </div>
           </div>
-          <div>
-            <v-btn round outline color="white">一站式物流平台</v-btn>
+          <div style="padding-top:5px">
+            <button class="my-index-btn">一站式物流平台</button>
           </div>
         </div>
         <div class="col-flex" style="min-width:280px">
@@ -60,5 +60,15 @@ export default {
 }
 .box-img img {
   width: 200px;
+}
+.my-index-btn{
+  outline:none;
+  border: 1px solid #fff;
+  color: #fff;
+  background: transparent;
+  line-height: 30px;
+  border-radius: 30px;
+  padding: 0 10px;
+  font-size: 15px
 }
 </style>

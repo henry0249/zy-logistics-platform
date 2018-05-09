@@ -11,8 +11,7 @@
         <div style="color:#aaa;font-size:13px">密码*</div>
         <div class="f1"></div>
         <div v-if="password" @click="showPsw = !showPsw" class="pointer" style="color:#546E7A;">
-          <i style="font-size:16px" class="material-icons" v-if="showPsw">visibility</i>
-          <i style="font-size:16px" class="material-icons" v-else>visibility_off</i>
+          <icon size="16">{{showPsw?'e1':'eed'}}</icon>
         </div>
       </div>
       <div>
@@ -33,19 +32,6 @@
     <div class="reg-tip reg-tip-text" @click="$router.push('/login/reg')">
       注册
     </div>
-    <v-bottom-sheet v-model="sheet">
-      <v-list>
-        <v-subheader>选择登录方式</v-subheader>
-        <v-list-tile v-for="tile in tiles" :key="tile.title" @click="sheet = false">
-          <!-- <v-list-tile-avatar> -->
-            <!-- <v-avatar size="30px" tile> -->
-              <img :src="tile.img" style="width:25px;margin:0 10px;height:auto" :style="tile.style" :alt="tile.title">
-            <!-- </v-avatar> -->
-          <!-- </v-list-tile-avatar> -->
-          <v-list-tile-title>{{ tile.title }}</v-list-tile-title>
-        </v-list-tile>
-      </v-list>
-    </v-bottom-sheet>
   </div>
 </template>
 
@@ -161,8 +147,9 @@ export default {
   outline: none;
   padding-top: 10px;
   padding-bottom: 2px;
-  border-bottom: 1px solid #aaa;
   width: 200px;
+  border: none;
+  border-bottom: 1px solid #eee;
 }
 .my-input:focus {
   border-bottom: 1px solid #42a5f5;
