@@ -1,13 +1,6 @@
 <template>
   <div>
     <add-header :title="title" @add="add"></add-header>
-    <el-dialog :title="title" :visible.sync="dialogVisible" width="30%">
-      <div>这是一段信息</div>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-      </div>
-    </el-dialog>
     <div class="p-list">
     </div>
   </div>
@@ -21,21 +14,22 @@
     },
     data() {
       return {
-        title: '添加平台',
-        dialogVisible: false
+        title: '平台添加',
+        dialogVisible: false,
+        keyArr: []
       }
     },
     methods: {
       async add() {
-        console.log(this.$store.state.user);
-        let obj = {role:[{value:'sys'}]}
-        console.log(Array.isArray(obj));
-        let res = this.$powerFilter(obj)
-        console.log(res);
-        // this.dialogVisible = true
-        // console.log(11);
-        // let res = await this.$api.all('/company/add',{
-        // })
+        let query = {}
+        query.title = this.title
+        query.key = 'company'
+        query.str = 'platform'
+        console.log(query);
+        this.$router.push({
+          path: '/organizationa/add',
+          query
+        })
       }
     },
   }

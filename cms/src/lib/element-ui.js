@@ -1,7 +1,8 @@
 import {
   Loading,
   Button,
-  Dialog
+  Dialog,
+  Input
 } from 'element-ui';
  
 export default {
@@ -9,5 +10,6 @@ export default {
     Vue.use(Loading)
     Vue.use(Button)
     Vue.use(Dialog)
+    Vue.use(Input)
   }
 }
