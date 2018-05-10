@@ -1,4 +1,4 @@
-let init = function(){
+let init = () => {
   return 'filter init'
 }
 export default init

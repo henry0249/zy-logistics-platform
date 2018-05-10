@@ -30,14 +30,15 @@ ajax.interceptors.request.use(async config => {
       config.headers['Authorization'] = localStorage.token || sessionStorage.token;
     }
   }
-  return config
+  config.headers['csrfToken'] = getCookie('csrfToken');
+  return config;
 }, err => {
   return Promise.reject(err)
 })
 // 注册响应拦截器
 ajax.interceptors.response.use(response => {
   if (response.headers.refleshtoken) {
-    store.commit('refleshToken',response.headers)
+    store.commit('refleshToken', response.headers)
   }
   return Promise.resolve(response.data)
 }, err => {

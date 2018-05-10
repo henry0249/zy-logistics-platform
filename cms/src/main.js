@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router' //路由
 import store from './store' //vuex
-// import './filters' //全局过滤器
+import './filters' //全局过滤器
 import './directives' //全局指令
 import './mixin' //全局混入
 import './prototype' //全局拓展原型方法

@@ -24,7 +24,8 @@ module.exports = app => {
     .get(/views/, 'static.views')//根views页面
     .get(/zylp/, 'static.zylp')//匹配zylp页面
 
-    .all('/:model/:curdType', checkToken(), 'curd.index')//通用增删改查接口
+    .get('/:model/:curdType', checkToken(), 'curd.index')//通用增删改查接口
+    .post('/:model/:curdType', checkToken(), 'curd.index')//通用增删改查接口
 
     .all('*', 'notfound.index');//404处理
 };

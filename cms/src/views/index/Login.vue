@@ -12,7 +12,7 @@
             </div>
           </div>
           <div style="padding-top:5px">
-            <button class="my-index-btn">一站式物流平台</button>
+            <button v-ripple class="my-index-btn">一站式物流平台</button>
           </div>
         </div>
         <div class="col-flex" style="min-width:280px">
