@@ -9,7 +9,7 @@ Vue.mixin({
     isSys() {
       return this.$store.state.isSys;
     },
-    store() {
+    $state() {
       return this.$store.state;
     }
   }

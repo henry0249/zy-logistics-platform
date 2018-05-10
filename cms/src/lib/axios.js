@@ -30,7 +30,7 @@ ajax.interceptors.request.use(async config => {
       config.headers['Authorization'] = localStorage.token || sessionStorage.token;
     }
   }
-  config.headers['csrfToken'] = getCookie('csrfToken');
+  // config.headers['csrfToken'] = getCookie('csrfToken');
   return config;
 }, err => {
   return Promise.reject(err)
