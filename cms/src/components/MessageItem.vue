@@ -1,10 +1,16 @@
 <template>
   <div class="main">
-    <i class="material-icons icon" :style="{color:data.color}">{{data.icon}}</i>
+    <div class="msg-icon">
+      <icon :color="data.color" size="16">{{data.icon}}</icon>
+    </div>
+    <!-- <i class="material-icons msg-icon" :style="{color:data.color}">{{data.icon}}</i> -->
     <div class="text" :style="{color:data.color}">
       {{data.text}}
     </div>
-    <i @click.stop="hide(index)" class="material-icons close">close</i>
+    <div class="close" @click.stop="hide(index)">
+      <icon>icon-ee1</icon>
+    </div>
+    <!-- <i @click.stop="hide(index)" class="material-icons close">close</i> -->
     <div class="progress" :style="{background:data.color,width:progress+'%'}">
     </div>
   </div>
@@ -57,7 +63,7 @@
     flex: 1;
     text-align: center
   }
-  .icon {
+  .msg-icon {
     margin-right: 10px
   }
   .close {

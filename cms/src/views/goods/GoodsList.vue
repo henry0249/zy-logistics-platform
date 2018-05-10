@@ -1,6 +1,6 @@
 <template>
-  <div class="tl" style="background:#fff">
-    
+  <div>
+    商品列表
   </div>
 </template>
 

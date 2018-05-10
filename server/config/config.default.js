@@ -34,7 +34,7 @@ module.exports = appInfo => {
   config.security = {
     csrf: {
       ignoreJSON: true,
-      enable: true,
+      enable: false,
       useSession: false, // 默认为 false，当设置为 true 时，将会把 csrf token 保存到 Session 中
       cookieName: 'csrfToken', // Cookie 中的字段名，默认为 csrfToken
       sessionName: 'csrfToken', // Session 中的字段名，默认为 csrfToken
