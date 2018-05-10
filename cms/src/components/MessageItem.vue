@@ -59,7 +59,7 @@
     margin-bottom: 10px
   }
   .text {
-    font-size: 16px;
+    font-size: 14px;
     flex: 1;
     text-align: center
   }

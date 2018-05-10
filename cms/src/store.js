@@ -8,6 +8,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     user: {},
+    isSys: false,
     token: '',
     tokenExp: '',
     baseUrl: window.location.protocol + '//' + window.location.host,
@@ -23,6 +24,13 @@ const store = new Vuex.Store({
       if (localStorage.tokenExp) {
         state.tokenExp = localStorage.tokenExp;
       }
+      if (state.user.role && state.user.role.length > 0) {
+        state.user.role.forEach(item => {
+          if (item === 'sys') {
+            state.isSys = true;
+          }
+        });
+      }
     },
     setUser(state, data) {
       localStorage.token = data.token;
@@ -30,6 +38,13 @@ const store = new Vuex.Store({
       localStorage.user = JSON.stringify(data.user || {});
       state.token = data.token;
       state.user = data.user || {};
+      if (state.user.role && state.user.role.length > 0) {
+        state.user.role.forEach(item => {
+          if (item === 'sys') {
+            state.isSys = true;
+          }
+        });
+      }
     },
     refleshToken(state, data) {
       localStorage.token = data.refleshtoken;
@@ -42,6 +57,7 @@ const store = new Vuex.Store({
       sessionStorage.removeItem('token');
       state.token = '';
       state.user = {};
+      state.isSys = false;
       router.replace('/');
     }
   },

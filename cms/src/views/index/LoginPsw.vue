@@ -3,7 +3,7 @@
     <div>
       <div style="color:#aaa;font-size:13px">手机号*</div>
       <div>
-        <input v-model="mobile" class="my-input" type="text">
+        <input @keyup.enter="login" v-model="mobile" class="my-input" type="text">
       </div>
     </div>
     <div style="padding-top:20px">
@@ -15,7 +15,7 @@
         </div>
       </div>
       <div>
-        <input :type="showPsw?'text':'password'" v-model="password" class="my-input">
+        <input @keyup.enter="login" :type="showPsw?'text':'password'" v-model="password" class="my-input">
       </div>
     </div>
     <div style="padding-top:30px;width:100%">

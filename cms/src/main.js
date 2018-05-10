@@ -11,7 +11,6 @@ import './lib' //第三方插件库
 import './assets/app.css' //通用css
 import './assets/app.js' //通用js
 import './api' //全局接口
-// import './powerFilter' //权限处理
 
 Vue.config.productionTip = false
 

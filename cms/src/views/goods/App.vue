@@ -1,7 +1,7 @@
 <template>
   <div class="g-goods flex">
     <div>
-      <left-nav :nav="nav" @itemClick="navClick"></left-nav>
+      <left-nav :nav="nav"></left-nav>
     </div>
     <div class="f1">
       <keep-alive>
@@ -56,12 +56,6 @@ export default {
         value: "测试"
       });
       let res = await this.$ajax.get("/field");
-    },
-    navClick(data){
-      console.log(data);
-      if (data.path) {
-        this.$router.push(data.path)
-      }
     }
   }
 };
