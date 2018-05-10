@@ -2,14 +2,14 @@
   <div class="g-left-nav">
     <div class="g-nav">
       <el-tooltip  effect="dark" content="展开菜单" placement="right" :disabled="!mini">
-        <div @click="toggleMenu" v-ripple class="tc nav-item" style="border-bottom:1px solid #F5F5F5">
+        <div @click="toggleMenu" v-ripple class="tc nav-item" style="border-bottom:1px solid #F5F5F5;height:20px">
           <icon color="#616161" size="10">{{mini?'menuunfold':'meunfold'}}</icon>
         </div>
       </el-tooltip>
       <div v-if="!item.hide" v-for="(item,index) in nav" :key="item.id">
         <el-tooltip v-if="item.icon" effect="dark" :content="item.name" placement="right" :disabled="!mini">
           <div @click="itemClick(item)" v-ripple class="nav-item flex ac" :class="{active:index === activeNavIndex}">
-            <icon :color="item.color">{{item.icon}}</icon>
+            <icon style="height:20px" :color="item.color">{{item.icon}}</icon>
             <div style="width:120px" v-if="!mini" class="f1 tf1" :style="{marginLeft:item.icon?'10px':''}">
               {{ item.name }}
             </div>
