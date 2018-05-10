@@ -1,19 +1,7 @@
 <template>
   <div class="g-goods flex">
-    <div v-sticky="{stickyTop:40}" class="g-goods-nav">
-      <div style="padding:1px">
-        <div @click="active(item,index)" v-if="item.io" v-ripple class="nav-item flex ac" v-for="(item,index) in nav" :key="index">
-          <div>
-            {{item.name}}
-          </div>
-          <div class="f1"></div>
-          <div style="padding-right:10px">
-            <span v-if="item.count!==undefined" style="font-size:10px" slot="badge">{{item.count}}</span>
-          </div>
-          <div class="active-border" v-if="activeIndex === index">
-          </div>
-        </div>
-      </div>
+    <div>
+      <left-nav :nav="nav" @itemClick="navClick"></left-nav>
     </div>
     <div class="f1">
       <keep-alive>
@@ -32,8 +20,11 @@
   // sys:
   // platform_admin
   // company_admin
+  import LeftNav from '../common/LeftNav';
   export default {
-    components: {},
+    components: {
+      LeftNav
+    },
     data() {
       return {
         activeIndex: 0,
@@ -64,7 +55,6 @@
     watch: {
       $route(val) {
         let io = true
-        console.log(val);
         this.nav.forEach((item, index) => {
           if (val.path == item.path) {
             this.activeIndex = index
@@ -77,32 +67,23 @@
       }
     },
     methods: {
-      active(item, index) {
-        console.log(index);
-        this.activeIndex = index
-        this.$router.push({
-          path: item.path,
-          params: {
-            index: index
-          }
-        })
-        console.log(this.$route);
-      },
+      navClick() {},
       getProps(data) {
         console.log(data);
       },
       getpower() {
         let res = this.powerFilter(this.user)
-        this.nav.forEach(item => {
+        let i = []
+        this.nav.forEach((item, index) => {
           for (const k in res) {
             if (res.hasOwnProperty(k)) {
               if (item.key == k) {
-                item.io = res[k]
+                i.push(index)
               }
             }
           }
         });
-        console.log(this.nav);
+        console.log(i);
       }
     },
     created() {
@@ -119,8 +100,8 @@
 <style scoped>
   .g-goods {
     min-height: 100vh;
-    width: calc(100% - 10%);
-    padding: 0 5%;
+    /* width: calc(100% - 10%); */
+    /* padding: 0 5%; */
     background: #f5f5f5;
     padding-top: 20px;
   }
