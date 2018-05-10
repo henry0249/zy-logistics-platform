@@ -19,15 +19,24 @@ export default {
   components: {
     MyHeader
   },
-  created(){
-    this.$store.commit('getLocalUser')
+  created() {
+    this.$store.commit("getLocalUser");
   }
 };
 </script>
 
 <style>
-  html,
-  body {
-    min-width: 1024px;
-  }
+html,
+body {
+  min-width: 1024px;
+}
+.g-container {
+  height: calc(100vh - 40px);
+  height: calc(100vh - 41px);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.base-bg{
+  background: #f3f4f5
+}
 </style>

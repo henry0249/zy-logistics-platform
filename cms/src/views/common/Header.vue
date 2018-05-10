@@ -62,7 +62,7 @@ export default {
         },
         {
           name: "组织架构",
-          path: "/organizationa",
+          path: "/org",
           icon: "supervisor_account"
         }
       ]

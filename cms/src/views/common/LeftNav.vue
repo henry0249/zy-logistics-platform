@@ -19,7 +19,7 @@
           </div>
         </el-tooltip>
       </div>
-      <div class="nav-item" v-if="nav.length===0">
+      <div class="nav-item" v-if="noMenu">
         无可操作菜单
       </div>
     </div>
@@ -58,6 +58,18 @@ export default {
         }
       });
       return res;
+    },
+    noMenu() {
+      if (!this.nav) {
+        return true;
+      }
+      let hideCount = 0;
+      this.nav.forEach(item => {
+        if (item.hide) {
+          hideCount++;
+        }
+      });
+      return hideCount === this.nav.length;
     }
   },
   methods: {
@@ -68,6 +80,7 @@ export default {
       if (this.autoJump) {
         if (!item.path) {
           this.$message.info(item.name + "即将开放");
+          return
         }
         this.$router.push(item.path);
       }

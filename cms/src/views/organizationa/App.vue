@@ -27,42 +27,41 @@ export default {
       nav: []
     };
   },
-  watch: {
-    $route(val) {
-      let io = true;
-      this.nav.forEach((item, index) => {
-        if (val.path == item.path) {
-          this.activeIndex = index;
-          io = false;
-        }
-      });
-      if (io) {
-        this.activeIndex = null;
-      }
-    }
-  },
   created() {
     this.nav = [
       {
         name: "平台管理",
         icon: "icon-pingtai1",
         hide: !this.isSys,
-        // path: '/organizationa/platform',
+        path: '/org/platform',
         color: "#EF5350"
       },
       {
         name: "公司管理",
-        // path: '/organizationa/company',
+        path: '/org/company',
         icon: "icon-company1",
         color: "#455A64"
       },
       {
         name: "用户管理",
         icon: "icon-yonghu-qunzu",
-        // path: '/organizationa/user',
+        path: '/org/user',
         color: "#42A5F5"
       }
     ];
+  },
+  mounted(){
+    if (this.isSys) {
+      this.$router.push({
+        path:'/org/platform',
+        query:this.$route.query
+      });
+    }else{
+      this.$router.push({
+        path:'/org/company',
+        query:this.$route.query
+      });
+    }
   }
 };
 </script>
