@@ -17,8 +17,11 @@
     "egg-passport-twitter": "^1.0.0",
     "egg-passport-weibo": "^1.0.0",
     "egg-scripts": "^2.5.0",
+    "is_js": "^0.9.0",
     "jsonwebtoken": "^8.2.1",
+    "judgejs": "^1.0.4",
     "koa-send": "^4.1.3",
+    "lodash": "^4.17.10",
     "request-ip": "^2.0.2",
     "useragent": "^2.3.0"
   },

@@ -1,7 +1,7 @@
 <template>
-  <div class="g-goods flex">
+  <div class="g-container flex">
     <div>
-      <left-nav :nav="nav"></left-nav>
+      <left-nav :nav.sync="nav" default-active="/org/platform"></left-nav>
     </div>
     <div class="f1">
       <keep-alive>
@@ -33,33 +33,46 @@ export default {
         name: "平台管理",
         icon: "icon-pingtai1",
         hide: !this.isSys,
-        path: '/org/platform',
-        color: "#EF5350"
+        color: "#EF5350",
+        children: [
+          {
+            name: "平台架构",
+            icon: "icon-structure",
+            path: "/org/platform",
+            color: "#EF5350"
+          },
+          {
+            name: "平台设置",
+            icon: "icon-icon-test",
+            path: "/org/platform_setting",
+            color: "#EF5350"
+          }
+        ]
       },
       {
         name: "公司管理",
-        path: '/org/company',
+        path: "/org/company",
         icon: "icon-company1",
         color: "#455A64"
       },
       {
         name: "用户管理",
         icon: "icon-yonghu-qunzu",
-        path: '/org/user',
+        path: "/org/user",
         color: "#42A5F5"
       }
     ];
   },
-  mounted(){
+  mounted() {
     if (this.isSys) {
       this.$router.push({
-        path:'/org/platform',
-        query:this.$route.query
+        path: "/org/platform",
+        query: this.$route.query
       });
-    }else{
+    } else {
       this.$router.push({
-        path:'/org/company',
-        query:this.$route.query
+        path: "/org/company",
+        query: this.$route.query
       });
     }
   }

@@ -1,17 +1,20 @@
 module.exports = {
   name: {
     name: '名称',
-    type: 'String'
+    type: 'String',
+    require: true
   },
   creater: {
     name: '创建人',
     type: 'ObjectId',
-    ref: 'User'
+    ref: 'User',
+    require: true
   },
   owner: {
     name: '拥有者',
     type: 'ObjectId',
-    ref: 'User'
+    ref: 'User',
+    require: true
   },
   isPlatform: {
     name: '平台标识',
@@ -36,7 +39,8 @@ module.exports = {
   admin: {
     name: '管理员',
     type: 'ObjectIdArray',
-    ref: 'User'
+    ref: 'User',
+    require: true
   },
   salesman: {
     name: '业务员',

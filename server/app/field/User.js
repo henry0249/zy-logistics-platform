@@ -48,5 +48,9 @@ module.exports = {
     name: '父级', //和superior有区别,多指数据上面的上下级关系
     type: 'ObjectId',
     ref: 'User'
+  },
+  isSys:{
+    name:'系统管理员标识',
+    type: 'Boolean'
   }
 }

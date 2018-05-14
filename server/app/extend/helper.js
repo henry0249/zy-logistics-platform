@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-let dayjs = require('dayjs');
+const is = require('is_js');
 
 module.exports = {
   index(param) {
@@ -70,7 +70,28 @@ module.exports = {
     }
     return obj
   },
-  dayjs(){
-    return dayjs()
+  is(fun, param) {
+    let flag = false;
+    if (is.array(param)) {
+      flag = is.all[fun](param);
+    } else {
+      flag = is[fun](param);
+    }
+    return flag;
+  },
+  isEmpty(param) {
+    return is.empty(param);
+  },
+  inArr(arr, obj) {
+    let flag = false;
+    if (!is.array(arr)) {
+      return false;
+    }
+    arr.forEach((item) => {
+      if (item === obj) {
+        flag = true;
+      }
+    })
+    return flag;
   }
 };

@@ -31,8 +31,7 @@ body {
   min-width: 1024px;
 }
 .g-container {
-  height: calc(100vh - 40px);
-  height: calc(100vh - 41px);
+  height: calc(100vh - 51px);
   overflow-x: hidden;
   overflow-y: auto;
 }

@@ -1,126 +1,82 @@
 <template>
   <div class="g-left-nav">
-    <div class="g-nav">
-      <el-tooltip  effect="dark" content="展开菜单" placement="right" :disabled="!mini">
-        <div @click="toggleMenu" v-ripple class="tc nav-item" style="border-bottom:1px solid #F5F5F5;height:20px">
-          <icon color="#616161" size="10">{{mini?'menuunfold':'meunfold'}}</icon>
+    <div class="collapse-change" @click="isCollapse=!isCollapse">
+      <icon size="10" style="transition: all .5s;" :class="{collapse:!isCollapse}">icon-caidan</icon>
+    </div>
+    <el-menu :open="defaultActive" unique-opened :default-active="defaultActive" router class="my-el-menu-vertical" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
+      <el-submenu v-if="item.children" :index="item.path||''" v-for="item in nav" :key="item.id">
+        <div slot="title" :class="{ac:!isCollapse||!item.children}">
+          <icon size="14" style="margin:0 5px">{{item.icon}}</icon>
+          <div v-if="!isCollapse || !item.children" class="tf1" style="width:110px" slot="title">
+            {{item.name}}
+          </div>
         </div>
-      </el-tooltip>
-      <div v-if="!item.hide" v-for="(item,index) in nav" :key="item.id">
-        <el-tooltip v-if="item.icon" effect="dark" :content="item.name" placement="right" :disabled="!mini">
-          <div @click="itemClick(item)" v-ripple class="nav-item flex ac" :class="{active:index === activeNavIndex}">
-            <icon style="height:20px" :color="item.color">{{item.icon}}</icon>
-            <div style="width:120px" v-if="!mini" class="f1 tf1" :style="{marginLeft:item.icon?'10px':''}">
-              {{ item.name }}
-            </div>
-            <div class="active-border" v-if="index === activeNavIndex">
-
+        <el-menu-item :index="sub.path" v-for="sub in item.children" :key="sub.id">
+          <div slot="title" class="ac">
+            <!-- <i class="el-icon-location"></i> -->
+            <icon size="14" style="margin:0 5px">{{sub.icon}}</icon>
+            <div slot="title" class="tf1">
+              {{sub.name}}
             </div>
           </div>
-        </el-tooltip>
-      </div>
-      <div class="nav-item" v-if="noMenu">
-        无可操作菜单
-      </div>
-    </div>
+        </el-menu-item>
+      </el-submenu>
+      <el-menu-item :index="item.path||''" v-else>
+        <icon size="14" style="margin:0 5px">{{item.icon}}</icon>
+        <span slot="title">{{item.name}}</span>
+      </el-menu-item>
+    </el-menu>
   </div>
 </template>
 
 <script>
-import { Tooltip } from "element-ui";
 export default {
-  components: {
-    [Tooltip.name]: Tooltip
-  },
   props: {
-    autoJump: {
-      type: Boolean,
-      default: true
-    },
     nav: {
       type: Array,
       default() {
         return [];
       }
+    },
+    defaultActive: {
+      type: String,
+      default: ""
     }
   },
   data() {
     return {
-      mini: false
+      mini: false,
+      isCollapse: false
     };
   },
-  computed: {
-    activeNavIndex() {
-      let res = -1;
-      this.nav.forEach((item, index) => {
-        if (item.path === this.$route.path) {
-          res = index;
-        }
-      });
-      return res;
-    },
-    noMenu() {
-      if (!this.nav) {
-        return true;
-      }
-      let hideCount = 0;
-      this.nav.forEach(item => {
-        if (item.hide) {
-          hideCount++;
-        }
-      });
-      return hideCount === this.nav.length;
-    }
-  },
   methods: {
-    toggleMenu() {
-      this.mini = !this.mini;
+    handleOpen(key, keyPath) {
+      console.log(key, keyPath);
     },
-    itemClick(item) {
-      if (this.autoJump) {
-        if (!item.path) {
-          this.$message.info(item.name + "即将开放");
-          return
-        }
-        this.$router.push(item.path);
-      }
-      this.$emit("itemClick", item);
+    handleClose(key, keyPath) {
+      console.log(key, keyPath);
     }
   }
 };
 </script>
 
-<style scoped>
+<style>
 .g-left-nav {
-  border-right: 1px solid #eee;
-  color: #424242;
-  height: calc(100vh - 41px);
-  overflow-x: hidden;
-  overflow-y: auto;
+  font-size: 14px;
 }
-.g-left-nav::-webkit-scrollbar {
-  display: none;
+.my-el-menu-vertical:not(.el-menu--collapse) {
+  width: 200px;
+  height: calc(100vh - 51px);
 }
-.nav-item {
-  padding: 15px 2rem;
-  position: relative;
-  transition: all 300ms;
-}
-.nav-item:hover {
-  /* background: #FAFAFA; */
+.collapse-change {
+  padding: 10px 0;
+  text-align: center;
   cursor: pointer;
-  color: #42a5f5;
+  border-bottom: 1px solid #eee;
+  border-right: 1px solid #eee;
+  color: #aaa;
 }
-.nav-item.active {
-  background: #eee;
-}
-.active-border {
-  position: absolute;
-  width: 2px;
-  height: 100%;
-  top: 0;
-  right: 0;
-  background: #42a5f5;
-  border-radius: 4px;
+.collapse {
+  transform: rotate(90deg);
 }
 </style>

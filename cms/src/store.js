@@ -24,13 +24,7 @@ const store = new Vuex.Store({
       if (localStorage.tokenExp) {
         state.tokenExp = localStorage.tokenExp;
       }
-      if (state.user.role && state.user.role.length > 0) {
-        state.user.role.forEach(item => {
-          if (item === 'sys') {
-            state.isSys = true;
-          }
-        });
-      }
+      state.isSys = state.user.isSys || false;
     },
     setUser(state, data) {
       localStorage.token = data.token;
@@ -38,13 +32,7 @@ const store = new Vuex.Store({
       localStorage.user = JSON.stringify(data.user || {});
       state.token = data.token;
       state.user = data.user || {};
-      if (state.user.role && state.user.role.length > 0) {
-        state.user.role.forEach(item => {
-          if (item === 'sys') {
-            state.isSys = true;
-          }
-        });
-      }
+      state.isSys = state.user.isSys || false;
     },
     refleshToken(state, data) {
       localStorage.token = data.refleshtoken;

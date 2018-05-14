@@ -1,6 +1,6 @@
 import App from './App.vue';
 import Platform from './Platform.vue';
-import PlatformInit from './PlatformInit.vue';
+import PlatformSetting from './PlatformSetting.vue';
 import Company from './Company.vue';
 import User from './User.vue';
 
@@ -11,12 +11,12 @@ export default [{
     path: 'platform',
     component: Platform
   },{
-    path: 'platform_init',
-    component: PlatformInit
-  },{
+    path: 'platform_setting',
+    component: PlatformSetting
+  }, {
     path: 'company',
     component: Company
-  },{
+  }, {
     path: 'User',
     component: User
   }]

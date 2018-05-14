@@ -109,7 +109,7 @@ export default {
 <style scoped>
 .g-header {
   background: #fff;
-  height: 40px;
+  height: 50px;
   padding: 0 2rem
 }
 .logo {
@@ -119,7 +119,7 @@ export default {
 }
 .nav-item {
   padding: 0 15px;
-  line-height: 40px;
+  line-height: 50px;
   cursor: pointer;
   color: #757575;
 }

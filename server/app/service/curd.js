@@ -1,6 +1,109 @@
 const Service = require('egg').Service;
+const is = require('is_js');
 
 class CurdService extends Service {
+  checkRequire(fieldName, params, requireArr) {
+    const ctx = this.ctx;
+    let fields;
+    try {
+      fields = require('../field/' + fieldName);
+    } catch (error) {
+      ctx.throw(422, '无效的数据实体', {
+        model: fieldName
+      });
+    }
+    //根据require判空
+    for (const key in fields) {
+      let require = false;
+      if (requireArr) {
+        require = ctx.helper.inArr(requireArr, key);
+      } else {
+        require = fields[key].require;
+      }
+      if (require && !params[key]) {
+        ctx.throw(422, `${fields[key] ? fields[key].name : key}不能为空`, {
+          key
+        });
+      }
+    }
+    return true;
+  }
+  checkFiled(fieldName, params = {}, curdType) {
+    let checkParam = JSON.parse(JSON.stringify(params));
+    delete checkParam._id;
+    delete checkParam.sort;
+    delete checkParam.populate;
+    delete checkParam.select;
+    delete checkParam.limit;
+    delete checkParam.skip;
+    delete checkParam.multi;
+    delete checkParam.vd;
+
+    if (curdType === 'update') {
+      checkParam = JSON.parse(JSON.stringify(params.update));
+    }
+
+    const ctx = this.ctx;
+    let fields;
+    try {
+      fields = require('../field/' + fieldName);
+    } catch (error) {
+      this.ctx.throw(422, '无效的数据实体', {
+        model: fieldName
+      });
+    }
+    if (is.empty(checkParam)) {
+      this.ctx.throw(422, '参数不能为空');
+    }
+
+    const isCheckType = [
+      'Object',
+      'Number',
+      'String',
+      'Array',
+      'Date',
+      'Boolean',
+    ];
+
+    for (const key in checkParam) {
+      if (!fields.hasOwnProperty(key)) {
+        this.ctx.throw(422, '无效的字段', {
+          key
+        });
+      }
+      let field = fields[key],
+        param = checkParam[key];
+      if (ctx.helper.inArr(isCheckType, field.type)) {
+        if (!is[field.type.toLowerCase()](param)) {
+          this.ctx.throw(422, `${field ? field.name : key}数据类型错误`, {
+            [key]: param
+          });
+        }
+      } else if (field.type === 'ObjectId') {
+        if (!is.string(param) || param.length !== 24) {
+          this.ctx.throw(422, `${field ? field.name : key}必须是_id格式`, {
+            [key]: param
+          });
+        }
+      } else if (field.type === 'ObjectIdArray') {
+        if (is.array(param)) {
+          let flag = true;
+          param.forEach((item, index) => {
+            if (!is.string(item) || item.length !== 24) {
+              this.ctx.throw(422, `${field.name}必须是全部由_id元素组成,第${index+1}个元素不是_id格式`, {
+                [key]: param
+              });
+            }
+          });
+        } else {
+          this.ctx.throw(422, `${field ? field.name : key}必须是数组形式`, {
+            [key]: param
+          });
+        }
+      }
+    }
+    return true;
+  }
   async index() {
     const {
       ctx
@@ -45,8 +148,21 @@ class CurdService extends Service {
     } else {
       curdParam = ctx.request.body;
     }
+
+    if (ctx.service[params.model] && ctx.service[params.model]['require']) {
+      let diyRequireArr = await ctx.service[params.model]['require'](params.curdType, curdParam);
+      await this.checkRequire(modelName, curdParam, diyRequireArr);
+    } else {
+      if (params.curdType === 'add' || params.curdType === 'set') {
+        this.checkRequire(modelName, curdParam);
+      } else {
+        this.checkRequire(modelName, curdParam, []);
+      }
+    }
+    this.checkFiled(modelName, curdParam, params.curdType);
+
     if (ctx.service[params.model] && ctx.service[params.model][params.curdType]) {
-      await ctx.service[params.model][params.curdType];
+      curdParam = await ctx.service[params.model][params.curdType](curdParam);
     }
     let data = await this[params.curdType](model, curdParam);
     if (!curdParam.withoutLog && modelName !== 'CurdLog') {
@@ -69,15 +185,9 @@ class CurdService extends Service {
   }
 
   async set(model, param) {
-    if (JSON.stringify(param) === '{}') {
-      ctx.throw(400, '添加的数据不能为空', param);
-    }
-    let vd = param.vd || param
-    delete param.vd
-    if (JSON.stringify(param) === '{}') {
-      ctx.throw(400, '添加的数据不能为空', param);
-    }
-    let hasData = await model.findOne(vd)
+    let vd = param.vd || param;
+    delete param.vd;
+    let hasData = await model.findOne(vd);
     if (hasData) {
       await hasData.update(param);
       return await model.findById(hasData._id);
@@ -105,11 +215,8 @@ class CurdService extends Service {
   async update(model, param) {
     let multi = param.multi || false;
     delete param.multi;
-    if (!param.find || JSON.stringify(param.find) === '{}') {
-      ctx.throw(400, '查询条件不能为空', param);
-    }
-    if (!param.update || JSON.stringify(param.update) === '{}') {
-      ctx.throw(400, '更新内容不能为空', param);
+    if (param.update._id) {
+      ctx.throw(400, '更新内容不能包含_id', param);
     }
     await model.update(param.find, param.update, {
       multi
@@ -154,9 +261,6 @@ class CurdService extends Service {
   async delete(model, param) {
     let multi = param.multi || false;
     delete param.multi;
-    if (!param || JSON.stringify(param) === '{}') {
-      ctx.throw(400, '删除条件不能为空', param);
-    }
     await model.remove(option, {
       multi
     });
