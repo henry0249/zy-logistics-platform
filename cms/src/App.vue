@@ -2,7 +2,7 @@
   <div>
     <message></message>
     <my-header style="border-bottom:1px solid #f3f4f5"></my-header>
-    <div class="g-container">
+    <div>
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
           <!-- 这里是会被缓存的视图组件-->
