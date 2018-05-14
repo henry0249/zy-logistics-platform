@@ -66,7 +66,7 @@ export default {
 }
 .my-el-menu-vertical:not(.el-menu--collapse) {
   width: 200px;
-  height: calc(100vh - 51px);
+  height: calc(100vh - 51px - 37px);
 }
 .collapse-change {
   padding: 10px 0;
