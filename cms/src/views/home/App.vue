@@ -1,9 +1,7 @@
 <template>
-  <div class="g-goods flex">
-    <div>
+  <div class="flex">
       <left-nav :nav="nav" @itemClick="navClick"></left-nav>
-    </div>
-    <div class="f1">
+    <div class="f1 g-container" style="overflow:hidden">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
           <!-- 这里是会被缓存的视图组件-->
@@ -44,5 +42,9 @@
 </script>
 
 <style scoped>
-
+  .app-box {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
 </style>
