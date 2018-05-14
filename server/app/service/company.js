@@ -3,8 +3,8 @@ const Service = require('egg').Service;
 class CompanyService extends Service {
   async require(curdType, param) {
     let requireObj = {
-      add: ['name'],
-      set: ['name']
+      add: ['name', 'type'],
+      set: ['name', 'type']
     };
     if (curdType === 'add' || curdType === 'set') {
       if (param.isPlatform !== true) {

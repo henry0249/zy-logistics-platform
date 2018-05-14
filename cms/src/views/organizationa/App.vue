@@ -1,9 +1,9 @@
 <template>
-  <div class="g-container flex">
-    <div>
+  <div class="flex">
+    <div class="g-container">
       <left-nav :nav.sync="nav" default-active="/org/platform"></left-nav>
     </div>
-    <div class="f1">
+    <div class="g-container f1">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
           <!-- 这里是会被缓存的视图组件-->

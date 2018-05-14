@@ -171,7 +171,7 @@ export default {
         this.loadingText = "";
       });
     },
-    handleSelect(key, keyPath) {
+    getSubCompany(key, keyPath) {
       console.log(key, keyPath);
     }
   },

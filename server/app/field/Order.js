@@ -9,8 +9,13 @@ module.exports = {
     name: '下单公司',
     ref:'Company'
   },
+  referee:{
+    type: 'ObjectId',
+    name: '推荐人',
+    ref:'User'
+  },
   name:{
     type:'String',
     name:'订单名称'
-  }
+  },
 }

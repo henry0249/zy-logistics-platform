@@ -1,4 +1,19 @@
 module.exports = {
+  type:{
+    name: '公司类型',
+    type: 'Array',
+    require: true,
+    option:[{
+      key:'logistics',
+      value:'物流公司'
+    },{
+      key:'shipper',
+      value:'发货厂商'
+    },{
+      key:'trading',
+      value:'贸易公司'
+    }]
+  },
   name: {
     name: '名称',
     type: 'String',

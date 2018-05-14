@@ -20,7 +20,7 @@ class CurdService extends Service {
       } else {
         require = fields[key].require;
       }
-      if (require && !params[key]) {
+      if ((require && !params[key]) || is.empty(params[key])) {
         ctx.throw(422, `${fields[key] ? fields[key].name : key}不能为空`, {
           key
         });
