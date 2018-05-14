@@ -156,7 +156,7 @@ export default {
         inputPattern: /^[\u4E00-\u9FA5\uF900-\uFA2D\w]+$/,
         inputErrorMessage: "平台名称不能为空"
       }).then(async ({ value }) => {
-        this.loadingText = "加载中";
+        this.loadingText = "正在初始化";
         try {
           this.platform = await this.$api.curd({
             model: "company",

@@ -34,7 +34,7 @@ module.exports = {
     type: 'Array',
     default: ['common']
   },
-  referee: {
+  recommendedByUser: {
     name: '推荐人',
     type: 'ObjectId',
     ref: 'User'
