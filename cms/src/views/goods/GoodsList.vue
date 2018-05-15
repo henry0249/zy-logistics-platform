@@ -1,139 +1,139 @@
 <template>
-  <div>
-    商品列表
-  </div>
+  <loading-box class="g-container g-box" v-model="loadingText">
+    <div v-if="!platform" class="no-platform">
+      <div v-if="!loadingText">
+        <div>
+          <icon size="30vw">meiyoushuju</icon>
+        </div>
+        <div style="margin-bottom:20px">
+          没有找到商品数据
+        </div>
+        您可以
+        <div v-ripple class="platform-init" @click="add">
+          添加商品
+        </div>或
+        <div class="platform-back" @click="$router.push('/home')">
+          返回主页
+        </div>
+      </div>
+    </div>
+    <div class="flex g-box" v-else>
+      <div class="flex addBox">
+        <el-button size="medium" type="primary" style="margin-right:30px;" @click="dialogShow = true">添 加</el-button>
+      </div>
+      <goods-table :tableHeader="tableHeader" :tableList="platform" :boxStyle="boxStyle">
+        <div slot-scope="scope" @click="test(scope)">test</div>
+      </goods-table>
+    </div>
+    <el-dialog title="添加商品" :visible.sync="dialogShow">
+      <goods-add v-model="dialogShow"></goods-add>
+    </el-dialog>
+  </loading-box>
 </template>
 
 <script>
+  import GoodsTable from '../common/Table.vue';
+  import GoodsAdd from './Add.vue';
   export default {
-    data: () => ({
-      pagination: {
-        sortBy: 'name'
-      },
-      selected: [],
-      headers: [
-        {
-          text: 'Dessert (100g serving)',
-          align: 'left',
-          value: 'name'
+    components: {
+      GoodsTable,
+      GoodsAdd
+    },
+    data() {
+      return {
+        dialogShow: false,
+        loadingText: "",
+        platform: "",
+        boxStyle: {
+          width: 'calc(100% - 20px)',
+          height: 'calc(100% - 50px)'
         },
-        { text: 'Calories', value: 'calories' },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
-        { text: 'Iron (%)', value: 'iron' }
-      ],
-      items: [
-        {
-          value: false,
-          name: 'Frozen Yogurt',
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          iron: '1%'
-        },
-        {
-          value: false,
-          name: 'Ice cream sandwich',
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          iron: '1%'
-        },
-        {
-          value: false,
-          name: 'Eclair',
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-          iron: '7%'
-        },
-        {
-          value: false,
-          name: 'Cupcake',
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-          iron: '8%'
-        },
-        {
-          value: false,
-          name: 'Gingerbread',
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-          iron: '16%'
-        },
-        {
-          value: false,
-          name: 'Jelly bean',
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-          iron: '0%'
-        },
-        {
-          value: false,
-          name: 'Lollipop',
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-          iron: '2%'
-        },
-        {
-          value: false,
-          name: 'Honeycomb',
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-          iron: '45%'
-        },
-        {
-          value: false,
-          name: 'Donut',
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-          iron: '22%'
-        },
-        {
-          value: false,
-          name: 'KitKat',
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-          iron: '6%'
-        }
-      ]
-    }),
-
+        tableHeader: [{
+          key: 'brand',
+          keyValue: '品牌',
+          // width: '100'
+        }, {
+          key: 'category',
+          keyValue: '分类',
+          // width: '100'
+        }, {
+          key: 'name',
+          keyValue: '名称',
+          // width: '200'
+        }, {
+          key: 'unit',
+          keyValue: '单位',
+          // width: '100'
+        }, {
+          key: 'tag',
+          keyValue: '标签',
+          // width: '200'
+        }]
+      };
+    },
     methods: {
-      toggleAll () {
-        if (this.selected.length) this.selected = []
-        else this.selected = this.items.slice()
+      add() {
+        this.dialogShow = true
       },
-      changeSort (column) {
-        if (this.pagination.sortBy === column) {
-          this.pagination.descending = !this.pagination.descending
-        } else {
-          this.pagination.sortBy = column
-          this.pagination.descending = false
-        }
+      test(row) {
+        console.log(row);
+      },
+      async getGoods() {
+        this.loadingText = "加载中";
+        try {
+          this.platform = await this.$api.curd({
+            model: "goods",
+            curdType: "find",
+          });
+          console.log(this.platform);
+        } catch (error) {}
+        this.loadingText = "";
       }
+    },
+    async created() {
+      this.getGoods()
     }
-  }
+  };
 </script>
 
 <style scoped>
-
+  .g-box {
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .no-platform {
+    margin: 0 auto;
+    text-align: center;
+  }
+  .platform-init {
+    margin-top: 20px;
+    margin: 0 10px;
+    display: inline-block;
+    padding: 10px 15px;
+    text-align: center;
+    border-radius: 3px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+    color: #fff;
+    background: #ef5350;
+    cursor: pointer;
+  }
+  .platform-back {
+    color: #aaa;
+    margin-top: 15px;
+    /* font-size: 10px; */
+    cursor: pointer;
+    color: #2196f3;
+  }
+  .addBox {
+    width: calc(100% - 20px);
+    height: 50px;
+    border-bottom: 1px solid #ccc;
+    box-sizing: border-box;
+    justify-content: flex-end;
+    align-items: center;
+    flex-direction: row;
+  }
 </style>

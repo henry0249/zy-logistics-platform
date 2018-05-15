@@ -1,5 +1,6 @@
 import App from './App.vue';
 import GoodsList from './GoodsList.vue';
+import Add from './Add.vue';
 
 export default [{
   path: '/goods',
@@ -8,5 +9,8 @@ export default [{
   children: [{
     path: 'list',
     component: GoodsList
+  },{
+    path: 'add',
+    component: Add
   }]
 }]

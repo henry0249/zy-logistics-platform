@@ -1,6 +1,7 @@
 import App from './App.vue';
 import Index from './Index.vue';
-import Add from './Add.vue';
+import AddOrder from './AddOrder.vue';
+import AddGoods from './AddGoods.vue';
 
 export default [{
   path: '/',
@@ -19,7 +20,10 @@ export default [{
     //   keepAlive: true // 需要被缓存
     // },
   },{
-    path: 'add',
-    component: Add,
+    path: 'add_order',
+    component: AddOrder,
+  },{
+    path: 'add_goods',
+    component: AddGoods,
   }]
 }]
