@@ -6,6 +6,9 @@ Vue.mixin({
     user() {
       return this.$store.state.user;
     },
+    company() {
+      return this.$store.state.company;
+    },
     isSys() {
       return this.$store.state.isSys;
     },

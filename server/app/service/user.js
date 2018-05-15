@@ -23,6 +23,9 @@ class UserService extends Service {
         name: param.username
       }, {
         email: param.username
+      }],
+      populate:[{
+        path:'company'
       }]
     })
     if (!user) {

@@ -19,4 +19,9 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
+  platform: {
+    name: '发布平台',
+    type: 'ObjectId',
+    ref: 'Company'
+  }
 }

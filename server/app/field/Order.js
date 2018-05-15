@@ -16,7 +16,8 @@ module.exports = {
   goods:{
     type:'Array',
     name:'商品名称',
-    require:true
+    require:true,
+    // [{name:'xx',unit:'吨',count:100,_id:'xx'}]
   },
   address:{
     type:'String',

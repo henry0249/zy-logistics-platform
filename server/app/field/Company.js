@@ -78,3 +78,20 @@ module.exports = {
     ref: 'User'
   }
 }
+// ajax.post('/company/findOne',{
+//   isPlatform:true,
+//   admin:{
+//     $in:[this.user._id]
+//   }
+// })
+// ajax.post('/company/findOne',{
+//   isPlatform:true,
+// })
+// ajax.post('/user/find',{
+//   isSys:true,
+// })
+// ajax.post('/user/find',{
+//   role:{
+//     $in:['sys']
+//   },
+// })

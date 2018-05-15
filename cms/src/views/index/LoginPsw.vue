@@ -128,9 +128,8 @@ export default {
           username: this.mobile,
           password: md5(this.password)
         });
+        await this.$store.dispatch('setUser',res);
         this.$message.success("登录成功");
-        this.$store.commit('setUser', res);
-        this.$router.push("/home");
         this.loadingText = "";
       } catch (error) {
         this.loadingText = "";

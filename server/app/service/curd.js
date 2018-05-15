@@ -20,10 +20,12 @@ class CurdService extends Service {
       } else {
         require = fields[key].require;
       }
-      if ((require && !params[key]) || is.empty(params[key])) {
-        ctx.throw(422, `${fields[key] ? fields[key].name : key}不能为空`, {
-          key
-        });
+      if (require) {
+        if (!params[key] || is.empty(params[key])) {
+          ctx.throw(422, `${fields[key] ? fields[key].name : key}不能为空`, {
+            key
+          });
+        }
       }
     }
     return true;
@@ -52,9 +54,9 @@ class CurdService extends Service {
         model: fieldName
       });
     }
-    if (is.empty(checkParam)) {
-      this.ctx.throw(422, '参数不能为空');
-    }
+    // if (is.empty(checkParam)) {
+    //   this.ctx.throw(422, '参数不能为空');
+    // }
 
     const isCheckType = [
       'Object',
@@ -73,32 +75,34 @@ class CurdService extends Service {
       }
       let field = fields[key],
         param = checkParam[key];
-      if (ctx.helper.inArr(isCheckType, field.type)) {
-        if (!is[field.type.toLowerCase()](param)) {
-          this.ctx.throw(422, `${field ? field.name : key}数据类型错误`, {
-            [key]: param
-          });
-        }
-      } else if (field.type === 'ObjectId') {
-        if (!is.string(param) || param.length !== 24) {
-          this.ctx.throw(422, `${field ? field.name : key}必须是_id格式`, {
-            [key]: param
-          });
-        }
-      } else if (field.type === 'ObjectIdArray') {
-        if (is.array(param)) {
-          let flag = true;
-          param.forEach((item, index) => {
-            if (!is.string(item) || item.length !== 24) {
-              this.ctx.throw(422, `${field.name}必须是全部由_id元素组成,第${index+1}个元素不是_id格式`, {
-                [key]: param
-              });
-            }
-          });
-        } else {
-          this.ctx.throw(422, `${field ? field.name : key}必须是数组形式`, {
-            [key]: param
-          });
+      if (!is.json(param)) {
+        if (ctx.helper.inArr(isCheckType, field.type)) {
+          if (!is[field.type.toLowerCase()](param)) {
+            this.ctx.throw(422, `${field ? field.name : key}数据类型错误`, {
+              [key]: param
+            });
+          }
+        } else if (field.type === 'ObjectId') {
+          if (!is.string(param) || param.length !== 24) {
+            this.ctx.throw(422, `${field ? field.name : key}必须是_id格式`, {
+              [key]: param
+            });
+          }
+        } else if (field.type === 'ObjectIdArray') {
+          if (is.array(param)) {
+            let flag = true;
+            param.forEach((item, index) => {
+              if (!is.string(item) || item.length !== 24) {
+                this.ctx.throw(422, `${field.name}必须是全部由_id元素组成,第${index+1}个元素不是_id格式`, {
+                  [key]: param
+                });
+              }
+            });
+          } else {
+            this.ctx.throw(422, `${field ? field.name : key}必须是数组形式`, {
+              [key]: param
+            });
+          }
         }
       }
     }

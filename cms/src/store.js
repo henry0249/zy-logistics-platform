@@ -8,6 +8,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     user: {},
+    company: {},
     isSys: false,
     token: '',
     tokenExp: '',
@@ -18,6 +19,9 @@ const store = new Vuex.Store({
       if (localStorage.user) {
         state.user = JSON.parse(localStorage.user);
       }
+      if (localStorage.company) {
+        state.company = JSON.parse(localStorage.company);
+      }
       if (localStorage.token) {
         state.token = localStorage.token;
       }
@@ -27,12 +31,15 @@ const store = new Vuex.Store({
       state.isSys = state.user.isSys || false;
     },
     setUser(state, data) {
+      console.log(data);
       localStorage.token = data.token;
       localStorage.tokenExp = data.tokenExp;
+      localStorage.company = JSON.stringify(data.company || {});
       localStorage.user = JSON.stringify(data.user || {});
       state.token = data.token;
       state.user = data.user || {};
       state.isSys = state.user.isSys || false;
+      state.company = data.company;
     },
     refleshToken(state, data) {
       localStorage.token = data.refleshtoken;
@@ -62,6 +69,24 @@ const store = new Vuex.Store({
       await ajax.get('/logout');
       context.commit('logout');
     },
+    async setUser(context, payload) {
+      if (payload.user.company.length <= 0) {
+        $message.show({
+          text: `暂为开放个人用户登录此后台系统`,
+          icon: 'error',
+          color: '#ff5252',
+          time: 10000
+        });
+      } else if (payload.user.company.length === 1) {
+        payload.company = payload.user.company[0];
+        context.commit('setUser', payload);
+        router.replace('/home');
+      } else {
+        payload.company = payload.user.company[0];
+        context.commit('setUser', payload);
+        router.replace('/home');
+      }
+    }
   }
 })
 export default store
