@@ -3,11 +3,23 @@ const Service = require('egg').Service;
 class CheckService extends Service {
   async sys(param, msg = '需要系统管理员权限') {
     const ctx = this.ctx;
-    let flag = ctx.user.isSys;
-    if (!flag) {
+    if (!ctx.user.isSys) {
       ctx.throw(401, msg, param);
     }
-    return flag;
+    return true;
+  }
+  async platformAdmin(param, msg = '需要平台管理员或系统管理员权限') {
+    const ctx = this.ctx;
+    if (!ctx.user.isSys) {
+      let isPlatformAdmin = ctx.service.curd.findOne(ctx.model.Platform, {
+        admin: { in: [ctx.user._id]
+        }
+      });
+      if (!isPlatformAdmin) {
+        ctx.throw(404, msg, param);
+      }
+    }
+    return true;
   }
 }
 module.exports = CheckService;

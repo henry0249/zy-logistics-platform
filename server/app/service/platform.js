@@ -2,17 +2,11 @@ const Service = require('egg').Service;
 
 class PlatformService extends Service {
   async beforeCurd(curdType, param) {
+    console.log(this);
     const ctx = this.ctx;
+    const check = ctx.service.check;
     if (curdType === 'add' || curdType === 'set') {
-      if (!ctx.user.isSys) {
-        let isPlatformAdmin = ctx.service.curd.findOne(ctx.model.Platform, {
-          admin: { in: [ctx.user._id]
-          }
-        });
-        if (!isPlatformAdmin) {
-          ctx.throw(404, '需要平台管理员或系统管理员权限', param);
-        }
-      }
+      await check.platformAdmin(param);
     }
   }
   async add(param) {

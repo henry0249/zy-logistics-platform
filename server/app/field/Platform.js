@@ -33,8 +33,7 @@ module.exports = {
   admin: {
     name: '管理员',
     type: 'ObjectIdArray',
-    ref: 'User',
-    require: true
+    ref: 'User'
   },
   salesman: {
     name: '市场专员',
