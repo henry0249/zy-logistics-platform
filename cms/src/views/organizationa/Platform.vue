@@ -89,10 +89,9 @@ export default {
         this.loadingText = "正在初始化";
         try {
           this.platform = await this.$api.curd({
-            model: "company",
+            model: "platform",
             curdType: "set",
             name: value,
-            isPlatform: true,
             vd: {
               name: value
             }
@@ -132,10 +131,9 @@ export default {
     ];
     try {
       this.platform = await this.$api.curd({
-        model: "company",
+        model: "platform",
         curdType: "findOne",
-        isPlatform: true,
-        populate: populate
+        // populate: populate
       });
       let serieData = [];
       serieData.push({
@@ -156,94 +154,72 @@ export default {
           type: "trading"
         }
       ];
-      let subUser = [
-        {
-          name: "负责人",
-          key: "owner"
-        },
-        {
-          name: "管理员",
-          key: "admin"
-        },
-        {
-          name: "业务员",
-          key: "salesman"
-        },
-        {
-          name: "审核员",
-          key: "auditor"
-        },
-        {
-          name: "财务员",
-          key: "financial"
-        }
-      ];
-      for (let i = 0; i < subCompany.length; i++) {
-        let item = subCompany[i];
-        let pushItem = {
-          name: item.name,
-          children: []
-        };
-        pushItem.children = await this.$api.curd({
-          model: "company",
-          curdType: "find",
-          platform: this.company._id,
-          type: {
-            in: [item.type]
-          },
-          populate: populate
-        });
-        for (let j = 0; j < subUser.length; j++) {
-          let subUserItem = subUser[j];
-          let subUserPushItem = {
-            name: subUserItem.name,
-            children: []
-          };
-          pushItem.children.forEach(companyItem => {
-            if (companyItem[subUserItem.key]) {
-              if (companyItem[subUserItem.key] instanceof Array) {
-                companyItem[subUserItem.key].forEach(companyItemItem => {
-                  subUserPushItem.children.push({
-                    name: companyItemItem.name || companyItemItem.mobile
-                  });
-                });
-              } else {
-                subUserPushItem.children.push({
-                  name:
-                    companyItem[subUserItem.key].name ||
-                    companyItem[subUserItem.key].mobile
-                });
-              }
-            }
-          });
-          pushItem.children.push(subUserPushItem);
-        }
-        serieData[0].children.push(pushItem);
-      }
+      // for (let i = 0; i < subCompany.length; i++) {
+      //   let item = subCompany[i];
+      //   let pushItem = {
+      //     name: item.name,
+      //     children: []
+      //   };
+      //   pushItem.children = await this.$api.curd({
+      //     model: "company",
+      //     curdType: "find",
+      //     platform: this.company._id,
+      //     type: {
+      //       in: [item.type]
+      //     },
+      //     populate: populate
+      //   });
+      //   for (let j = 0; j < subUser.length; j++) {
+      //     let subUserItem = subUser[j];
+      //     let subUserPushItem = {
+      //       name: subUserItem.name,
+      //       children: []
+      //     };
+      //     pushItem.children.forEach(companyItem => {
+      //       if (companyItem[subUserItem.key]) {
+      //         if (companyItem[subUserItem.key] instanceof Array) {
+      //           companyItem[subUserItem.key].forEach(companyItemItem => {
+      //             subUserPushItem.children.push({
+      //               name: companyItemItem.name || companyItemItem.mobile
+      //             });
+      //           });
+      //         } else {
+      //           subUserPushItem.children.push({
+      //             name:
+      //               companyItem[subUserItem.key].name ||
+      //               companyItem[subUserItem.key].mobile
+      //           });
+      //         }
+      //       }
+      //     });
+      //     pushItem.children.push(subUserPushItem);
+      //   }
+      //   serieData[0].children.push(pushItem);
+      // }
 
-      for (let i = 0; i < subUser.length; i++) {
-        let item = subUser[i];
-        let pushItem = {
-          name: item.name,
-          children: []
-        };
-        if (this.platform[item.key]) {
-          if (this.platform[item.key] instanceof Array) {
-            this.platform[item.key].forEach(userItem => {
-              pushItem.children.push({
-                name: userItem.name || userItem.mobile
-              });
-            });
-          } else {
-            console.log(this.platform[item.key]);
-            pushItem.children.push({
-              name:
-                this.platform[item.key].name || this.platform[item.key].mobile
-            });
-          }
-        }
-        serieData[0].children.push(pushItem);
-      }
+      // for (let i = 0; i < subUser.length; i++) {
+      //   let item = subUser[i];
+      //   let pushItem = {
+      //     name: item.name,
+      //     children: []
+      //   };
+      //   if (this.platform[item.key]) {
+      //     if (this.platform[item.key] instanceof Array) {
+      //       this.platform[item.key].forEach(userItem => {
+      //         pushItem.children.push({
+      //           name: userItem.name || userItem.mobile
+      //         });
+      //       });
+      //     } else {
+      //       console.log(this.platform[item.key]);
+      //       pushItem.children.push({
+      //         name:
+      //           this.platform[item.key].name || this.platform[item.key].mobile
+      //       });
+      //     }
+      //   }
+      //   serieData[0].children.push(pushItem);
+      // }
       this.options.series[0].data = serieData;
     } catch (error) {}
     this.loadingText = "";

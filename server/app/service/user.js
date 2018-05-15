@@ -26,6 +26,8 @@ class UserService extends Service {
       }],
       populate:[{
         path:'company'
+      },{
+        path:'platform'
       }]
     })
     if (!user) {

@@ -152,11 +152,23 @@ class CurdService extends Service {
     } else {
       curdParam = ctx.request.body;
     }
-
-    if (ctx.service[params.model] && ctx.service[params.model]['require']) {
-      let diyRequireArr = await ctx.service[params.model]['require'](params.curdType, curdParam);
+    let hasService = (funName)=>{
+      if (ctx.service[params.model] && ctx.service[params.model][funName]) {
+        return ctx.service[params.model][funName];
+      }else{
+        return false;
+      }
+    }
+    if (hasService('beforeCurd')) {
+      let beforeRes = await hasService('beforeCurd')(params.curdType, curdParam);
+      if (beforeRes) {
+        curdParam = beforeRes;
+      }
+    }
+    if (hasService('require')) {
+      let diyRequireArr = await hasService('require')(params.curdType, curdParam);
       await this.checkRequire(modelName, curdParam, diyRequireArr);
-    } else {
+    }else{
       if (params.curdType === 'add' || params.curdType === 'set') {
         this.checkRequire(modelName, curdParam);
       } else {
@@ -165,17 +177,20 @@ class CurdService extends Service {
     }
     this.checkFiled(modelName, curdParam, params.curdType);
 
-    if (ctx.service[params.model] && ctx.service[params.model][params.curdType]) {
-      curdParam = await ctx.service[params.model][params.curdType](curdParam);
+    if(hasService(params.curdType)){
+      curdParam = await hasService(params.curdType)(curdParam);
     }
+  
     let data = await this[params.curdType](model, curdParam);
-    if (ctx.service[params.model] && ctx.service[params.model]['curdCallback']) {
-      data = await ctx.service[params.model]['curdCallback']({
+
+    if(hasService('curdCallback')){
+      data = await hasService('curdCallback')({
         curdType:params.curdType,
         data,
         curdParam
       });
     }
+
     if (!curdParam.withoutLog && modelName !== 'CurdLog') {
       let ua = ctx.helper.ua();
       let logParms = {

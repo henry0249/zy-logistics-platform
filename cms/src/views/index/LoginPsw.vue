@@ -129,7 +129,6 @@ export default {
           password: md5(this.password)
         });
         await this.$store.dispatch('setUser',res);
-        this.$message.success("登录成功");
         this.loadingText = "";
       } catch (error) {
         this.loadingText = "";

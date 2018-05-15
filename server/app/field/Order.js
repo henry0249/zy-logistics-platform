@@ -1,45 +1,48 @@
 module.exports = {
+  state: {
+    type: 'Array',
+    name: '状态'
+  },
   user: {
     type: 'ObjectId',
     name: '下单客户',
-    ref:'User'
+    ref: 'User'
   },
-  company:{
+  company: {
     type: 'ObjectId',
     name: '下单公司',
-    ref:'Company'
+    ref: 'Company'
   },
-  name:{
-    type:'String',
-    name:'订单名称'
+  name: {
+    type: 'String',
+    name: '订单名称'
   },
-  goods:{
-    type:'Array',
-    name:'商品名称',
-    require:true,
-    // [{name:'xx',unit:'吨',count:100,_id:'xx'}]
+  goods: {
+    type: 'Array',
+    name: '商品名称',
+    require: true,
   },
-  address:{
-    type:'String',
-    name:'收货地址',
-    require:true
+  address: {
+    type: 'String',
+    name: '收货地址',
+    require: true
   },
-  recommendedByUser:{
+  recommendedByUser: {
     type: 'ObjectId',
     name: '推荐人',
-    ref:'User'
+    ref: 'User'
   },
-  recommendedByCompany:{
+  recommendedByCompany: {
     type: 'ObjectId',
     name: '推荐公司',
-    ref:'Company'
+    ref: 'Company'
   },
-  desc:{
-    type:'String',
-    name:'描述'
+  desc: {
+    type: 'String',
+    name: '描述'
   },
-  remark:{
-    type:'String',
-    name:'备注'
+  remark: {
+    type: 'String',
+    name: '备注'
   }
 }

@@ -9,6 +9,9 @@ Vue.mixin({
     company() {
       return this.$store.state.company;
     },
+    platform() {
+      return this.$store.state.platform;
+    },
     isSys() {
       return this.$store.state.isSys;
     },

@@ -2,12 +2,16 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import router from './router' //路由
 import ajaxLib from './lib/axios'
+import {
+  SSL_OP_CIPHER_SERVER_PREFERENCE
+} from 'constants';
 const ajax = ajaxLib.ajax;
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
     user: {},
+    platform: {},
     company: {},
     isSys: false,
     token: '',
@@ -22,6 +26,9 @@ const store = new Vuex.Store({
       if (localStorage.company) {
         state.company = JSON.parse(localStorage.company);
       }
+      if (localStorage.platform) {
+        state.platform = JSON.parse(localStorage.platform);
+      }
       if (localStorage.token) {
         state.token = localStorage.token;
       }
@@ -31,15 +38,17 @@ const store = new Vuex.Store({
       state.isSys = state.user.isSys || false;
     },
     setUser(state, data) {
-      console.log(data);
+      state.token = data.token;
+      state.isSys = state.user.isSys || false;
+      state.user = data.user || {};
+      state.company = data.company || {};
+      state.platform = data.platform || {};
+
       localStorage.token = data.token;
       localStorage.tokenExp = data.tokenExp;
-      localStorage.company = JSON.stringify(data.company || {});
-      localStorage.user = JSON.stringify(data.user || {});
-      state.token = data.token;
-      state.user = data.user || {};
-      state.isSys = state.user.isSys || false;
-      state.company = data.company;
+      localStorage.company = JSON.stringify(state.company);
+      localStorage.user = JSON.stringify(state.user);
+      localStorage.platform = JSON.stringify(state.platform);
     },
     refleshToken(state, data) {
       localStorage.token = data.refleshtoken;
@@ -70,21 +79,23 @@ const store = new Vuex.Store({
       context.commit('logout');
     },
     async setUser(context, payload) {
-      if (payload.user.company.length <= 0) {
-        $message.show({
-          text: `暂为开放个人用户登录此后台系统`,
-          icon: 'error',
-          color: '#ff5252',
-          time: 10000
-        });
-      } else if (payload.user.company.length === 1) {
+      if (payload.user.isSys) {
         payload.company = payload.user.company[0];
+        if (payload.user.platform) {
+          payload.platform = payload.user.platform;
+        }
         context.commit('setUser', payload);
+        $message.success("登录成功");
         router.replace('/home');
       } else {
-        payload.company = payload.user.company[0];
-        context.commit('setUser', payload);
-        router.replace('/home');
+        if (payload.user.company.length <= 0) {
+          $message.show({
+            text: `暂为开放个人用户登录此后台系统`,
+            icon: 'error',
+            color: '#ff5252',
+            time: 10000
+          });
+        }
       }
     }
   }
