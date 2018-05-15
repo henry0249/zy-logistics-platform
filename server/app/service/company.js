@@ -37,6 +37,7 @@ class CompanyService extends Service {
         admin.push(item._id)
       });
     }
+
     return {
       ...param,
       creater: ctx.user._id,
@@ -46,6 +47,30 @@ class CompanyService extends Service {
   }
   async set(param) {
     return await this.add(param);
+  }
+  async curdCallback(param){
+    const ctx = this.ctx;
+    if (param.curdType === 'set' || param.curdType === 'add' ) {
+      let user = await ctx.service.curd.find(ctx.model.User, {
+        _id: {
+          $in:[
+            ...param.data.admin,
+            ...param.data.salesman,
+            ...param.data.auditor,
+            ...param.data.dispatcher,
+            ...param.data.financial,
+          ]
+        },
+      });
+      for (let i = 0; i < user.length; i++) {
+        await user[i].update({
+          $addToSet:{
+            company:param.data._id
+          }
+        })
+      }
+    }
+    return param.data;
   }
 }
 module.exports = CompanyService;

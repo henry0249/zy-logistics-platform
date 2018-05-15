@@ -169,6 +169,13 @@ class CurdService extends Service {
       curdParam = await ctx.service[params.model][params.curdType](curdParam);
     }
     let data = await this[params.curdType](model, curdParam);
+    if (ctx.service[params.model] && ctx.service[params.model]['curdCallback']) {
+      data = await ctx.service[params.model]['curdCallback']({
+        curdType:params.curdType,
+        data,
+        curdParam
+      });
+    }
     if (!curdParam.withoutLog && modelName !== 'CurdLog') {
       let ua = ctx.helper.ua();
       let logParms = {

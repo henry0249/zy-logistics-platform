@@ -19,7 +19,7 @@
     </div>
     <div v-else>
       <div>
-        <chart style="width:70%;margin:0 auto" :options="options"></chart>
+        <chart style="width:80%;height:600px;margin:0 auto" :options="options"></chart>
       </div>
       <!-- {{platform}} -->
     </div>
@@ -34,92 +34,22 @@ export default {
       platform: "",
       activeIndex: "1",
       options: {
+
         tooltip: {
           trigger: "item",
           triggerOn: "mousemove"
         },
+        // grid:{
+        //   containLabel:true,
+        //   left:'10%'
+        // },
         series: [
           {
             type: "tree",
-            data: [
-              {
-                name: "中源物流平台",
-                children: [
-                  {
-                    name: "物流公司",
-                    children: [
-                      {
-                        name: "负责人"
-                      },
-                      {
-                        name: "管理人员"
-                      },
-                      {
-                        name: "业务专员"
-                      },
-                      {
-                        name: "财务文员"
-                      }
-                    ]
-                  },
-                  {
-                    name: "发货厂商",
-                    children: [
-                      {
-                        name: "负责人"
-                      },
-                      {
-                        name: "管理人员"
-                      },
-                      {
-                        name: "业务专员"
-                      },
-                      {
-                        name: "财务文员"
-                      }
-                    ]
-                  },
-                  {
-                    name: "贸易公司",
-                    children: [
-                      {
-                        name: "负责人"
-                      },
-                      {
-                        name: "管理人员"
-                      },
-                      {
-                        name: "业务专员"
-                      },
-                      {
-                        name: "财务文员"
-                      }
-                    ]
-                  },
-                  {
-                    name: "平台负责人"
-                  },
-                  {
-                    name: "平台管理员",
-                    children: []
-                  },
-                  {
-                    name: "平台业务员",
-                    children: []
-                  },
-                  {
-                    name: "平台调度员",
-                    children: []
-                  },
-                  {
-                    name: "平台财务员",
-                    children: []
-                  }
-                ]
-              }
-            ],
+            data: [],
+            // layout:'radial',
             // top: "1%",
-            left: "12%",
+            // left: "12%",
             // bottom: "1%",
             symbolSize: 7,
             label: {
@@ -177,12 +107,144 @@ export default {
   },
   async created() {
     this.loadingText = "加载中";
+    let populate = [
+      {
+        path: "creater"
+      },
+      {
+        path: "owner"
+      },
+      {
+        path: "admin"
+      },
+      {
+        path: "salesman"
+      },
+      {
+        path: "auditor"
+      },
+      {
+        path: "financial"
+      },
+      {
+        path: "dispatcher"
+      }
+    ];
     try {
       this.platform = await this.$api.curd({
         model: "company",
         curdType: "findOne",
-        isPlatform: true
+        isPlatform: true,
+        populate: populate
       });
+      let serieData = [];
+      serieData.push({
+        name: this.platform.name,
+        children: []
+      });
+      let subCompany = [
+        {
+          name: "物流公司",
+          type: "logistics"
+        },
+        {
+          name: "发货厂商",
+          type: "shipper"
+        },
+        {
+          name: "贸易公司",
+          type: "trading"
+        }
+      ];
+      let subUser = [
+        {
+          name: "负责人",
+          key: "owner"
+        },
+        {
+          name: "管理员",
+          key: "admin"
+        },
+        {
+          name: "业务员",
+          key: "salesman"
+        },
+        {
+          name: "审核员",
+          key: "auditor"
+        },
+        {
+          name: "财务员",
+          key: "financial"
+        }
+      ];
+      for (let i = 0; i < subCompany.length; i++) {
+        let item = subCompany[i];
+        let pushItem = {
+          name: item.name,
+          children: []
+        };
+        pushItem.children = await this.$api.curd({
+          model: "company",
+          curdType: "find",
+          platform: this.company._id,
+          type: {
+            in: [item.type]
+          },
+          populate: populate
+        });
+        for (let j = 0; j < subUser.length; j++) {
+          let subUserItem = subUser[j];
+          let subUserPushItem = {
+            name: subUserItem.name,
+            children: []
+          };
+          pushItem.children.forEach(companyItem => {
+            if (companyItem[subUserItem.key]) {
+              if (companyItem[subUserItem.key] instanceof Array) {
+                companyItem[subUserItem.key].forEach(companyItemItem => {
+                  subUserPushItem.children.push({
+                    name: companyItemItem.name || companyItemItem.mobile
+                  });
+                });
+              } else {
+                subUserPushItem.children.push({
+                  name:
+                    companyItem[subUserItem.key].name ||
+                    companyItem[subUserItem.key].mobile
+                });
+              }
+            }
+          });
+          pushItem.children.push(subUserPushItem);
+        }
+        serieData[0].children.push(pushItem);
+      }
+
+      for (let i = 0; i < subUser.length; i++) {
+        let item = subUser[i];
+        let pushItem = {
+          name: item.name,
+          children: []
+        };
+        if (this.platform[item.key]) {
+          if (this.platform[item.key] instanceof Array) {
+            this.platform[item.key].forEach(userItem => {
+              pushItem.children.push({
+                name: userItem.name || userItem.mobile
+              });
+            });
+          } else {
+            console.log(this.platform[item.key]);
+            pushItem.children.push({
+              name:
+                this.platform[item.key].name || this.platform[item.key].mobile
+            });
+          }
+        }
+        serieData[0].children.push(pushItem);
+      }
+      this.options.series[0].data = serieData;
     } catch (error) {}
     this.loadingText = "";
   }
