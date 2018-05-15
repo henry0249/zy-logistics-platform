@@ -108,6 +108,15 @@ class CurdService extends Service {
     }
     return true;
   }
+  hasService(funName){
+    const ctx = this.ctx;
+    let params = ctx.params;
+    if (ctx.service[params.model] && ctx.service[params.model][funName]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
   async index() {
     const {
       ctx
@@ -152,23 +161,18 @@ class CurdService extends Service {
     } else {
       curdParam = ctx.request.body;
     }
-    let hasService = (funName)=>{
-      if (ctx.service[params.model] && ctx.service[params.model][funName]) {
-        return ctx.service[params.model][funName];
-      }else{
-        return false;
-      }
-    }
-    if (hasService('beforeCurd')) {
-      let beforeRes = await hasService('beforeCurd')(params.curdType, curdParam);
+    let diyService = ctx.service[params.model];
+    if (this.hasService('beforeCurd')) {
+      let beforeRes = await diyService['beforeCurd'](params.curdType, curdParam);
       if (beforeRes) {
         curdParam = beforeRes;
       }
     }
-    if (hasService('require')) {
-      let diyRequireArr = await hasService('require')(params.curdType, curdParam);
+
+    if (this.hasService('require')) {
+      let diyRequireArr = await diyService['require'](params.curdType, curdParam);
       await this.checkRequire(modelName, curdParam, diyRequireArr);
-    }else{
+    } else {
       if (params.curdType === 'add' || params.curdType === 'set') {
         this.checkRequire(modelName, curdParam);
       } else {
@@ -177,15 +181,15 @@ class CurdService extends Service {
     }
     this.checkFiled(modelName, curdParam, params.curdType);
 
-    if(hasService(params.curdType)){
-      curdParam = await hasService(params.curdType)(curdParam);
+    if (this.hasService(params.curdType)) {
+      curdParam = await diyService[params.curdType](curdParam);
     }
-  
+
     let data = await this[params.curdType](model, curdParam);
 
-    if(hasService('curdCallback')){
-      data = await hasService('curdCallback')({
-        curdType:params.curdType,
+    if (this.hasService('curdCallback')) {
+      data = await diyService['curdCallback']({
+        curdType: params.curdType,
         data,
         curdParam
       });

@@ -1,6 +1,6 @@
 <template>
   <loading-box class="g-container" v-model="loadingText">
-    <div v-if="!platform" class="no-platform">
+    <div v-if="!platform._id" class="no-platform">
       <div v-if="!loadingText">
         <div>
           <icon size="30vw">meiyoushuju</icon>
@@ -18,10 +18,10 @@
       </div>
     </div>
     <div v-else>
-      <div>
+      <!-- <div>
         <chart style="width:80%;height:600px;margin:0 auto" :options="options"></chart>
-      </div>
-      <!-- {{platform}} -->
+      </div> -->
+      {{platform}}
     </div>
   </loading-box>
 </template>
@@ -31,10 +31,8 @@ export default {
   data() {
     return {
       loadingText: "",
-      platform: "",
       activeIndex: "1",
       options: {
-
         tooltip: {
           trigger: "item",
           triggerOn: "mousemove"
@@ -88,13 +86,8 @@ export default {
       }).then(async ({ value }) => {
         this.loadingText = "正在初始化";
         try {
-          this.platform = await this.$api.curd({
-            model: "platform",
-            curdType: "set",
-            name: value,
-            vd: {
-              name: value
-            }
+          this.$store.dispatch('addPlatform',{
+            name:value
           });
         } catch (error) {}
         this.loadingText = "";
@@ -105,124 +98,7 @@ export default {
     }
   },
   async created() {
-    this.loadingText = "加载中";
-    let populate = [
-      {
-        path: "creater"
-      },
-      {
-        path: "owner"
-      },
-      {
-        path: "admin"
-      },
-      {
-        path: "salesman"
-      },
-      {
-        path: "auditor"
-      },
-      {
-        path: "financial"
-      },
-      {
-        path: "dispatcher"
-      }
-    ];
-    try {
-      this.platform = await this.$api.curd({
-        model: "platform",
-        curdType: "findOne",
-        // populate: populate
-      });
-      let serieData = [];
-      serieData.push({
-        name: this.platform.name,
-        children: []
-      });
-      let subCompany = [
-        {
-          name: "物流公司",
-          type: "logistics"
-        },
-        {
-          name: "发货厂商",
-          type: "shipper"
-        },
-        {
-          name: "贸易公司",
-          type: "trading"
-        }
-      ];
-      // for (let i = 0; i < subCompany.length; i++) {
-      //   let item = subCompany[i];
-      //   let pushItem = {
-      //     name: item.name,
-      //     children: []
-      //   };
-      //   pushItem.children = await this.$api.curd({
-      //     model: "company",
-      //     curdType: "find",
-      //     platform: this.company._id,
-      //     type: {
-      //       in: [item.type]
-      //     },
-      //     populate: populate
-      //   });
-      //   for (let j = 0; j < subUser.length; j++) {
-      //     let subUserItem = subUser[j];
-      //     let subUserPushItem = {
-      //       name: subUserItem.name,
-      //       children: []
-      //     };
-      //     pushItem.children.forEach(companyItem => {
-      //       if (companyItem[subUserItem.key]) {
-      //         if (companyItem[subUserItem.key] instanceof Array) {
-      //           companyItem[subUserItem.key].forEach(companyItemItem => {
-      //             subUserPushItem.children.push({
-      //               name: companyItemItem.name || companyItemItem.mobile
-      //             });
-      //           });
-      //         } else {
-      //           subUserPushItem.children.push({
-      //             name:
-      //               companyItem[subUserItem.key].name ||
-      //               companyItem[subUserItem.key].mobile
-      //           });
-      //         }
-      //       }
-      //     });
-      //     pushItem.children.push(subUserPushItem);
-      //   }
-      //   serieData[0].children.push(pushItem);
-      // }
-
-      // for (let i = 0; i < subUser.length; i++) {
-      //   let item = subUser[i];
-      //   let pushItem = {
-      //     name: item.name,
-      //     children: []
-      //   };
-      //   if (this.platform[item.key]) {
-      //     if (this.platform[item.key] instanceof Array) {
-      //       this.platform[item.key].forEach(userItem => {
-      //         pushItem.children.push({
-      //           name: userItem.name || userItem.mobile
-      //         });
-      //       });
-      //     } else {
-      //       console.log(this.platform[item.key]);
-      //       pushItem.children.push({
-      //         name:
-      //           this.platform[item.key].name || this.platform[item.key].mobile
-      //       });
-      //     }
-      //   }
-      //   serieData[0].children.push(pushItem);
-      // }
-      this.options.series[0].data = serieData;
-    } catch (error) {}
-    this.loadingText = "";
+    
   }
 };
 </script>

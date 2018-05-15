@@ -50,6 +50,10 @@ const store = new Vuex.Store({
       localStorage.user = JSON.stringify(state.user);
       localStorage.platform = JSON.stringify(state.platform);
     },
+    setPlatform(state, data) {
+      state.platform = data || {};
+      localStorage.platform = JSON.stringify(state.platform);
+    },
     refleshToken(state, data) {
       localStorage.token = data.refleshtoken;
       localStorage.tokenExp = data.tokenexp;
@@ -97,6 +101,15 @@ const store = new Vuex.Store({
           });
         }
       }
+    },
+    async addPlatform(context, payload) {
+      let res = await ajax.post('/platform/set', {
+        name: payload.name,
+        vd: {
+          name: payload.name
+        }
+      });
+      context.commit('setPlatform', res);
     }
   }
 })
