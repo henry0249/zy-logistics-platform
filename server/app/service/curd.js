@@ -2,6 +2,58 @@ const Service = require('egg').Service;
 const is = require('is_js');
 
 class CurdService extends Service {
+  checkMethod() {
+    const ctx = this.ctx;
+    let {
+      method,
+      params
+    } = ctx;
+    let acceptObj = {
+      'GET': ['find', 'findOne', 'findById'],
+      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete'],
+      'PUT': ['update'],
+      'DELETE': ['delete']
+    }
+    let accept = acceptObj[method];
+    if (!accept) {
+      ctx.throw(422, '不支持此请求方法', {
+        method,
+        acceptObj
+      });
+    }
+    let flag = false;
+    accept.forEach((item) => {
+      if (params.curdType === item) {
+        flag = true;
+      }
+    })
+    if (!flag) {
+      ctx.throw(422, '不支持此操作方法', {
+        method,
+        params,
+        accept
+      });
+    }
+    if (!this[params.curdType]) {
+      ctx.throw(422, '没有找到操作方法', {
+        method,
+        params,
+        accept
+      });
+    }
+    return true;
+  }
+  checkModel() {
+    const ctx = this.ctx;
+    let params = ctx.params;
+    const modelName = params.model.substring(0, 1).toUpperCase() + params.model.substring(1);
+    if (!ctx.model[modelName]) {
+      ctx.throw(422, '没有找到数据实体', {
+        params
+      });
+    }
+    return ctx.model[modelName];
+  }
   checkRequire(fieldName, params, requireArr) {
     const ctx = this.ctx;
     let fields;
@@ -108,7 +160,7 @@ class CurdService extends Service {
     }
     return true;
   }
-  hasService(funName){
+  hasService(funName) {
     const ctx = this.ctx;
     let params = ctx.params;
     if (ctx.service[params.model] && ctx.service[params.model][funName]) {
@@ -118,43 +170,13 @@ class CurdService extends Service {
     }
   }
   async index() {
-    const {
-      ctx
-    } = this;
+    const ctx = this.ctx;
     let {
       method,
       params
     } = ctx;
-    let acceptObj = {
-      'GET': ['find', 'findOne', 'findById'],
-      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete'],
-      'PUT': ['update'],
-      'DELETE': ['delete']
-    }
-    let accept = acceptObj[method];
-    let flag = false;
-
-    accept.forEach((item) => {
-      if (params.curdType === item) {
-        flag = true;
-      }
-    })
-
-    if (!ctx.service.curd[params.curdType]) {
-      flag = false;
-    }
-
-    const modelName = params.model.substring(0, 1).toUpperCase() + params.model.substring(1);
-    const model = ctx.model[modelName];
-    if (!model) {
-      flag = false;
-    }
-    if (!flag) {
-      ctx.throw(404, '无效的请求路径', {
-        method,
-        params
-      });
-    }
+    this.checkMethod();
+    let model = this.checkModel();
     let curdParam = {};
     if (method === 'GET') {
       curdParam = ctx.query;
@@ -162,6 +184,7 @@ class CurdService extends Service {
       curdParam = ctx.request.body;
     }
     let diyService = ctx.service[params.model];
+
     if (this.hasService('beforeCurd')) {
       let beforeRes = await diyService['beforeCurd'](params.curdType, curdParam);
       if (beforeRes) {
@@ -169,20 +192,24 @@ class CurdService extends Service {
       }
     }
 
-    if (this.hasService('require')) {
-      let diyRequireArr = await diyService['require'](params.curdType, curdParam);
-      await this.checkRequire(modelName, curdParam, diyRequireArr);
-    } else {
-      if (params.curdType === 'add' || params.curdType === 'set') {
-        this.checkRequire(modelName, curdParam);
-      } else {
-        this.checkRequire(modelName, curdParam, []);
-      }
-    }
-    this.checkFiled(modelName, curdParam, params.curdType);
+    // if (this.hasService('require')) {
+    //   let diyRequireArr = await diyService['require'](params.curdType, curdParam);
+    //   await this.checkRequire(modelName, curdParam, diyRequireArr);
+    // } else {
+    //   if (params.curdType === 'add' || params.curdType === 'set') {
+    //     this.checkRequire(modelName, curdParam);
+    //   } else {
+    //     this.checkRequire(modelName, curdParam, []);
+    //   }
+    // }
+    // this.checkFiled(modelName, curdParam, params.curdType);
 
     if (this.hasService(params.curdType)) {
       curdParam = await diyService[params.curdType](curdParam);
+    }
+
+    if (this.hasService('beforeExecuted')) {
+      curdParam = await diyService['beforeExecuted'](params.curdType, curdParam);
     }
 
     let data = await this[params.curdType](model, curdParam);
@@ -195,7 +222,7 @@ class CurdService extends Service {
       });
     }
 
-    if (!curdParam.withoutLog && modelName !== 'CurdLog') {
+    if (!curdParam.withoutLog) {
       let ua = ctx.helper.ua();
       let logParms = {
         method,
