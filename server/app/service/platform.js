@@ -56,5 +56,8 @@ class PlatformService extends Service {
     }
     return param.data;
   }
+  async orgTree(){
+    const ctx = this.ctx;
+  }
 }
 module.exports = PlatformService;
