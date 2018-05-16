@@ -30,7 +30,7 @@ module.exports = {
   },
   platform: {
     name: '所属平台',
-    type: 'ObjectId',
+    type: 'ObjectIdArray',
     ref: 'Platform'
   },
   company: {

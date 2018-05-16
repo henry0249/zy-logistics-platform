@@ -1,6 +1,6 @@
 <template>
   <loading-box class="g-container" v-model="loadingText">
-    <div v-if="!platform._id" class="no-platform">
+    <div v-if="is(platform,'empty')" class="no-platform">
       <div v-if="!loadingText">
         <div>
           <icon size="30vw">meiyoushuju</icon>
@@ -13,66 +13,25 @@
           快速初始化
         </div>或
         <a class="platform-back" @click="$router.push('/home')">
-                  返回主页
-                </a>
+          返回主页
+        </a>
       </div>
     </div>
     <div v-else>
-      <!-- <div>
-        <chart style="width:80%;height:600px;margin:0 auto" :options="options"></chart>
-      </div> -->
-      {{platform}}
+      <org-tree style="width:65%;height:600px;"></org-tree>
     </div>
   </loading-box>
 </template>
 
 <script>
+import OrgTree from './OrgTree'
 export default {
+  components:{
+    OrgTree
+  },
   data() {
     return {
-      loadingText: "",
-      activeIndex: "1",
-      options: {
-        tooltip: {
-          trigger: "item",
-          triggerOn: "mousemove"
-        },
-        // grid:{
-        //   containLabel:true,
-        //   left:'10%'
-        // },
-        series: [
-          {
-            type: "tree",
-            data: [],
-            // layout:'radial',
-            // top: "1%",
-            // left: "12%",
-            // bottom: "1%",
-            symbolSize: 7,
-            label: {
-              normal: {
-                position: "left",
-                verticalAlign: "middle",
-                align: "right",
-                fontSize: 12
-              }
-            },
-            leaves: {
-              label: {
-                normal: {
-                  position: "right",
-                  verticalAlign: "middle",
-                  align: "left"
-                }
-              }
-            }
-            // expandAndCollapse: true,
-            // animationDuration: 550,
-            // animationDurationUpdate: 750
-          }
-        ]
-      }
+      loadingText: ""
     };
   },
   methods: {
@@ -92,13 +51,7 @@ export default {
         } catch (error) {}
         this.loadingText = "";
       });
-    },
-    getSubCompany(key, keyPath) {
-      console.log(key, keyPath);
     }
-  },
-  async created() {
-    
   }
 };
 </script>

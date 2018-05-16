@@ -27,7 +27,7 @@ export default {
   data() {
     return {
       logoImg:
-        "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-04-24-%E9%94%A6%E6%B4%B2%E5%BB%BA%E8%AE%BElogo_meitu_1.jpg",
+        "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-16-zyfz_logo.png",
       // activeNavIndex: 0,
       nav: [
         {

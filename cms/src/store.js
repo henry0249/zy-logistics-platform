@@ -85,9 +85,7 @@ const store = new Vuex.Store({
     async setUser(context, payload) {
       if (payload.user.isSys) {
         payload.company = payload.user.company[0];
-        if (payload.user.platform) {
-          payload.platform = payload.user.platform;
-        }
+        payload.platform = payload.user.platform[0];
         context.commit('setUser', payload);
         $message.success("登录成功");
         router.replace('/home');

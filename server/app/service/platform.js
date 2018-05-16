@@ -41,13 +41,16 @@ class PlatformService extends Service {
             ...param.data.salesman,
             ...param.data.auditor,
             ...param.data.dispatcher,
+            ...param.data.documentClerk,
             ...param.data.financial
           ]
         },
       });
       for (let i = 0; i < user.length; i++) {
         await user[i].update({
-          platform: param.data._id
+          $addToSet:{
+            platform:param.data._id
+          }
         })
       }
     }
