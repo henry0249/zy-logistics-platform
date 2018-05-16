@@ -70,14 +70,12 @@ module.exports = {
     }
     return obj
   },
-  is(fun, param) {
-    let flag = false;
-    if (is.array(param)) {
-      flag = is.all[fun](param);
-    } else {
-      flag = is[fun](param);
+  is(val, funName, all) {
+    if (all) {
+      return is.all[funName](val);
+    }else{
+      return is[funName](val);
     }
-    return flag;
   },
   isEmpty(param) {
     return is.empty(param);

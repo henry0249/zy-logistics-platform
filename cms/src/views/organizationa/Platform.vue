@@ -1,6 +1,6 @@
 <template>
   <loading-box class="g-container" v-model="loadingText">
-    <div v-if="is(platform,'empty')" class="no-platform">
+    <div v-if="is('empty',platform)" class="no-platform">
       <div v-if="!loadingText">
         <div>
           <icon size="30vw">meiyoushuju</icon>
