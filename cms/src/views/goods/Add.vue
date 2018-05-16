@@ -12,7 +12,12 @@
         <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
       </el-upload>
       <div class="flex arr-box" v-else-if="item.type == 'Arr'" style="width:380px;">
-        <el-input v-for="(v,i) in item.options" :key="i" v-model="v.value" :placeholder="'标签'+i" style="width:70px;"></el-input>
+        <el-tag :key="tag" v-for="tag in item.options" closable :disable-transitions="false" @close="handleClose(item.options,tag)">
+          {{tag}}
+        </el-tag>
+        <el-input class="input-new-tag" v-if="inputVisible" v-model="inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(item.options)" @blur="handleInputConfirm(item.options)">
+        </el-input>
+        <el-button v-else class="button-new-tag" size="small" @click="showInput">添加新标签</el-button>
       </div>
       <el-input type="textarea" autosize v-else-if="item.type == 'textarea'" v-model="item.value" :placeholder="'请输入'+item.keyValue" style="width:380px;"></el-input>
     </div>
@@ -36,10 +41,31 @@
       return {
         fileList2: [],
         loading: false,
+        inputVisible: false,
+        inputValue: '',
         keyArr: AddKey
       }
     },
     methods: {
+      handleClose(options, tag) {
+        options.splice(options.indexOf(tag), 1);
+        console.log(options);
+      },
+      showInput() {
+        this.inputVisible = true;
+        this.$nextTick(_ => {
+          this.$refs.saveTagInput.$refs.input.focus();
+        });
+      },
+      handleInputConfirm(options) {
+        let inputValue = this.inputValue;
+        if (inputValue) {
+          options.push(inputValue);
+        }
+        this.inputVisible = false;
+        this.inputValue = '';
+        console.log(options);
+      },
       handleRemove(file, fileList) {
         console.log(file, fileList);
       },
@@ -81,15 +107,16 @@
       },
       async getData() {
         this.loading = true
+        let key = [{
+          key: 'brand',
+        }, {
+          key: 'category',
+        }]
         let data = {
           model: 'user',
           curdType: 'findOne',
           _id: this.user._id,
           populate: [{
-            path: 'brand'
-          }, {
-            path: 'category'
-          }, {
             path: 'company'
           }, {
             path: 'platform'
@@ -97,17 +124,34 @@
         }
         try {
           let res = await this.$api.curd(data)
-          if (res.company.length > 0) {
+          console.log(res);
+          let obj = {}
+          for (let index = 0; index < key.length; index++) {
+            let keyRes = await this.$api.curd({
+              model: key[index].key,
+              curdType: 'find',
+            })
             this.keyArr.forEach(keyItem => {
-              if (keyItem.key == 'company') {
-                res.company.forEach(item => {
-                  item.value = item._id
-                  item.label = item.name
+              if (keyItem.key == key[index].key) {
+                keyRes.forEach(resItem => {
+                  keyItem.value = resItem._id
+                  keyItem.label = resItem.name
                 });
-                keyItem.options = res.company
               }
             });
           }
+          this.keyArr.forEach(keyItem => {
+            data.populate.forEach(item => {
+              if (keyItem.key == item.path) {
+                res[item.path].forEach(resItem => {
+                  let arr = {}
+                  arr.value = resItem._id
+                  arr.label = resItem.name
+                  keyItem.options.push(arr)
+                });
+              }
+            });
+          })
         } catch (error) {}
         this.loading = false
       }
@@ -140,5 +184,20 @@
     justify-content: flex-start;
     align-items: center;
     flex-wrap: wrap;
+  }
+  .el-tag+.el-tag {
+    margin-left: 10px;
+  }
+  .button-new-tag {
+    margin-left: 10px;
+    height: 32px;
+    line-height: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .input-new-tag {
+    width: 90px;
+    margin-left: 10px;
+    vertical-align: bottom;
   }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="flex index-box">
     <loading-box class="g-container index-box" v-model="loadingText">
-      <div v-if="!platform" class="no-platform">
+      <div v-if="!data" class="no-platform">
         <div class="flex center" v-if="!loadingText">
           <div class="flex center">
             <icon size="30vw">meiyoushuju</icon>
@@ -30,7 +30,7 @@
     data() {
       return {
         loadingText: "",
-        platform: "www",
+        data: "www",
         filterKey: [{
             key: 'all',
             label: '全部',
@@ -80,7 +80,7 @@
           let res = await this.$api.curd(data)
           console.log(res);
           if (res.length > 0) {} else {
-            this.platform = ""
+            this.data = ""
           }
           this.loadingText = ""
         } catch (error) {

@@ -1,7 +1,7 @@
 <template>
   <div class="g-goods flex">
     <div>
-      <left-nav :nav="nav"></left-nav>
+      <left-nav :nav="nav" :default-active="'/goods/list'"></left-nav>
     </div>
     <div class="f1">
       <keep-alive>
@@ -26,20 +26,20 @@
       return {
         activeIndex: 0,
         nav: [{
-            name: "商品类型",
-            color: "red",
-            icon: "ec"
-          },
-          {
             name: "商品列表",
             color: "orange",
             icon: "icon-liebiao",
             path: '/goods/list'
-          },
-          {
-            name: "上架管理",
-            icon: "icon-shangjia3",
-            color: "green"
+          }, {
+            name: "分类管理",
+            color: "orange",
+            icon: "icon-fenlei",
+            path: '/goods/category'
+          }, {
+            name: "商标管理",
+            color: "orange",
+            icon: "icon-shangbiao",
+            path: '/goods/brand'
           },
           {
             name: "添加商品",
@@ -62,5 +62,43 @@
 </script>
 
 <style scoped>
-
+  .g-box {
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .no-platform {
+    margin: 0 auto;
+    text-align: center;
+  }
+  .platform-init {
+    margin-top: 20px;
+    margin: 0 10px;
+    display: inline-block;
+    padding: 10px 15px;
+    text-align: center;
+    border-radius: 3px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+    color: #fff;
+    background: #ef5350;
+    cursor: pointer;
+  }
+  .platform-back {
+    color: #aaa;
+    margin-top: 15px;
+    /* font-size: 10px; */
+    cursor: pointer;
+    color: #2196f3;
+  }
+  .addBox {
+    width: calc(100% - 20px);
+    height: 50px;
+    border-bottom: 1px solid #ccc;
+    box-sizing: border-box;
+    justify-content: flex-end;
+    align-items: center;
+    flex-direction: row;
+  }
 </style>

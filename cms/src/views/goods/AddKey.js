@@ -24,9 +24,7 @@ export default [{
   key: 'tag',
   value: null,
   type: 'Arr',
-  options: [{
-    value: ''
-  }],
+  options: [],
   keyValue: '标签'
 }, {
   key: 'company',
@@ -61,13 +59,15 @@ export default [{
     key: 4,
     value: '不展示'
   }]
-}, {
-  key: 'cover',
-  value: null,
-  type: 'upload',
-  action: 'https://yixiu.natappvip.cc/upload/',
-  keyValue: '封面'
-}, {
+},
+//  {
+//   key: 'cover',
+//   value: null,
+//   type: 'upload',
+//   action: 'https://yixiu.natappvip.cc/upload/',
+//   keyValue: '封面'
+// },
+ {
   key: 'desc',
   value: null,
   type: 'textarea',

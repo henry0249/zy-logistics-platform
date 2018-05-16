@@ -1,6 +1,6 @@
 <template>
   <loading-box class="g-container g-box" v-model="loadingText">
-    <div v-if="!platform" class="no-platform">
+    <div v-if="!data" class="no-platform">
       <div v-if="!loadingText">
         <div>
           <icon size="30vw">meiyoushuju</icon>
@@ -18,10 +18,10 @@
       </div>
     </div>
     <div class="flex g-box" v-else>
-      <div class="flex addBox">
-        <el-button size="medium" type="primary" style="margin-right:30px;" @click="dialogShow = true">添 加</el-button>
-      </div>
-      <goods-table :tableHeader="tableHeader" :tableList="platform" :boxStyle="boxStyle">
+      <!-- <div class="flex addBox">
+          <el-button size="medium" type="primary" style="margin-right:30px;" @click="dialogShow = true">添 加</el-button>
+        </div> -->
+      <goods-table :tableHeader="tableHeader" :tableList="data" :boxStyle="boxStyle">
         <div slot-scope="scope" @click="test(scope)">test</div>
       </goods-table>
     </div>
@@ -43,10 +43,10 @@
       return {
         dialogShow: false,
         loadingText: "",
-        platform: "",
+        data: "",
         boxStyle: {
           width: 'calc(100% - 20px)',
-          height: 'calc(100% - 50px)'
+          height: 'calc(100% - 10px)'
         },
         tableHeader: [{
           key: 'brand',
@@ -81,11 +81,11 @@
       async getGoods() {
         this.loadingText = "加载中";
         try {
-          this.platform = await this.$api.curd({
+          this.data = await this.$api.curd({
             model: "goods",
             curdType: "find",
           });
-          console.log(this.platform);
+          console.log(this.data);
         } catch (error) {}
         this.loadingText = "";
       }
@@ -97,43 +97,5 @@
 </script>
 
 <style scoped>
-  .g-box {
-    width: 100%;
-    height: 100%;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  .no-platform {
-    margin: 0 auto;
-    text-align: center;
-  }
-  .platform-init {
-    margin-top: 20px;
-    margin: 0 10px;
-    display: inline-block;
-    padding: 10px 15px;
-    text-align: center;
-    border-radius: 3px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
-    color: #fff;
-    background: #ef5350;
-    cursor: pointer;
-  }
-  .platform-back {
-    color: #aaa;
-    margin-top: 15px;
-    /* font-size: 10px; */
-    cursor: pointer;
-    color: #2196f3;
-  }
-  .addBox {
-    width: calc(100% - 20px);
-    height: 50px;
-    border-bottom: 1px solid #ccc;
-    box-sizing: border-box;
-    justify-content: flex-end;
-    align-items: center;
-    flex-direction: row;
-  }
+
 </style>

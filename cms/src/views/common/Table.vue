@@ -1,6 +1,6 @@
 <template>
   <div :style="boxStyle">
-    <el-table :data="tableList" style="width: 100%">
+    <el-table :data="tableList" style="width: 100%" :height="heightValue">
       <el-table-column v-for="(item,index) in tableHeader" :key="index" :prop="item.key" :label="item.keyValue" :width="item.width>0?item.width:''">
       </el-table-column>
       <el-table-column fixed="right" label="操作">
@@ -32,8 +32,36 @@
         default () {
           return {}
         }
+      },
+       heightValue: {
+        type: [Object, String],
+        default () {
+          return {}
+        }
       }
     },
+    data() {
+      return {
+        num: 0,
+        io: false,
+      }
+    },
+    mounted() {
+      let tabel = document.getElementsByClassName('el-table__body-wrapper')[0]
+      tabel.addEventListener('scroll', (e) => {
+        let scrollHeight = tabel.scrollHeight
+        let clientHeight = tabel.clientHeight
+        let scrollTop = tabel.scrollTop
+        if (scrollHeight == clientHeight + scrollTop) {
+          if (this.io == false) {
+            this.num++
+          }
+          this.io = true
+          this.$emit('scrollMore', this.num)
+          this.io = false
+        }
+      })
+    }
   }
 </script>
 
