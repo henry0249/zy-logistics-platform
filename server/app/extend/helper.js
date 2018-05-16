@@ -70,7 +70,7 @@ module.exports = {
     }
     return obj
   },
-  is(val, funName, all) {
+  is(funName, val, all) {
     if (all) {
       return is.all[funName](val);
     }else{
