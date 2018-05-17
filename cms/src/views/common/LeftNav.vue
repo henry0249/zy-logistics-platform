@@ -1,5 +1,5 @@
 <template>
-  <div class="g-left-nav">
+  <div class="g-left-nav hide-scroll">
     <div class="collapse-change" @click="isCollapse=!isCollapse">
       <icon size="10" style="transition: all .5s;" :class="{collapse:!isCollapse}">icon-caidan</icon>
     </div>
@@ -67,6 +67,8 @@ export default {
 .my-el-menu-vertical:not(.el-menu--collapse) {
   width: 200px;
   height: calc(100vh - 51px - 37px);
+  overflow-y: auto;
+  overflow-x: hidden
 }
 .collapse-change {
   padding: 10px 0;

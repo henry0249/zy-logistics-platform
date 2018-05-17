@@ -4,7 +4,7 @@ module.exports = {
     type: 'String',
     require: true
   },
-  setting:{
+  setting: {
     name: '设置',
     type: 'Object'
   },
@@ -50,7 +50,7 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'User'
   },
-  documentClerk:{
+  documentClerk: {
     name: '单据文员',
     type: 'ObjectIdArray',
     ref: 'User'
@@ -59,5 +59,20 @@ module.exports = {
     name: '财务专员',
     type: 'ObjectIdArray',
     ref: 'User'
+  },
+  logistics: {
+    name: '物流公司',
+    type: 'ObjectIdArray',
+    ref: 'Company'
+  },
+  shipper: {
+    name: '发货厂商',
+    type: 'ObjectIdArray',
+    ref: 'Company'
+  },
+  trading: {
+    name: '贸易公司',
+    type: 'ObjectIdArray',
+    ref: 'Company'
   }
 }

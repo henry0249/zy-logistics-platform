@@ -17,7 +17,13 @@ body {
   fill: currentColor;
   overflow: hidden;
 }
-
+.hide-scroll{
+  overflow-y: auto;
+  overflow-x: auto
+}
+.hide-scroll::-webkit-scrollbar{
+  display:none;
+}
 p {
   line-height: 1.6;
   font-size: 14px;

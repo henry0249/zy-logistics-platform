@@ -18,7 +18,7 @@
       </div>
     </div>
     <div v-else>
-      <org-tree style="width:65%;height:600px;"></org-tree>
+      <org-tree></org-tree>
     </div>
   </loading-box>
 </template>

@@ -15,50 +15,64 @@
 </template>
 
 <script>
-  import LeftNav from '../common/LeftNav';
-  export default {
-    components: {
-      LeftNav
-    },
-    data() {
-      return {
-        nav: [{
-          name: '需求列表',
-          color: 'red',
-          icon: 'icon-ed4',
-          path: '/home/index',
-        }, {
-          name: "添加",
-          icon: "icon-add",
-          // hide: !this.isSys,
-          color: "#094",
-          children: [{
-              name: "添加商品",
-              icon: "icon-add",
-              path: "/home/add_goods",
-              color: "#094"
-            },
-            {
-              name: "添加订单",
-              icon: "icon-add",
-              path: "/home/add_order",
-              color: "#094"
-            }
-          ]
-        }, ]
-      }
-    },
-    methods: {
-      navClick() {}
-    }
+import LeftNav from "../common/LeftNav";
+export default {
+  components: {
+    LeftNav
+  },
+  data() {
+    return {
+      nav: [
+        {
+          name: "创建订单",
+          color: "red",
+          icon: "icon-ed4",
+          path: "/home/index"
+        },
+        {
+          name: "待接单",
+          color: "red",
+          icon: "icon-ed4",
+          path: "/home/index"
+        },
+        {
+          name: "待审核",
+          color: "red",
+          icon: "icon-ed4",
+          path: "/home/index"
+        },
+        {
+          name: "待配货",
+          color: "red",
+          icon: "icon-ed4",
+          path: "/home/index"
+        },
+        {
+          name: "待调度",
+          color: "red",
+          icon: "icon-ed4",
+          path: "/home/index"
+        },
+        {
+          name: "待结算",
+          color: "red",
+          icon: "icon-ed4",
+          path: "/home/index"
+        }
+      ]
+    };
+  },
+  methods: {
+    navClick() {}
   }
+};
 </script>
 
 <style scoped>
-  .app-box {
-    width: 100%;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: flex-start;
-  }
+.app-box {
+  width: 100%;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
 </style>

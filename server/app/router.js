@@ -20,6 +20,8 @@ module.exports = app => {
     .all('/refleshToken', checkToken(), 'user.refleshToken')//刷新token
     .all('/logout', 'user.logout')//注销
 
+    .post('/platform/orgTree','platform.orgTree') //平台组织结构
+
     .get('/', 'static.views') //根路径匹配
     .get(/views/, 'static.views')//根views页面
     .get(/zylp/, 'static.zylp')//匹配zylp页面

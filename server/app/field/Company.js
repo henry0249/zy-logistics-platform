@@ -1,17 +1,19 @@
 module.exports = {
-  type:{
+  type: {
     name: '公司类型',
     type: 'Array',
-    require: true,
-    option:[{
-      key:'logistics',
-      value:'物流公司'
-    },{
-      key:'shipper',
-      value:'发货厂商'
-    },{
-      key:'trading',
-      value:'贸易公司'
+    option: [{
+      key: 'common',
+      value: '一般公司'
+    }, {
+      key: 'logistics',
+      value: '物流公司'
+    }, {
+      key: 'shipper',
+      value: '发货厂商'
+    }, {
+      key: 'trading',
+      value: '贸易公司'
     }]
   },
   name: {
@@ -30,9 +32,9 @@ module.exports = {
   platform: {
     name: '所属平台',
     type: 'ObjectId',
-    ref:'Platform'
+    ref: 'Platform'
   },
-  setting:{
+  setting: {
     name: '设置',
     type: 'Object'
   },
@@ -62,7 +64,6 @@ module.exports = {
     name: '管理员',
     type: 'ObjectIdArray',
     ref: 'User',
-    require: true
   },
   salesman: {
     name: '业务专员',
@@ -75,20 +76,3 @@ module.exports = {
     ref: 'User'
   }
 }
-// ajax.post('/company/findOne',{
-//   isPlatform:true,
-//   admin:{
-//     $in:[this.user._id]
-//   }
-// })
-// ajax.post('/company/findOne',{
-//   isPlatform:true,
-// })
-// ajax.post('/user/find',{
-//   isSys:true,
-// })
-// ajax.post('/user/find',{
-//   role:{
-//     $in:['sys']
-//   },
-// })

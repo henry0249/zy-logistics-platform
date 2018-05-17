@@ -1,8 +1,8 @@
 <template>
   <div>
     <message></message>
-    <my-header style="border-bottom:1px solid #f3f4f5"></my-header>
-    <div>
+    <my-header style="border-bottom:1px solid #f3f4f5;box-sizing:border-box;"></my-header>
+    <div class="g-container hide-scroll">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
           <!-- 这里是会被缓存的视图组件-->
@@ -33,9 +33,8 @@
     min-width: 1024px;
   }
   .g-container {
-    height: calc(100vh - 51px);
-    overflow-x: hidden;
-    overflow-y: auto;
+    height: calc(100vh - 50px);
+    width: 100vw
   }
   .base-bg {
     background: #f3f4f5

@@ -6,6 +6,9 @@ import Reg from './Reg.vue';
 import RestPsw from './RestPsw.vue';
 
 export default [{
+  path: '/',
+  redirect: '/login'
+}, {
   path: '/index',
   component: Index,
   meta: {
