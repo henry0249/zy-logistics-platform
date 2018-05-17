@@ -44,20 +44,20 @@ export default [{
   type: 'select',
   keyValue: '售卖状态',
   options: [{
-    key: 0,
-    value: '未上架'
+    value: 0,
+    label: '未上架'
   }, {
-    key: 1,
-    value: '正常售卖'
+    value: 1,
+    label: '正常售卖'
   }, {
-    key: 2,
-    value: '缺货'
+    value: 2,
+    label: '缺货'
   }, {
-    key: 3,
-    value: '已下架'
+    value: 3,
+    label: '已下架'
   }, {
-    key: 4,
-    value: '不展示'
+    value: 4,
+    label: '不展示'
   }]
 },
 //  {

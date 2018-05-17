@@ -1,8 +1,8 @@
 <template>
-  <div class="flex add-box" v-loading="loading">
+  <div class="g-add-box" v-loading="loading" :element-loading-text="loading" element-loading-spinner="el-icon-loading" element-loading-background="rgba(255, 255, 255, 0.7)">
     <div class="flex list-box" v-for="(item,index) in keyArr" :key="index">
-      <span style="width:100px;display:inline-block;">{{item.keyValue}}</span>
-      <el-input v-if="item.type == 'input'" v-model="item.value" :placeholder="'请输入'+item.keyValue" style="width:222px;"></el-input>
+      <span style="width:100px">{{item.keyValue}}</span>
+      <el-input v-if="item.type == 'input'" v-model="item.value" :placeholder="`请输入${item.keyValue}`" style="width:222px;"></el-input>
       <el-select v-else-if="item.type == 'select'" v-model="item.value" :placeholder="'请选择'+item.keyValue" style="width:222px;">
         <el-option v-for="v in item.options" :key="v.id" :label="v.label" :value="v.value">
         </el-option>
@@ -29,27 +29,28 @@
 </template>
 
 <script>
-  import AddKey from './AddKey';
   export default {
     props: {
-      value: {
-        type: Boolean,
-        default: false
+      keyArr: {
+        type: Array,
+        default () {
+          return []
+        }
       },
+      str: {
+        type: String,
+        default: ''
+      }
     },
     data() {
       return {
-        fileList2: [],
-        loading: false,
+        loading: '',
         inputVisible: false,
+        fileList2: [],
         inputValue: '',
-        keyArr: AddKey
       }
     },
     methods: {
-      handleClose(options, tag) {
-        options.splice(options.indexOf(tag), 1);
-      },
       showInput() {
         this.inputVisible = true;
         this.$nextTick(_ => {
@@ -65,10 +66,17 @@
         this.inputValue = '';
         console.log(options);
       },
-      sub() {
+      handleClose(options, tag) {
+        options.splice(options.indexOf(tag), 1);
+      },
+      async sub() {
         let str = ''
+        let data = {
+          model: this.str,
+          curdType: 'add',
+        }
         this.keyArr.forEach(item => {
-          if (item.value == null) {
+          if (item.value == null && item.type !== 'Arr') {
             str += item.keyValue + '、'
           }
         });
@@ -80,89 +88,31 @@
             }
           })
         } else {
-          this.add()
+          this.loading = '加载中'
+          this.keyArr.forEach(item => {
+            if (item.type == 'Arr' && item.options.length > 0) {
+              data[item.key] = item.options
+            } else {
+              data[item.key] = item.value
+            }
+          });
+          try {
+            console.log(data);
+            let res = await this.$api.curd(data)
+            console.log(res);
+          } catch (error) {}
+          this.loading = ''
+          // this.$router.go(0)
         }
-      },
-      async add() {
-        this.loading = true
-        let data = {
-          model: 'goods',
-          curdType: 'add',
-        }
-        this.keyArr.forEach(item => {
-          data[item.key] = item.value
-        });
-        try {
-          let res = await this.$api.curd(data)
-          console.log(res);
-        } catch (error) {}
-        this.loading = false
-      },
-      async getData() {
-        this.loading = true
-        let key = [{
-          key: 'brand',
-        }, {
-          key: 'category',
-        }]
-        let data = {
-          model: 'user',
-          curdType: 'findOne',
-          _id: this.user._id,
-          populate: [{
-            path: 'company'
-          }, {
-            path: 'platform'
-          }]
-        }
-        try {
-          let res = await this.$api.curd(data)
-          console.log(res);
-          let obj = {}
-          for (let index = 0; index < key.length; index++) {
-            let keyRes = await this.$api.curd({
-              model: key[index].key,
-              curdType: 'find',
-            })
-            this.keyArr.forEach(keyItem => {
-              if (keyItem.key == key[index].key) {
-                keyRes.forEach(resItem => {
-                  keyItem.value = resItem._id
-                  keyItem.label = resItem.name
-                });
-              }
-            });
-          }
-          this.keyArr.forEach(keyItem => {
-            data.populate.forEach(item => {
-              if (keyItem.key == item.path) {
-                res[item.path].forEach(resItem => {
-                  let arr = {}
-                  arr.value = resItem._id
-                  arr.label = resItem.name
-                  keyItem.options.push(arr)
-                });
-              }
-            });
-          })
-        } catch (error) {}
-        this.loading = false
       }
-    },
-    created() {
-      this.getData()
     }
   }
 </script>
 
 <style scoped>
-  .add-box {
+  .g-add-box {
     width: 100%;
-    height: 100%;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    overflow: auto;
+    max-height: calc(85vh - 114px);
   }
   .list-box {
     width: 500px;
@@ -171,6 +121,10 @@
     align-items: center;
     margin-top: 20px;
     margin-left: 30px;
+  }
+  .list-box:last-child {
+    justify-content: flex-end;
+    width: 480px;
   }
   .arr-box {
     flex-direction: row;

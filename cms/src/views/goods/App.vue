@@ -1,7 +1,7 @@
 <template>
   <div class="g-goods flex">
     <div>
-      <left-nav :nav="nav" :default-active="'/goods/list'"></left-nav>
+      <left-nav :nav="nav" :default-active="path"></left-nav>
     </div>
     <div class="f1">
       <keep-alive>
@@ -24,6 +24,7 @@
     },
     data() {
       return {
+        path: '/goods/list',
         activeIndex: 0,
         nav: [{
             name: "商品列表",
@@ -57,6 +58,9 @@
         });
         let res = await this.$ajax.get("/field");
       }
+    },
+    mounted() {
+      this.path = this.$route.path
     }
   };
 </script>

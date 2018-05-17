@@ -2,6 +2,10 @@
   <div :style="boxStyle">
     <el-table :data="tableList" style="width: 100%" :height="heightValue">
       <el-table-column v-for="(item,index) in tableHeader" :key="index" :prop="item.key" :label="item.keyValue" :width="item.width>0?item.width:''">
+        <div slot-scope="scope">
+          <el-tag v-if="item.type == 'Arr'" type="success" disable-transitions v-for="(v,i) in scope.row.tag" :key="i" style="margin-right:3px;">{{v}}</el-tag>
+          <div v-if="!item.type">{{scope.row[item.key]}}</div>
+        </div>
       </el-table-column>
       <el-table-column fixed="right" label="操作">
         <div slot-scope="scope">
@@ -33,7 +37,7 @@
           return {}
         }
       },
-       heightValue: {
+      heightValue: {
         type: [Object, String],
         default () {
           return {}
