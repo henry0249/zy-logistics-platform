@@ -2,7 +2,7 @@
   <div>
     <message></message>
     <my-header style="border-bottom:1px solid #f3f4f5;box-sizing:border-box;"></my-header>
-    <div class="g-container hide-scroll">
+    <div class="hide-scroll">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
           <!-- 这里是会被缓存的视图组件-->
@@ -34,7 +34,10 @@
   }
   .g-container {
     height: calc(100vh - 50px);
-    width: 100vw
+    overflow-y: auto
+  }
+  .g-container::-webkit-scrollbar{
+    display:none;
   }
   .base-bg {
     background: #f3f4f5

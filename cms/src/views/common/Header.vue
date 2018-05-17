@@ -43,7 +43,7 @@
         logoImg: "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-16-zyfz_logo.png",
         nav: [{
             name: "待处理订单",
-            path: "/home/index",
+            path: "/home",
             icon: "shopping_cart"
           },
           {

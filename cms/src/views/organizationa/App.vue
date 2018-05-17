@@ -1,14 +1,12 @@
 <template>
   <div class="flex">
     <left-nav :nav.sync="nav" default-active="/org/platform"></left-nav>
-    <div class="f1">
+    <div class="f1 g-container">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
-          <!-- 这里是会被缓存的视图组件-->
         </router-view>
       </keep-alive>
       <router-view v-if="!$route.meta.keepAlive">
-        <!-- 这里是不被缓存的视图组件-->
       </router-view>
     </div>
   </div>
@@ -28,24 +26,18 @@ export default {
   created() {
     this.nav = [
       {
-        name: "平台管理",
-        icon: "icon-pingtai1",
         hide: !this.isSys,
-        color: "#EF5350",
-        children: [
-          {
-            name: "平台架构",
-            icon: "icon-structure",
-            path: "/org/platform",
-            color: "#EF5350"
-          },
-          {
-            name: "平台设置",
-            icon: "icon-icon-test",
-            path: "/org/platform_setting",
-            color: "#EF5350"
-          }
-        ]
+        name: "平台架构",
+        icon: "icon-structure",
+        path: "/org/platform",
+        color: "#EF5350"
+      },
+      {
+        hide: !this.isSys,
+        name: "平台设置",
+        icon: "icon-icon-test",
+        path: "/org/platform_setting",
+        color: "#EF5350"
       },
       {
         name: "公司管理",
