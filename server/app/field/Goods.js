@@ -4,10 +4,14 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Brand'
   },
-  category: {
+  category: { //  水泥 钢材 河沙卵石 石子 
     name: '分类',
     type: 'ObjectId',
     ref: 'Category'
+  },
+  price:{
+    name: '价格',
+    type: 'ObjectId'
   },
   name: {
     name: '名称',
@@ -22,6 +26,11 @@ module.exports = {
   tag: {
     type: 'Array',
     name: '标签'
+  },
+  spec: {
+    type: 'String',
+    name: '规格',
+    require: true
   },
   saleState: {
     name: '售卖状态',
@@ -48,19 +57,19 @@ module.exports = {
     name: '创建人',
     type: 'ObjectId',
     ref: 'User',
-    require: true
+    // require: true
   },
   company: {
     name: '发布公司',
     type: 'ObjectId',
     ref: 'Company',
-    require: true
+    // require: true
   },
   platform: {
     name: '发布平台',
     type: 'ObjectId',
-    ref: 'Company',
-    require: true
+    ref: 'Platform',
+    // require: true
   },
   cover: {
     name: '封面',

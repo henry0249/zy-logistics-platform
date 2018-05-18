@@ -19,7 +19,6 @@
           <router-view style="padding:20px 40px;flex:1" ></router-view>
         </div>
       </div>
-      
     </div>
   </div>
 </template>

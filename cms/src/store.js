@@ -88,7 +88,7 @@ const store = new Vuex.Store({
         payload.platform = payload.user.platform[0];
         context.commit('setUser', payload);
         $message.success("登录成功");
-        router.replace('/home');
+        router.replace('/order');
       } else {
         if (payload.user.company.length <= 0) {
           $message.show({

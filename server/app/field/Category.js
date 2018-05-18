@@ -4,19 +4,24 @@ module.exports = {
     name: '名称',
     require: true
   },
-  cover:{
+  cover: {
     type: 'String',
     name: '封面',
   },
-  desc:{
+  desc: {
     type: 'String',
     name: '描述',
   },
-  remark:{
+  remark: {
     type: 'String',
     name: '备注',
   },
-  creater:{
+  parent: {
+    name: '父级分类',
+    type: 'ObjectId',
+    ref: 'Category'
+  },
+  creater: {
     name: '创建人',
     type: 'ObjectId',
     ref: 'User',

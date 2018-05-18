@@ -71,12 +71,14 @@ export default {
   overflow-x: hidden
 }
 .collapse-change {
-  padding: 10px 0;
   text-align: center;
   cursor: pointer;
   border-bottom: 1px solid #eee;
   border-right: 1px solid #eee;
   color: #aaa;
+  height: 36px;
+  line-height: 36px;  
+  box-sizing: border-box;
 }
 .collapse {
   transform: rotate(90deg);

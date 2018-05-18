@@ -54,8 +54,9 @@ class CurdService extends Service {
     }
     return ctx.model[modelName];
   }
-  checkRequire(fieldName, params, requireArr) {
+  checkRequire(params, requireArr) {
     const ctx = this.ctx;
+    let fieldName = ctx.params.model.substring(0, 1).toUpperCase() + ctx.params.model.substring(1);
     let fields;
     try {
       fields = require('../field/' + fieldName);
@@ -192,6 +193,11 @@ class CurdService extends Service {
       }
     }
 
+    // if (params.curdType === 'add' || params.curdType === 'set') {
+    //   this.checkRequire(curdParam);
+    // } else {
+    //   this.checkRequire(curdParam, []);
+    // }
     // if (this.hasService('require')) {
     //   let diyRequireArr = await diyService['require'](params.curdType, curdParam);
     //   await this.checkRequire(modelName, curdParam, diyRequireArr);
@@ -318,7 +324,7 @@ class CurdService extends Service {
   async delete(model, param) {
     let multi = param.multi || false;
     delete param.multi;
-    await model.remove(option, {
+    await model.remove(param, {
       multi
     });
     return '删除成功';
