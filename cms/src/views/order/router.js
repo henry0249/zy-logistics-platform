@@ -9,6 +9,7 @@ import Settlement from './Settlement.vue';
 export default [{
   path: '/order',
   component: App,
+  redirect: '/order/create',
   meta: {
     keepAlive: true // 需要被缓存
   },
@@ -34,6 +35,5 @@ export default [{
   }, {
     path: 'settlement',
     component: Settlement,
-
   }]
 }]

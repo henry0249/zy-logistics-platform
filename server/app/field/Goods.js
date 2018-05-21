@@ -9,9 +9,11 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Category'
   },
-  price:{
+  price: {
     name: '价格',
-    type: 'ObjectId'
+    type: 'ObjectIdArray',
+    ref: 'Price',
+    require: true
   },
   name: {
     name: '名称',
@@ -53,12 +55,6 @@ module.exports = {
       value: '不展示'
     }]
   },
-  creater: {
-    name: '创建人',
-    type: 'ObjectId',
-    ref: 'User',
-    // require: true
-  },
   company: {
     name: '发布公司',
     type: 'ObjectId',
@@ -73,14 +69,6 @@ module.exports = {
   },
   cover: {
     name: '封面',
-    type: 'String'
-  },
-  desc: {
-    name: '描述',
-    type: 'String'
-  },
-  remark: {
-    name: '备注',
     type: 'String'
   },
   detail: {

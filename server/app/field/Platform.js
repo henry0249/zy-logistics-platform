@@ -8,14 +8,6 @@ module.exports = {
     name: '设置',
     type: 'Object'
   },
-  desc: {
-    name: '描述',
-    type: 'String'
-  },
-  remark: {
-    name: '备注',
-    type: 'String'
-  },
   info: {
     name: '其他信息',
     type: 'Object'
@@ -74,5 +66,10 @@ module.exports = {
     name: '贸易公司',
     type: 'ObjectIdArray',
     ref: 'Company'
+  },
+  address: {
+    name: '地址',
+    type: 'ObjectId',
+    ref: 'Address'
   }
 }

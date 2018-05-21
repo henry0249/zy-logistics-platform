@@ -3,7 +3,7 @@
     <img class="logo" :src="logoImg" alt="">
     <div class="flex ac my-nav" style="margin-left:20px">
       <div @click="navClick(item,index)" v-ripple class="ac nav-item" :class="{active:index === activeNavIndex}" v-for="(item,index) in nav" :key="index">
-        <!-- <v-icon small v-if="item.icon">{{item.icon}}</v-icon> -->
+        <icon style="margin-right:5px" small v-if="item.icon">{{item.icon}}</icon>
         <div>
           {{item.name}}
         </div>
@@ -44,29 +44,44 @@ export default {
         "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-16-zyfz_logo.png",
       nav: [
         {
-          name: "待处理订单",
-          path: "/order",
-          icon: "shopping_cart"
-        },
-        {
-          name: "物流详情",
-          path: "",
-          icon: "store"
-        },
-        {
           name: "订单管理",
+          path: "/order",
+          icon: "icon-daichulidingdan"
+        },
+        {
+          name: "运单管理",
           path: "",
-          icon: "store"
+          icon: "icon-wuliu"
         },
         {
           name: "商品管理",
           path: "/goods",
-          icon: "store"
+          icon: "icon-leixing"
         },
         {
-          name: "组织架构",
-          path: "/org",
-          icon: "supervisor_account"
+          name: "财务管理",
+          path: "",
+          icon: "icon-jiesuan"
+        },
+        {
+          name: "统计报表",
+          path: "",
+          icon: "icon-chart"
+        },
+        {
+          name: "公司管理",
+          path: "",
+          icon: "icon-GSB"
+        },
+        {
+          name: "平台管理",
+          path: "/platform",
+          icon: "icon-pingtai1"
+        },
+        {
+          name: "系统管理",
+          path: "",
+          icon: "icon-xitongguanli"
         }
       ]
     };
@@ -76,6 +91,7 @@ export default {
       let flag = true;
       if (
         this.$route.path.indexOf("login") > -1 ||
+        this.$route.path.indexOf("chooseCompany") > -1 ||
         this.$route.path.indexOf("notfound") > -1
       ) {
         flag = false;

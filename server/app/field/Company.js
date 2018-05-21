@@ -38,25 +38,12 @@ module.exports = {
     name: '设置',
     type: 'Object'
   },
-  desc: {
-    name: '描述',
-    type: 'String'
-  },
-  remark: {
-    name: '备注',
-    type: 'String'
-  },
   info: {
     name: '其他信息',
     type: 'Object'
   },
-  creater: {
-    name: '创建人',
-    type: 'ObjectId',
-    ref: 'User'
-  },
   owner: {
-    name: '拥有者',
+    name: '主管理员',
     type: 'ObjectId',
     ref: 'User'
   },
@@ -70,9 +57,19 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'User'
   },
+  auditor: {
+    name: '审核员',
+    type: 'ObjectIdArray',
+    ref: 'User'
+  },
   financial: {
     name: '财务文员',
     type: 'ObjectIdArray',
     ref: 'User'
+  },
+  address: {
+    name: '地址',
+    type: 'ObjectId',
+    ref: 'Address'
   }
 }

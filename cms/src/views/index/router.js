@@ -4,6 +4,7 @@ import LoginQuick from './LoginQuick.vue';
 import LoginPsw from './LoginPsw.vue';
 import Reg from './Reg.vue';
 import RestPsw from './RestPsw.vue';
+import ChooseCompany from './ChooseCompany.vue';
 
 export default [{
   path: '/',
@@ -47,4 +48,10 @@ export default [{
       pass: true //放行
     }
   }]
+},{
+  path: '/chooseCompany',
+  component: ChooseCompany,
+  meta: {
+    pass: true //放行
+  }
 }]

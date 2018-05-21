@@ -26,21 +26,6 @@ module.exports = {
   },
   body: {
     name: '请求数据',
-    type: 'Object',
-  },
-  remark: {
-    name: '备注',
     type: 'String',
   }
 }
-// ua: String,
-//     ip: String,
-//     method: String,
-//     curdType: String,
-//     body: Object,
-//     model: String,
-//     remark: String,
-//     user: {
-//       type: Schema.Types.ObjectId,
-//       ref: 'User'
-//     }

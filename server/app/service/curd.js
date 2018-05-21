@@ -52,7 +52,7 @@ class CurdService extends Service {
         params
       });
     }
-    return ctx.model[modelName];
+    return modelName;
   }
   checkRequire(params, requireArr) {
     const ctx = this.ctx;
@@ -75,7 +75,7 @@ class CurdService extends Service {
       }
       if (require) {
         if (!params[key] || is.empty(params[key])) {
-          ctx.throw(422, `${fields[key] ? fields[key].name : key}不能为空`, {
+          ctx.throw(422, `${fields[key] ? fields[key].name : key}必填`, {
             key
           });
         }
@@ -177,13 +177,15 @@ class CurdService extends Service {
       params
     } = ctx;
     this.checkMethod();
-    let model = this.checkModel();
+    let modelName = this.checkModel();
+    let model = ctx.model[modelName];
     let curdParam = {};
     if (method === 'GET') {
       curdParam = ctx.query;
     } else {
       curdParam = ctx.request.body;
     }
+
     let diyService = ctx.service[params.model];
 
     if (this.hasService('beforeCurd')) {
@@ -193,21 +195,16 @@ class CurdService extends Service {
       }
     }
 
-    // if (params.curdType === 'add' || params.curdType === 'set') {
-    //   this.checkRequire(curdParam);
-    // } else {
-    //   this.checkRequire(curdParam, []);
-    // }
-    // if (this.hasService('require')) {
-    //   let diyRequireArr = await diyService['require'](params.curdType, curdParam);
-    //   await this.checkRequire(modelName, curdParam, diyRequireArr);
-    // } else {
-    //   if (params.curdType === 'add' || params.curdType === 'set') {
-    //     this.checkRequire(modelName, curdParam);
-    //   } else {
-    //     this.checkRequire(modelName, curdParam, []);
-    //   }
-    // }
+    if (this.hasService('require')) {
+      let diyRequireArr = await diyService['require'](params.curdType, curdParam);
+      await this.checkRequire(modelName, curdParam, diyRequireArr);
+    } else {
+      if (params.curdType === 'add' || params.curdType === 'set') {
+        this.checkRequire(modelName, curdParam);
+      } else {
+        this.checkRequire(modelName, curdParam, []);
+      }
+    }
     // this.checkFiled(modelName, curdParam, params.curdType);
 
     if (this.hasService(params.curdType)) {
@@ -233,14 +230,14 @@ class CurdService extends Service {
       let logParms = {
         method,
         ...params,
-        body: curdParam,
+        body: JSON.stringify(curdParam),
         ...ua
       };
       if (ctx.user) {
         logParms.user = ctx.user._id;
       }
       if (curdParam.logRemark) {
-        logParms.remark = curdParam.logRemark
+        logParms.remark = curdParam.logRemark;
       }
       await this.log(ctx.model.CurdLog, logParms);
     }
@@ -312,7 +309,8 @@ class CurdService extends Service {
       select = param.select || {};
     delete param.populate;
     delete param.select;
-    return await model[findType](param).populate(populate)
+    return await model[findType](param)
+      .populate(populate)
       .select(select);
   }
   async findById(model, param) {
@@ -330,7 +328,7 @@ class CurdService extends Service {
     return '删除成功';
   }
   async log(model, param) {
-    await this.add(model, param)
+    await this.add(model, param);
   }
 }
 module.exports = CurdService;

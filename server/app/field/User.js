@@ -2,11 +2,10 @@ module.exports = {
   type: {
     name: '客户类型',
     type: 'String'
-    // default: ['散户'] //散户 大客户 vip
   },
-  tag:{
+  tag: {
     name: '客户标签',
-    type: 'Array',//vip 黑名单
+    type: 'Array', //vip 黑名单
   },
   name: {
     name: '用户名',
@@ -24,9 +23,9 @@ module.exports = {
     name: '密码',
     type: 'String'
   },
-  info: {
-    name: '其他信息',
-    type: 'Object'
+  balance: {
+    name: '账户余额',
+    type: 'Number'
   },
   platform: {
     name: '所属平台',
@@ -61,5 +60,15 @@ module.exports = {
   isSys: {
     name: '系统管理员标识',
     type: 'Boolean'
+  },
+  defaultAddress: {
+    name: '默认地址',
+    type: 'ObjectId',
+    ref: 'Address'
+  },
+  address: {
+    name: '收货地址',
+    type: 'ObjectIdArray',
+    ref: 'Address'
   }
 }

@@ -1,36 +1,27 @@
 module.exports = {
-  _id:{
+  _id: {
     type: 'ObjectId',
     name: '订单号'
   },
-  user: {
+  author: {
     type: 'ObjectId',
-    name: '下单客户',
+    name: '客户名称',
     ref: 'User'
-  },
-  company: {
-    type: 'ObjectId',
-    name: '下单公司',
-    ref: 'Company'
   },
   goods: {
     type: 'Array',
-    name: '商品名称',
-    require: true,
+    name: '商品信息',
   },
-  address: {
+  'address': {
     type: 'String',
-    name: '收货地址',
-    require: true
+    name: '收货地址'
   },
-  recommendedByUser: {
-    type: 'ObjectId',
-    name: '推荐人',
-    ref: 'User'
+  deposit: {
+    type: Number,
+    name: '定金'
   },
-  recommendedByCompany: {
-    type: 'ObjectId',
-    name: '推荐公司',
-    ref: 'Company'
-  }
+  remark: {
+    type: 'String',
+    name: '备注',
+  },
 }

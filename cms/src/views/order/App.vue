@@ -24,40 +24,52 @@ export default {
     return {
       nav: [
         {
-          name: "创建订单",
+          name: "订单计划",
           color: "red",
-          icon: "icon-ed4",
+          icon: "icon-chuangjiandingdan",
           path: "/order/create"
         },
         {
           name: "待接单",
           color: "red",
-          icon: "icon-ed4",
-          path: "/order/taking"
+          icon: "icon-jiedanyingli",
+          path: "/order/taking",
+          badge: 8
         },
         {
           name: "待审核",
           color: "red",
-          icon: "icon-ed4",
-          path: "/order/check"
+          icon: "icon-shenhe1",
+          path: "/order/check",
+          badge: 0
         },
         {
           name: "待配货",
           color: "red",
-          icon: "icon-ed4",
-          path: "/order/distribution"
+          icon: "icon-cf-c97",
+          path: "/order/distribution",
+          badge: 0
         },
         {
           name: "待调度",
           color: "red",
-          icon: "icon-ed4",
-          path: "/order/dispatch"
+          icon: "icon-tiaoduzhongxin",
+          path: "/order/dispatch",
+          badge: 0
         },
         {
           name: "待结算",
           color: "red",
-          icon: "icon-ed4",
-          path: "/order/settlement"
+          icon: "icon-jiesuan",
+          path: "/order/settlement",
+          badge: 0
+        },
+        {
+          name: "所有订单",
+          color: "red",
+          icon: "icon-liebiao",
+          path: "/order/all",
+          badge: 0
         }
       ]
     };

@@ -29,13 +29,3 @@ module.exports = {
     type: 'Date'
   }
 }
-// value: String,
-//     ua: Object,
-//     ualist: Array,
-//     user: {
-//       type: Schema.Types.ObjectId,
-//       ref: 'User'
-//     },
-//     expAt: Date,
-//     loginAt: Date,
-//     logoutAt: Date,

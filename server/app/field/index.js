@@ -12,7 +12,7 @@ module.exports = function (name) {
       'Boolean': Boolean,
       'ObjectId': mongoose.Schema.Types.ObjectId
     };
-    let obj = {}
+    let obj = {};
     let field = JSON.parse(JSON.stringify(require('./' + name)));
     for (const key in field) {
       let item = field[key];
@@ -20,12 +20,20 @@ module.exports = function (name) {
         item.type = typeObj['ObjectId'];
         let temp = [];
         temp.push(item);
-        obj[key] = temp
+        obj[key] = temp;
       } else {
         item.type = typeObj[item.type];
-        obj[key] = item
+        obj[key] = item;
       }
     }
+    obj.desc = {
+      type: String,
+      name: '描述'
+    };
+    obj.remark = {
+      type: String,
+      name: '备注'
+    };
     let schema = new mongoose.Schema(obj, {
       versionKey: false,
       timestamps: true,
@@ -36,7 +44,6 @@ module.exports = function (name) {
       schema,
       obj
     };
-    // return obj;
   } else {
     let res = {}
     fs.readdirSync(__dirname).forEach((file) => {
