@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import axios from 'axios'
 import store from '../store';
+import router from '../router';
+import {
+  MessageBox
+} from 'element-ui';
 
 function getCookie(name) {
   var strcookie = document.cookie; //获取cookie字符串
@@ -42,12 +46,18 @@ ajax.interceptors.response.use(response => {
   }
   return Promise.resolve(response.data)
 }, err => {
-  $message.show({
-    text: `${err.response.status}:${err.response.data.message || err.message }`,
-    icon: 'error',
-    color: '#ff5252',
-    time: 10000
-  })
+  MessageBox.confirm(`${err.response.status}:${err.response.data.message || err.message }`, '提示', {
+    showCancelButton: false,
+    confirmButtonText: err.response.status === 401 ? '重新登录' : '确定',
+    type: 'error',
+    center: true
+  }).then(() => {
+    if (err.response.status === 401) {
+      router.replace('/')
+    }
+  }).catch(() => {
+
+  });
   return Promise.reject(err)
 })
 

@@ -14,8 +14,13 @@ module.exports = {
       value: '运输价'
     }]
   },
-  isHistory: {
-    name: '是否为历史价格',
+  parent: {
+    name: '上次价格',
+    type: 'ObjectId',
+    ref: 'Price'
+  },
+  history: {
+    name: '历史价格标识',
     type: 'Boolean'
   },
   value: {
@@ -28,8 +33,8 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Goods'
   },
-  company: {
-    name: '所属厂商',
+  mfrs: {
+    name: '生产厂商',
     type: 'ObjectId',
     ref: 'Company'
   },
@@ -51,15 +56,5 @@ module.exports = {
     name: '目的地',
     type: 'ObjectId',
     ref: 'Address'
-  },
-  company: {
-    name: '发布公司',
-    type: 'ObjectId',
-    ref: 'Company',
-  },
-  platform: {
-    name: '发布平台',
-    type: 'ObjectId',
-    ref: 'Platform',
   }
 }

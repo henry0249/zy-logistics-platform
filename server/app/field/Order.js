@@ -35,15 +35,15 @@ module.exports = {
     ref: 'Address',
     require: true
   },
-  amount:{
+  amount: {
     name: '金额',
     type: 'Number'
   },
-  payable:{
+  payable: {
     name: '应付款',
     type: 'Number'
   },
-  paid:{
+  paid: {
     name: '已付款',
     type: 'Number'
   },
@@ -60,6 +60,14 @@ module.exports = {
       bankTransfer: '银行转账',
       alipay: '支付宝',
       wechatPay: '微信支付'
+    }
+  },
+  transportModel: {
+    type: 'Number',
+    name: '运输方式',
+    default: 0,
+    option: {
+      0: '包邮', //需要匹配运输价格,内部结算
     }
   },
   expectedDeliveryTime: {

@@ -7,7 +7,7 @@ import User from './User.vue';
 export default [{
   path: '/platform',
   component: App,
-  // redirect: '/platform/org',
+  redirect: '/platform/org',
   children: [{
     path: 'org',
     component: Org

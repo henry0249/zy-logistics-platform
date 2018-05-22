@@ -12,8 +12,7 @@ module.exports = {
   price: {
     name: '价格',
     type: 'ObjectIdArray',
-    ref: 'Price',
-    require: true
+    ref: 'Price'
   },
   name: {
     name: '名称',
@@ -38,34 +37,38 @@ module.exports = {
     name: '售卖状态',
     type: 'Number',
     default: 0,
-    option: [{
-      key: 0,
-      value: '未上架'
-    }, {
-      key: 1,
-      value: '正常售卖'
-    }, {
-      key: 2,
-      value: '缺货'
-    }, {
-      key: 3,
-      value: '已下架'
-    }, {
-      key: 4,
-      value: '不展示'
-    }]
+    option: {
+      0:'未发布',
+      1:'已发布',
+      2:'已下架',
+      3:'缺货中',
+    }
+  },
+  transportModel: {
+    type: 'Number',
+    name: '运输方式',
+    default: 0,
+    option: {
+      0: '平台配送', //需要匹配运输价格,内部结算
+      1: '客户自提', //不能填运输价格
+      2: '平台代送', //需要输入运输价格,用户结算
+      3: '商家包邮' // 第三方厂家承担运输价格
+    }
+  },
+  mfrs:{
+    name: '生产厂商',
+    type: 'ObjectId',
+    ref: 'Company',
   },
   company: {
     name: '发布公司',
     type: 'ObjectId',
     ref: 'Company',
-    // require: true
   },
   platform: {
     name: '发布平台',
     type: 'ObjectId',
     ref: 'Platform',
-    // require: true
   },
   cover: {
     name: '封面',
