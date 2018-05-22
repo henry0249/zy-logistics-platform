@@ -249,14 +249,11 @@ class CurdService extends Service {
     delete param.vd;
     let hasData = await model.findOne(vd);
     if (hasData) {
-      await hasData.update(param);
-      return await model.findById(hasData._id);
-    } else {
-      param.createdAt = new Date();
-      let modelDate = new model(param);
-      await modelDate.save();
-      return modelDate;
+      this.ctx.throw(400, '已经存在相同的数据', param);
     }
+    let modelDate = new model(param);
+    await modelDate.save();
+    return modelDate;
   }
   async add(model, param) {
     let list = param.list || []

@@ -20,26 +20,47 @@
         </div>
       </el-tree>
     </div>
+    <el-dialog width="35%" :title="'添加'+addTitle" :visible.sync="companyDialogTableVisible">
+      <el-form ref="form" :model="companyForm" label-width="80px" size="small">
+        <el-form-item label="类型">
+          {{addTitle}}
+        </el-form-item>
+        <el-form-item label="名称">
+          <el-input v-model="companyForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="自营">
+          <el-switch v-model="companyForm.self"></el-switch>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="companyFormSubmit">立即创建</el-button>
+          <el-button @click="companyDialogTableVisible= false">取消</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <el-dialog :title="addTitle" :visible.sync="userDialogTableVisible">
+      即将开放此功能
+    </el-dialog>
   </loading-box>
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        loadingText: "",
-        options: {
-          title: {
-            text: "平台架构图",
-            textStyle: {
-              fontSize: 16
-            }
-          },
-          tooltip: {
-            trigger: "item",
-            triggerOn: "mousemove"
-          },
-          series: [{
+export default {
+  data() {
+    return {
+      loadingText: "",
+      options: {
+        title: {
+          text: "平台架构图",
+          textStyle: {
+            fontSize: 16
+          }
+        },
+        tooltip: {
+          trigger: "item",
+          triggerOn: "mousemove"
+        },
+        series: [
+          {
             type: "tree",
             data: [],
             // layout:'radial',
@@ -68,57 +89,112 @@
             // expandAndCollapse: true,
             // animationDuration: 550,
             // animationDurationUpdate: 750
-          }]
-        },
-        data: [],
-        filterText: "",
-        defaultProps: {
-          children: "children",
-          label: "name"
-        }
-      };
-    },
-    watch: {
-      filterText(val) {
-        this.$refs.tree.filter(val);
+          }
+        ]
+      },
+      data: [],
+      filterText: "",
+      defaultProps: {
+        children: "children",
+        label: "name"
+      },
+      companyDialogTableVisible: false,
+      userDialogTableVisible: false,
+      addTitle: "",
+      companyForm: {
+        name: "",
+        self: false
       }
-    },
-    methods: {
-      async getTreeData() {
-        this.loadingText = "加载中...";
-        try {
-          let res = await this.$ajax.post("/platform/orgTree", {
-            _id: this.platform._id
-          });
-          this.data = [res];
-          this.options.series[0].data = this.data;
-        } catch (error) {}
-        this.loadingText = "";
-      },
-      filterNode(value, data) {
-        if (!value) return true;
-        return data.name.indexOf(value) !== -1;
-      },
-      addNode(data) {
-        console.log(data);
-      },
-      removeNode(data) {
-        console.log(data);
-      }
-    },
-    mounted() {
-      this.getTreeData();
+    };
+  },
+  watch: {
+    filterText(val) {
+      this.$refs.tree.filter(val);
     }
-  };
+  },
+  methods: {
+    async getTreeData() {
+      this.loadingText = "加载中...";
+      try {
+        let res = await this.$ajax.post("/platform/orgTree", {
+          _id: this.platform._id
+        });
+        this.data = [res];
+        this.options.series[0].data = this.data;
+      } catch (error) {}
+      this.loadingText = "";
+    },
+    filterNode(value, data) {
+      if (!value) return true;
+      return data.name.indexOf(value) !== -1;
+    },
+    addNode(data) {
+      this.addTitle = data.name;
+      if (data.company) {
+        this.companyDialogTableVisible = true;
+      } else if (data.user) {
+        this.userDialogTableVisible = true;
+      } else {
+        this.$confirm(`无效的操作`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          showCancelButton: false,
+          type: "warning",
+          center: true
+        });
+      }
+    },
+    removeNode(data) {
+      console.log(data);
+      this.$confirm(`即将开放此功能`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        showCancelButton: false,
+        type: "warning",
+        center: true
+      });
+    },
+    async companyFormSubmit() {
+      if (!this.companyForm.name) {
+        this.$message.error("公司名称不能为空!");
+        return;
+      }
+      if (!this.platform._id) {
+        this.$message.error("未找到平台!");
+        return;
+      }
+      this.loadingText = "正在添加公司";
+      this.companyDialogTableVisible = false;
+      try {
+        // let res = await this.$ajax.post("/company/delete", {
+        //   ...this.companyForm,
+        //   platform: this.platform._id,
+        //   vd: {
+        //     name: this.companyForm.name
+        //   }
+        // });
+        let res2 = await this.$ajax.post("/company/delete", {
+          name:this.companyForm.name,
+          platform: this.platform._id,
+        });
+        this.$message.success("成功添加公司!");
+      } catch (error) {}
+      this.loadingText = "";
+    }
+  },
+  mounted() {
+    this.getTreeData();
+  }
+};
 </script>
 
 <style scoped>
-  .custom-tree-node {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 14px;
-    padding-right: 8px;
-  }
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
+}
 </style>

@@ -120,6 +120,7 @@ class PlatformService extends Service {
         name: childrenItem.name,
         children: [],
         company: true,
+        type: childrenItem.path
       };
       platform[childrenItem.path].forEach((companyItem) => {
         let companyPushItem = {
@@ -132,7 +133,7 @@ class PlatformService extends Service {
           let companyUserPushItem = {
             name: userItem.name,
             companyUser: true,
-            company_id:companyItem._id
+            company_id: companyItem._id
           };
           companyPushItem.push(companyUserPushItem);
         });
@@ -145,6 +146,7 @@ class PlatformService extends Service {
         name: childrenItem.name,
         children: [],
         user: true,
+        type: childrenItem.path
       };
       platform[childrenItem.path].forEach((userItem) => {
         let userName = userItem.name || userItem.mobile;

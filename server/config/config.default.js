@@ -15,8 +15,10 @@ module.exports = appInfo => {
     clients: {
       // clientId, access the client instance by app.mongooseDB.get('clientId')
       zylp: {
-        url: 'mongodb://zylp:pxh5201798@localhost/zy-logistics-platform',
-        options: {},
+        url: 'mongodb://zylp:pxh5201798@localhost:27017/zy-logistics-platform',
+        options: {
+          useMongoClient: true
+        }
       }
     }
   };
@@ -33,7 +35,7 @@ module.exports = appInfo => {
   //安全设置
   config.security = {
     csrf: {
-      ignoreJSON: true,
+      ignoreJSON: false,
       enable: false,
       useSession: false, // 默认为 false，当设置为 true 时，将会把 csrf token 保存到 Session 中
       cookieName: 'csrfToken', // Cookie 中的字段名，默认为 csrfToken

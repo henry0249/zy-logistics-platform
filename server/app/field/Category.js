@@ -16,11 +16,6 @@ module.exports = {
     type: 'String',
     name: '备注',
   },
-  isFirst: {
-    type: 'Boolean',
-    name: '是否是一级分类',
-    default: false
-  },
   parent: {
     name: '父级分类',
     type: 'ObjectId',

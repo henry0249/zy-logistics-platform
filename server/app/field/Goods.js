@@ -9,11 +9,6 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Category'
   },
-  price: {
-    name: '价格',
-    type: 'ObjectIdArray',
-    ref: 'Price'
-  },
   name: {
     name: '名称',
     type: 'String',
@@ -38,24 +33,21 @@ module.exports = {
     type: 'Number',
     default: 0,
     option: {
-      0:'未发布',
-      1:'已发布',
-      2:'已下架',
-      3:'缺货中',
+      0: '未发布',
+      1: '已发布',
+      2: '已下架',
+      3: '缺货中',
     }
   },
-  transportModel: {
-    type: 'Number',
-    name: '运输方式',
-    default: 0,
-    option: {
-      0: '平台配送', //需要匹配运输价格,内部结算
-      1: '客户自提', //不能填运输价格
-      2: '平台代送', //需要输入运输价格,用户结算
-      3: '商家包邮' // 第三方厂家承担运输价格
-    }
+  selfDeliverySupport: {
+    name: '是否支持自提',
+    type: 'Boolean'
   },
-  mfrs:{
+  freeDelivery: {
+    name: '是否包邮',
+    type: 'Boolean'
+  },
+  mfrs: {
     name: '生产厂商',
     type: 'ObjectId',
     ref: 'Company',

@@ -29,6 +29,10 @@ module.exports = {
     name: '资质认证材料',
     type: 'Object'
   },
+  self:{
+    name: '自营',
+    type: 'Boolean'
+  },
   platform: {
     name: '所属平台',
     type: 'ObjectId',

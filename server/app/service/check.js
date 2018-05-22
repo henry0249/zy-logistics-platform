@@ -21,5 +21,18 @@ class CheckService extends Service {
     }
     return true;
   }
+  async companyAdmin(param, msg = '需要公司管理员或系统管理员权限') {
+    const ctx = this.ctx;
+    if (!ctx.user.isSys) {
+      let isCompanyAdmin = ctx.service.curd.findOne(ctx.model.Company, {
+        admin: { in: [ctx.user._id]
+        }
+      });
+      if (!isCompanyAdmin) {
+        ctx.throw(404, msg, param);
+      }
+    }
+    return true;
+  }
 }
 module.exports = CheckService;

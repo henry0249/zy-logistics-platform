@@ -7,7 +7,8 @@ module.exports = {
       check: '待审核',
       distribution: '待配货',
       dispatch: '待调度',
-      settlement: '待结算'
+      settlement: '待结算',
+      delete: '已删除'
     }
   },
   user: {
@@ -25,7 +26,7 @@ module.exports = {
     name: '名称'
   },
   goods: {
-    type: 'Array',
+    type: 'ObjectId',
     name: '商品名称',
     require: true,
   },
@@ -62,19 +63,38 @@ module.exports = {
       wechatPay: '微信支付'
     }
   },
+  selfDelivery: {
+    name: '是否自提',
+    type: 'Boolean'
+  },
+  freeDelivery: {
+    name: '是否包邮',
+    type: 'Boolean'
+  },
   transportModel: {
     type: 'Number',
     name: '运输方式',
     default: 0,
     option: {
-      0: '包邮', //需要匹配运输价格,内部结算
+      0: '平台配送', //需要匹配运输价格,内部结算
+      1: '客户自提', //不能填运输价格
+      2: '平台代送', //需要输入运输价格,用户结算
+      3: '商家包邮' // 第三方厂家承担运输价格
     }
   },
   expectedDeliveryTime: {
     name: '期望收货时间',
     type: 'Date'
   },
-  producer: {
+  deliveryTime: {
+    name: '收货时间',
+    type: 'Date'
+  },
+  finishTime: {
+    name: '完成时间',
+    type: 'Date'
+  },
+  mfrs: {
     name: '生产厂商',
     type: 'ObjectId',
     ref: 'Company',

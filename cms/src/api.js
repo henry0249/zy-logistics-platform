@@ -38,6 +38,9 @@ class Api {
     delete data.curdType;
     return ajax.post(`/${model}/${curdType}`, data);
   }
+  static async sql(model, curdType, data) {
+    return ajax.post(`/${model}/${curdType}`, data);
+  }
   static async logout() {
     return ajax.post('/logout')
   }
