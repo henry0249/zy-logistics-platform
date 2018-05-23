@@ -53,13 +53,14 @@
             name: "品牌管理",
             color: "orange",
             icon: "icon-shangbiao",
+            iconSize: '15',
             path: "/goods/brand"
-          },{
+          }, {
             name: "添加价格",
             icon: "icon-jiagebaohu",
             color: "#1565C0",
+            iconSize: '15',
             path: "/goods/add",
-            size:'3'
           },
           {
             name: "添加商品",

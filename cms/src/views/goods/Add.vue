@@ -3,9 +3,9 @@
     <el-table-column v-for="(item,index) in tableHeader" :key="index" :prop="item.key" :label="item.keyValue">
     </el-table-column>
     <!-- <el-table-column prop="name" label="姓名" width="180">
-                                    </el-table-column>
-                                    <el-table-column prop="address" label="地址">
-                                    </el-table-column> -->
+                                      </el-table-column>
+                                      <el-table-column prop="address" label="地址">
+                                      </el-table-column> -->
   </el-table>
 </template>
 
@@ -81,7 +81,9 @@
     },
     created() {
       // this.del()
-      this.getData();
+      console.log(this.company);
+      console.log(this.platform);
+      // this.getData();
     }
   };
 </script>

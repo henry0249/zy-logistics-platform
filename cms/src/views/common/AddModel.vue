@@ -1,6 +1,6 @@
 <template>
   <div class="g-add-box" v-loading="loading" :element-loading-text="loading" element-loading-spinner="el-icon-loading" element-loading-background="rgba(255, 255, 255, 0.7)">
-    <div class="flex list-box" v-for="(item,index) in keyArr" :key="index">
+    <div class="flex list-box" v-for="item in keyArr" :key="item.id">
       <span style="width:100px">{{item.keyValue}}</span>
       <el-input v-if="item.type == 'input'" v-model="item.value" :placeholder="`请输入${item.keyValue}`" style="width:222px;"></el-input>
       <el-select v-else-if="item.type == 'select'" v-model="item.value" :placeholder="'请选择'+item.keyValue" style="width:222px;">
@@ -23,7 +23,11 @@
       <el-switch @change="switchChange" v-else-if="item.type == 'switch'" v-model="item.value" :active-text="item.options[0]" :inactive-text="item.options[1]">>
       </el-switch>
     </div>
-    <div class="flex list-box">
+    <div v-if="str == 'goods'" class="flex list-box" v-for="v in price" :key="v.id">
+      <span style="width:100px">{{v.keyValue}}</span>
+      <el-input v-if="v.type == 'input'" v-model="v.value" :placeholder="`请输入${v.keyValue}`" style="width:222px;"></el-input>
+    </div>
+    <div class="flex list-box" style="">
       <el-button @click="$router.go(0)">取 消</el-button>
       <el-button type="success" @click="sub">提 交</el-button>
     </div>
@@ -50,6 +54,22 @@
         inputVisible: false,
         fileList2: [],
         inputValue: '',
+        price: [{
+          key: 'factory',
+          keyValue: '出厂价',
+          type: 'input',
+          value: null,
+        }, {
+          key: 'sell',
+          keyValue: '销售价',
+          type: 'input',
+          value: null,
+        }, {
+          key: 'transport',
+          keyValue: '运输价',
+          type: 'input',
+          value: null,
+        }],
       }
     },
     methods: {
@@ -126,6 +146,27 @@
             console.log(data);
             let res = await this.$api.curd(data)
             console.log(res);
+            if (this.str == 'goods') {
+              for (let index = 0; index < this.price.length; index++) {
+                let item = this.price[index]
+                let options = {
+                  model: 'price',
+                  curdType: 'add',
+                  type: item.key,
+                  value: item.value,
+                  goods: res._id
+                }
+                if (data.mfrs) {
+                  options.mfrs = data.mfrs
+                }
+                if (item.value) {
+                  try {
+                    let price = await this.$api.curd(options)
+                    console.log('price', price);
+                  } catch (error) {}
+                }
+              }
+            }
           } catch (error) {}
           this.loading = ''
           // this.$router.go(0)
@@ -154,7 +195,15 @@
   }
   .list-box:last-child {
     justify-content: flex-end;
-    width: 480px;
+    width: calc(100% - 60px);
+  }
+  .list-box1 {
+    width: 500px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-top: 20px;
+    margin-left: 30px;
   }
   .arr-box {
     flex-direction: row;

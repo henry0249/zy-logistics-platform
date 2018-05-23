@@ -1,18 +1,15 @@
 <template>
   <common-list title="商品" :tableHeader="tableHeader" str="goods" :keyArr="keyArr" :populate="populate" :or="or">
     <el-button slot-scope="scope" slot="operation" size="mini" @click="test(scope)">超小按钮</el-button>
-    <!-- <category-add str="goods" :key-arr="keyArr" slot="addModel"></category-add> -->
   </common-list>
 </template>
 
 <script>
   import AddKey from './AddKey.js';
   import CommonList from '../common/CommonList.vue';
-  // import CategoryAdd from './AddModel.vue';
   export default {
     components: {
       CommonList,
-      // CategoryAdd
     },
     data() {
       return {
@@ -83,10 +80,10 @@
             model: 'company',
             curdType: 'find',
           })
-          // console.log(this.keyArr);
           this.keyArr.forEach((item, index) => {
+            console.log('object', item.key);
             if (item.key == 'platform.name') {
-              // console.log('platform');
+              console.log('platform');
               if (this.platform._id) {
                 item.options.push({
                   value: this.platform._id,
@@ -97,7 +94,7 @@
               }
             }
             if (item.key == 'company.name') {
-              // console.log('company');
+              console.log('this.company', this.company);
               if (this.company._id) {
                 item.options.push({
                   value: this.company._id,
