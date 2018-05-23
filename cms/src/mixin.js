@@ -4,22 +4,25 @@ import Vue from 'vue'
 Vue.mixin({
   computed: {
     loginInfo() {
-      return this.$store.state.loginInfo;
+      return this.$store.state.loginInfo || {};
     },
     user() {
-      return this.$store.state.loginInfo.user;
+      return this.$store.state.loginInfo.user || {};
     },
     company() {
-      return this.$store.state.loginInfo.company;
+      return this.$store.state.loginInfo.company || {};
     },
     platform() {
-      return this.$store.state.loginInfo.platform;
+      return this.$store.state.loginInfo.platform || {};
     },
     isSys() {
-      return this.$store.state.loginInfo.user.isSys;
+      return this.$store.state.loginInfo.user.isSys || false;
+    },
+    field() {
+      return this.$store.state.field || {};
     },
     $state() {
       return this.$store.state;
-    }
+    },
   }
 })

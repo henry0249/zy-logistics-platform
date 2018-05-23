@@ -125,7 +125,6 @@ export default {
   async created(){
     if (this.showHeader) {
       await this.$store.dispatch('getLoginInfo');
-      console.log('header');
     }
   }
 };

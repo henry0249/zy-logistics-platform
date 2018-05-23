@@ -57,11 +57,6 @@ body {
   overflow: hidden;
 }
 
-.hide-scroll {
-  overflow-y: auto;
-  overflow-x: auto
-}
-
 .hide-scroll::-webkit-scrollbar {
   display: none;
 }
