@@ -15,7 +15,7 @@ export default [{
     path: 'add',
     component: Add
   },{
-    path: 'category',
+    path: 'category/:_id',
     component: GoodsCategory
   },{
     path: 'brand',

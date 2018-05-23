@@ -1,17 +1,17 @@
 <template>
-  <common-list title="品牌" :tableHeader="tableHeader" str="brand">
+  <common-list title="品牌" :tableHeader="tableHeader" str="brand" :key-arr="keyArr">
     <el-button slot-scope="scope" slot="operation" size="mini" @click="test(scope)">超小按钮</el-button>
-    <category-add str="brand" :key-arr="keyArr" slot="addModel" :keyArr="keyArr"></category-add>
+    <!-- <category-add str="brand" :key-arr="keyArr" slot="addModel" :keyArr="keyArr"></category-add> -->
   </common-list>
 </template>
 
 <script>
   import CommonList from '../common/CommonList.vue';
-  import CategoryAdd from './AddModel.vue';
+  // import CategoryAdd from './AddModel.vue';
   export default {
     components: {
       CommonList,
-      CategoryAdd
+      // CategoryAdd
     },
     data() {
       return {

@@ -20,10 +20,12 @@
         <el-button v-else class="button-new-tag" size="small" @click="showInput">添加新标签</el-button>
       </div>
       <el-input type="textarea" autosize v-else-if="item.type == 'textarea'" v-model="item.value" :placeholder="'请输入'+item.keyValue" style="width:380px;"></el-input>
+      <el-switch @change="switchChange" v-else-if="item.type == 'switch'" v-model="item.value" :active-text="item.options[0]" :inactive-text="item.options[1]">>
+      </el-switch>
     </div>
     <div class="flex list-box">
-      <el-button @click="$router.go(0)">取消</el-button>
-      <el-button type="success" @click="sub">成功按钮</el-button>
+      <el-button @click="$router.go(0)">取 消</el-button>
+      <el-button type="success" @click="sub">提 交</el-button>
     </div>
   </div>
 </template>
@@ -51,6 +53,9 @@
       }
     },
     methods: {
+      switchChange(val) {
+        console.log(val);
+      },
       showInput() {
         this.inputVisible = true;
         this.$nextTick(_ => {
@@ -69,34 +74,55 @@
       handleClose(options, tag) {
         options.splice(options.indexOf(tag), 1);
       },
+      filterMethods(str) {
+        if (str.indexOf('.') > -1) {
+          let arr = str.splice('.')
+          return arr[arr[0]][arr[1]]
+        } else {
+          return str
+        }
+      },
       async sub() {
-        let str = ''
+        let io = true
         let data = {
           model: this.str,
           curdType: 'add',
         }
         this.keyArr.forEach(item => {
-          if (item.value == null && item.type !== 'Arr') {
-            str += item.keyValue + '、'
+          if (item.value == null && item.key == 'name') {
+            io = false
+            this.$alert(`${item.keyValue}不能为空`, '提示', {
+              confirmButtonText: '确定',
+              callback: () => {
+                return
+              }
+            })
           }
         });
-        if (str.length > 0) {
-          this.$alert(`${str.substr(0,str.length-1)}不能为空`, '提示', {
-            confirmButtonText: '确定',
-            callback: () => {
-              return
-            }
-          })
-        } else {
+        if (io) {
           this.loading = '加载中'
           this.keyArr.forEach(item => {
             if (item.type == 'Arr' && item.options.length > 0) {
               data[item.key] = item.options
+            } else if (item.key.indexOf('.') != -1) {
+              item.options.forEach(opItem => {
+                if (opItem.value == item.value) {
+                  item.value = opItem._id
+                  data[item.key.split('.')[0]] = item.value
+                }
+              });
             } else {
               data[item.key] = item.value
             }
           });
           try {
+            for (const key in data) {
+              if (data.hasOwnProperty(key)) {
+                if (data[key] == null) {
+                  delete data[key]
+                }
+              }
+            }
             console.log(data);
             let res = await this.$api.curd(data)
             console.log(res);
@@ -105,6 +131,9 @@
           // this.$router.go(0)
         }
       }
+    },
+    created() {
+      console.log('this.keyArr', this.keyArr);
     }
   }
 </script>
@@ -112,7 +141,8 @@
 <style scoped>
   .g-add-box {
     width: 100%;
-    max-height: calc(85vh - 114px);
+    max-height: calc(85vh - 200px);
+    overflow: auto;
   }
   .list-box {
     width: 500px;

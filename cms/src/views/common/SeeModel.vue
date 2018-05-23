@@ -1,26 +1,9 @@
 <template>
   <div class="see-box">
     <div class="flex list-box" v-for="(item,index) in keyArr" :key="index">
-      <span style="width:100px">{{item.keyValue}}</span>
-      <el-input v-if="item.type == 'input'" v-model="item.value" :placeholder="`请输入${item.keyValue}`" style="width:222px;"></el-input>
-      <el-select v-else-if="item.type == 'select'" v-model="item.value" :placeholder="'请选择'+item.keyValue" style="width:222px;">
-        <el-option v-for="v in item.options" :key="v.id" :label="v.label" :value="v.value">
-        </el-option>
-      </el-select>
-      <el-upload v-else-if="item.type =='upload' " class="upload-demo" :action="item.action" :on-preview="handlePreview" :on-remove="handleRemove" :file-list="fileList2" list-type="picture">
-        <el-button size="small" type="primary">点击上传</el-button>
-        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-      </el-upload>
-      <div class="flex arr-box" v-else-if="item.type == 'Arr'" style="width:380px;">
-        <el-tag :key="tag" v-for="tag in item.options">
-          {{tag}}
-        </el-tag>
-      </div>
-      <el-input type="textarea" autosize v-else-if="item.type == 'textarea'" v-model="item.value" :placeholder="'请输入'+item.keyValue" style="width:380px;"></el-input>
-    </div>
-    <div class="flex list-box">
-      <el-button @click="$router.go(0)">取消</el-button>
-      <el-button type="success" @click="sub">成功按钮</el-button>
+      <span class="see-span">{{item.keyValue}}</span>
+      <span class="right-span" v-if="item.type == 'switch'">{{item.value?'支持':'不支持'}}</span>
+      <span class="right-span" v-else>{{filterMethods(index,item.key)}}</span>
     </div>
   </div>
 </template>
@@ -34,27 +17,139 @@
           return []
         }
       },
+      keyData: {
+        type: Object,
+        default () {
+          return {};
+        }
+      },
+      populate: {
+        type: Array,
+        default () {
+          return []
+        }
+      },
+      str: {
+        type: String,
+        default () {
+          return ''
+        }
+      },
+      myid: {
+        type: String,
+        default: ''
+      }
     },
+    watch: {
+      myid(val) {
+        console.log('val', val);
+      }
+    },
+    methods: {
+      filterMethods(index, val) {
+        if (val.indexOf('.') > -1) {
+          let str = val.split('.')
+          // console.log(str);
+          // console.log(this.keyData['mfrs']['name']);
+          console.log('--------------------------------------');
+          console.log(index);
+          console.log(str);
+          console.log(str[0], str[1]);
+          console.log([str[0]]);
+          console.log(this.keyData);
+          console.log(this.keyData[str[0]]);
+          if (this.keyData[str[0]] == undefined) {
+            return '无'
+          } else {
+            return this.keyData[str[0]][str[1]]
+          }
+        } else {
+          if (val == 'saleState') {
+            let options = [{
+              value: 0,
+              label: '未发布'
+            }, {
+              value: 1,
+              label: '已发布'
+            }, {
+              value: 2,
+              label: '已下架'
+            }, {
+              value: 3,
+              label: '缺货中'
+            }]
+            let label = ''
+            options.forEach(item => {
+              if (item.value == this.keyData[val]) {
+                label = item.label
+              }
+            });
+            return label
+          } else {
+            return this.keyData[val]
+          }
+        }
+      },
+      async getData() {
+        try {
+          let data = {
+            model: this.str,
+            curdType: 'find',
+            _id: this.myid
+          }
+          console.log(res);
+        } catch (error) {}
+      }
+    },
+    mounted() {
+      // console.log('this.keyData', this.keyData);
+      // console.log('this.keyArr', this.keyArr);
+      this.getData()
+    },
+    created() {
+      console.log('this.keyArr[6]', this.keyArr[6]);
+      console.log('this.keyData[6]', this.keyData);
+    }
   }
 </script>
 
 <style scoped>
   .see-box {
     width: 100%;
-    max-height: calc(85vh - 114px);
+    max-height: calc(85vh - 200px);
     overflow: auto;
   }
   .list-box {
-    width: 500px;
+    width: calc(100% - 60px);
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    margin-top: 20px;
-    margin-left: 30px;
+    margin: 0 30px;
+    min-height: 40px;
+    border: 1px solid #dfdfdf;
+    border-top: none;
+    box-sizing: border-box;
   }
-  .list-box:last-child {
-    justify-content: flex-end;
-    width: 480px;
+  .list-box:first-child {
+    border-top: 1px solid #dfdfdf;
+  }
+  .see-span {
+    width: 100px;
+    background: #cccccc6e;
+    min-height: 40px;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+  .right-span {
+    flex: 1;
+    margin-left: 20px;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
   }
   .arr-box {
     flex-direction: row;

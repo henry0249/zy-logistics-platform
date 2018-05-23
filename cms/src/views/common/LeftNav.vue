@@ -6,14 +6,14 @@
     <el-menu background-color="#545c64" text-color="#fff" active-text-color="#ffd04b" :open="defaultActive" unique-opened :default-active="defaultActive" :router="router" class="my-el-menu-vertical" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
       <el-submenu v-if="item.children" :index="item.path||''" v-for="item in nav" :key="item.id">
         <div slot="title" :class="{ac:!isCollapse||!item.children}">
-          <icon size="14" style="margin:0 5px">{{item.icon}}</icon>
+          <icon :size="''+item.iconSize||14" style="margin:0 5px">{{item.icon}}</icon>
           <div v-if="!isCollapse || !item.children" class="tf1" style="width:110px" slot="title">
             {{item.name}}
           </div>
         </div>
         <el-menu-item :index="sub.path" v-for="sub in item.children" :key="sub.id">
           <div slot="title" class="ac">
-            <icon size="14" style="margin:0 5px">{{sub.icon}}</icon>
+            <icon :size="''+sub.iconSize||14" style="margin:0 5px">{{sub.icon}}</icon>
             <div slot="title" class="tf1">
               {{sub.name}}
             </div>
@@ -22,9 +22,9 @@
       </el-submenu>
       <el-menu-item :index="item.path||''" v-else>
         <el-badge v-if="item.badge!==undefined && item.badge>0 && isCollapse" :value="item.badge">
-          <icon size="14" style="margin:0 5px">{{item.icon}}</icon>
+          <icon :size="''+item.iconSize||14" style="margin:0 5px">{{item.icon}}</icon>
         </el-badge>
-        <icon v-else size="14" style="margin:0 5px">{{item.icon}}</icon>
+        <icon v-else :size="''+item.iconSize||14" style="margin:0 5px">{{item.icon}}</icon>
         <span slot="title">{{item.name}}</span>
         <el-badge v-if="item.badge!==undefined && item.badge>0 && !isCollapse" style="float:right" class="mark" :value="item.badge" />
         <div v-if="item.badge!==undefined && item.badge===0 && !isCollapse" style="float:right">

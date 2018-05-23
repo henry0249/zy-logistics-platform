@@ -1,18 +1,18 @@
 <template>
-  <common-list title="商品" :tableHeader="tableHeader" str="goods">
-    <!-- <el-button slot-scope="scope" slot="operation" size="mini" @click="test(scope)">超小按钮</el-button> -->
-    <category-add str="goods" :key-arr="keyArr" slot="addModel" :keyArr="keyArr"></category-add>
+  <common-list title="商品" :tableHeader="tableHeader" str="goods" :keyArr="keyArr" :populate="populate" :or="or">
+    <el-button slot-scope="scope" slot="operation" size="mini" @click="test(scope)">超小按钮</el-button>
+    <!-- <category-add str="goods" :key-arr="keyArr" slot="addModel"></category-add> -->
   </common-list>
 </template>
 
 <script>
   import AddKey from './AddKey.js';
   import CommonList from '../common/CommonList.vue';
-  import CategoryAdd from './AddModel.vue';
+  // import CategoryAdd from './AddModel.vue';
   export default {
     components: {
       CommonList,
-      CategoryAdd
+      // CategoryAdd
     },
     data() {
       return {
@@ -25,10 +25,10 @@
         },
         heightValue: 'calc(100% - 10px)',
         tableHeader: [{
-          key: 'brand',
+          key: 'brand.name',
           keyValue: '品牌',
         }, {
-          key: 'category',
+          key: 'category.name',
           keyValue: '分类',
         }, {
           key: 'name',
@@ -42,10 +42,34 @@
           type: 'Arr'
         }],
         keyArr: AddKey,
+        populate: [{
+          path: 'brand'
+        }, {
+          path: 'category'
+        }, {
+          path: 'platform'
+        }, {
+          path: 'company'
+        }, {
+          path: 'mfrs'
+        }],
+        or: [{
+          key: 'name'
+        }, {
+          key: 'category',
+          type: 'id'
+        }, {
+          type: 'id',
+          key: 'brand',
+        }, {
+          key: 'tag',
+          type: 'in'
+        }],
       };
     },
     methods: {
       async getData() {
+        let i = 0
         try {
           let category = await this.$api.curd({
             model: 'category',
@@ -55,54 +79,67 @@
             model: 'brand',
             curdType: 'find',
           })
+          let company = await this.$api.curd({
+            model: 'company',
+            curdType: 'find',
+          })
+          // console.log(this.keyArr);
           this.keyArr.forEach((item, index) => {
-            console.log(index);
-            console.log(Object.keys(this.platform).length > 0);
-            if (item.key == 'platform') {
-              if (Object.keys(this.platform).length > 0) {}
+            if (item.key == 'platform.name') {
+              // console.log('platform');
+              if (this.platform._id) {
+                item.options.push({
+                  value: this.platform._id,
+                  label: this.platform.name
+                })
+              } else {
+                i = index
+              }
             }
-            // if (item.key == 'category') {
-            //   category.forEach(resItem => {
-            //     item.options.push({
-            //       value: resItem._id,
-            //       label: resItem.name
-            //     })
-            //   });
-            // } else if (item.key == 'brand') {
-            //   brand.forEach(resItem => {
-            //     item.options.push({
-            //       value: resItem._id,
-            //       label: resItem.name
-            //     })
-            //   });
-            // } else if (item.key == 'company') {
-            //   if (Object.keys(this.company).length > 0) {
-            //     item.options.push({
-            //       value: this.company._id,
-            //       label: this.company.name
-            //     })
-            //   } else {
-            //     this.keyArr.splice(index, 1)
-            //   }
-            // } else if (item.key == 'platform') {
-            //   console.log(1111);
-            //   if (Object.keys(this.platform).length > 0) {
-            //     console.log(2222);
-            //     item.options.push({
-            //       value: this.platform._id,
-            //       label: this.platform.name
-            //     })
-            //   } else {
-            //     console.log(3333);
-            //     this.keyArr.splice(index, 1)
-            //   }
-            // }
+            if (item.key == 'company.name') {
+              // console.log('company');
+              if (this.company._id) {
+                item.options.push({
+                  value: this.company._id,
+                  label: this.company.name
+                })
+              } else {
+                i = index
+              }
+            }
+            if (item.key == 'mfrs.name') {
+              company.forEach(resItem => {
+                item.options.push({
+                  value: resItem.name,
+                  label: resItem.name,
+                  _id: resItem._id,
+                })
+              });
+            }
+            if (item.key == 'category.name') {
+              category.forEach(resItem => {
+                item.options.push({
+                  value: resItem.name,
+                  label: resItem.name,
+                  _id: resItem._id,
+                })
+              });
+            }
+            if (item.key == 'brand.name') {
+              brand.forEach(resItem => {
+                item.options.push({
+                  value: resItem.name,
+                  label: resItem.name,
+                  _id: resItem._id,
+                })
+              });
+            }
           });
-          console.log(this.keyArr);
+          this.keyArr.splice(i, 1)
         } catch (error) {}
       }
     },
-    created() {
+    async created() {
       this.getData()
     }
   };

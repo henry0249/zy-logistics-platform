@@ -1,10 +1,10 @@
 <template>
   <div :style="boxStyle">
-    <el-table :data="tableList" style="width: 100%" :height="heightValue">
+    <el-table stripe size="mini" :data="tableList" style="width: 100%" :height="heightValue">
       <el-table-column v-for="(item,index) in tableHeader" :key="index" :prop="item.key" :label="item.keyValue" :width="item.width>0?item.width:''">
         <div slot-scope="scope">
-          <el-tag v-if="item.type == 'Arr'" type="success" disable-transitions v-for="(v,i) in scope.row.tag" :key="i" style="margin-right:3px;">{{v}}</el-tag>
-          <div v-if="!item.type">{{scope.row[item.key]}}</div>
+          <el-tag v-if="item.type == 'Arr'" size="mini" type="success" disable-transitions v-for="(v,i) in scope.row.tag" :key="i" style="margin-right:3px;">{{v}}</el-tag>
+          <div v-if="!item.type">{{filterMethods(scope.row,item.key)}}</div>
         </div>
       </el-table-column>
       <el-table-column fixed="right" label="操作">
@@ -48,6 +48,16 @@
       return {
         num: 0,
         io: false,
+      }
+    },
+    methods: {
+      filterMethods(row, val) {
+        if (val.indexOf('.') > -1) {
+          let str = val.split('.')
+          return row[str[0]][str[1]]
+        } else {
+          return row[val]
+        }
       }
     },
     mounted() {
