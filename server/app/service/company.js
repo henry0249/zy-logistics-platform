@@ -18,5 +18,8 @@ class CompanyService extends Service {
   async set(param) {
     return await this.add(param);
   }
+  async setCallback(param) {
+    return param.data;
+  }
 }
 module.exports = CompanyService;

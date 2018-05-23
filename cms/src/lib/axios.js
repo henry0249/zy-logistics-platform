@@ -42,7 +42,10 @@ ajax.interceptors.request.use(async config => {
 // 注册响应拦截器
 ajax.interceptors.response.use(response => {
   if (response.headers.refleshtoken) {
-    store.commit('refleshToken', response.headers)
+    store.commit('setToken', {
+      token: response.headers.refleshtoken,
+      exp: response.headers.tokenexp
+    })
   }
   return Promise.resolve(response.data)
 }, err => {

@@ -197,12 +197,12 @@ class CurdService extends Service {
 
     if (this.hasService('require')) {
       let diyRequireArr = await diyService['require'](params.curdType, curdParam);
-      await this.checkRequire(modelName, curdParam, diyRequireArr);
+      await this.checkRequire(curdParam, diyRequireArr);
     } else {
       if (params.curdType === 'add' || params.curdType === 'set') {
-        this.checkRequire(modelName, curdParam);
+        this.checkRequire(curdParam);
       } else {
-        this.checkRequire(modelName, curdParam, []);
+        this.checkRequire(curdParam, []);
       }
     }
     // this.checkFiled(modelName, curdParam, params.curdType);
@@ -216,6 +216,14 @@ class CurdService extends Service {
     }
 
     let data = await this[params.curdType](model, curdParam);
+
+    if (this.hasService(params.curdType+'Callback')) {
+      data = await diyService[params.curdType+'Callback']({
+        curdType: params.curdType,
+        data,
+        curdParam
+      });
+    }
 
     if (this.hasService('curdCallback')) {
       data = await diyService['curdCallback']({
@@ -319,6 +327,10 @@ class CurdService extends Service {
   async delete(model, param) {
     let multi = param.multi || false;
     delete param.multi;
+    let data = await model.find(param);
+    if (data.length===0) {
+      this.ctx.throw(404, '未找到要删除的数据', param);
+    }
     await model.remove(param, {
       multi
     });

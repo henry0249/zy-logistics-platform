@@ -166,24 +166,23 @@ export default {
       this.loadingText = "正在添加公司";
       this.companyDialogTableVisible = false;
       try {
-        // let res = await this.$ajax.post("/company/delete", {
-        //   ...this.companyForm,
-        //   platform: this.platform._id,
-        //   vd: {
-        //     name: this.companyForm.name
-        //   }
-        // });
-        let res2 = await this.$ajax.post("/company/delete", {
-          name:this.companyForm.name,
+        await this.$ajax.post("/company/set", {
+          ...this.companyForm,
           platform: this.platform._id,
+          vd: {
+            name: this.companyForm.name
+          }
         });
         this.$message.success("成功添加公司!");
+        this.companyForm.name = "";
+        this.companyForm.self = false;
       } catch (error) {}
       this.loadingText = "";
     }
   },
-  mounted() {
+  async mounted() {
     this.getTreeData();
+    let res = await this.$ajax('/field');
   }
 };
 </script>

@@ -30,9 +30,14 @@ module.exports = {
     decrypted += decipher.final('utf8');
     return decrypted;
   },
-  async jwtSign(user_info, exp = Math.floor(Date.now() / 1000) + (2 * 60 * 60)) {
+  async jwtSign(user_info, option = {}) {
+    let exp = option.exp || Math.floor(Date.now() / 1000) + (2 * 60 * 60);
+    delete option.exp;
     let token = await jwt.sign({
-      user: user_info,
+      user: {
+        ...user_info,
+        ...option
+      },
       exp
     }, this.config.jwtKey)
     return {
@@ -73,7 +78,7 @@ module.exports = {
   is(funName, val, all) {
     if (all) {
       return is.all[funName](val);
-    }else{
+    } else {
       return is[funName](val);
     }
   },

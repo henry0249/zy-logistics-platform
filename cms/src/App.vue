@@ -21,8 +21,8 @@
     components: {
       MyHeader
     },
-    created() {
-      this.$store.commit("getLocalUser");
+    created(){
+      this.$store.commit('getLocalToken')
     }
   };
 </script>

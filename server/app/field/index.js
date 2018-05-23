@@ -50,6 +50,14 @@ module.exports = function (name) {
       var pathname = path.join(__dirname, file);
       if (file !== 'index.js') {
         let dataItem = require('./' + file);
+        dataItem.desc = {
+          type: 'String',
+          name: '描述'
+        };
+        dataItem.remark = {
+          type: 'String',
+          name: '备注'
+        };
         res[file.replace('.js', '')] = dataItem;
       }
     });

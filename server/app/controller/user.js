@@ -9,6 +9,10 @@ class UserController extends Controller {
     } = this;
     ctx.body = ctx.user;
   }
+  async loginInfo(){
+    const ctx = this.ctx;
+    ctx.body = ctx.tokenData;
+  }
   async loginLocal(){
     const {
       ctx

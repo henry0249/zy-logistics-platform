@@ -15,7 +15,7 @@ module.exports = app => {
     .post('/sms/send', 'lib.smsSend') //发送验证码
     .post('/sms/validate', 'lib.smsValidate') //验证验证码
     .post('/register/mobile', 'user.registerMobile') //手机号注册
-    .get('/user', checkToken(), 'user.info') //获取用户信息
+    .get('/loginInfo', checkToken(), 'user.loginInfo') //获取用户信息
     .get('/field', checkToken(), 'field.index') //获取数据库字段信息
     .all('/refleshToken', checkToken(), 'user.refleshToken') //刷新token
     .all('/logout', 'user.logout') //注销

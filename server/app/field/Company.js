@@ -2,19 +2,13 @@ module.exports = {
   type: {
     name: '公司类型',
     type: 'Array',
-    option: [{
-      key: 'common',
-      value: '一般公司'
-    }, {
-      key: 'logistics',
-      value: '物流公司'
-    }, {
-      key: 'shipper',
-      value: '发货厂商'
-    }, {
-      key: 'trading',
-      value: '贸易公司'
-    }]
+    option:{
+      common:'一般公司',
+      logistics:'物流公司',
+      shipper:'发货厂商',
+      trading:'贸易公司'
+    },
+    require: true
   },
   name: {
     name: '名称',

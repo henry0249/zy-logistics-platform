@@ -115,32 +115,40 @@ class PlatformService extends Service {
       children: [],
       root: true
     };
-    platformCompany.forEach((childrenItem) => {
+    for (let i = 0; i < platformCompany.length; i++) {
+      let childrenItem = platformCompany[i];
       let pushItem = {
         name: childrenItem.name,
         children: [],
         company: true,
         type: childrenItem.path
       };
-      platform[childrenItem.path].forEach((companyItem) => {
+      let platformCompanyData = await ctx.model.Company.find({
+        type: {
+          $in: [childrenItem.path]
+        },
+        platform:platform._id
+      });
+      platformCompanyData.forEach((companyItem) => {
         let companyPushItem = {
-          name: companyItem.name,
-          companyNode: true,
           _id: companyItem._id,
+          name: companyItem.name,
+          self: companyItem.self,
+          companyNode: true,
           children: []
         };
         companyUser.forEach((userItem) => {
           let companyUserPushItem = {
             name: userItem.name,
             companyUser: true,
-            company_id: companyItem._id
+            company_id: companyItem._id,
           };
           companyPushItem.push(companyUserPushItem);
         });
         pushItem.children.push(companyPushItem);
       })
       data.children.push(pushItem);
-    });
+    }
     platformUser.forEach((childrenItem) => {
       let pushItem = {
         name: childrenItem.name,

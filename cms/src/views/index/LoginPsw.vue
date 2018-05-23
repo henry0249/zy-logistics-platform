@@ -126,14 +126,18 @@ export default {
       try {
         let res = await this.$api.login_local({
           username: this.mobile,
-          password: md5(this.password)
+          password: md5(this.password),
+          sys: "cms"
         });
-        await this.$store.dispatch('setUser',res);
+        this.$store.commit("setToken", res);
+        await this.$store.dispatch("getLoginInfo");
+        this.$router.push("/order");
         this.loadingText = "";
       } catch (error) {
+        console.log(error);
         this.loadingText = "";
-        localStorage.removeItem('token');
-        sessionStorage.removeItem('token');
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
       }
     }
   }

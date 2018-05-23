@@ -8,6 +8,8 @@ module.exports = {
       distribution: '待配货',
       dispatch: '待调度',
       settlement: '待结算',
+      transport: '运输中',
+      finish: '已完成',
       delete: '已删除'
     }
   },
@@ -30,28 +32,27 @@ module.exports = {
     name: '商品名称',
     require: true,
   },
+  goodsCount: {
+    type: 'Number',
+    name: '商品数量',
+    require: true,
+  },
   address: {
     name: '收货地址',
     type: 'ObjectId',
     ref: 'Address',
     require: true
   },
-  amount: {
-    name: '金额',
-    type: 'Number'
-  },
-  payable: {
-    name: '应付款',
-    type: 'Number'
-  },
   paid: {
-    name: '已付款',
+    name: '实付款',
     type: 'Number'
   },
+
   deposit: {
     name: '定金',
     type: 'Number'
   },
+
   paymentModel: {
     name: '付款方式',
     type: 'String',
@@ -63,28 +64,61 @@ module.exports = {
       wechatPay: '微信支付'
     }
   },
+
   selfDelivery: {
     name: '是否自提',
     type: 'Boolean'
   },
+
   freeDelivery: {
     name: '是否包邮',
     type: 'Boolean'
   },
+
+  balance:{
+    name:'结算金额',
+    type: 'Boolean'
+  },
+
+  parent: {
+    type: 'ObjectId',
+    ref: 'Order'
+  },
+  lastCompany: {
+    type: 'ObjectId',
+    name: '上家公司',
+    ref: 'Company'
+  },
+  currentCompany:{
+    type: 'ObjectId',
+    name: '当前公司',
+    ref: 'Company'
+  },
+  nextCompany: {
+    type: 'ObjectId',
+    name: '下家公司',
+    ref: 'Company'
+  },
+  purchasePrice: {
+    name: '进价',
+    type: 'Number',
+    require: true
+  },
+  sellPrice: {
+    name: '售价',
+    type: 'Number',
+    require: true
+  },
+
   transportModel: {
     type: 'Number',
     name: '运输方式',
-    default: 0,
     option: {
       0: '平台配送', //需要匹配运输价格,内部结算
       1: '客户自提', //不能填运输价格
       2: '平台代送', //需要输入运输价格,用户结算
       3: '商家包邮' // 第三方厂家承担运输价格
     }
-  },
-  expectedDeliveryTime: {
-    name: '期望收货时间',
-    type: 'Date'
   },
   deliveryTime: {
     name: '收货时间',
@@ -94,23 +128,5 @@ module.exports = {
     name: '完成时间',
     type: 'Date'
   },
-  mfrs: {
-    name: '生产厂商',
-    type: 'ObjectId',
-    ref: 'Company',
-  },
-  pool: {
-    name: '联营商',
-    type: 'Array'
-  },
-  recommendedByUser: {
-    type: 'ObjectId',
-    name: '推荐人',
-    ref: 'User'
-  },
-  recommendedByCompany: {
-    type: 'ObjectId',
-    name: '推荐公司',
-    ref: 'Company'
-  }
+
 }

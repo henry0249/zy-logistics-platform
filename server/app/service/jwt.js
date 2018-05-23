@@ -1,30 +1,41 @@
 const Service = require('egg').Service;
 
 class jwtService extends Service {
-  async sign(user) {
-    const {
-      ctx
-    } = this;
-    let token = await ctx.helper.jwtSign(user);
+  async sign(user, option = {}) {
+    const ctx = this.ctx;
+    let token = await ctx.helper.jwtSign(user, option);
     let uaObj = ctx.helper.ua();
     let tokenData = await ctx.model.Jwt.findOne({
       user: user._id
     });
     if (tokenData) {
-      await tokenData.update({
+      let update = {
         ...token,
         $addToSet: {
           ualist: uaObj
         },
         ua: uaObj,
-        loginAt: new Date()
-      })
+        loginAt: new Date(),
+        ...option
+      };
+      if (!option.company) {
+        update.$unset = {
+          company: 1
+        }
+      }
+      if (!option.platform) {
+        update.$unset = {
+          platform: 1
+        }
+      }
+      await tokenData.update(update);
     } else {
       let newTokenData = new ctx.model.Jwt({
         ...token,
         user: user._id,
         ua: uaObj,
-        loginAt: new Date()
+        loginAt: new Date(),
+        ...option
       })
       await newTokenData.save();
       await newTokenData.update({
@@ -36,27 +47,56 @@ class jwtService extends Service {
     return token;
   }
   async verify() {
-    const {
-      ctx
-    } = this;
+    const ctx = this.ctx;
     let {
       header,
       body,
     } = ctx.request;
     let token = header.authorization || body.token;
     await ctx.helper.jwtVerify(token);
-    let hasToken = await ctx.model.Jwt.findOne({
+    let tokenData = await ctx.model.Jwt.findOne({
       value: token
-    });
-    if (!hasToken) {
-      ctx.throw(401, '登录已失效,请尝试重新登录');
-    }
-    let user = await ctx.model.User.findById(hasToken.user);
-    if (!user) {
+    }).populate([{
+      path: 'user'
+    }, {
+      path: 'company',
+      // populate: [{
+      //   name: '管理员',
+      //   path: 'admin'
+      // }, {
+      //   name: '业务专员',
+      //   path: 'salesman'
+      // }, {
+      //   name: '财务文员',
+      //   path: 'financial'
+      // }]
+    }, {
+      path: 'platform',
+      // populate: [{
+      //   name: '管理员',
+      //   path: 'admin'
+      // }, {
+      //   name: '市场专员',
+      //   path: 'salesman'
+      // }, {
+      //   name: '审核员',
+      //   path: 'auditor'
+      // }, {
+      //   name: '物流专员',
+      //   path: 'dispatcher'
+      // }, {
+      //   name: '单据文员',
+      //   path: 'documentClerk'
+      // }, {
+      //   name: '财务专员',
+      //   path: 'financial'
+      // }]
+    }]);
+    if (!tokenData) {
       ctx.throw(401, '登录已失效,请尝试重新登录');
     }
     let dayjs = require('dayjs');
-    let refleshRange = dayjs(hasToken.expAt).diff(dayjs(), 'second');
+    let refleshRange = dayjs(tokenData.expAt).diff(dayjs(), 'second');
     if (refleshRange > 0 && refleshRange <= 600) {
       let newToken = await this.sign(user);
       ctx.set({
@@ -65,33 +105,31 @@ class jwtService extends Service {
         tokenexp: newToken.expAt
       });
     }
-    return user;
+    return tokenData;
   }
   async reflesh() {
-    const {
-      ctx
-    } = this;
+    const ctx = this.ctx;
     let {
       header,
       body,
     } = ctx.request;
     let token = header.authorization || body.token;
-    let hasToken = await ctx.model.Jwt.findOne({
+    let tokenData = await ctx.model.Jwt.findOne({
       value: token
     });
-    if (!hasToken) {
+    if (!tokenData) {
       ctx.throw(401, '登录已失效,请尝试重新登录');
     }
     let dayjs = require('dayjs');
-    let refleshRange = dayjs(hasToken.expAt).diff(dayjs(), 'second');
+    let refleshRange = dayjs(tokenData.expAt).diff(dayjs(), 'second');
     if (refleshRange > 0 && refleshRange <= 600) {
       let user = await ctx.helper.jwtVerify(token);
       return await this.sign(user);
     }
     return {
       refleshRange: refleshRange,
-      value: hasToken.value,
-      expAt: hasToken.expAt
+      token: tokenData.value,
+      exp: tokenData.expAt
     };
   }
 }

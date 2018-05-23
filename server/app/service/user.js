@@ -2,9 +2,7 @@ const Service = require('egg').Service;
 
 class UserService extends Service {
   async loginLocal(param) {
-    const {
-      ctx
-    } = this;
+    const ctx = this.ctx;
     if (!param.username) {
       ctx.throw(406, '手机号/用户名/邮箱不能为空', {
         path: ctx.path
@@ -23,13 +21,8 @@ class UserService extends Service {
         name: param.username
       }, {
         email: param.username
-      }],
-      populate:[{
-        path:'company'
-      },{
-        path:'platform'
       }]
-    })
+    });
     if (!user) {
       ctx.throw(404, '用户不存在', {
         path: ctx.path,
@@ -50,14 +43,44 @@ class UserService extends Service {
         username: param.username
       });
     }
-    let token = await ctx.service.jwt.sign(user);
+    let option = {};
+    if (param.sys === 'cms') {
+      option.sys = 'cms';
+      if (user.company.length > 1) {
+        if (!param.company) {
+          ctx.throw(422, `请从请${user.company.length}个公司中选择一个登录`);
+        }
+        option.company = param.company;
+      }
+      if (user.company.length === 1 && user.platform.length === 1) {
+        if (!param.company || !param.platform) {
+          ctx.throw(422, `请选择一个公司或平台登录`);
+        }
+        if (param.company && param.platform) {
+          ctx.throw(422, `不能同时登录平台和公司`);
+        }
+        if (param.company) {
+          option.company = param.company;
+        }
+        if (param.platform) {
+          option.platform = param.platform;
+        }
+      }
+      if (user.company.length === 0 && user.platform.length === 1) {
+        option.platform = user.platform[0];
+      }
+      if (user.platform.length === 0) {
+        if (!user.isSys) {
+          ctx.throw(422, `未指定平台的用户不能登录后台系统`);
+        }
+      }
+    }
+    let token = await ctx.service.jwt.sign(user, option);
     return {
-      user,
       token: token.value,
-      tokenExp: token.expAt
+      exp: token.expAt
     };
   }
-
   async registerMobile() {
     const {
       ctx

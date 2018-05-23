@@ -7,8 +7,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    user: {},
-    platform: {},
+    loginInfo: {},
     platformPower: {
       owner: false,
       admin: false,
@@ -18,7 +17,6 @@ const store = new Vuex.Store({
       documentClerk: false,
       financial: false
     },
-    company: {},
     companyPower: {
       owner: false,
       admin: false,
@@ -27,86 +25,48 @@ const store = new Vuex.Store({
       documentClerk: false,
       financial: false
     },
-    isSys: false,
     token: '',
     tokenExp: '',
     baseUrl: window.location.protocol + '//' + window.location.host,
   },
   mutations: {
-    getLocalUser(state) {
-      if (localStorage.user) {
-        state.user = JSON.parse(localStorage.user);
-      }
-      if (localStorage.company) {
-        state.company = JSON.parse(localStorage.company);
-      }
-      if (localStorage.platform) {
-        state.platform = JSON.parse(localStorage.platform);
-      }
-      if (localStorage.platformPower) {
-        state.platformPower = JSON.parse(localStorage.platformPower);
-      }
-      if (localStorage.companyPower) {
-        state.companyPower = JSON.parse(localStorage.companyPower);
-      }
-      if (localStorage.token) {
-        state.token = localStorage.token;
-      }
-      if (localStorage.tokenExp) {
-        state.tokenExp = localStorage.tokenExp;
-      }
-      state.isSys = state.user.isSys || false;
+    setLoginInfo(state, data) {
+      state.loginInfo = data || {};
+      let user = data.user;
+      let platform = data.platform;
+      let company = data.company;
+      // for (const powerKey in state.platformPower) {
+      //   if (platform[powerKey] instanceof Array) {
+      //     platform[powerKey].forEach(item => {
+      //       if (item === user._id || user.isSys) {
+      //         state.platformPower[powerKey] = true;
+      //       }
+      //     });
+      //   }
+      // }
+      // for (const powerKey in state.companyPower) {
+      //   if (company[powerKey] instanceof Array) {
+      //     company[powerKey].forEach(item => {
+      //       if (item === user._id || user.isSys) {
+      //         state.companyPower[powerKey] = true;
+      //       }
+      //     });
+      //   }
+      // }
     },
-    setUser(state, data) {
-      state.token = data.token;
-      state.isSys = state.user.isSys || false;
-      state.user = data.user || {};
+    setToken(state, data) {
       localStorage.token = data.token;
-      localStorage.tokenExp = data.tokenExp;
-      localStorage.user = JSON.stringify(state.user);
+      localStorage.tokenExp = data.exp;
+      state.token = data.token;
+      state.tokenExp = data.exp;
     },
-    setPlatform(state, data) {
-      state.platform = data || {};
-      for (const powerKey in state.platformPower) {
-        if (data[powerKey] instanceof Array) {
-          data[powerKey].forEach(item => {
-            if (item === state.user._id) {
-              state.platformPower[powerKey] = true;
-            }
-          });
-        }
-      }
-      localStorage.platform = JSON.stringify(state.platform);
-      localStorage.platformPower = JSON.stringify(state.platformPower);
-    },
-    setCompany(state, data) {
-      state.company = data || {};
-      for (const powerKey in state.companyPower) {
-        if (data[powerKey] instanceof Array) {
-          data[powerKey].forEach(item => {
-            if (item === state.user._id) {
-              state.companyPower[powerKey] = true;
-            }
-          });
-        }
-      }
-      localStorage.company = JSON.stringify(state.company);
-      localStorage.companyPower = JSON.stringify(state.companyPower);
-    },
-    refleshToken(state, data) {
-      localStorage.token = data.refleshtoken;
-      localStorage.tokenExp = data.tokenexp;
-      state.token = data.refleshToken;
-      state.tokenExp = data.tokenExp;
+    getLocalToken(state) {
+      state.token = localStorage.token;
+      state.tokenExp = localStorage.tokenExp;
     },
     logout(state) {
       localStorage.removeItem('token');
       localStorage.removeItem('tokenExp');
-      localStorage.removeItem('user');
-      localStorage.removeItem('company');
-      localStorage.removeItem('platform');
-      localStorage.removeItem('platformPower');
-      localStorage.removeItem('companyPower');
       for (const powerKey in state.platformPower) {
         state.platformPower[powerKey] = false;
       }
@@ -123,64 +83,13 @@ const store = new Vuex.Store({
     }
   },
   actions: {
-    async getUserInfo(context, payload) {
-      let res = await ajax.get('/user')
-      if (res) {
-        context.commit('setUser', res);
-      } else {
-        context.commit('setUser', {});
-      }
+    async getLoginInfo(context, payload) {
+      let res = await ajax.get('/loginInfo')
+      context.commit('setLoginInfo', res);
     },
     async logout(context, payload) {
       await ajax.get('/logout');
       context.commit('logout');
-    },
-    async setUser(context, payload) {
-      let {
-        company,
-        platform
-      } = payload.user;
-
-      if (company.length > 0 || platform.length > 0) {
-        $message.success("登录成功");
-        context.commit('setUser', payload);
-        if (company.length > 1 || platform.length > 1) {
-          router.replace('/chooseCompany');
-        }
-        if (company.length == 1 && platform.length == 1) {
-          router.replace('/chooseCompany');
-        }
-        if (company.length == 1 && platform.length == 0) {
-          context.commit('setCompany', company[0]);
-        }
-        if (company.length == 0 && platform.length == 1) {
-          context.commit('setPlatform', platform[0]);
-        }
-        router.replace('/order');
-      } else {
-        $message.show({
-          text: `暂为开放个人用户登录此后台系统`,
-          icon: 'error',
-          color: '#ff5252',
-          time: 10000
-        });
-      }
-      // if (payload.user.isSys) {
-      //   payload.company = payload.user.company[0];
-      //   payload.platform = payload.user.platform[0];
-      //   context.commit('setUser', payload);
-      //   $message.success("登录成功");
-      //   router.replace('/order');
-      // } else {
-      //   if (payload.user.company.length <= 0) {
-      //     $message.show({
-      //       text: `暂为开放个人用户登录此后台系统`,
-      //       icon: 'error',
-      //       color: '#ff5252',
-      //       time: 10000
-      //     });
-      //   }
-      // }
     },
     async addPlatform(context, payload) {
       let res = await ajax.post('/platform/set', {
