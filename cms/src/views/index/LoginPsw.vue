@@ -134,7 +134,6 @@ export default {
         this.$router.push("/order");
         this.loadingText = "";
       } catch (error) {
-        console.log(error);
         this.loadingText = "";
         localStorage.removeItem("token");
         sessionStorage.removeItem("token");

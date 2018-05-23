@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <left-nav :nav.sync="nav" default-active="/platform/org"></left-nav>
+    <left-nav :nav.sync="nav"></left-nav>
     <div class="f1 g-container">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
@@ -26,14 +26,12 @@ export default {
   created() {
     this.nav = [
       {
-        hide: !this.isSys,
         name: "平台架构",
         icon: "icon-structure",
         path: "/platform/org",
         color: "#EF5350"
       },
       {
-        hide: !this.isSys,
         name: "平台设置",
         icon: "icon-icon-test",
         path: "/platform/setting",

@@ -3,7 +3,7 @@
     <div style="background-color:#545c64" class="collapse-change" @click="isCollapse=!isCollapse">
       <icon size="10" style="transition: all .5s;" :class="{collapse:!isCollapse}">icon-caidan</icon>
     </div>
-    <el-menu background-color="#545c64" text-color="#fff" active-text-color="#ffd04b" :open="defaultActive" unique-opened :default-active="defaultActive" :router="router" class="my-el-menu-vertical" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
+    <el-menu background-color="#545c64" text-color="#fff" active-text-color="#ffd04b" :open="defaultActive" unique-opened :default-active="defaultActive" :router="router" class="my-el-menu-vertical hide-scroll" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
       <el-submenu v-if="item.children" :index="item.path||''" v-for="item in nav" :key="item.id">
         <div slot="title" :class="{ac:!isCollapse||!item.children}">
           <icon :size="''+item.iconSize||14" style="margin:0 5px">{{item.icon}}</icon>

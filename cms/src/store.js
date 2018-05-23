@@ -8,6 +8,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     loginInfo: {},
+    field: {},
     platformPower: {
       owner: false,
       admin: false,
@@ -25,6 +26,7 @@ const store = new Vuex.Store({
       documentClerk: false,
       financial: false
     },
+
     token: '',
     tokenExp: '',
     baseUrl: window.location.protocol + '//' + window.location.host,
@@ -33,26 +35,31 @@ const store = new Vuex.Store({
     setLoginInfo(state, data) {
       state.loginInfo = data || {};
       let user = data.user;
-      let platform = data.platform;
-      let company = data.company;
-      // for (const powerKey in state.platformPower) {
-      //   if (platform[powerKey] instanceof Array) {
-      //     platform[powerKey].forEach(item => {
-      //       if (item === user._id || user.isSys) {
-      //         state.platformPower[powerKey] = true;
-      //       }
-      //     });
-      //   }
-      // }
-      // for (const powerKey in state.companyPower) {
-      //   if (company[powerKey] instanceof Array) {
-      //     company[powerKey].forEach(item => {
-      //       if (item === user._id || user.isSys) {
-      //         state.companyPower[powerKey] = true;
-      //       }
-      //     });
-      //   }
-      // }
+
+      function setPower(data, stateData) {
+        for (let powerKey in stateData) {
+          let powerItem = data[powerKey];
+          if (typeof powerItem === 'string') {
+            stateData[powerKey] = user._id === powerItem;
+          } else {
+            if (powerItem instanceof Array) {
+              powerItem.forEach(item => {
+                if (item === user._id) {
+                  stateData[powerKey] = true;
+                }
+              });
+            }
+          }
+          if (user.isSys) {
+            stateData[powerKey] = true;
+          }
+        }
+      }
+      setPower(data.platform || {}, state.platformPower);
+      setPower(data.company || {}, state.companyPower);
+    },
+    setField(state, data) {
+      state.field = data || {};
     },
     setToken(state, data) {
       localStorage.token = data.token;
@@ -84,8 +91,14 @@ const store = new Vuex.Store({
   },
   actions: {
     async getLoginInfo(context, payload) {
-      let res = await ajax.get('/loginInfo')
+      let res = await ajax.get('/loginInfo');
       context.commit('setLoginInfo', res);
+      let fieldRes = await ajax.get('/field');
+      context.commit('setField', fieldRes);
+    },
+    async getField(context, payload) {
+      let res = await ajax.get('/field');
+      context.commit('setField', res);
     },
     async logout(context, payload) {
       await ajax.get('/logout');
