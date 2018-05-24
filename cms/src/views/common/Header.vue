@@ -121,11 +121,6 @@ export default {
       }
       this.$router.push(item.path);
     }
-  },
-  async created(){
-    if (this.showHeader) {
-      await this.$store.dispatch('getLoginInfo');
-    }
   }
 };
 </script>

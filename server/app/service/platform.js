@@ -132,7 +132,7 @@ class PlatformService extends Service {
       platformCompanyData.forEach((companyItem) => {
         let companyPushItem = {
           _id: companyItem._id,
-          name: companyItem.name,
+          name: companyItem.name + (companyItem.self?'(自营)':''),
           self: companyItem.self,
           companyNode: true,
           children: []
@@ -143,7 +143,7 @@ class PlatformService extends Service {
             companyUser: true,
             company_id: companyItem._id,
           };
-          companyPushItem.push(companyUserPushItem);
+          companyPushItem.children.push(companyUserPushItem);
         });
         pushItem.children.push(companyPushItem);
       })

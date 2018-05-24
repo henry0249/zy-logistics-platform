@@ -1,10 +1,8 @@
 <template>
   <div>
-    <List index selection :thead="filed" :data="data">
-      <template v-if="column.property === 'goods'" slot-scope="{row,column,index}">
-        单位登记我的几位大家玩i大家玩i大家玩i低价位焦点网ID就
-      </template>
-    </List>
+    <my-table :loadmore="loadmore" index selection :thead="filed" :data.sync="data" :select.sync="select">
+      
+    </my-table>
   </div>
 </template>
 
@@ -20,19 +18,21 @@ export default {
       filed: filed,
       data: [
         {
-          address: "上海市普陀"
-        },
-        {
           address: "上海市普陀区金沙江路 1517 弄"
-        },
-        {
-          address: "上海市普陀区金沙江路 1519 弄"
-        },
-        {
-          address: "上海市普陀区金沙江路 1516 弄"
         }
       ]
     };
+  },
+  methods: {
+    async loadmore() {
+      let p = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(666);
+        }, 1000);
+      });
+      await p;
+      return [];
+    }
   }
 };
 </script>

@@ -98,7 +98,7 @@ class jwtService extends Service {
     let dayjs = require('dayjs');
     let refleshRange = dayjs(tokenData.expAt).diff(dayjs(), 'second');
     if (refleshRange > 0 && refleshRange <= 600) {
-      let newToken = await this.sign(user);
+      let newToken = await this.sign(tokenData.user);
       ctx.set({
         refleshRange,
         refleshtoken: newToken.value,

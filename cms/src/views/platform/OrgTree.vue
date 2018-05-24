@@ -10,20 +10,20 @@
         <div class="custom-tree-node" slot-scope="{ node, data }">
           <div>{{ node.label }}</div>
           <div v-if="!data.root">
-            <el-button v-if="data.user || data.company || data.companyNode" @click="() => addNode(data)" icon="el-icon-plus" type="text" size="mini">
+            <el-button v-if="data.user || data.company || data.companyUser" @click="() => addNode(data)" icon="el-icon-plus" type="text" size="mini">
               添加
             </el-button>
-            <el-button v-if="!(data.user || data.company)" @click="() => removeNode(data)" icon="el-icon-delete" type="text" size="mini">
+            <el-button v-if="!(data.user || data.company || data.companyUser)" @click="() => removeNode(data)" icon="el-icon-delete" type="text" size="mini">
               删除{{data.user}}
             </el-button>
           </div>
         </div>
       </el-tree>
     </div>
-    <el-dialog width="35%" :title="'添加'+addTitle" :visible.sync="companyDialogTableVisible">
+    <el-dialog width="35%" :title="'添加'+field.Company.type.option[addType]" :visible.sync="companyDialogTableVisible">
       <el-form ref="form" :model="companyForm" label-width="80px" size="small">
         <el-form-item label="类型">
-          {{addTitle}}
+          {{field.Company.type.option[addType]}}
         </el-form-item>
         <el-form-item label="名称">
           <el-input v-model="companyForm.name"></el-input>
@@ -37,7 +37,7 @@
         </el-form-item>
       </el-form>
     </el-dialog>
-    <el-dialog :title="addTitle" :visible.sync="userDialogTableVisible">
+    <el-dialog :title="addType" :visible.sync="userDialogTableVisible">
       即将开放此功能
     </el-dialog>
   </loading-box>
@@ -62,6 +62,8 @@ export default {
         series: [
           {
             type: "tree",
+            // expandAndCollapse: false,
+            initialTreeDepth: 2,
             data: [],
             // layout:'radial',
             // top: "1%",
@@ -100,7 +102,7 @@ export default {
       },
       companyDialogTableVisible: false,
       userDialogTableVisible: false,
-      addTitle: "",
+      addType: "",
       companyForm: {
         name: "",
         self: false
@@ -129,7 +131,8 @@ export default {
       return data.name.indexOf(value) !== -1;
     },
     addNode(data) {
-      this.addTitle = data.name;
+      this.addType = data.type;
+      console.log(data);
       if (data.company) {
         this.companyDialogTableVisible = true;
       } else if (data.user) {
@@ -145,7 +148,6 @@ export default {
       }
     },
     removeNode(data) {
-      console.log(data);
       this.$confirm(`即将开放此功能`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -169,6 +171,7 @@ export default {
         await this.$ajax.post("/company/set", {
           ...this.companyForm,
           platform: this.platform._id,
+          type: [this.addType],
           vd: {
             name: this.companyForm.name
           }
@@ -176,13 +179,13 @@ export default {
         this.$message.success("成功添加公司!");
         this.companyForm.name = "";
         this.companyForm.self = false;
+        await this.getTreeData();
       } catch (error) {}
       this.loadingText = "";
     }
   },
-  async mounted() {
+  mounted() {
     this.getTreeData();
-    let res = await this.$ajax('/field');
   }
 };
 </script>
