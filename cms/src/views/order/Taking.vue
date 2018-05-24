@@ -1,6 +1,6 @@
 <template>
   <div>
-    <my-table :loadmore="loadmore" index selection :thead="filed" :data.sync="data" :select.sync="select">
+    <my-table  index selection op :loadmore="loadmore" :thead="filed" :data.sync="data">
       
     </my-table>
   </div>
