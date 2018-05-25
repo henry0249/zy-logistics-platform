@@ -76,8 +76,12 @@ module.exports = {
     type: 'Boolean'
   },
 
-  balance: {
+  balanced: {
     name: '已结算',
+    type: 'Boolean'
+  },
+  invoiced:{
+    name: '已开发票',
     type: 'Boolean'
   },
 
