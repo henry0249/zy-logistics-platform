@@ -31,14 +31,19 @@
         </my-form>
         <div>
           <my-table size="small" index edit border :thead="thead" :data.sync="data">
-            <my-form-item select v-model="goods.brand" :options="brands" filterable size="mini" @click.stop v-if="scope.column.property === 'brand'" slot-scope="scope">
-            </my-form-item>
+            <template slot-scope="scope" v-if="scope.column.property==='brand'">
+              <my-form-item select v-model="data[scope.index].brand" :options="brands" filterable size="mini">
+              </my-form-item>
+            </template>
           </my-table>
         </div>
       </div>
       <div class="tr" style="margin-top:30px">
         <el-button size="small" type="primary">立即创建</el-button>
         <el-button size="small">取消</el-button>
+      </div>
+      <div>
+        {{data}}
       </div>
       <div>
         {{order}}
