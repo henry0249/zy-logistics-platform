@@ -26,6 +26,8 @@
     <div v-if="str == 'goods'" class="flex list-box" v-for="v in price" :key="v.id">
       <span style="width:100px">{{v.keyValue}}</span>
       <el-input v-if="v.type == 'input'" v-model="v.value" :placeholder="`请输入${v.keyValue}`" style="width:222px;"></el-input>
+      <el-cascader style="width:222px;" v-else-if="v.type == 'select'" v-model="v.value" placeholder="请选择地区" :options="v.options" expand-trigger="hover" filterable change-on-select></el-cascader>
+      {{v.value}}
     </div>
     <div class="flex list-box" style="">
       <el-button @click="$router.go(0)">取 消</el-button>
@@ -35,6 +37,7 @@
 </template>
 
 <script>
+  import cityData from './cityData.js';
   export default {
     props: {
       keyArr: {
@@ -55,6 +58,12 @@
         fileList2: [],
         inputValue: '',
         price: [{
+          key: 'address',
+          keyValue: '地区',
+          type: 'select',
+          value: null,
+          options: cityData
+        }, {
           key: 'factory',
           keyValue: '出厂价',
           type: 'input',
@@ -109,7 +118,18 @@
           curdType: 'add',
         }
         this.keyArr.forEach(item => {
-          if (item.value == null && item.key == 'name') {
+          if (item.value == null && item.key == 'name' || item.value == null && item.key == 'platform.name' || item.value == null && item.key == 'company.name') {
+            io = false
+            this.$alert(`${item.keyValue}不能为空`, '提示', {
+              confirmButtonText: '确定',
+              callback: () => {
+                return
+              }
+            })
+          }
+        });
+        this.price.forEach(item => {
+          if (item.value == null) {
             io = false
             this.$alert(`${item.keyValue}不能为空`, '提示', {
               confirmButtonText: '确定',
@@ -143,27 +163,56 @@
                 }
               }
             }
-            console.log(data);
             let res = await this.$api.curd(data)
-            console.log(res);
             if (this.str == 'goods') {
+              let addressOptions = {
+                model: 'address',
+                curdType: 'add',
+              }
+              this.price[0].options.forEach(optionsItem => {
+                if (optionsItem.value == this.price[0].value[0]) {
+                  let i = 0
+                  this.price[0].value.forEach((valueItem, valueIndex) => {
+                    if (valueIndex == 0) {
+                      addressOptions.province = optionsItem.label
+                    } else if (valueIndex == 1) {
+                      optionsItem.children.forEach((childrenItem, childrenIndex) => {
+                        if (childrenItem.value == valueItem) {
+                          addressOptions.city = childrenItem.label
+                          i = childrenIndex
+                        }
+                      });
+                    } else {
+                      optionsItem.children[i].children.forEach(childrenItem => {
+                        if (childrenItem == valueItem) {
+                          addressOptions.district = childrenItem.label
+                        }
+                      });
+                    }
+                  });
+                }
+              });
+              let address = await this.$api.curd(addressOptions)
               for (let index = 0; index < this.price.length; index++) {
-                let item = this.price[index]
-                let options = {
-                  model: 'price',
-                  curdType: 'add',
-                  type: item.key,
-                  value: item.value,
-                  goods: res._id
-                }
-                if (data.mfrs) {
-                  options.mfrs = data.mfrs
-                }
-                if (item.value) {
-                  try {
+                if (this.price[index].key == 'address') {} else {
+                  let item = this.price[index]
+                  let options = {
+                    model: 'price',
+                    curdType: 'add',
+                    type: item.key,
+                    value: item.value,
+                    goods: res._id,
+                    mfrs: res.mfrs,
+                  }
+                  if (data.mfrs) {
+                    options.mfrs = data.mfrs
+                  }
+                  if (address) {
+                    options.address = address._id
+                  }
+                  if (item.value) {
                     let price = await this.$api.curd(options)
-                    console.log('price', price);
-                  } catch (error) {}
+                  }
                 }
               }
             }

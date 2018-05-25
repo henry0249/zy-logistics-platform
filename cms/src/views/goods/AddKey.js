@@ -21,12 +21,6 @@ export default [{
     type: 'input',
     keyValue: '单位'
   }, {
-    key: 'tag',
-    value: null,
-    type: 'Arr',
-    options: [],
-    keyValue: '标签'
-  }, {
     key: 'spec',
     value: null,
     type: 'input',
@@ -92,5 +86,11 @@ export default [{
     value: null,
     type: 'textarea',
     keyValue: '详情'
+  }, {
+    key: 'tag',
+    value: null,
+    type: 'Arr',
+    options: [],
+    keyValue: '标签'
   }
 ]

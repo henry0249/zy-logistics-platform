@@ -56,13 +56,6 @@
             iconSize: '15',
             path: "/goods/brand"
           }, {
-            name: "添加价格",
-            icon: "icon-jiagebaohu",
-            color: "#1565C0",
-            iconSize: '15',
-            path: "/goods/add",
-          },
-          {
             name: "添加商品",
             icon: "icon-tianjiashangpin1",
             color: "#1565C0",

@@ -79,12 +79,16 @@
           let company = await this.$api.curd({
             model: 'company',
             curdType: 'find',
+            type: {
+              $in: ['shipper']
+            }
           })
+          console.log('common', company);
           this.keyArr.forEach((item, index) => {
             console.log('object', item.key);
             if (item.key == 'platform.name') {
               console.log('platform');
-              if (this.platform._id) {
+              if (Object.keys(this.platform).length > 0) {
                 item.options.push({
                   value: this.platform._id,
                   label: this.platform.name
@@ -95,7 +99,7 @@
             }
             if (item.key == 'company.name') {
               console.log('this.company', this.company);
-              if (this.company._id) {
+              if (Object.keys(this.company).length > 0) {
                 item.options.push({
                   value: this.company._id,
                   label: this.company.name

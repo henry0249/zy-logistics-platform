@@ -288,6 +288,8 @@
       }
     },
     async mounted() {
+      console.log('this.platform', this.platform);
+      console.log('this.company', this.company);
       let data = {
         skip: 0,
         limit: 20
