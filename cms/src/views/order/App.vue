@@ -1,7 +1,7 @@
 <template>
   <div class="flex">
-    <left-nav :nav="nav" @itemClick="navClick"></left-nav>
-    <div class="f1 g-container" style="overflow:hidden">
+    <left-nav :nav="nav"></left-nav>
+    <div class="f1 g-container">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
           <!-- 这里是会被缓存的视图组件-->
@@ -73,9 +73,6 @@ export default {
         }
       ]
     };
-  },
-  methods: {
-    navClick() {}
   }
 };
 </script>

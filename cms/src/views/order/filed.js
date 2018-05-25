@@ -12,7 +12,7 @@ module.exports = {
     type: 'Array',
     name: '商品信息',
   },
-  'address': {
+  'address.name': {
     type: 'String',
     name: '收货地址'
   },

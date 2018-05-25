@@ -98,7 +98,18 @@ class jwtService extends Service {
     let dayjs = require('dayjs');
     let refleshRange = dayjs(tokenData.expAt).diff(dayjs(), 'second');
     if (refleshRange > 0 && refleshRange <= 600) {
-      let newToken = await this.sign(tokenData.user);
+      let option = {};
+      if (!ctx.tokenData) {
+        ctx.throw(401, '登录已失效,请尝试重新登录');
+      }
+      if (ctx.tokenData.company) {
+        option.company = ctx.tokenData.company;
+      }
+      if (ctx.tokenData.platform) {
+        option.platform = ctx.tokenData.platform;
+      }
+      option.sys = ctx.tokenData.sys;
+      let newToken = await this.sign(tokenData.user, option);
       ctx.set({
         refleshRange,
         refleshtoken: newToken.value,

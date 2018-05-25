@@ -43,6 +43,7 @@ module.exports = {
     ref: 'Address',
     require: true
   },
+
   paid: {
     name: '实付款',
     type: 'Number'
@@ -66,30 +67,80 @@ module.exports = {
   },
 
   selfDelivery: {
-    name: '是否自提',
+    name: '客户选择自提',
     type: 'Boolean'
   },
 
   freeDelivery: {
-    name: '是否包邮',
+    name: '客户选择包邮',
     type: 'Boolean'
   },
 
-  balance:{
-    name:'结算金额',
+  balance: {
+    name: '已结算',
     type: 'Boolean'
   },
+
+  settlementMethod: {
+    type: 'Number',
+    name: '结算方式',
+    option: {
+      0: '先款后货',
+      1: '先货后款',
+      2: '平台垫付',
+      3: '预付定金',
+      4: '活动搭赠'
+    }
+  },
+
+  transportModel: {
+    type: 'Number',
+    name: '运输方式',
+    option: {
+      0: '平台配送',
+      1: '委托配送',
+      2: '商家配送',
+      3: '客户自提',
+    },
+    optionDesc: {
+      0: '自营商品，平台公司结算运费给物流商',
+      1: '第三方商家，商家结算运费给物流商',
+      2: '无需填运费信息，无需结算运费',
+      3: '无需填运费信息，无需结算运费'
+    },
+    desc: '运费结算:填写运费信息，运费累加到客户订单金额，平台公司结算运费给物流商'
+  },
+
+  invoiceType: {
+    type: 'Number',
+    name: '发票类型',
+    option: {
+      0: '增值专票',
+      1: '增值普票'
+    }
+  },
+  deliveryTime: {
+    name: '配送时间',
+    type: 'Date'
+  },
+  finishTime: {
+    name: '完成时间',
+    type: 'Date'
+  },
+
 
   parent: {
     type: 'ObjectId',
     ref: 'Order'
   },
+
   lastCompany: {
     type: 'ObjectId',
     name: '上家公司',
     ref: 'Company'
   },
-  currentCompany:{
+
+  currentCompany: {
     type: 'ObjectId',
     name: '当前公司',
     ref: 'Company'
@@ -99,6 +150,7 @@ module.exports = {
     name: '下家公司',
     ref: 'Company'
   },
+
   purchasePrice: {
     name: '进价',
     type: 'Number',
@@ -109,24 +161,4 @@ module.exports = {
     type: 'Number',
     require: true
   },
-
-  transportModel: {
-    type: 'Number',
-    name: '运输方式',
-    option: {
-      0: '平台配送', //需要匹配运输价格,内部结算
-      1: '客户自提', //不能填运输价格
-      2: '平台代送', //需要输入运输价格,用户结算
-      3: '商家包邮' // 第三方厂家承担运输价格
-    }
-  },
-  deliveryTime: {
-    name: '收货时间',
-    type: 'Date'
-  },
-  finishTime: {
-    name: '完成时间',
-    type: 'Date'
-  },
-
 }

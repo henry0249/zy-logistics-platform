@@ -5,7 +5,7 @@
       </slot>
     </div>
     <loading-box v-model="loadingText">
-      <el-table v-if="tableHeight" @cell-click="cellClick" @row-click="rowClick" size="mini" class-name="mylist" style="width: 100%;font-size:13px" :data="data" :height="tableHeight" @selection-change="handleSelectionChange">
+      <el-table :border="border" ref="table" @cell-click="cellClick" @row-click="rowClick" :size="size" class-name="mylist" style="width: 100%;box-sizing: border-box;" :data="data" :height="tableHeight" @selection-change="handleSelectionChange">
         <el-table-column v-if="selection" type="selection" width="30">
         </el-table-column>
         <el-table-column v-if="index" show-overflow-tooltip type="index" width="30">
@@ -13,7 +13,7 @@
         <el-table-column show-overflow-tooltip :prop="key" :label="item.name" :width="''+(item.width||'')" v-for="(item, key) in thead" :key="key">
           <template slot-scope="scope">
                 <slot :row="scope.row" :column="scope.column" :index="scope.$index">
-                  {{scope.row[scope.column.property]}}
+                  {{deepKey(scope.row,scope.column.property)}}
                 </slot>
 </template>
         </el-table-column>
@@ -24,10 +24,10 @@
             <i style="color:#F56C6C" @click="handleOp('delete',scope)" class="el-icon-delete pointer"></i>
           </div>
         </el-table-column>
-        <div v-ripple @click="loadmoreFun" v-if="data.length>0 && loadmoreText!=='nomore'" class="loadmore" slot="append">
+        <div v-ripple @click="loadmoreFun" v-if="loadmore&&data.length>0 && loadmoreText!=='nomore'" class="loadmore" slot="append">
           {{loadmoreText}}
         </div>
-        <div v-if="data.length>0&&loadmoreText==='nomore'" class="loadmore nomore" slot="append">
+        <div v-if="loadmore&&data.length>0&&loadmoreText==='nomore'" class="loadmore nomore" slot="append">
           没有更多数据了
         </div>
       </el-table>
@@ -36,15 +36,26 @@
       <slot name="footer">
       </slot>
     </div>
+    <input ref="fixedInput" v-model="fixedInputVal" @blur="fixedInputBlur" @keyup.enter="fixedInputBlur" v-if="showFixedInput" class="fixed-input" :style="fixedInputStyle"/>
+
   </div>
 </template>
 
 <script>
 export default {
   props: {
+    size: {
+      type: String,
+      default: ""
+    },
     height: {
       type: String,
-      default: "100vh - 50px"
+      default: ""
+    },
+    
+    border: {
+      type: Boolean,
+      default: false
     },
     selection: {
       type: Boolean,
@@ -61,6 +72,10 @@ export default {
       default: false
     },
     op: {
+      type: Boolean,
+      default: false
+    },
+    edit: {
       type: Boolean,
       default: false
     },
@@ -82,17 +97,41 @@ export default {
   },
   data() {
     return {
-      tableHeight: "",
+      tableHeight: "auto",
       loadingText: "加载中",
-      loadmoreText: "加载更多"
+      loadmoreText: "加载更多",
+      fixedInputStyle: {},
+      showFixedInput: false,
+      fixedInputVal: "",
+      currentRowIndex: -1,
+      currentRowKey: "",
+      currentRow: {}
     };
   },
   watch: {
     height() {
       this.setTableHeight();
+    },
+    showFixedInput(val) {
+      if (val) {
+        this.$nextTick(() => {
+          this.$refs.fixedInput.focus();
+        });
+      }
     }
   },
   methods: {
+    fixedInputBlur() {
+      this.showFixedInput = false;
+      if (this.currentRowKey.indexOf(".") > -1) {
+        let keyArr = this.currentRowKey.split(".");
+        this.currentRow[keyArr[0]][keyArr[1]] = this.fixedInputVal;
+      } else {
+        this.currentRow[this.currentRowKey] = this.fixedInputVal;
+      }
+      this.data.splice(this.currentRowIndex, 1, this.currentRow);
+      this.$emit("update:data", this.data);
+    },
     handleSelectionChange(val) {
       this.$emit("update:select", val);
     },
@@ -103,6 +142,25 @@ export default {
       });
     },
     cellClick(row, column, cell, event) {
+      if (this.edit && column.property) {
+        this.showFixedInput = true;
+        let { width, height, top, left } = cell.getBoundingClientRect();
+        this.fixedInputStyle = {
+          width: width + "px",
+          height: height + "px",
+          top: top + "px",
+          left: left + "px"
+        };
+        this.fixedInputVal = this.deepKey(row, column.property);
+        this.currentRowIndex = this.data.indexOf(row);
+        this.currentRowKey = column.property;
+        this.currentRow = row;
+        this.$emit("cellEdit", {
+          key: column.property,
+          index: this.data.indexOf(row),
+          row: row
+        });
+      }
       this.$emit("cellClick", {
         text: row[column.property],
         row,
@@ -120,29 +178,37 @@ export default {
       });
     },
     setTableHeight() {
-      let headerHeight = this.$refs.header ? this.$refs.header.clientHeight : 0;
-      let footerHeight = this.$refs.footer ? this.$refs.footer.clientHeight : 0;
-      this.tableHeight = `calc(${
-        this.height
-      } - ${headerHeight}px - ${footerHeight}px)`;
+      if (this.height) {
+        let headerHeight = this.$refs.header
+          ? this.$refs.header.clientHeight
+          : 0;
+        let footerHeight = this.$refs.footer
+          ? this.$refs.footer.clientHeight
+          : 0;
+        this.tableHeight = `calc(${
+          this.height
+        } - ${headerHeight}px - ${footerHeight}px)`;
+      } else {
+        this.tableHeight = "auto";
+      }
     },
     async loadmoreFun() {
       this.loadingText = "加载中";
       try {
         let res = await this.loadmore();
-        console.log(res);
         if (res instanceof Array) {
           if (res.length === 0) {
             this.loadmoreText = "nomore";
           } else {
-            this.$emit("update:data", [...this.data, ...res]);
+            res.forEach(item => {
+              this.data.push(item);
+            });
             this.loadmoreText = "加载更多";
           }
         } else {
           this.loadmoreText = "nomore";
         }
       } catch (error) {
-        console.log(error);
       }
       this.loadingText = "";
     }
@@ -162,12 +228,24 @@ export default {
 <style scoped>
 .loadmore {
   text-align: center;
-  line-height: 37px;
+  line-height: 36px;
   cursor: pointer;
   color: #409eff;
 }
 .nomore {
   color: #aaa;
   cursor: default;
+}
+.fixed-input {
+  position: fixed;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  padding: 0px 10px;
+  /* border: 1px dashed #eee; */
+  /* border-bottom: 1px dashed #409eff; */
+  border-radius: 2px;
+  color: #606266;
 }
 </style>

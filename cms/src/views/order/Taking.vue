@@ -1,6 +1,6 @@
 <template>
   <div>
-    <my-table  index selection op :loadmore="loadmore" :thead="filed" :data.sync="data">
+    <my-table height="100vh - 50px" edit  index selection op :loadmore="loadmore" :thead="filed" :data.sync="data">
       
     </my-table>
   </div>
@@ -8,17 +8,15 @@
 
 <script>
 import filed from "./filed";
-import List from "./List";
 export default {
-  components: {
-    List
-  },
   data() {
     return {
       filed: filed,
       data: [
         {
-          address: "上海市普陀区金沙江路 1517 弄"
+          address: {
+            name: "上海市普陀区金沙江路 1517 弄"
+          }
         }
       ]
     };
@@ -31,7 +29,13 @@ export default {
         }, 1000);
       });
       await p;
-      return [];
+      return [
+        {
+          address: {
+            name: "上海市"
+          }
+        }
+      ];
     }
   }
 };

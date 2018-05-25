@@ -13,7 +13,7 @@
             <el-button v-if="data.user || data.company || data.companyUser" @click="() => addNode(data)" icon="el-icon-plus" type="text" size="mini">
               添加
             </el-button>
-            <el-button v-if="!(data.user || data.company || data.companyUser)" @click="() => removeNode(data)" icon="el-icon-delete" type="text" size="mini">
+            <el-button style="color:#F56C6C" v-if="!(data.user || data.company || data.companyUser)" @click="() => removeNode(data)" icon="el-icon-delete" type="text" size="mini">
               删除{{data.user}}
             </el-button>
           </div>
