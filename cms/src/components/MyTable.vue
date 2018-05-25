@@ -10,7 +10,14 @@
         </el-table-column>
         <el-table-column v-if="index" show-overflow-tooltip type="index" width="30">
         </el-table-column>
-        <el-table-column show-overflow-tooltip :prop="key" :label="item.name" :width="''+(item.width||'')" v-for="(item, key) in thead" :key="key">
+        <el-table-column v-if="is('json',thead)" show-overflow-tooltip :prop="key" :label="item.name" :width="''+(item.width||'')" v-for="(item, key) in thead" :key="key">
+          <template slot-scope="scope">
+            <slot :row="scope.row" :column="scope.column" :index="scope.$index">
+              {{deepKey(scope.row,scope.column.property)}}
+            </slot>
+          </template>
+        </el-table-column>
+        <el-table-column v-if="is('array',thead)" show-overflow-tooltip :prop="item.key" :label="item.label||item.name" :width="''+(item.width||'')" v-for="(item, index) in thead" :key="index">
           <template slot-scope="scope">
             <slot :row="scope.row" :column="scope.column" :index="scope.$index">
               {{deepKey(scope.row,scope.column.property)}}
@@ -39,7 +46,6 @@
       </slot>
     </div>
     <input ref="fixedInput" v-model="fixedInputVal" @blur="fixedInputBlur" @keyup.enter="fixedInputBlur" v-if="showFixedInput" class="fixed-input" :style="fixedInputStyle"/>
-
   </div>
 </template>
 
@@ -117,6 +123,9 @@
       }
     },
     methods: {
+      test(val){
+        console.log(val);
+      },
       fixedInputBlur() {
         this.showFixedInput = false;
         if (this.currentRowKey.indexOf(".") > -1) {
@@ -138,6 +147,7 @@
         });
       },
       cellClick(row, column, cell, event) {
+        console.log(cell);
         if (this.edit && column.property) {
           this.showFixedInput = true;
           let {
@@ -241,7 +251,7 @@
     box-sizing: border-box;
     border: none;
     outline: none;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);          
     padding: 0px 10px;
     /* border: 1px dashed #eee; */
     /* border-bottom: 1px dashed #409eff; */

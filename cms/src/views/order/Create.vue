@@ -13,11 +13,11 @@
             </my-form-item>
             <my-form-item select v-model="order.transportModel" label="运输方式" :options="field.Order.transportModel.option">
             </my-form-item>
-            <my-form-item input v-model="order.invoiceType" label="配送时间">
+            <my-form-item input v-model="order.deliveryTime" label="配送时间">
             </my-form-item>
           </div>
           <div class="flex ac jb" style="margin:15px 0">
-            <my-form-item select v-model="order.settlementMethod"  label="发票类型" :options="field.Order.invoiceType.option">
+            <my-form-item select v-model="order.invoiceType"  label="发票类型" :options="field.Order.invoiceType.option">
             </my-form-item>
             <my-form-item input v-model="order.contactName" label="收货人">
             </my-form-item>
@@ -30,8 +30,9 @@
           </my-form-item>
         </my-form>
         <div>
-          <my-table size="small" index edit border @cellEdit="cellEdit" :thead="filed" :data.sync="data">
-            
+          <my-table size="small" index edit border :thead="thead" :data.sync="data">
+            <my-form-item select v-model="goods.brand" :options="brands" filterable size="mini" @click.stop v-if="scope.column.property === 'brand'" slot-scope="scope">
+            </my-form-item>
           </my-table>
         </div>
       </div>
@@ -47,38 +48,13 @@
 </template>
 
 <script>
+import { create } from "./field";
+
 export default {
   data() {
-    let filed = {
-      brand: {
-        name: "品牌",
-        type: "ObjectId"
-      },
-      name: {
-        name: "名称",
-        type: "String",
-        require: true
-      },
-      unit: {
-        name: "单位",
-        type: "String",
-        require: true
-      },
-      goodsCount: {
-        name: "数量"
-      },
-      sellPrice: {
-        name: "销售单价"
-      },
-      transportPrice: {
-        name: "运输单价"
-      },
-      totalPrice: {
-        name: "合计金额"
-      }
-    };
+    let field = create;
     let goods = {};
-    for (const key in filed) {
+    for (const key in field) {
       goods[key] = "";
     }
     return {
@@ -91,28 +67,30 @@ export default {
       goods: goods,
       order: {
         customer: [],
-        settlementMethod: '',
-        transportModel: '',
+        settlementMethod: "",
+        transportModel: "",
         deliveryTime: new Date(),
-        invoiceType: '',
-        contactName:'',
-        contactMobile:'',
-        address:''
+        invoiceType: "",
+        contactName: "",
+        contactMobile: "",
+        address: ""
       },
-      filed: filed,
-      customer: []
+      thead: field,
+      customer: [],
+      brands:[]
     };
   },
   methods: {
     async cellEdit(val) {
       console.log(val);
     },
-    async getCustomer() {
+    async getData() {
       this.loadingText = "加载中";
       this.customer = [];
       try {
-        let users = await this.$ajax.post("/user/find");
-        let companys = await this.$ajax.post("/company/find");
+        let users = await this.$ajax("/user/find");
+        let companys = await this.$ajax("/company/find");
+        this.brands = await this.$ajax("/brand/find");
         users.forEach(item => {
           item.label = item.name || item.mobile;
           item.value = item._id;
@@ -121,21 +99,24 @@ export default {
           item.label = item.name || item.mobile;
           item.value = item._id;
         });
-        this.customer = [{
-          value: 'company',
-          label: '公司',
-          children:companys
-        },{
-          value: 'user',
-          label: '个人',
-          children:users
-        }];
+        this.customer = [
+          {
+            value: "company",
+            label: "公司",
+            children: companys
+          },
+          {
+            value: "user",
+            label: "个人",
+            children: users
+          }
+        ];
       } catch (error) {}
       this.loadingText = "";
     }
   },
-  created(){
-    this.getCustomer();
+  created() {
+    this.getData();
   }
 };
 </script>
