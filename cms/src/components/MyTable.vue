@@ -200,7 +200,7 @@
             this.height
           } - ${headerHeight}px - ${footerHeight}px)`;
         } else {
-          this.tableHeight = "auto";
+          this.tableHeight = "";
         }
       },
       async loadmoreFun() {

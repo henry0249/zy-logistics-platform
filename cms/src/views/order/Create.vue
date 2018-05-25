@@ -49,7 +49,6 @@
 
 <script>
 import { create } from "./field";
-
 export default {
   data() {
     let field = create;
