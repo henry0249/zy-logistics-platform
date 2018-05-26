@@ -105,51 +105,9 @@ var keyArr1 = [{
     keyValue: "规格"
   }
 ]
-var tableHeader = [{
-  key: 'address',
-  keyValue: '地区'
-}, {
-  key: 'factory',
-  keyValue: '出厂价'
-}, {
-  key: 'sell',
-  keyValue: '销售价'
-}, {
-  key: 'transport',
-  keyValue: '运输价'
-}]
-var tableList = [{
-  address: {
-    key: "address",
-    keyValue: "地区",
-    type: "select",
-    value: null,
-    options: []
-  },
-  factory: {
-    key: "factory",
-    keyValue: "出厂价",
-    type: "input",
-    value: null
-  },
-  sell: {
-    key: "sell",
-    keyValue: "销售价",
-    type: "input",
-    value: null
-  },
-  transport: {
-    key: "transport",
-    keyValue: "运输价",
-    type: "input",
-    value: null
-  }
-}]
 module.exports = {
   keyArr1,
   keyArr2,
   keyArr3,
   keyArr4,
-  tableHeader,
-  tableList
 }

@@ -42,9 +42,17 @@
           </div>
         </div>
       </div>
-      <my-table index size="mini" edit :thead="tableTeader" :data.sync="tableList">
+      <my-table index size="mini" edit :thead="tableTeader" :data.sync="tableList" op>
+        <div slot="op" slot-scope="scope">
+          <i v-if="tableList.length>1" title="删除该地区" class="pointer" style="margin-right:10px" @click="delAdr(scope['index'])">
+            <icon size="16px">icon-ec1</icon>
+          </i>
+          <i title="增加一个地区" class="pointer" @click="addAdr">
+            <icon size="16px">icon-54</icon>
+          </i>
+        </div>
         <template slot-scope="scope" v-if="scope.column.property === 'address'">
-                <el-cascader size="mini" placeholder="试试搜索：指南" :options="cityData" filterable v-model="scope.row[scope.column.property]" change-on-select></el-cascader>
+                  <el-cascader size="mini" placeholder="试试搜索：北京" :options="cityData" filterable v-model="scope.row[scope.column.property]" change-on-select></el-cascader>
 </template>
       </my-table>
     </div>
@@ -57,12 +65,12 @@
 
 <script>
   import cityData from "../common/cityData.js";
+  import cityKey from "./cityKey.js";
   import {
     keyArr1,
     keyArr2,
     keyArr3,
     keyArr4,
-    tableTeader
   } from "./add.js";
   export default {
     data() {
@@ -71,6 +79,7 @@
         inputVisible: false,
         inputValue: "",
         keyArr4,
+        cityKey,
         keyArr3,
         keyArr2,
         keyArr1,
@@ -93,9 +102,9 @@
         },
         tableList: [{
           address: [],
-          factory: "2",
-          sell: "3",
-          transport: "4"
+          factory: 0,
+          sell: 0,
+          transport: 0
         }]
       };
     },
@@ -105,10 +114,13 @@
       }
     },
     methods: {
+      add() {
+        console.log(1111111111);
+      },
       delAdr(i) {
         console.log(i);
-        if (this.price.length > 1) {
-          this.price.splice(i, 1);
+        if (this.tableList.length > 1) {
+          this.tableList.splice(i, 1);
         } else {
           this.$alert(`至少有一个地区`, "提示", {
             confirmButtonText: "确定",
@@ -119,36 +131,10 @@
         }
       },
       addAdr() {
-        let obj = {
-          address: {
-            key: "address",
-            keyValue: "地区",
-            type: "select",
-            value: null,
-            options: cityData
-          },
-          factory: {
-            key: "factory",
-            keyValue: "出厂价",
-            type: "input",
-            value: null
-          },
-          sell: {
-            key: "sell",
-            keyValue: "销售价",
-            type: "input",
-            value: null
-          },
-          transport: {
-            key: "transport",
-            keyValue: "运输价",
-            type: "input",
-            value: null
-          }
-        };
-        this.price.push(obj);
+        let obj = JSON.parse(JSON.stringify(this.tableList[this.tableList.length - 1]));
+        this.tableList.push(obj);
       },
-      sub() {
+      async sub() {
         console.log(this.keyArr3);
         let obj = {};
         this.keyArr1.forEach(item => {
@@ -170,7 +156,104 @@
           if (item.value) {
             obj[item.key] = item.value;
           }
+          if (item.key == 'tag') {
+            obj[item.key] = item.options
+          }
         });
+        try {
+          this.loading = true
+          for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+              console.log(key);
+              if (key.indexOf('.') > -1) {
+                let str = key.split('.')
+                console.log(str[0]);
+                obj[str[0]] = obj[key]
+                delete obj[key]
+              }
+            }
+          }
+          obj.model = 'goods'
+          obj.curdType = 'add'
+          console.log('obj', obj);
+          let res = await this.$api.curd(obj)
+          console.log('res', res);
+          if (res) {
+            for (let index = 0; index < this.tableList.length; index++) {
+              let addressOp = {
+                model: 'address',
+                curdType: 'add',
+                province: this.cityKey[this.tableList[index].address[0]],
+                city: this.cityKey[this.tableList[index].address[1]],
+                district: this.cityKey[this.tableList[index].address[2]],
+              }
+              // if (this.tableList[index].address.length == 1) {
+              //   delete addressOp.city
+              //   delete addressOp.district
+              // } else if (this.tableList[index].address.length == 2) {
+              //   delete addressOp.district
+              // } else {
+              //   delete addressOp.city
+              //   delete addressOp.province
+              //   delete addressOp.district
+              // }
+              console.log('addressOp', addressOp);
+              let findAddress = await this.$api.curd({
+                model: 'address',
+                curdType: 'findOne',
+                province: this.cityKey[this.tableList[index].address[0]],
+                city: this.cityKey[this.tableList[index].address[1]],
+                district: this.cityKey[this.tableList[index].address[2]],
+              })
+              if (findAddress) {
+                for (const key in this.tableList[index]) {
+                  console.log(222222);
+                  if (this.tableList[index].hasOwnProperty(key)) {
+                    if (key !== 'address') {
+                      console.log(key);
+                      let priceOp = {
+                        model: 'price',
+                        curdType: 'add',
+                        address: findAddress._id,
+                        goods: res._id,
+                        value: this.tableList[index][key],
+                        type: key
+                      }
+                      let price = await this.$api.curd(priceOp)
+                      console.log('price', price);
+                    }
+                  }
+                }
+              } else {
+                let address = await this.$api.curd(addressOp)
+                console.log('address', address);
+                if (address) {
+                  console.log(111111);
+                  for (const key in this.tableList[index]) {
+                    console.log(222222);
+                    if (this.tableList[index].hasOwnProperty(key)) {
+                      if (key !== 'address') {
+                        console.log(key);
+                        let priceOp = {
+                          model: 'price',
+                          curdType: 'add',
+                          address: address._id,
+                          goods: res._id,
+                          value: this.tableList[index][key],
+                          type: key
+                        }
+                        let price = await this.$api.curd(priceOp)
+                        console.log('price', price);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          console.log('obj', obj);
+        } catch (error) {}
+        this.loading = false
       },
       switchChange(val) {
         console.log(val);
@@ -232,11 +315,13 @@
                   $in: ["shipper"]
                 }
               });
+              console.log('mfrs', res);
               res.forEach(resItem => {
-                res.label = resItem.name;
-                res.value = resItem._id;
-                this.keyArr2[index].options.push(res);
+                resItem.label = resItem.name;
+                resItem.value = resItem._id;
+                this.keyArr2[index].options.push(resItem);
               });
+              console.log('this.keyArr2[index]', this.keyArr2[index]);
             } catch (error) {
               console.log(error);
             }
