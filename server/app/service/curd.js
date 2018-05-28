@@ -10,7 +10,7 @@ class CurdService extends Service {
     } = ctx;
     let acceptObj = {
       'GET': ['find', 'findOne', 'findById'],
-      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete'],
+      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete', 'aggregate'],
       'PUT': ['update'],
       'DELETE': ['delete']
     }
@@ -217,8 +217,8 @@ class CurdService extends Service {
 
     let data = await this[params.curdType](model, curdParam);
 
-    if (this.hasService(params.curdType+'Callback')) {
-      data = await diyService[params.curdType+'Callback']({
+    if (this.hasService(params.curdType + 'Callback')) {
+      data = await diyService[params.curdType + 'Callback']({
         curdType: params.curdType,
         data,
         curdParam
@@ -328,7 +328,7 @@ class CurdService extends Service {
     let multi = param.multi || false;
     delete param.multi;
     let data = await model.find(param);
-    if (data.length===0) {
+    if (data.length === 0) {
       this.ctx.throw(404, '未找到要删除的数据', param);
     }
     await model.remove(param, {
@@ -336,6 +336,12 @@ class CurdService extends Service {
     });
     return '删除成功';
   }
+
+  //聚合 $push: "$$ROOT" 根数据
+  async aggregate(model, param) {
+    return await model.aggregate(param);
+  }
+
   async log(model, param) {
     await this.add(model, param);
   }

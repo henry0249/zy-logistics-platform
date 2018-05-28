@@ -22,13 +22,15 @@
         <el-color-picker style="width:100%" v-if="$attrs.color!==undefined" v-model="data"></el-color-picker>
         <el-rate v-if="$attrs.rate!==undefined" v-model="data"></el-rate>
         <el-checkbox v-if="$attrs.checkbox!==undefined" v-model="data"></el-checkbox>
-        <el-cascader style="width:100%" v-if="$attrs.cascader!==undefined" :options="options" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-cascader>
+        <el-cascader style="width:100%" v-if="$attrs.cascader!==undefined" :options="options" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change"></el-cascader>
+        <el-cascader style="width:100%" v-if="$attrs.area!==undefined" :options="areaData" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change"></el-cascader>
       </slot>
     </div>
   </div>
 </template>
 
 <script>
+import { pca, pcaa } from "area-data";
 import MyForm from "./MyForm";
 export default {
   extends: MyForm,
@@ -56,17 +58,44 @@ export default {
       datetime: "",
       color: "",
       rate: 0,
-      cascader: []
+      cascader: [],
+      area: []
     };
     for (const key in defaultDataOptions) {
       if (this.$attrs.hasOwnProperty(key)) {
         this.data = defaultDataOptions[key];
       }
     }
+    
+    if (this.$attrs.hasOwnProperty("area")) {
+      for (const provinceKey in pca["86"]) {
+        let city = [];
+        for (const cityKey in pca[provinceKey]) {
+          let district = [];
+          for (const districtKey in pcaa[cityKey]) {
+            district.push({
+              value: districtKey,
+              label: pcaa[cityKey][districtKey],
+            });
+          }
+          city.push({
+            value: cityKey,
+            label: pca[provinceKey][cityKey],
+            children:district
+          });
+        }
+        this.areaData.push({
+          value: provinceKey,
+          label: pca["86"][provinceKey],
+          children: city
+        });
+      }
+    }
   },
   data() {
     return {
-      data: ""
+      data: "",
+      areaData: []
     };
   },
   watch: {
@@ -89,6 +118,11 @@ export default {
       } else {
         return option[this.size || this.$parent.size] || "15px";
       }
+    }
+  },
+  methods: {
+    change(val) {
+      this.$emit("change", val);
     }
   }
 };

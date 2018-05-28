@@ -1,39 +1,38 @@
 module.exports = {
-  create:{
-    brand: {
-      name: "品牌",
-      type: "ObjectId",
-      readOnly:true
-    },
-    name: {
-      name: "名称",
+  create: {
+    // brand: {
+    //   name: "品牌",
+    //   type: "ObjectId",
+    //   readOnly: true
+    // },
+    goods: {
+      name: "商品名称",
       type: "String",
       require: true,
-      readOnly:true
-    },
-    unit: {
-      name: "单位",
-      type: "String",
-      require: true,
-      readOnly:true
+      readOnly: true,
+      width: "300"
     },
     goodsCount: {
       name: "数量"
     },
+    unit: {
+      name: "单位",
+      readOnly: true
+    },
     sellPrice: {
       name: "销售单价",
-      readOnly:true
+      readOnly: true
     },
     transportPrice: {
       name: "运输单价",
-      readOnly:true
+      readOnly: true
     },
     totalPrice: {
       name: "合计金额",
-      readOnly:true
+      readOnly: true
     }
   },
-  taking:{
+  taking: {
     _id: {
       type: 'ObjectId',
       name: '订单号'
@@ -58,6 +57,6 @@ module.exports = {
     remark: {
       type: 'String',
       name: '备注',
-    },
+    }
   }
 }

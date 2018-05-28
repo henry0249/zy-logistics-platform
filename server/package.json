@@ -6,6 +6,7 @@
   "dependencies": {
     "@alicloud/sms-sdk": "^1.0.9",
     "ali-oss": "^5.1.1",
+    "area-data": "^5.0.6",
     "dayjs": "^1.5.21",
     "egg": "^2.2.1",
     "egg-mongoose": "^2.2.1",

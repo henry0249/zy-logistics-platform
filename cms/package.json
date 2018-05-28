@@ -10,6 +10,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "area-data": "^5.0.6",
     "axios": "^0.18.0",
     "compression-webpack-plugin": "^1.1.11",
     "cube-ui": "^1.8.0",

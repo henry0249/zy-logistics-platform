@@ -23,7 +23,7 @@
             </my-form-item>
             <my-form-item input v-model="order.contactMobile" label="联系电话">
             </my-form-item>
-            <my-form-item input v-model="order.address" label="送货地址">
+            <my-form-item area v-model="order.address" label="送货地址">
             </my-form-item>
           </div>
           <my-form-item width="100%" input type="textarea" autosize label="订单备注">
@@ -31,8 +31,8 @@
         </my-form>
         <div>
           <my-table size="small" index edit border :thead="thead" :data.sync="data">
-            <template slot-scope="scope" v-if="scope.column.property==='brand'">
-              <my-form-item select v-model="data[scope.index].brand" :options="brands" filterable size="mini">
+            <template slot-scope="scope">
+              <my-form-item v-if="scope.column.property==='goods'" @change="goodsChange" cascader v-model="data[scope.index].goods" :options="goods" filterable size="mini">
               </my-form-item>
             </template>
           </my-table>
@@ -68,7 +68,6 @@ export default {
           ...goods
         }
       ],
-      goods: goods,
       order: {
         customer: [],
         settlementMethod: "",
@@ -77,11 +76,12 @@ export default {
         invoiceType: "",
         contactName: "",
         contactMobile: "",
-        address: ""
+        address: []
       },
       thead: field,
       customer: [],
-      brands:[]
+      brands: [],
+      goods: []
     };
   },
   methods: {
@@ -95,6 +95,29 @@ export default {
         let users = await this.$ajax("/user/find");
         let companys = await this.$ajax("/company/find");
         this.brands = await this.$ajax("/brand/find");
+        let goods = await this.$ajax.post("/goods/aggregate", {
+          $group: {
+            _id: "$brand",
+            children: {
+              $push: "$$ROOT"
+            }
+          }
+        });
+        this.goods = [];
+        goods.forEach(item => {
+          item.children.forEach(childrenItem => {
+            childrenItem.label = childrenItem.name;
+            childrenItem.value = childrenItem._id;
+          });
+          this.brands.forEach(brandItem => {
+            if (brandItem._id === item._id) {
+              brandItem.value = brandItem._id;
+              brandItem.label = brandItem.name;
+              brandItem.children = item.children;
+              this.goods.push(brandItem);
+            }
+          });
+        });
         users.forEach(item => {
           item.label = item.name || item.mobile;
           item.value = item._id;
@@ -117,6 +140,24 @@ export default {
         ];
       } catch (error) {}
       this.loadingText = "";
+    },
+    getGoodsByBrandAndId(brand_id,goods_id){
+      let val = {};
+      this.goods.forEach((item)=>{
+        if (item._id === brand_id) {
+          if (item.children) {
+            item.children.forEach((goodsItem)=>{
+              if (goodsItem._id === goods_id) {
+                val = goodsItem;
+              }
+            })
+          }
+        }
+      });
+      return val;
+    },
+    goodsChange(val) {
+      // console.log(this.getGoodsByBrandAndId(val[0],val[1]));
     }
   },
   created() {

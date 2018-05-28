@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        target: 'http://yixiu.natappvip.cc', // 接口域名
+        target: 'http://bymm.natappvip.cc', // 接口域名
         changeOrigin: true, //是否跨域
         pathRewrite: {
           '^/api': '' //需要rewrite的,
