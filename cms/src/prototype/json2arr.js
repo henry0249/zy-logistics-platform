@@ -8,10 +8,12 @@ let json2arr = (object) => {
         const element = object[key];
         res.push({
           label: element,
-          value: isNaN(Number(key))?key:Number(key)
+          value: isNaN(Number(key)) ? key : Number(key)
         });
       }
     }
+    return res;
+  } else {
     return res;
   }
 }
