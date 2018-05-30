@@ -31,8 +31,13 @@
         </my-form>
         <div>
           <my-table size="small" index edit border :thead="thead" :data.sync="data">
-            <!-- <my-form-item cascader v-model="order.customer" filterable  label="客户名称" :options="customer">
-                          </my-form-item> -->
+            <template slot-scope="scope">
+              <my-form-item v-if="scope.prop === 'goods'" size="mini" cascader v-model="scope.row.goods" filterable :options="goods">
+              </my-form-item>
+              <div v-if="scope.prop === 'unit'">
+                {{goodsUnit}}
+              </div>
+            </template>
           </my-table>
         </div>
       </div>
@@ -51,127 +56,138 @@
 </template>
 
 <script>
-  import {
-    create
-  } from "./field";
-  export default {
-    data() {
-      let field = create;
-      let goods = {};
-      for (const key in field) {
-        goods[key] = "";
-      }
-      return {
-        loadingText: "",
-        data: [{
+import { create } from "./field";
+export default {
+  data() {
+    let field = create;
+    let goods = {};
+    for (const key in field) {
+      goods[key] = "";
+    }
+    return {
+      loadingText: "",
+      data: [
+        {
           ...goods
-        }],
-        order: {
-          customer: [],
-          settlementMethod: 1,
-          transportModel: 0,
-          deliveryTime: "" + new Date(),
-          invoiceType: 0,
-          contactName: "",
-          contactMobile: "",
-          address: []
-        },
-        thead: field,
+        }
+      ],
+      order: {
         customer: [],
-        brands: [],
-        goods: []
-      };
+        settlementMethod: 1,
+        transportModel: 0,
+        deliveryTime: "" + new Date(),
+        invoiceType: 0,
+        contactName: "",
+        contactMobile: "",
+        address: []
+      },
+      thead: field,
+      customer: [],
+      brands: [],
+      goods: []
+    };
+  },
+  computed: {
+    goodsUnit() {
+      let goodsData = this.data[0].goods;
+      if (goodsData.length === 2) {
+        return this.getGoodsByBrandAndId(goodsData[0], goodsData[1]).unit;
+      } else {
+        return "-";
+      }
+    }
+  },
+  methods: {
+    async cellEdit(val) {
+      console.log(val);
     },
-    methods: {
-      async cellEdit(val) {
-        console.log(val);
-      },
-      async getData() {
-        this.loadingText = "加载中";
-        this.customer = [];
-        try {
-          let users = await this.$ajax("/user/find");
-          let companys = await this.$ajax("/company/find");
-          this.brands = await this.$ajax("/brand/find");
-          let goods = await this.$ajax.post("/goods/aggregate", {
-            $group: {
-              _id: "$brand",
-              children: {
-                $push: "$$ROOT"
-              }
-            }
-          });
-          this.goods = [];
-          goods.forEach(item => {
-            item.children.forEach(childrenItem => {
-              childrenItem.label = childrenItem.name;
-              childrenItem.value = childrenItem._id;
-            });
-            this.brands.forEach(brandItem => {
-              if (brandItem._id === item._id) {
-                brandItem.value = brandItem._id;
-                brandItem.label = brandItem.name;
-                brandItem.children = item.children;
-                this.goods.push(brandItem);
-              }
-            });
-          });
-          users.forEach(item => {
-            item.label = item.name || item.mobile;
-            item.value = item._id;
-          });
-          companys.forEach(item => {
-            item.label = item.name || item.mobile;
-            item.value = item._id;
-          });
-          this.customer = [{
-              value: "company",
-              label: "公司",
-              children: companys
-            },
-            {
-              value: "user",
-              label: "个人",
-              children: users
-            }
-          ];
-        } catch (error) {}
-        this.loadingText = "";
-      },
-      getGoodsByBrandAndId(brand_id, goods_id) {
-        let val = {};
-        this.goods.forEach(item => {
-          if (item._id === brand_id) {
-            if (item.children) {
-              item.children.forEach(goodsItem => {
-                if (goodsItem._id === goods_id) {
-                  val = goodsItem;
-                }
-              });
+    async getData() {
+      this.loadingText = "加载中";
+      this.customer = [];
+      try {
+        let users = await this.$ajax("/user/find");
+        let companys = await this.$ajax("/company/find");
+        this.brands = await this.$ajax("/brand/find");
+        let goods = await this.$ajax.post("/goods/aggregate", {
+          $group: {
+            _id: "$brand",
+            children: {
+              $push: "$$ROOT"
             }
           }
         });
-        return val;
-      },
-      goodsChange(val) {
-        // console.log(this.getGoodsByBrandAndId(val[0],val[1]));
-      }
+        this.goods = [];
+        goods.forEach(item => {
+          item.children.forEach(childrenItem => {
+            childrenItem.label = childrenItem.name;
+            childrenItem.value = childrenItem._id;
+          });
+          this.brands.forEach(brandItem => {
+            if (brandItem._id === item._id) {
+              brandItem.value = brandItem._id;
+              brandItem.label = brandItem.name;
+              brandItem.children = item.children;
+              this.goods.push(brandItem);
+            }
+          });
+        });
+        users.forEach(item => {
+          item.label = item.name || item.mobile;
+          item.value = item._id;
+        });
+        companys.forEach(item => {
+          item.label = item.name || item.mobile;
+          item.value = item._id;
+        });
+        this.customer = [
+          {
+            value: "company",
+            label: "公司",
+            children: companys
+          },
+          {
+            value: "user",
+            label: "个人",
+            children: users
+          }
+        ];
+      } catch (error) {}
+      this.loadingText = "";
     },
-    created() {
-      this.getData();
+    getGoodsByBrandAndId(brand_id, goods_id) {
+      let val = {};
+      this.goods.forEach(item => {
+        if (item._id === brand_id) {
+          if (item.children) {
+            item.children.forEach(goodsItem => {
+              if (goodsItem._id === goods_id) {
+                val = goodsItem;
+              }
+            });
+          }
+        }
+      });
+      return val;
+    },
+    goodsChange(val) {
+      // console.log(this.getGoodsByBrandAndId(val[0],val[1]));
     }
-  };
+  },
+  created() {
+    this.getData();
+  }
+};
 </script>
 
 <style scoped>
-  .g-order-create {
-    padding: 3% 5%;
-  }
-  .g-order {
-    margin: 0 auto;
-    padding: 30px;
-    /* box-shadow: 0 0 10px rgba(0,0,0,.2); */
-    border: 1px solid #eee;
-    border-radius: 4px;
-  }
+.g-order-create {
+  padding: 3% 5%;
+}
+.g-order {
+  margin: 0 auto;
+  padding: 30px;
+  /* box-shadow: 0 0 10px rgba(0,0,0,.2); */
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
 </style>
