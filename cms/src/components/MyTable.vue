@@ -10,7 +10,7 @@
         </el-table-column>
         <el-table-column v-if="index" show-overflow-tooltip type="index" width="30">
         </el-table-column>
-        <el-table-column v-if="item.slot" show-overflow-tooltip :prop="key" :label="item.name" :width="''+(item.width||'')" v-for="(item, key) in thead" :key="key">
+        <el-table-column v-if="item.slot" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" v-for="(item, key) in thead" :key="key">
           <template slot-scope="scope">
             <slot :prop="key" :row="scope.row" :column="scope.column" :index="scope.$index">{{deepKey(scope.row,scope.column.property)}}</slot>
           </template>

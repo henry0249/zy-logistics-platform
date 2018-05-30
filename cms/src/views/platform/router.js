@@ -3,6 +3,7 @@ import Org from './Org.vue';
 import Setting from './Setting.vue';
 import Company from './Company.vue';
 import User from './User.vue';
+import Area from './Area.vue';
 
 export default [{
   path: '/platform',
@@ -20,5 +21,8 @@ export default [{
   }, {
     path: 'user',
     component: User
+  }, {
+    path: 'area',
+    component: Area
   }]
 }]

@@ -48,6 +48,11 @@ export default {
         icon: "icon-yonghu-qunzu",
         path: "/platform/user",
         color: "#42A5F5"
+      },
+      {
+        name: "区域管理",
+        icon: "icon-quyu",
+        path: "/platform/area",
       }
     ];
   }

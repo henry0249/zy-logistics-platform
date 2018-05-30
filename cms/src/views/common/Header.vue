@@ -2,7 +2,7 @@
   <div class="flex ac g-header" v-if="showHeader">
     <img class="logo" :src="logoImg" alt="">
     <div class="flex ac my-nav" style="margin-left:20px">
-      <div @click="navClick(item,index)" v-ripple class="ac nav-item" :class="{active:index === activeNavIndex}" v-for="(item,index) in nav" :key="index">
+      <div v-if="!item.hide" @click="navClick(item,index)" v-ripple class="ac nav-item" :class="{active:index === activeNavIndex}" v-for="(item,index) in nav" :key="index">
         <icon style="margin-right:5px" small v-if="item.icon">{{item.icon}}</icon>
         <div>
           {{item.name}}
@@ -24,15 +24,6 @@
         <el-dropdown-item @click.native="$store.dispatch('logout')">注销</el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
-    <!-- <v-btn flat icon color="red lighten-1">
-              <v-icon>volume_up</v-icon>
-            </v-btn>
-            <v-btn flat icon color="blue lighten-2">
-              <v-icon>notifications</v-icon>
-            </v-btn>
-            <v-btn flat icon color="green lighten-2">
-              <v-icon>face</v-icon>
-            </v-btn> -->
   </div>
 </template>
 
@@ -42,48 +33,7 @@ export default {
     return {
       logoImg:
         "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-16-zyfz_logo.png",
-      nav: [
-        {
-          name: "订单管理",
-          path: "/order",
-          icon: "icon-daichulidingdan"
-        },
-        {
-          name: "运单管理",
-          path: "",
-          icon: "icon-wuliu"
-        },
-        {
-          name: "商品管理",
-          path: "/goods",
-          icon: "icon-leixing"
-        },
-        {
-          name: "财务管理",
-          path: "",
-          icon: "icon-jiesuan"
-        },
-        {
-          name: "统计报表",
-          path: "",
-          icon: "icon-chart"
-        },
-        {
-          name: "公司管理",
-          path: "",
-          icon: "icon-GSB"
-        },
-        {
-          name: "平台管理",
-          path: "/platform",
-          icon: "icon-pingtai1"
-        },
-        {
-          name: "系统管理",
-          path: "",
-          icon: "icon-xitongguanli"
-        }
-      ]
+      nav: []
     };
   },
   computed: {
@@ -121,6 +71,51 @@ export default {
       }
       this.$router.push(item.path);
     }
+  },
+  mounted() {
+    this.nav = [
+      {
+        name: "订单管理",
+        path: "/order",
+        icon: "icon-daichulidingdan"
+      },
+      {
+        name: "运单管理",
+        path: "",
+        icon: "icon-wuliu"
+      },
+      {
+        name: "商品管理",
+        path: "/goods",
+        icon: "icon-leixing"
+      },
+      {
+        name: "财务管理",
+        path: "",
+        icon: "icon-jiesuan"
+      },
+      {
+        name: "统计报表",
+        path: "",
+        icon: "icon-chart"
+      },
+      {
+        name: "公司管理",
+        path: "",
+        icon: "icon-GSB"
+      },
+      {
+        name: "平台管理",
+        path: "/platform",
+        icon: "icon-pingtai1"
+      },
+      {
+        name: "系统管理",
+        path: "/sys",
+        icon: "icon-xitongguanli",
+        hide: this.user.isSys !== true
+      }
+    ];
   }
 };
 </script>
