@@ -28,76 +28,114 @@
 </template>
 
 <script>
-  import {
-    pca,
-    pcaa
-  } from "area-data";
-  import streetData from "./street.js";
-  import MyForm from "./MyForm";
-  export default {
-    extends: MyForm,
-    props: ["value", "label"],
-    created() {
-      let defaultDataOptions = {
-        select: "",
-        input: "",
-        number: 0,
-        switch: false,
-        time: "",
-        date: "",
-        datetime: "",
-        color: "",
-        rate: 0,
-        cascader: [],
-        area: []
-      };
-      for (const key in defaultDataOptions) {
-        if (this.$attrs.hasOwnProperty(key)) {
-          this.data = defaultDataOptions[key];
-        }
+import { pca, pcaa } from "area-data";
+import streetData from "./street.js";
+import MyForm from "./MyForm";
+export default {
+  extends: MyForm,
+  props: ["value", "label"],
+  created() {
+    let defaultDataOptions = {
+      select: "",
+      input: "",
+      number: 0,
+      switch: false,
+      time: "",
+      date: "",
+      datetime: "",
+      color: "",
+      rate: 0,
+      cascader: [],
+      area: []
+    };
+    for (const key in defaultDataOptions) {
+      if (this.$attrs.hasOwnProperty(key)) {
+        this.data = defaultDataOptions[key];
       }
-    },
-    data() {
-      return {
-        data: "",
-        areaData: []
-      };
-    },
-    watch: {
-      data(val) {
-        this.$emit("input", val);
-      }
-    },
-    computed: {
-      fontSize() {
-        let option = {
-          large: "15px",
-          medium: "14px",
-          small: "13px",
-          mini: "12px"
-        };
-        if (this.labelSize) {
-          return this.labelSize;
-        } else {
-          return option[this.size || this.$parent.size] || "15px";
-        }
-      }
-    },
-    methods: {
-      change(val) {
-        this.$emit("change", val);
-      }
-    },
-    mounted() {
-      this.$nextTick(() => {
-        this.data = this.value;
-      });
     }
-  };
+    if (this.$attrs.hasOwnProperty("area")) {
+      for (const provinceKey in pca["86"]) {
+        let city = [];
+        for (const cityKey in pca[provinceKey]) {
+          let district = [];
+          for (const districtKey in pcaa[cityKey]) {
+            let street = [];
+            for (const streetKey in streetData[districtKey]) {
+              street.push({
+                value: streetKey,
+                label:streetData[districtKey][streetKey]
+              });
+            }
+            let streetItem = {
+              value: districtKey,
+              label: pcaa[cityKey][districtKey]
+            };
+            if (street.length > 0) {
+              streetItem.children = street;
+            }
+            district.push(streetItem);
+          }
+          let districtItem = {
+            value: cityKey,
+            label: pca[provinceKey][cityKey]
+          };
+          if (district.length > 0) {
+            districtItem.children = district;
+          }
+          city.push(districtItem);
+        }
+        let cityItem = {
+          value: provinceKey,
+          label: pca["86"][provinceKey]
+        };
+        if (city.length > 0) {
+          cityItem.children = city;
+        }
+        this.areaData.push(cityItem);
+      }
+    }
+  },
+  data() {
+    return {
+      data: "",
+      areaData: []
+    };
+  },
+  watch: {
+    data(val) {
+      this.$emit("input", val);
+    }
+  },
+  computed: {
+    fontSize() {
+      let option = {
+        large: "15px",
+        medium: "14px",
+        small: "13px",
+        mini: "12px"
+      };
+      if (this.labelSize) {
+        return this.labelSize;
+      } else {
+        return option[this.size || this.$parent.size] || "15px";
+      }
+    }
+  },
+  methods: {
+    change(val) {
+      this.$emit("change", val);
+    }
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.data = this.value;
+    });
+  }
+};
 </script>
 
 <style scoped>
-  .g-form-item {
-    color: #606266;
-  }
+.g-form-item {
+  color: #606266;
+}
 </style>

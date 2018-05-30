@@ -20,22 +20,22 @@ module.exports = {
   },
   province: {
     name: '省',
-    type: 'String'
+    type: 'Number'
   },
   city: {
     name: '市',
-    type: 'String'
+    type: 'Number'
   },
   county:{
     name: '县',
-    type: 'String'
+    type: 'Number'
   },
   township: {
     name: '乡',
-    type: 'String'
+    type: 'Number'
   },
   stree: {
     name: '街道',
-    type: 'String'
+    type: 'Number'
   }
 }
