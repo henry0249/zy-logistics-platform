@@ -1,4 +1,45 @@
-export default [{
+let goodsThead = {
+  "brand.name": {
+    name: '品牌'
+  },
+  "category.name": {
+    name: '分类'
+  },
+  "name": {
+    name: '名称'
+  },
+  "unit": {
+    name: '单位'
+  },
+  "tag": {
+    name: '标签',
+    readOnly: true
+  }
+}
+let populate = [{
+  path: 'brand'
+}, {
+  path: 'category'
+}, {
+  path: 'platform'
+}, {
+  path: 'company'
+}, {
+  path: 'mfrs'
+}]
+let or = [{
+  key: 'name'
+}, {
+  key: 'category',
+  type: 'id'
+}, {
+  type: 'id',
+  key: 'brand',
+}, {
+  key: 'tag',
+  type: 'in'
+}]
+let addkey = [{
     key: 'brand.name',
     value: null,
     type: 'select',
@@ -94,4 +135,51 @@ export default [{
     keyValue: '标签'
   }
 ]
-
+let goodsKey = {
+  name: {
+    value: '',
+  },
+  unit: {
+    value: '',
+  },
+  spec: {
+    value: '',
+  },
+  category: {
+    value: '',
+  },
+  brand: {
+    value: '',
+  },
+  company: {
+    value: '',
+  },
+  platform: {
+    value: '',
+  },
+  mfrs: {
+    value: '',
+  },
+  saleState: {
+    value: '',
+  },
+  selfDeliverySupport: {
+    value: '',
+  },
+  freeDelivery: {
+    value: '',
+  },
+  tag: {
+    value: '',
+  },
+  detail: {
+    value: '',
+  },
+}
+module.exports = {
+  goodsThead,
+  populate,
+  or,
+  addkey,
+  goodsKey
+}

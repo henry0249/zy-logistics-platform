@@ -82,9 +82,6 @@
       }
     },
     methods: {
-      switchChange(val) {
-        console.log(val);
-      },
       showInput() {
         this.inputVisible = true;
         this.$nextTick(_ => {

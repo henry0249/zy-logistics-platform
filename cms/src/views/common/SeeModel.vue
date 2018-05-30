@@ -3,6 +3,7 @@
     <div class="flex list-box" v-for="(item,index) in keyArr" :key="index">
       <span class="see-span">{{item.keyValue}}</span>
       <span class="right-span" v-if="item.type == 'switch'">{{item.value?'支持':'不支持'}}</span>
+      <span class="right-span" v-else-if="item.type === 'Arr'">{{Arrfilter(item.key)}}</span>
       <span class="right-span" v-else>{{filterMethods(index,item.key)}}</span>
     </div>
   </div>
@@ -23,41 +24,22 @@
           return {};
         }
       },
-      populate: {
-        type: Array,
-        default () {
-          return []
-        }
-      },
       str: {
-        type: String,
-        default () {
-          return ''
-        }
-      },
-      myid: {
         type: String,
         default: ''
       }
     },
-    watch: {
-      myid(val) {
-        console.log('val', val);
-      }
-    },
     methods: {
+      Arrfilter(key) {
+        let str = ''
+        this.keyData[key].forEach(keyItem => {
+          str += keyItem + '、'
+        });
+        return str.substr(0, str.length - 1)
+      },
       filterMethods(index, val) {
         if (val.indexOf('.') > -1) {
           let str = val.split('.')
-          // console.log(str);
-          // console.log(this.keyData['mfrs']['name']);
-          console.log('--------------------------------------');
-          console.log(index);
-          console.log(str);
-          console.log(str[0], str[1]);
-          console.log([str[0]]);
-          console.log(this.keyData);
-          console.log(this.keyData[str[0]]);
           if (this.keyData[str[0]] == undefined) {
             return '无'
           } else {
@@ -102,13 +84,11 @@
       }
     },
     mounted() {
-      // console.log('this.keyData', this.keyData);
-      // console.log('this.keyArr', this.keyArr);
       this.getData()
     },
     created() {
-      console.log('this.keyArr[6]', this.keyArr[6]);
-      console.log('this.keyData[6]', this.keyData);
+      console.log('this.keyArr', this.keyArr);
+      console.log('this.keyData', this.keyData);
     }
   }
 </script>
@@ -116,7 +96,7 @@
 <style scoped>
   .see-box {
     width: 100%;
-    max-height: calc(85vh - 200px);
+    max-height: calc(85vh - 190px);
     overflow: auto;
   }
   .list-box {

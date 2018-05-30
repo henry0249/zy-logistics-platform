@@ -88,7 +88,8 @@
           address: {
             name: "地区",
             options: [],
-            readOnly: true
+            readOnly: true,
+            slot:true
           },
           factory: {
             name: "出厂价"
