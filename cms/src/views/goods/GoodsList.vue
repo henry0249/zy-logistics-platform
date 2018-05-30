@@ -1,151 +1,113 @@
 <template>
-  <common-list title="商品" :tableHeader="tableHeader" str="goods" :keyArr="keyArr" :populate="populate" :or="or">
-    <el-button slot-scope="scope" slot="operation" size="mini" @click="test(scope)">超小按钮</el-button>
-  </common-list>
+  <div class="goods-box">
+    <my-table index size="mini" edit :thead="tableHeader" :data.sync="tableList" op @op="op">
+      <template slot-scope="scope" v-if="scope.column.property === 'tag'">
+                    <el-tag style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+</template>
+    </my-table>
+    <el-dialog :title="title" :visible.sync="show">
+      <component :is="componentName" :key-arr="key" :key-data="keyData" :str="str"></component>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
-  import AddKey from './AddKey.js';
-  import CommonList from '../common/CommonList.vue';
+  import AddKey from "./AddKey.js";
+  import CommonList from "../common/CommonList.vue";
+  import SeeModel from "../common/SeeModel.vue";
+  import EdmitModel from "../common/EdmitModel.vue";
+  import Add from "./Add.vue";
+  import {
+    goodsThead,
+    populate,
+    or,
+    addkey
+  } from "./key.js";
   export default {
     components: {
       CommonList,
+      SeeModel,
+      Add,
+      EdmitModel
     },
     data() {
       return {
-        dialogShow: false,
+        str: "goods",
+        show: false,
+        title: "",
         loadingText: "",
+        componentName: "",
         data: "",
+        keyData: {},
         boxStyle: {
-          width: 'calc(100% - 20px)',
-          height: 'calc(100% - 10px)'
+          width: "calc(100% - 20px)",
+          height: "calc(100% - 10px)"
         },
-        heightValue: 'calc(100% - 10px)',
-        tableHeader: [{
-          key: 'brand.name',
-          keyValue: '品牌',
-        }, {
-          key: 'category.name',
-          keyValue: '分类',
-        }, {
-          key: 'name',
-          keyValue: '名称',
-        }, {
-          key: 'unit',
-          keyValue: '单位',
-        }, {
-          key: 'tag',
-          keyValue: '标签',
-          type: 'Arr'
-        }],
-        keyArr: AddKey,
-        populate: [{
-          path: 'brand'
-        }, {
-          path: 'category'
-        }, {
-          path: 'platform'
-        }, {
-          path: 'company'
-        }, {
-          path: 'mfrs'
-        }],
-        or: [{
-          key: 'name'
-        }, {
-          key: 'category',
-          type: 'id'
-        }, {
-          type: 'id',
-          key: 'brand',
-        }, {
-          key: 'tag',
-          type: 'in'
-        }],
+        heightValue: "calc(100% - 10px)",
+        tableList: [],
+        tableHeader: goodsThead,
+        keyArr: addkey,
+        populate,
+        or
       };
     },
+    computed: {
+      key() {
+        let i = null;
+        let arr = JSON.parse(JSON.stringify(this.keyArr));
+        arr.forEach((item, index) => {
+          if (item.key === "company.name" && !this.company.name) {
+            i = index;
+          } else if (item.key === "platform.name" && !this.platform.name) {
+            i = index;
+          }
+        });
+        if (i) {
+          arr.splice(i, 1);
+        }
+        return arr;
+      }
+    },
     methods: {
+      async test() {},
+      op(val) {
+        if (val.type === "read") {
+          this.componentName = "SeeModel";
+          this.title = "查看详情";
+          this.show = true;
+          this.keyData = val.value.row;
+        } else if (val.type === "edit") {
+          this.$router.push({
+            path: '/goods/edmit/' + val.value.row._id,
+            query: {
+              str: 'goods'
+            }
+          })
+        }
+      },
       async getData() {
-        let i = 0
+        let i = 0;
         try {
-          let category = await this.$api.curd({
-            model: 'category',
-            curdType: 'find',
-          })
-          let brand = await this.$api.curd({
-            model: 'brand',
-            curdType: 'find',
-          })
-          let company = await this.$api.curd({
-            model: 'company',
-            curdType: 'find',
-            type: {
-              $in: ['shipper']
-            }
-          })
-          console.log('common', company);
-          this.keyArr.forEach((item, index) => {
-            console.log('object', item.key);
-            if (item.key == 'platform.name') {
-              console.log('platform');
-              if (Object.keys(this.platform).length > 0) {
-                item.options.push({
-                  value: this.platform._id,
-                  label: this.platform.name
-                })
-              } else {
-                i = index
-              }
-            }
-            if (item.key == 'company.name') {
-              console.log('this.company', this.company);
-              if (Object.keys(this.company).length > 0) {
-                item.options.push({
-                  value: this.company._id,
-                  label: this.company.name
-                })
-              } else {
-                i = index
-              }
-            }
-            if (item.key == 'mfrs.name') {
-              company.forEach(resItem => {
-                item.options.push({
-                  value: resItem.name,
-                  label: resItem.name,
-                  _id: resItem._id,
-                })
-              });
-            }
-            if (item.key == 'category.name') {
-              category.forEach(resItem => {
-                item.options.push({
-                  value: resItem.name,
-                  label: resItem.name,
-                  _id: resItem._id,
-                })
-              });
-            }
-            if (item.key == 'brand.name') {
-              brand.forEach(resItem => {
-                item.options.push({
-                  value: resItem.name,
-                  label: resItem.name,
-                  _id: resItem._id,
-                })
-              });
-            }
-          });
-          this.keyArr.splice(i, 1)
+          let data = {
+            model: "goods",
+            curdType: "find",
+            populate: this.populate
+          };
+          let res = await this.$api.curd(data);
+          console.log(res);
+          this.tableList = res;
         } catch (error) {}
       }
     },
     async created() {
-      this.getData()
+      this.getData();
     }
   };
 </script>
 
 <style scoped>
-
+  .goods-box {
+    width: calc(100% - 40px);
+    margin: 0 auto;
+  }
 </style>
