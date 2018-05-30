@@ -10,20 +10,21 @@
         </el-table-column>
         <el-table-column v-if="index" show-overflow-tooltip type="index" width="30">
         </el-table-column>
-        <el-table-column ref="test" v-if="is('json',thead)" show-overflow-tooltip :prop="key" :label="item.name" :width="''+(item.width||'')" v-for="(item, key) in thead" :key="key">
+        <el-table-column v-if="item.slot" show-overflow-tooltip :prop="key" :label="item.name" :width="''+(item.width||'')" v-for="(item, key) in thead" :key="key">
+          <template slot-scope="scope">
+            <slot :prop="key" :row="scope.row" :column="scope.column" :index="scope.$index">{{deepKey(scope.row,scope.column.property)}}</slot>
+          </template>
+        </el-table-column>
+        <el-table-column v-else show-overflow-tooltip :prop="key" :label="item.name" :width="''+(item.width||'')" :key="key">
+          
+        </el-table-column>
+        <!-- <el-table-column v-if="is('array',thead)" show-overflow-tooltip :prop="item.key" :label="item.label||item.name" :width="''+(item.width||'')" v-for="(item, index) in thead" :key="index">
           <template slot-scope="scope">
             <slot :row="scope.row" :column="scope.column" :index="scope.$index">
               {{deepKey(scope.row,scope.column.property)}}
             </slot>
           </template>
-        </el-table-column>
-        <el-table-column v-if="is('array',thead)" show-overflow-tooltip :prop="item.key" :label="item.label||item.name" :width="''+(item.width||'')" v-for="(item, index) in thead" :key="index">
-          <template slot-scope="scope">
-            <slot :row="scope.row" :column="scope.column" :index="scope.$index">
-              {{deepKey(scope.row,scope.column.property)}}
-            </slot>
-          </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="操作" v-if="op" :width="''+opWidth||''">
           <div slot-scope="scope">
             <slot name="op" :row="scope.row" :column="scope.column" :index="scope.$index">
@@ -107,7 +108,8 @@ export default {
       fixedInputVal: "",
       currentRowIndex: -1,
       currentRowKey: "",
-      currentRow: {}
+      currentRow: {},
+      showColumnSlot: true
     };
   },
   watch: {
@@ -157,7 +159,7 @@ export default {
       if (!column.property) {
         return;
       }
-      if (this.is('json',this.thead)) {
+      if (this.is("json", this.thead)) {
         if (!this.thead[column.property]) {
           return;
         }
@@ -165,13 +167,13 @@ export default {
           return;
         }
       }
-      if (this.is('array',this.thead)) {
+      if (this.is("array", this.thead)) {
         let edit = true;
-        this.thead.forEach((item)=>{
+        this.thead.forEach(item => {
           if (item.key === column.property && item.readOnly) {
             edit = false;
           }
-        })
+        });
         if (!edit) {
           return;
         }
@@ -245,7 +247,6 @@ export default {
     setTimeout(() => {
       this.loadingText = "";
     }, 300);
-    console.log(this.$refs.test);
   }
 };
 </script>

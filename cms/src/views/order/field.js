@@ -10,14 +10,16 @@ module.exports = {
       type: "String",
       require: true,
       readOnly: true,
-      width: "300"
+      slot: true,
+      width: "300",
     },
     goodsCount: {
       name: "数量"
     },
     unit: {
       name: "单位",
-      readOnly: true
+      readOnly: true,
+      slot: true,
     },
     sellPrice: {
       name: "销售单价",
