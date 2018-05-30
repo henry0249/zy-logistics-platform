@@ -1,6 +1,9 @@
 import is from 'is_js';
 
 let json2arr = (object) => {
+  if (!is.json(object)) {
+    return object;
+  }
   if (is.json(object)) {
     let res = [];
     for (const key in object) {
@@ -12,8 +15,6 @@ let json2arr = (object) => {
         });
       }
     }
-    return res;
-  } else {
     return res;
   }
 }
