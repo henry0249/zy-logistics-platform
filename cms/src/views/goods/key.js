@@ -13,7 +13,8 @@ let goodsThead = {
   },
   "tag": {
     name: '标签',
-    readOnly: true
+    readOnly: true,
+    slot:true
   }
 }
 let populate = [{

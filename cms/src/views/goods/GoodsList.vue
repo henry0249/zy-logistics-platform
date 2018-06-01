@@ -1,14 +1,14 @@
 <template>
-  <div class="goods-box">
+  <loading-box class="goods-box" v-model="loadingText">
     <my-table index size="mini" edit :thead="tableHeader" :data.sync="tableList" op @op="op">
       <template slot-scope="scope" v-if="scope.column.property === 'tag'">
-                    <el-tag style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+              <el-tag style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['tag']" :key="item.id">{{item}}</el-tag>
 </template>
     </my-table>
     <el-dialog :title="title" :visible.sync="show">
       <component :is="componentName" :key-arr="key" :key-data="keyData" :str="str"></component>
     </el-dialog>
-  </div>
+  </loading-box>
 </template>
 
 <script>
@@ -88,6 +88,7 @@
       async getData() {
         let i = 0;
         try {
+          this.loadingText = '加载中'
           let data = {
             model: "goods",
             curdType: "find",
@@ -97,6 +98,7 @@
           console.log(res);
           this.tableList = res;
         } catch (error) {}
+        this.loadingText = ''
       }
     },
     async created() {
