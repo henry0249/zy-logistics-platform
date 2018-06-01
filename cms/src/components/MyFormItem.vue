@@ -7,7 +7,7 @@
     </slot>
     <div class="f1">
       <slot>
-        <el-select ref="select" style="width:100%" v-if="$attrs.select!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size">
+        <el-select ref="select" style="width:100%" v-if="$attrs.select!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change">
           <el-option v-for="item in json2arr($attrs.options)" :key="item._id||item.value || item.id" :label="item.name || item.label" :value="item._id||item.value">
           </el-option>
         </el-select>

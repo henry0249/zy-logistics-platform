@@ -25,6 +25,7 @@ module.exports = app => {
     .get('/', 'static.views') //根路径匹配
     .get(/views/, 'static.views') //根views页面
     .get(/zylp/, 'static.zylp') //匹配zylp页面
+    .get(/test/, 'static.test') //匹配test页面
 
     .all('/:model/:curdType', checkToken(), 'curd.index') //通用增删改查接口
 

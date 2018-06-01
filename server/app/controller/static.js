@@ -44,5 +44,16 @@ class StaticController extends Controller {
       root: root
     });
   }
+  async test() {
+    const {
+      ctx
+    } = this
+    let root = path.resolve(__dirname, '../../');
+    let filePath = ctx.helper.staticFilter(ctx.path);
+    await send(ctx, filePath, {
+      root: root
+    });
+  }
+
 }
 module.exports = StaticController
