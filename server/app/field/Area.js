@@ -5,7 +5,7 @@ module.exports = {
     option:{
       province:'省',
       city:'市',
-      district:'区',
+      county:'县',
       township:'乡',
       stree:'街道'
     }

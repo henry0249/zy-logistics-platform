@@ -16,9 +16,21 @@
     window.addEventListener('click', async () => {
       // /wx/order/sign
       // let res = await
-      let res = await axios.post('https://m.yixiutech.com/wx/order/sign',{
+      let res = await axios.post('https://m.yixiutech.com/wx/pay/sign2',{
         trade_type:'MWEB'
       });
+      let data = res.data.data;
+      console.log(data);
+      let query = {
+        noncestr:data.nonceStr,
+        package:data.package,
+        timestamp:data.timeStamp,
+        sign:data.sign
+      };
+      let href = 'weixin://wap/pay?appid='+data.appId;
+      for (const key in query) {
+        href+=`&${key}=`
+      }
       // window.location.href = `weixin://wap/pay?`;
     });
   </script>
