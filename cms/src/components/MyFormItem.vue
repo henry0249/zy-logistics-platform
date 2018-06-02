@@ -11,7 +11,7 @@
           <el-option v-for="item in json2arr($attrs.options)" :key="item._id||item.value || item.id" :label="item.name || item.label" :value="item._id||item.value">
           </el-option>
         </el-select>
-        <el-input style="width:100%" v-if="$attrs.input!==undefined" v-model="value" v-bind="$attrs" :size="size||$parent.size"></el-input>
+        <el-input style="width:100%" v-if="$attrs.input!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-input>
         <el-input-number style="width:100%" v-if="$attrs.number!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-input-number>
         <el-switch v-if="$attrs.switch!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-switch>
         <el-time-select style="width:100%" v-if="$attrs.time!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-time-select>
