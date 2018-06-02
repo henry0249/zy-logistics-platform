@@ -29,6 +29,9 @@ class Api {
   static async vdSms(data) {
     return ajax.post('/sms/vd', data)
   }
+  static async getArea() {
+    return ajax('/area/select')
+  }
   static async curd(data) {
     let {
       model,
