@@ -213,7 +213,6 @@ export default {
       } else {
         this.tableHeight = "";
       }
-      console.log(this.tableHeight);
     },
     async loadmoreFun() {
       this.loadingText = "加载中";

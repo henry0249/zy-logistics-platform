@@ -1,4 +1,5 @@
 const Service = require('egg').Service;
+const areaField = require('../field/Area');
 
 class CompanyService extends Service {
   async preAdd(data, option) {
@@ -32,7 +33,6 @@ class CompanyService extends Service {
   async add() {
     const ctx = this.ctx;
     let body = ctx.request.body;
-    console.log(body);
     if (!body[body.type]) {
       ctx.throw(422, '信息填写不完整', body);
     }
@@ -112,12 +112,15 @@ class CompanyService extends Service {
     await model.save();
     delete body.type;
     delete body[body.type];
+
     for (const key in body) {
-      await this.preAdd({
-        type: key,
-        key: body[key].key,
-        name: body[key].name
-      }, modelOption);
+      if (areaField.type.option.hasOwnProperty(key)) {
+        await this.preAdd({
+          type: key,
+          key: body[key].key,
+          name: body[key].name
+        }, modelOption);
+      }
     }
     return '添加成功';
   }
