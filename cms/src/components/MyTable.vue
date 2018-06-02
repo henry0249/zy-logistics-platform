@@ -5,27 +5,21 @@
       </slot>
     </div>
     <loading-box v-model="loadingText">
-      <el-table ref="table" @cell-click="cellClick" @row-click="rowClick" v-bind="$attrs" class-name="mylist" style="width: 100%;box-sizing: border-box;" :data="data" :height="tableHeight" @selection-change="handleSelectionChange">
+      <el-table ref="table" @cell-click="cellClick" @row-click="rowClick" v-bind="$attrs" :data="data" :height="tableHeight" @selection-change="handleSelectionChange">
         <el-table-column v-if="selection" type="selection" width="30">
         </el-table-column>
         <el-table-column v-if="index" show-overflow-tooltip type="index" width="30">
         </el-table-column>
-        <el-table-column v-if="item.slot" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" v-for="(item, key) in thead" :key="key">
+        <el-table-column v-if="item.slot" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'auto')" v-for="(item, key) in thead" :key="key">
           <template slot-scope="scope">
             <slot :prop="key" :row="scope.row" :column="scope.column" :index="scope.$index">{{deepKey(scope.row,scope.column.property)}}</slot>
           </template>
         </el-table-column>
-        <el-table-column v-else show-overflow-tooltip :prop="key" :label="item.name" :width="''+(item.width||'')" :key="key">
+        <el-table-column v-else show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'auto')" :key="key">
           
         </el-table-column>
-        <!-- <el-table-column v-if="is('array',thead)" show-overflow-tooltip :prop="item.key" :label="item.label||item.name" :width="''+(item.width||'')" v-for="(item, index) in thead" :key="index">
-          <template slot-scope="scope">
-            <slot :row="scope.row" :column="scope.column" :index="scope.$index">
-              {{deepKey(scope.row,scope.column.property)}}
-            </slot>
-          </template>
-        </el-table-column> -->
-        <el-table-column label="操作" v-if="op" :width="''+opWidth||''">
+
+        <el-table-column label="操作" v-if="op" :width="''+opWidth">
           <div slot-scope="scope">
             <slot name="op" :row="scope.row" :column="scope.column" :index="scope.$index">
               <i style="color:#909399" @click="handleOp('read',scope)" class="el-icon-view pointer"></i>
@@ -95,7 +89,8 @@ export default {
       type: Function
     },
     opWidth: {
-      type: [String, Number]
+      type: [String, Number],
+      default:'90'
     }
   },
   data() {
@@ -218,6 +213,7 @@ export default {
       } else {
         this.tableHeight = "";
       }
+      console.log(this.tableHeight);
     },
     async loadmoreFun() {
       this.loadingText = "加载中";
@@ -243,9 +239,9 @@ export default {
     this.setTableHeight();
   },
   mounted() {
-    this.setTableHeight();
     setTimeout(() => {
       this.loadingText = "";
+      this.setTableHeight();
     }, 300);
   }
 };

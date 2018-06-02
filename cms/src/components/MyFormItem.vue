@@ -21,7 +21,7 @@
         <el-rate v-if="$attrs.rate!==undefined" v-model="data"></el-rate>
         <el-checkbox v-if="$attrs.checkbox!==undefined" v-model="data"></el-checkbox>
         <el-cascader style="width:100%" v-if="$attrs.cascader!==undefined" :options="$attrs.options" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change"></el-cascader>
-        <el-cascader style="width:100%" v-if="$attrs.area!==undefined" :options="areaData" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change"></el-cascader>
+        <el-cascader style="width:100%" v-if="area!==undefined" :options="areaData" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="areaChange"></el-cascader>
       </slot>
     </div>
   </div>
@@ -33,7 +33,7 @@ import streetData from "./street.js";
 import MyForm from "./MyForm";
 export default {
   extends: MyForm,
-  props: ["value", "label"],
+  props: ["value", "label", "level", "area"],
   created() {
     let defaultDataOptions = {
       select: "",
@@ -53,46 +53,8 @@ export default {
         this.data = defaultDataOptions[key];
       }
     }
-    if (this.$attrs.hasOwnProperty("area")) {
-      for (const provinceKey in pca["86"]) {
-        let city = [];
-        for (const cityKey in pca[provinceKey]) {
-          let district = [];
-          for (const districtKey in pcaa[cityKey]) {
-            let street = [];
-            for (const streetKey in streetData[districtKey]) {
-              street.push({
-                value: streetKey,
-                label:streetData[districtKey][streetKey]
-              });
-            }
-            let streetItem = {
-              value: districtKey,
-              label: pcaa[cityKey][districtKey]
-            };
-            if (street.length > 0) {
-              streetItem.children = street;
-            }
-            district.push(streetItem);
-          }
-          let districtItem = {
-            value: cityKey,
-            label: pca[provinceKey][cityKey]
-          };
-          if (district.length > 0) {
-            districtItem.children = district;
-          }
-          city.push(districtItem);
-        }
-        let cityItem = {
-          value: provinceKey,
-          label: pca["86"][provinceKey]
-        };
-        if (city.length > 0) {
-          cityItem.children = city;
-        }
-        this.areaData.push(cityItem);
-      }
+    if (this.area !== undefined) {
+      this.data = [];
     }
   },
   data() {
@@ -104,6 +66,9 @@ export default {
   watch: {
     data(val) {
       this.$emit("input", val);
+    },
+    level(val) {
+      this.setAreaData();
     }
   },
   computed: {
@@ -121,12 +86,172 @@ export default {
       }
     }
   },
+
   methods: {
     change(val) {
       this.$emit("change", val);
+    },
+    areaChange(val) {
+      let res = {};
+      if (val[0]) {
+        res.province = {
+          key: Number(val[0]),
+          name: pca["86"][val[0]]
+        };
+      }
+      if (val[1]) {
+        res.city = {
+          key: Number(val[1]),
+          name: pca[val[0]][val[1]]
+        };
+      }
+      if (val[2]) {
+        res.county = {
+          key: Number(val[2]),
+          name: pcaa[val[1]][val[2]]
+        };
+      }
+      if (val[3]) {
+        res.township = {
+          key: Number(val[3]),
+          name: streetData[val[2]][val[3]]
+        };
+      }
+      this.$emit("change", res);
+    },
+    setAreaData() {
+      if (this.area !== undefined) {
+        let area = this.area;
+        this.areaData = [];
+        for (const provinceKey in pca["86"]) {
+          let city = [];
+          if (this.level !== undefined) {
+            let level = Number(this.level);
+            for (const cityKey in pca[provinceKey]) {
+              let district = [];
+              for (const districtKey in pcaa[cityKey]) {
+                let street = [];
+                for (const streetKey in streetData[districtKey]) {
+                  if (this.is("json", this.area)) {
+                    if (area.township) {
+                      let pushStreetFlag = false;
+                      area.township.forEach(item => {
+                        if (this.is("json", item)) {
+                          if (item.key === Number(streetKey)) {
+                            pushStreetFlag = true;
+                          }
+                        }
+                        if (item === Number(streetKey)) {
+                          pushStreetFlag = true;
+                        }
+                      });
+                      if (pushStreetFlag) {
+                        district.push(streetItem);
+                      }
+                    }
+                  } else {
+                    street.push({
+                      value: streetKey,
+                      label: streetData[districtKey][streetKey]
+                    });
+                  }
+                }
+                let streetItem = {
+                  value: districtKey,
+                  label: pcaa[cityKey][districtKey]
+                };
+                if (street.length > 0 && level >= 3) {
+                  streetItem.children = street;
+                }
+                if (level >= 2) {
+                  if (this.is("json", this.area)) {
+                    if (area.county) {
+                      let pushDistrictFlag = false;
+                      area.county.forEach(item => {
+                        if (this.is("json", item)) {
+                          if (item.key === Number(districtKey)) {
+                            pushDistrictFlag = true;
+                          }
+                        }
+                        if (item === Number(districtKey)) {
+                          pushDistrictFlag = true;
+                        }
+                      });
+                      if (pushDistrictFlag) {
+                        district.push(streetItem);
+                      }
+                    }
+                  } else {
+                    district.push(streetItem);
+                  }
+                }
+              }
+              let districtItem = {
+                value: cityKey,
+                label: pca[provinceKey][cityKey]
+              };
+              if (district.length > 0) {
+                districtItem.children = district;
+              }
+              if (level >= 1) {
+                if (this.is("json", this.area)) {
+                  if (area.city) {
+                    let pushCityFlag = false;
+                    area.city.forEach(item => {
+                      if (this.is("json", item)) {
+                        if (item.key === Number(cityKey)) {
+                          pushCityFlag = true;
+                        }
+                      }
+                      if (item === Number(cityKey)) {
+                        pushCityFlag = true;
+                      }
+                    });
+                    if (pushCityFlag) {
+                      city.push(districtItem);
+                    }
+                  }
+                } else {
+                  city.push(districtItem);
+                }
+              }
+            }
+          }
+          let cityItem = {
+            value: provinceKey,
+            label: pca["86"][provinceKey]
+          };
+          if (city.length > 0) {
+            if (this.level !== undefined && Number(this.level) >= 0) {
+              cityItem.children = city;
+            }
+          }
+          if (this.is("json", this.area)) {
+            if (area.province) {
+              let pushProvinceFlag = false;
+              area.province.forEach(item => {
+                if (this.is("json", item)) {
+                  if (item.key === Number(provinceKey)) {
+                    pushProvinceFlag = true;
+                  }
+                }
+                if (item === Number(provinceKey)) {
+                  pushProvinceFlag = true;
+                }
+              });
+              if (pushProvinceFlag) {
+                this.areaData.push(cityItem);
+              }
+            }
+          } else {
+            this.areaData.push(cityItem);
+          }
+        }
+      }
     }
   },
   mounted() {
+    this.setAreaData();
     this.$nextTick(() => {
       this.data = this.value;
     });

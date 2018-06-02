@@ -19,10 +19,6 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Price'
   },
-  history: {
-    name: '历史价格标识',
-    type: 'Boolean'
-  },
   value: {
     name: '价格',
     type: 'Number',
@@ -42,19 +38,9 @@ module.exports = {
     name: '价格表',
     type: 'String'
   },
-  address: {
-    name: '地区',
+  area: {
+    name: '区域',
     type: 'ObjectId',
-    ref: 'Address'
-  },
-  from: {
-    name: '出发地',
-    type: 'ObjectId',
-    ref: 'Address'
-  },
-  to: {
-    name: '目的地',
-    type: 'ObjectId',
-    ref: 'Address'
+    ref: 'Area'
   }
 }

@@ -20,6 +20,7 @@ module.exports = app => {
     .all('/refleshToken', checkToken(), 'user.refleshToken') //刷新token
     .all('/logout', 'user.logout') //注销
 
+    .post('/area/add', checkToken(), 'area.add') //添加区域
     .post('/platform/orgTree', checkToken(), 'platform.orgTree') //平台组织结构
 
     .get('/', 'static.views') //根路径匹配

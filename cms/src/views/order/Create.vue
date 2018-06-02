@@ -23,7 +23,7 @@
             </my-form-item>
             <my-form-item input v-model="order.contactMobile" label="联系电话">
             </my-form-item>
-            <my-form-item area change-on-select filterable v-model="order.address" label="送货地址">
+            <my-form-item area :level="0" change-on-select filterable v-model="order.address" label="送货地址">
             </my-form-item>
           </div>
           <my-form-item width="100%" input type="textarea" autosize label="订单备注">

@@ -2,7 +2,7 @@
   <i v-if="!svg" ref="icon" class="iconfont" :class="iconName()" :style="style">
       <slot></slot>
     </i>
-  <svg :style="style" ref="svgIcon" v-else class="icon" aria-hidden="true">
+  <svg :style="style" ref="svgIcon" v-else class="icon" :class="{spin:spin}" aria-hidden="true">
       <use :xlink:href="'#'+iconName()"></use>
       <slot></slot>
     </svg>
@@ -26,6 +26,10 @@ export default {
     size: {
       type: [String, Number],
       default: ""
+    },
+    spin:{
+      type: Boolean,
+      default: false
     }
   },
   computed: {

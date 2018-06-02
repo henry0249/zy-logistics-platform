@@ -1,22 +1,25 @@
 module.exports = {
-  type:{
+  type: {
     name: 'l类型',
     type: 'String',
-    option:{
-      province:'省',
-      city:'市',
-      county:'县',
-      township:'乡',
-      stree:'街道'
-    }
+    option: {
+      province: '省',
+      city: '市',
+      county: '县',
+      township: '乡',
+      street: '街道'
+    },
+    require: true
   },
   key: {
     name: '编码',
-    type: 'Number'
+    type: 'Number',
+    require: true
   },
-  name:{
+  name: {
     name: '名称',
-    type: 'String'
+    type: 'String',
+    require: true
   },
   province: {
     name: '省',
@@ -26,16 +29,12 @@ module.exports = {
     name: '市',
     type: 'Number'
   },
-  county:{
+  county: {
     name: '县',
     type: 'Number'
   },
   township: {
     name: '乡',
-    type: 'Number'
-  },
-  stree: {
-    name: '街道',
     type: 'Number'
   }
 }

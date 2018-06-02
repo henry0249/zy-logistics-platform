@@ -1,4 +1,8 @@
 module.exports = {
+  default: {
+    name: '默认',
+    type: 'Boolean'
+  },
   name: {
     name: '详情',
     type: 'String'
@@ -11,8 +15,8 @@ module.exports = {
     name: '城市',
     type: 'String'
   },
-  district: {
-    name: '地区/乡镇',
+  county: {
+    name: '县',
     type: 'String'
   },
   stree: {
