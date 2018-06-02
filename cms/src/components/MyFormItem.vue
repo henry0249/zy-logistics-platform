@@ -99,7 +99,11 @@ export default {
           name: pca["86"][val[0]]
         };
         if (this.is('json',this.area)) {
-          
+          this.area.province.forEach(element => {
+            if (this.is('json',element)) {
+              res.province._id = element._id;
+            }
+          });
         }
       }
       if (val[1]) {
@@ -107,18 +111,39 @@ export default {
           key: Number(val[1]),
           name: pca[val[0]][val[1]]
         };
+        if (this.is('json',this.area)) {
+          this.area.city.forEach(element => {
+            if (this.is('json',element)) {
+              res.city._id = element._id;
+            }
+          });
+        }
       }
       if (val[2]) {
         res.county = {
           key: Number(val[2]),
           name: pcaa[val[1]][val[2]]
         };
+        if (this.is('json',this.area)) {
+          this.area.county.forEach(element => {
+            if (this.is('json',element)) {
+              res.county._id = element._id;
+            }
+          });
+        }
       }
       if (val[3]) {
         res.township = {
           key: Number(val[3]),
           name: streetData[val[2]][val[3]]
         };
+        if (this.is('json',this.area)) {
+          this.area.township.forEach(element => {
+            if (this.is('json',element)) {
+              res.township._id = element._id;
+            }
+          });
+        }
       }
       this.$emit("change", res);
     },
