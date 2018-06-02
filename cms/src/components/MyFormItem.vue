@@ -98,6 +98,9 @@ export default {
           key: Number(val[0]),
           name: pca["86"][val[0]]
         };
+        if (this.is('json',this.area)) {
+          
+        }
       }
       if (val[1]) {
         res.city = {
