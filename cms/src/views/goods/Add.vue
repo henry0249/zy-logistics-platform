@@ -42,19 +42,19 @@
           </div>
         </div>
       </div>
-      <my-table index size="mini" edit :thead="tableTeader" :data.sync="tableList" op>
+      <my-table v-if="!loading" index size="mini" edit :thead="tableTeader" :data.sync="tableList" op>
         <div slot="op" slot-scope="scope">
           <i v-if="tableList.length>1" title="删除该地区" class="pointer" style="margin-right:10px" @click="delAdr(scope['index'])">
-            <icon size="16px">icon-ec1</icon>
-          </i>
-          <i title="增加一个地区" class="pointer" @click="addAdr">
-            <icon size="16px">icon-54</icon>
-          </i>
+                                    <icon size="16px">icon-ec1</icon>
+                                  </i>
+          <i v-if="scope['index'] === tableList.length - 1" title="增加一个地区" class="pointer" @click="addAdr">
+                                    <icon size="16px">icon-54</icon>
+                                  </i>
         </div>
         <template slot-scope="scope" v-if="scope.column.property === 'address'">
-                  <el-cascader size="mini" placeholder="试试搜索：北京" :options="cityData" filterable v-model="scope.row[scope.column.property]" change-on-select></el-cascader>
-</template>
-      </my-table>
+          <my-form-item size="mini" style="width:100%" label="区域数据" v-model="scope.row[scope.column.property]" :area="area" :level="areaLevel" placeholder="选择数据" @change="areaChange"/>
+          </template>
+        </my-table>
     </div>
     <div class="add-footer">
       <el-button size="mini" @click="$router.go(0)">取 消</el-button>
@@ -75,6 +75,8 @@
   export default {
     data() {
       return {
+        areaLevel:5,
+        area:{},
         loading: false,
         inputVisible: false,
         inputValue: "",
@@ -83,13 +85,13 @@
         keyArr3,
         keyArr2,
         keyArr1,
-        cityData,
+        cityData: [],
         tableTeader: {
           address: {
             name: "地区",
             options: [],
             readOnly: true,
-            slot:true
+            slot: true
           },
           factory: {
             name: "出厂价"
@@ -115,11 +117,9 @@
       }
     },
     methods: {
-      add() {
-        console.log(1111111111);
-      },
+      areaChange(val){},
+      add() {},
       delAdr(i) {
-        console.log(i);
         if (this.tableList.length > 1) {
           this.tableList.splice(i, 1);
         } else {
@@ -136,7 +136,6 @@
         this.tableList.push(obj);
       },
       async sub() {
-        console.log(this.keyArr3);
         let obj = {};
         this.keyArr1.forEach(item => {
           if (item.value) {
@@ -165,10 +164,8 @@
           this.loading = true
           for (const key in obj) {
             if (obj.hasOwnProperty(key)) {
-              console.log(key);
               if (key.indexOf('.') > -1) {
                 let str = key.split('.')
-                console.log(str[0]);
                 obj[str[0]] = obj[key]
                 delete obj[key]
               }
@@ -176,9 +173,7 @@
           }
           obj.model = 'goods'
           obj.curdType = 'add'
-          console.log('obj', obj);
           let res = await this.$api.curd(obj)
-          console.log('res', res);
           if (res) {
             for (let index = 0; index < this.tableList.length; index++) {
               let addressOp = {
@@ -188,17 +183,6 @@
                 city: this.cityKey[this.tableList[index].address[1]],
                 district: this.cityKey[this.tableList[index].address[2]],
               }
-              // if (this.tableList[index].address.length == 1) {
-              //   delete addressOp.city
-              //   delete addressOp.district
-              // } else if (this.tableList[index].address.length == 2) {
-              //   delete addressOp.district
-              // } else {
-              //   delete addressOp.city
-              //   delete addressOp.province
-              //   delete addressOp.district
-              // }
-              console.log('addressOp', addressOp);
               let findAddress = await this.$api.curd({
                 model: 'address',
                 curdType: 'findOne',
@@ -208,10 +192,8 @@
               })
               if (findAddress) {
                 for (const key in this.tableList[index]) {
-                  console.log(222222);
                   if (this.tableList[index].hasOwnProperty(key)) {
                     if (key !== 'address') {
-                      console.log(key);
                       let priceOp = {
                         model: 'price',
                         curdType: 'add',
@@ -221,20 +203,15 @@
                         type: key
                       }
                       let price = await this.$api.curd(priceOp)
-                      console.log('price', price);
                     }
                   }
                 }
               } else {
                 let address = await this.$api.curd(addressOp)
-                console.log('address', address);
                 if (address) {
-                  console.log(111111);
                   for (const key in this.tableList[index]) {
-                    console.log(222222);
                     if (this.tableList[index].hasOwnProperty(key)) {
                       if (key !== 'address') {
-                        console.log(key);
                         let priceOp = {
                           model: 'price',
                           curdType: 'add',
@@ -244,7 +221,6 @@
                           type: key
                         }
                         let price = await this.$api.curd(priceOp)
-                        console.log('price', price);
                       }
                     }
                   }
@@ -252,13 +228,10 @@
               }
             }
           }
-          console.log('obj', obj);
         } catch (error) {}
         this.loading = false
       },
-      switchChange(val) {
-        console.log(val);
-      },
+      switchChange(val) {},
       handleInputConfirm(options) {
         let inputValue = this.inputValue;
         if (inputValue) {
@@ -266,7 +239,6 @@
         }
         this.inputVisible = false;
         this.inputValue = "";
-        console.log(options);
       },
       handleClose(options, tag) {
         options.splice(options.indexOf(tag), 1);
@@ -316,16 +288,12 @@
                   $in: ["shipper"]
                 }
               });
-              console.log('mfrs', res);
               res.forEach(resItem => {
                 resItem.label = resItem.name;
                 resItem.value = resItem._id;
                 this.keyArr2[index].options.push(resItem);
               });
-              console.log('this.keyArr2[index]', this.keyArr2[index]);
-            } catch (error) {
-              console.log(error);
-            }
+            } catch (error) {}
           } else if (this.keyArr2[index].key == "saleState") {} else {
             let key = this.keyArr2[index].key.split(".");
             try {
@@ -333,24 +301,95 @@
                 model: key[0],
                 curdType: "find"
               });
-              console.log("ress", res);
               res.forEach(resItem => {
                 resItem.label = resItem.name;
                 resItem.value = resItem._id;
                 this.keyArr2[index].options.push(resItem);
               });
-            } catch (error) {
-              console.log(error);
-            }
+            } catch (error) {}
           }
         }
-        console.log(this.keyArr2);
         this.loading = false;
-      }
+      },
+      async addArea() {
+        try {
+          let arr = ['province', 'city', 'county', 'township', 'stree']
+          let province = await this.$api.curd({
+            model: 'area',
+            curdType: 'set',
+            type: 'province',
+            key: 1,
+            name: '广西壮族自治区'
+          })
+          if (province) {
+            console.log('province', province);
+            let city = await this.$api.curd({
+              model: 'area',
+              curdType: 'set',
+              type: 'city',
+              key: 2,
+              name: '贵港市',
+              province: 1
+            })
+            if (city) {
+              console.log('city', city);
+              let county = await this.$api.curd({
+                model: 'area',
+                curdType: 'set',
+                type: 'county',
+                key: 3,
+                name: '港北区',
+                city: 2,
+                province: 1
+              })
+              if (county) {
+                console.log('county', county);
+                let township = await this.$api.curd({
+                  model: 'area',
+                  curdType: 'set',
+                  type: 'township',
+                  key: 4,
+                  name: '桂平市',
+                  city: 2,
+                  province: 1,
+                  county: 3
+                })
+                if (township) {
+                  console.log('township', township);
+                  let stree = await this.$api.curd({
+                    model: 'area',
+                    curdType: 'set',
+                    type: 'stree',
+                    key: 5,
+                    name: '城区',
+                    city: 2,
+                    province: 1,
+                    county: 3,
+                    township: 4
+                  })
+                  console.log('stree', stree);
+                }
+              }
+            }
+          }
+        } catch (error) {}
+      },
+      async getArea() {
+         try {
+           this.area = await this.$api.getArea()
+          console.log(this.area)
+
+          } catch (error) {
+            console.log(error)
+          }
+      },
     },
     async created() {
+      this.loading = true
+      await this.getArea()
       this.changeKeyData();
       await this.getData();
+      this.loading = false
     }
   };
 </script>
@@ -375,7 +414,6 @@
   }
   .add-content {
     flex: 1;
-    /* width: calc(100% - 120px); */
     height: calc(100vh - 51px - 45px - 40px);
     width: calc(100% - 40px);
     overflow: auto;
