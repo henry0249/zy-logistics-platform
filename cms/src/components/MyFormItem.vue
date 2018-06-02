@@ -69,6 +69,9 @@ export default {
     },
     level(val) {
       this.setAreaData();
+    },
+    area(){
+      this.setAreaData();
     }
   },
   computed: {
@@ -141,6 +144,7 @@ export default {
         });
       }
       res.last = res[last];
+      res.last.type = last;
       this.$emit("change", res);
     },
     setAreaData() {

@@ -3,15 +3,10 @@
     <loading-box v-model="laodingText">
       <my-table style="padding:0 1%" size="mini" height="100vh - 50px" index border :loadmore="loadmore" :thead="thead" :data.sync="data">
         <div class="flex ac" slot="header" style="padding:1% 0">
-          <my-form-item v-model="areaType" select :options="field.Area.type.option" @change="areaTypeChange" size="mini" style="width:20%" label="类型" placeholder="选择区域类型" />
-          <!-- <el-button icon="el-icon-search" style="margin-left:20px" size="mini" type="primary">搜索</el-button> -->
+          <my-form-item @change="areaTypeChange0" style="width:20%" label="类型" v-model="areaType" select size="mini" :options="field.Area.type.option" placeholder="区域类型" />
+          <my-form-item label="筛选" v-model="areaSelect" :area="areaData" :level="areaLevel>0?areaLevel-1:areaLevel" size="mini" change-on-select style="width:20%;margin-left:20px" placeholder="区域数据" @change="areaSelectChange"/>
           <div class="f1"></div>
-          <el-dropdown @command="dropdownHandle">
-            <el-button icon="el-icon-plus" style="margin-left:20px" size="mini" type="primary" @click="show=true">添加区域<i class="el-icon-caret-bottom el-icon--right"></i></el-button>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item v-for="(item,key) in field.Area.type.option" :key="key" :command="key">添加{{item}}</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
+          <el-button icon="el-icon-plus" style="margin-left:20px" size="mini" type="primary" @click="dialogVisible=true">添加区域</el-button>
         </div>
         <template slot-scope="scope">
           <span v-if="scope.prop==='type'">{{field.Area.type.option[scope.row[scope.prop]]}}</span>
@@ -23,7 +18,7 @@
             <my-form size="mini" v-if="dialogVisible">
               <div class="flex ac jb">
                 <my-form-item @change="dropdownHandle" style="width:30%" label="添加类型" v-model="areaType" select :options="field.Area.type.option" placeholder="选择区域类型" />
-                <my-form-item style="width:65%" label="区域数据" v-model="area" :area="areaData" :level="areaLevel" placeholder="选择数据" @change="areaChange"/>
+                <my-form-item style="width:65%" label="区域数据" v-model="area" area :level="areaLevel" placeholder="选择数据" @change="areaChange"/>
               </div>
               <el-alert  style="margin-top:20px" v-if="areaType==='street'" title="选择街道时,区域数据对应的是乡,需要手动添加街道名称" type="warning">
               </el-alert>
@@ -67,7 +62,9 @@ export default {
       limit: 10,
       dialogVisible: false,
       area: [],
-      areaData:[],
+      areaSelect:[],
+      areaSelectResult:{},
+      areaData:'',
       areaLevel: 0,
       streetOtion: {
         key: 0,
@@ -78,7 +75,6 @@ export default {
   },
   methods: {
     dropdownHandle(val) {
-      this.dialogVisible = true;
       this.areaType = val;
       let level = {
         province: 0,
@@ -89,12 +85,28 @@ export default {
       };
       this.areaLevel = level[val];
     },
+    areaTypeChange0(val){
+this.areaType = val;
+      let level = {
+        province: 0,
+        city: 1,
+        county: 2,
+        township: 3,
+        street: 4
+      };
+      this.areaLevel = level[val];
+      this.getAreaTable();
+    },
     areaChange(val) {
       console.log(val);
       this.areaOption = val;
     },
+    areaSelectChange(val){
+      console.log(val);
+      this.areaSelectResult = val;
+      this.getAreaTable();
+    },
     async addArea() {
-      console.log(this.areaOption);
       if (this.is("empty", JSON.parse(JSON.stringify(this.areaOption)))) {
         this.$message.loading("没有选择区域数据");
         return;
@@ -114,21 +126,27 @@ export default {
           addOption.street = this.streetOtion;
         }
         await this.$ajax.post("/area/add", addOption);
+        this.getAreaTable();
       } catch (error) {}
       this.laodingText = "";
     },
     areaTypeChange(val){
       this.areaType = val;
-      this.getAreaTable()
+      this.getAreaTable();
     },
     async getAreaTable() {
-      this.laodingText = "正在添加...";
+      this.laodingText = "加载中...";
       this.data = [];
       try {
-        this.data = await this.$ajax.post("/area/find?type=", {
+        let findOption = {
           type: this.areaType,
-          limit: this.limit || 10
-        });
+          limit: this.limit || 10,
+          skip: this.data.length
+        };
+        if(this.areaSelectResult.last){
+          findOption[this.areaSelectResult.last.type] = this.areaSelectResult.last.key;
+        }
+        this.data = await this.$ajax.post("/area/find?type=", findOption);
         this.areaData = await this.$ajax("/area/select");
       } catch (error) {}
       this.laodingText = "";
@@ -136,11 +154,15 @@ export default {
     async loadmore() {
       let res = [];
       try {
-        res = await this.$ajax.post("/area/find", {
+        let findOption = {
           type: this.areaType,
           limit: this.limit || 10,
           skip: this.data.length
-        });
+        };
+        if(this.areaSelectResult.last){
+          findOption[this.areaSelectResult.last.type] = this.areaSelectResult.last.key;
+        }
+        res = await this.$ajax.post("/area/find", findOption);
       } catch (error) {}
       return res;
     }
