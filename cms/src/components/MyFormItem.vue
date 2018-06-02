@@ -146,7 +146,10 @@ export default {
                         }
                       });
                       if (pushStreetFlag) {
-                        district.push(streetItem);
+                        street.push({
+                          value: streetKey,
+                          label: streetData[districtKey][streetKey]
+                        });
                       }
                     }
                   } else {

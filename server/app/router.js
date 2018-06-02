@@ -21,6 +21,7 @@ module.exports = app => {
     .all('/logout', 'user.logout') //注销
 
     .post('/area/add', checkToken(), 'area.add') //添加区域
+    .all('/area/select', checkToken(), 'area.findForSelect') //区域数据
     .post('/platform/orgTree', checkToken(), 'platform.orgTree') //平台组织结构
 
     .get('/', 'static.views') //根路径匹配

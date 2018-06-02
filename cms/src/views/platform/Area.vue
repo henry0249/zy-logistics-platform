@@ -23,7 +23,7 @@
             <my-form size="mini" v-if="dialogVisible">
               <div class="flex ac jb">
                 <my-form-item @change="dropdownHandle" style="width:30%" label="添加类型" v-model="areaType" select :options="field.Area.type.option" placeholder="选择区域类型" />
-                <my-form-item style="width:65%" label="区域数据" v-model="area" area :level="areaLevel" placeholder="选择数据" @change="areaChange"/>
+                <my-form-item style="width:65%" label="区域数据" v-model="area" :area="area" :level="areaLevel" placeholder="选择数据" @change="areaChange"/>
               </div>
               <el-alert  style="margin-top:20px" v-if="areaType==='street'" title="选择街道时,区域数据对应的是乡,需要手动添加街道名称" type="warning">
               </el-alert>
@@ -127,6 +127,7 @@ export default {
           type: this.areaType,
           limit: this.limit || 10
         });
+        this.area = await this.$ajax("/area/select");
       } catch (error) {}
       this.laodingText = "";
     },
