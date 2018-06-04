@@ -1,169 +1,162 @@
 <template>
-  <common-list :title="name" :tableHeader="tableHeader" str="category" :key-arr="keyArr" :populate="populate">
-    <el-button slot-scope="scope" slot="operation" size="mini" @click="test(scope)">超小按钮</el-button>
-    <!-- <category-add str="category" :key-arr="keyArr" slot="addModel"></category-add> -->
-  </common-list>
+  <loading-box class="goods-box" v-model="loadingText">
+    <my-table index size="mini" edit :thead="tableHeader" :data.sync="tableList" op @op="op">
+    </my-table>
+    <el-dialog :title="title" :visible.sync="show">
+      <component :is="componentName" :key-arr="key" :key-data="keyData" :str="str"></component>
+    </el-dialog>
+  </loading-box>
 </template>
 
 <script>
-  import CommonList from "../common/CommonList.vue";
-  // import CategoryAdd from "./AddModel.vue";
+  import SeeModel from "../common/SeeModel.vue";
+  import EdmitModel from "../common/EdmitModel.vue";
+  import {
+    categoryThead,
+    categoryThead2,
+    keyArr
+  } from "./categoryData.js";
   export default {
     components: {
-      CommonList,
-      // CategoryAdd
+      SeeModel,
+      EdmitModel
     },
     data() {
       return {
-        name: '',
-        tableHeader: [],
+        str: "goods",
+        show: false,
+        title: "",
+        loadingText: "",
+        componentName: "",
+        data: "",
+        keyData: {},
+        boxStyle: {
+          width: "calc(100% - 20px)",
+          height: "calc(100% - 10px)"
+        },
+        heightValue: "calc(100% - 10px)",
+        tableList: [],
+        tableHeader: categoryThead,
+        keyArr,
         populate: [{
           path: 'parent'
         }],
-        tableHeader1: [{
-            key: "name",
-            keyValue: "分类名"
-          },
-          {
-            key: "desc",
-            keyValue: "描述"
-          },
-          {
-            key: "remark",
-            keyValue: "备注"
-          }
-        ],
-        tableHeader2: [{
-            key: "name",
-            keyValue: "分类名"
-          },
-          {
-            key: "desc",
-            keyValue: "描述"
-          },
-          {
-            key: "remark",
-            keyValue: "备注"
-          }, {
-            key: "parent.name",
-            keyValue: "上级分类"
-          }
-        ],
-        keyArr: [],
-        keyArr1: [{
-            key: "name",
-            keyValue: "分类名",
-            value: null,
-            type: "input"
-          },
-          // {
-          //   key: 'cover',
-          //   value: null,
-          //   type: 'upload',
-          //   action: 'https://yixiu.natappvip.cc/upload/',
-          //   keyValue: '封面'
-          // },
-          {
-            key: "desc",
-            keyValue: "描述",
-            value: null,
-            type: "textarea"
-          },
-          {
-            key: "remark",
-            keyValue: "备注",
-            value: null,
-            type: "textarea"
-          }
-        ],
-        keyArr2: [{
-            key: "name",
-            keyValue: "分类名",
-            value: null,
-            type: "input"
-          },
-          // {
-          //   key: 'cover',
-          //   value: null,
-          //   type: 'upload',
-          //   action: 'https://yixiu.natappvip.cc/upload/',
-          //   keyValue: '封面'
-          // },
-          {
-            key: "desc",
-            keyValue: "描述",
-            value: null,
-            type: "textarea"
-          },
-          {
-            key: "remark",
-            keyValue: "备注",
-            value: null,
-            type: "textarea"
-          }, {
-            key: 'parent.name',
-            value: null,
-            type: 'select',
-            keyValue: '上级分类',
-            options: []
-          }
-        ],
       };
     },
+    computed: {
+      key() {
+        let i = null;
+        let arr = JSON.parse(JSON.stringify(this.keyArr));
+        arr.forEach((item, index) => {
+          if (item.key === "company.name" && !this.company.name) {
+            i = index;
+          } else if (item.key === "platform.name" && !this.platform.name) {
+            i = index;
+          }
+        });
+        if (i) {
+          arr.splice(i, 1);
+        }
+        return arr;
+      }
+    },
     watch: {
-      $route(val) {
-        console.log('route', val.path);
-        this.op(val.path)
+      async $route(val) {
+        let parent = {
+          "parent.name": {
+            name: '上级分类'
+          },
+        }
+        if (val.path === '/goods/category/1') {
+          let i = null
+          delete this.tableHeader['parent.name']
+          this.keyArr.forEach((item, index) => {
+            if (item.key === 'parent.name') {
+              i = index
+            }
+          });
+          if (i) {
+            this.keyArr.splice(i, 1)
+          }
+        } else if (val.path === '/goods/category/2') {
+          let i = null
+          this.tableHeader['parent.name'] = {
+            name: '上级分类'
+          }
+          this.keyArr.forEach((item, index) => {
+            if (item.key === 'parent.name') {
+              i = index
+            }
+          });
+          if (!i) {
+            this.keyArr.push({
+              key: 'parent.name',
+              value: null,
+              type: 'select',
+              keyValue: '上级分类',
+              options: []
+            })
+          }
+        }
+        console.log(val.path);
+        await this.getData()
       }
     },
     methods: {
-      test(row) {
-        console.log(row);
-      },
-      async op(op) {
-        console.log(op);
-        if (op == "/goods/category/2") {
-          console.log('222222222');
-          this.name = '二级分类'
-          try {
-            console.log(3333333);
-            let res = await this.$api.curd({
-              model: 'category',
-              curdType: 'find',
-              parent: {
-                $exists: false
-              }
-            })
-            console.log('res', res);
-            res.forEach(item => {
-              item.value = item._id
-              item.label = item.name
-            });
-            this.tableHeader = this.tableHeader2
-            this.keyArr2.forEach(keyItem => {
-              if (keyItem.key == 'parent.name') {
-                keyItem.options = res
-              }
-            });
-            this.keyArr = this.keyArr2
-            console.log(this.keyArr);
-          } catch (error) {}
-        } else {
-          console.log(111111111);
-          let i = null
-          this.name = '一级分类'
-          this.tableHeader = this.tableHeader1
-          this.keyArr = this.keyArr1
+      op(val) {
+        if (val.type === "read") {
+          this.componentName = "SeeModel";
+          this.title = "查看详情";
+          this.show = true;
+          this.keyData = val.value.row;
+        } else if (val.type === "edit") {
+          this.$router.push({
+            path: '/goods/edmit/' + val.value.row._id,
+            query: {
+              str: 'goods'
+            }
+          })
         }
-        console.log('this.keyArr', this.keyArr);
+      },
+      async getData() {
+        let i = 0;
+        try {
+          this.loadingText = '加载中'
+          let data = {
+            model: "category",
+            curdType: "find",
+            populate: this.populate,
+            limit: 20,
+            skip: 0,
+          };
+          if (this.$route.path === '/goods/category/2') {
+            data.parent = {
+              $exists: true
+            }
+          }
+          if (this.$route.path === '/goods/category/1') {
+            data.parent = {
+              $exists: false
+            }
+          }
+          console.log('data', data);
+          let res = await this.$api.curd(data);
+          console.log(res);
+          this.tableList = res;
+        } catch (error) {}
+        this.loadingText = ''
       }
     },
-    created() {
-      this.op(this.$route.path)
+    async created() {
+      console.log(this.$route);
+      await this.getData();
     }
   };
 </script>
 
 <style scoped>
-
+  .goods-box {
+    width: calc(100% - 40px);
+    margin: 0 auto;
+  }
 </style>

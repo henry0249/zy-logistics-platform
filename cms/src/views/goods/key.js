@@ -182,5 +182,5 @@ module.exports = {
   populate,
   or,
   addkey,
-  goodsKey
+  goodsKey,
 }

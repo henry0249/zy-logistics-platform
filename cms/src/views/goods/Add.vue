@@ -45,85 +45,23 @@
         <my-table style="margin-top:20px;" border index size="mini" edit :thead="tableTeader" :data.sync="tableList" op>
           <div slot="op" slot-scope="scope">
             <i v-if="tableList.length>1" title="删除该地区" class="pointer" style="margin-right:10px" @click="delAdr(scope['index'])">
-                <icon size="16px">icon-ec1</icon>
-              </i>
+                                    <icon size="16px">icon-ec1</icon>
+                                  </i>
             <i v-if="scope['index'] === tableList.length - 1" title="增加一个地区" class="pointer" @click="addAdr">
-                <icon size="16px">icon-54</icon>
-              </i>
+                                    <icon size="16px">icon-54</icon>
+                                  </i>
           </div>
           <template slot-scope="scope" v-if="scope.column.property === 'address'">
-              <my-form-item :change-on-select="true" size="mini" style="width:100%" label="区域数据" v-model="scope.row[scope.column.property]" :area="area" :level="areaLevel" placeholder="选择数据" @change="areaChange"/>
+                                  <my-form-item :change-on-select="true" size="mini" style="width:100%" label="区域数据" v-model="scope.row[scope.column.property]" :area="area" :level="areaLevel" placeholder="选择数据" @change="areaChange"/>
 </template>
         </my-table>
       </div>
       <div class="tr" style="margin-top:30px">
         <el-button size="small" @click="$router.go(-1)">取 消</el-button>
-        <el-button size="small" type="primary" @click="sub">立即修改</el-button>
+        <el-button size="small" type="primary" @click="sub">添 加</el-button>
       </div>
     </div>
   </loading-box>
-  <!-- <div class="flex add-warp" v-loading="loading">
-              <div class="flex add-header">
-                <span>添加商品</span>
-              </div>
-              <div class="add-content">
-                <div class="add-list-box">
-                  <div class="flex add-list">
-                    <div class="flex list-box" v-for="item in keyArr1" :key="item.id">
-                      <span class="flex add-span">{{item.keyValue}}</span>
-                      <el-input v-model="item.value" :placeholder="`请输入${item.keyValue}`" style="flex:1;margin-right:20px"></el-input>
-                    </div>
-                  </div>
-                  <div class="flex add-list">
-                    <div class="flex list-box" v-for="item in keyArr2" :key="item.id">
-                      <span class="flex add-span">{{item.keyValue}}</span>
-                      <el-select v-model="item.value" :placeholder="'请选择'+item.keyValue" style="flex:1;margin-right:20px">
-                        <el-option v-for="v in item.options" :key="v.id" :label="v.label" :value="v.value">
-                        </el-option>
-                      </el-select>
-                    </div>
-                  </div>
-                  <div class="flex add-list">
-                    <div class="flex list-box" v-for="item in keyArr3" :key="item.id">
-                      <span class="flex add-span">{{item.keyValue}}</span>
-                      <el-switch @change="switchChange" v-model="item.value" :active-text="item.options[0]" :inactive-text="item.options[1]">>
-                      </el-switch>
-                    </div>
-                  </div>
-                  <div class="flex add-list" style="margin-bottom:10px;">
-                    <div class="flex list-box" v-for="item in keyArr4" :key="item.id" style="width:calc(50% - 10px)">
-                      <span class="flex add-span">{{item.keyValue}}</span>
-                      <el-input type="textarea" :autosize="{ minRows: 4, maxRows: 4}" v-if="item.type == 'textarea'" v-model="item.value" :placeholder="'请输入'+item.keyValue" style="flex:1;margin-right:20px"></el-input>
-                      <div class="flex arr-box" v-else-if="item.type == 'Arr'" style="flex:1">
-                        <el-tag style="margin:5px 0 0 5px" :key="tag" v-for="tag in item.options" closable :disable-transitions="false" @close="handleClose(item.options,tag)">
-                          {{tag}}
-                        </el-tag>
-                        <el-input class="input-new-tag" v-if="inputVisible" v-model="inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(item.options)" @blur="handleInputConfirm(item.options)">
-                        </el-input>
-                        <el-button v-else class="button-new-tag" style="margin:5px 0 0 5px" size="small" @click="showInput">添加新标签</el-button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <my-table v-if="!loading" index size="mini" edit :thead="tableTeader" :data.sync="tableList" op>
-                  <div slot="op" slot-scope="scope">
-                    <i v-if="tableList.length>1" title="删除该地区" class="pointer" style="margin-right:10px" @click="delAdr(scope['index'])">
-                                                            <icon size="16px">icon-ec1</icon>
-                                                          </i>
-                    <i v-if="scope['index'] === tableList.length - 1" title="增加一个地区" class="pointer" @click="addAdr">
-                                                            <icon size="16px">icon-54</icon>
-                                                          </i>
-                  </div>
-<template slot-scope="scope" v-if="scope.column.property === 'address'">
-  <my-form-item size="mini" style="width:100%" label="区域数据" v-model="scope.row[scope.column.property]" :area="area" :level="areaLevel" placeholder="选择数据" @change="areaChange" />
-</template>
-        </my-table>
-    </div>
-    <div class="add-footer">
-      <el-button size="mini" @click="$router.go(0)">取 消</el-button>
-      <el-button size="mini" type="success" @click="sub">提 交</el-button>
-    </div>
-  </div> -->
 </template>
 
 <script>
@@ -161,11 +99,6 @@
         loading: false,
         inputVisible: false,
         inputValue: "",
-        keyArr4,
-        cityKey,
-        keyArr3,
-        keyArr2,
-        keyArr1,
         cityData: [],
         tableTeader: {
           address: {
@@ -185,7 +118,7 @@
           }
         },
         tableList: [{
-          address: [],
+          address: {},
           factory: 0,
           sell: 0,
           transport: 0
@@ -199,10 +132,8 @@
     },
     methods: {
       areaChange(val) {
-        console.log(val);
         this.areaObj = val
       },
-      add() {},
       delAdr(i) {
         if (this.tableList.length > 1) {
           this.tableList.splice(i, 1);
@@ -236,19 +167,26 @@
           detail: this.goods.detail,
         };
         if (this.platform.name) {
-          obj.platform = this.platform._id
+          obj.platform = this.platform._id;
+          delete obj.company;
         }
         if (this.company.name) {
-          obj.company = this.company._id
+          obj.company = this.company._id;
+          delete obj.platform;
+        }
+        for (const key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            if (!obj[key]) {
+              delete obj[key]
+            }
+          }
         }
         try {
           let res = await this.$api.curd(obj)
           if (res) {
-            console.log('goods', res);
             await this.addPrice(res._id)
           }
         } catch (error) {
-          console.log(error);
         }
       },
       async addPrice(id) {
@@ -256,25 +194,57 @@
           for (const key in this.tableList[index]) {
             if (this.tableList[index].hasOwnProperty(key)) {
               if (key !== 'address') {
-                let priceOp = {
-                  model: 'price',
-                  curdType: 'add',
-                  area: this.areaObj.last._id,
-                  goods: id,
-                  value: this.tableList[index][key],
-                  type: key
+                let _id = ''
+                for (const k in this.area) {
+                  if (this.area.hasOwnProperty(k)) {
+                    if (this.area[k].length > 0) {
+                      this.area[k].forEach(item => {
+                        if (Number(this.tableList[index].address[this.tableList[index].address.length - 1]) === item.key) {
+                          _id = item._id
+                        }
+                      });
+                    }
+                  }
                 }
-                let price = await this.$api.curd(priceOp)
-                console.log('price', price);
+                if (_id !== '') {
+                  let priceOp = {
+                    model: 'price',
+                    curdType: 'add',
+                    area: _id,
+                    goods: id,
+                    value: this.tableList[index][key],
+                    type: key
+                  }
+                  let price = await this.$api.curd(priceOp)
+                } else {
+                }
               }
             }
           }
         }
       },
       async sub() {
-        this.loading = true
-        await this.addGoods()
-        this.loading = false
+        let io = false
+        this.tableList.forEach(item => {
+          if (item.address.length === 0) {
+            io = true
+          }
+        });
+        if (!this.goods.name) {
+          this.$alert('请先填写名字', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {}
+          });
+        } else if (io) {
+          this.$alert('请选择地区', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {}
+          });
+        } else {
+          this.loadingText = '加载中'
+          await this.addGoods()
+          this.loadingText = ''
+        }
       },
       switchChange(val) {},
       handleInputConfirm(options) {
@@ -294,31 +264,6 @@
           this.$refs.saveTagInput.$refs.input.focus();
         });
       },
-      changeKeyData() {
-        let i = 0;
-        if (Object.keys(this.company).length <= 0) {
-          for (let index = 0; index < this.keyArr2.length; index++) {
-            if (this.keyArr2[index].key === "company.name") {
-              i = index;
-            }
-          }
-        } else if (Object.keys(this.platform).length <= 0) {
-          for (let index = 0; index < this.keyArr2.length; index++) {
-            if (this.keyArr2[index].key === "platform.name") {
-              i = index;
-            }
-          }
-        }
-        this.keyArr2.splice(i, 1);
-      },
-      async getGoods() {
-        try {
-          let res = await this.$api.curd({
-            model: 'goods',
-            curdType: 'find',
-          })
-        } catch (error) {}
-      },
       async getMfrs() {
         try {
           let res = await this.$api.curd({
@@ -328,7 +273,6 @@
               $in: ['shipper']
             }
           })
-          console.log('res', res);
           res.forEach(resItem => {
             let {
               _id,
@@ -380,9 +324,7 @@
       async getArea() {
         try {
           this.area = await this.$api.getArea()
-          console.log(this.area)
         } catch (error) {
-          console.log(error)
         }
       },
     },
@@ -427,93 +369,4 @@
   .form-right {
     margin-right: 20px
   }
-  /* .add-warp {
-                width: 100%;
-                height: 100%;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: center;
-              }
-              .add-header {
-                height: 36px;
-                width: calc(100% - 40px);
-                border-bottom: 1px solid #ccc;
-                flex-direction: row;
-                justify-content: flex-start;
-                align-items: center;
-                margin-bottom: 10px;
-                box-sizing: border-box;
-              }
-              .add-content {
-                flex: 1;
-                height: calc(100vh - 51px - 45px - 40px);
-                width: calc(100% - 40px);
-                overflow: auto;
-                flex-direction: column;
-                align-items: center;
-                justify-content: flex-start;
-              }
-              .add-list-box {
-                width: calc(100% - 120px);
-                margin: 0 auto;
-              }
-              .list-box {
-                width: 33.3%;
-                min-height: 40px;
-                float: left;
-                margin: 10px 0;
-                flex-direction: row;
-                justify-content: flex-start;
-                align-items: center;
-              }
-              .add-span {
-                width: 100px;
-                flex-direction: row;
-                justify-content: flex-start;
-                align-items: center;
-              }
-              .add-list {
-                width: 100%;
-                flex-direction: row;
-                justify-content: flex-start;
-                align-items: flex-start;
-                flex-wrap: wrap;
-              }
-              .arr-box {
-                flex: 1;
-                height: 96px;
-                flex-direction: row;
-                justify-content: flex-start;
-                align-items: flex-start;
-                flex-wrap: wrap;
-                box-sizing: border-box;
-                border: 1px solid #ccc;
-                overflow: auto;
-                border-radius: 4px;
-              }
-              .list-box:last-child {
-              }
-              .add-address-box {
-                width: 100%;
-                height: 200px;
-                flex-direction: row;
-                justify-content: center;
-                align-items: flex-start;
-                flex-wrap: wrap;
-                position: relative;
-              }
-              .input-new-tag {
-                width: 80px;
-                margin: 5px 0 0 5px;
-              }
-              .icon-box {
-                position: absolute;
-                right: 0px;
-                top: 50%;
-                transform: translateY(-50%);
-              }
-              .add-footer {
-                width: calc(100% - 40px);
-                height: 40px;
-              } */
 </style>

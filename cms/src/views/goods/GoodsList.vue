@@ -92,7 +92,9 @@
           let data = {
             model: "goods",
             curdType: "find",
-            populate: this.populate
+            populate: this.populate,
+            limit:20,
+            skip:0
           };
           let res = await this.$api.curd(data);
           console.log(res);
