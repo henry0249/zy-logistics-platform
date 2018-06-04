@@ -1,20 +1,24 @@
 let categoryThead = {
   'name': {
     readOnly: true,
-    name: '分类名'
+    name: '品牌名'
   },
-  "desc": {
+  "tag": {
     readOnly: true,
-    name: '描述'
+    name: '标签'
   },
-  "remark": {
+  "type": {
     readOnly: true,
-    name: '备注'
+    name: '类型'
+  },
+  "category.name": {
+    readOnly: true,
+    name: '分类'
   }
 }
 let keyArr = [{
     key: "name",
-    keyValue: "分类名",
+    keyValue: "品牌名",
     value: null,
     type: "input"
   },
@@ -26,21 +30,21 @@ let keyArr = [{
   //   keyValue: '封面'
   // },
   {
-    key: "desc",
-    keyValue: "描述",
+    key: "tag",
+    keyValue: "标签",
     value: null,
-    type: "textarea"
+    type: "Arr"
   },
   {
-    key: "remark",
-    keyValue: "备注",
+    key: "type",
+    keyValue: "类型",
     value: null,
-    type: "textarea"
+    type: "input"
   }, {
-    key: 'parent.name',
+    key: 'category.name',
     value: null,
     type: 'select',
-    keyValue: '上级分类',
+    keyValue: '分类',
     options: []
   }
 ]

@@ -3,27 +3,26 @@
     <my-table index size="mini" edit :thead="tableHeader" :data.sync="tableList" op @op="op">
     </my-table>
     <el-dialog :title="title" :visible.sync="show">
-      <component :is="componentName" :key-arr="key" :key-data="keyData" :str="str"></component>
+      <component :show.sync="show" :is="componentName" :key-arr="key" :key-data="keyData" :str="str"></component>
     </el-dialog>
   </loading-box>
 </template>
 
 <script>
   import SeeModel from "../common/SeeModel.vue";
-  import EdmitModel from "../common/EdmitModel.vue";
+  import CategoryEdmit from './CategoryEdmit';
   import {
     categoryThead,
-    categoryThead2,
     keyArr
   } from "./categoryData.js";
   export default {
     components: {
       SeeModel,
-      EdmitModel
+      CategoryEdmit
     },
     data() {
       return {
-        str: "goods",
+        str: "",
         show: false,
         title: "",
         loadingText: "",
@@ -62,8 +61,14 @@
     },
     watch: {
       async $route(val) {
+        this.changePath(val)
+      }
+    },
+    methods: {
+      async changePath(val) {
         let parent = {
           "parent.name": {
+            readOnly: true,
             name: '上级分类'
           },
         }
@@ -100,22 +105,20 @@
         }
         console.log(val.path);
         await this.getData()
-      }
-    },
-    methods: {
+      },
       op(val) {
         if (val.type === "read") {
           this.componentName = "SeeModel";
           this.title = "查看详情";
           this.show = true;
           this.keyData = val.value.row;
+          this.str = this.$route.path
         } else if (val.type === "edit") {
-          this.$router.push({
-            path: '/goods/edmit/' + val.value.row._id,
-            query: {
-              str: 'goods'
-            }
-          })
+          this.componentName = "CategoryEdmit";
+          this.title = "修改信息";
+          this.show = true;
+          this.keyData = val.value.row;
+          this.str = this.$route.path
         }
       },
       async getData() {
@@ -149,7 +152,7 @@
     },
     async created() {
       console.log(this.$route);
-      await this.getData();
+      await this.changePath(this.$route);
     }
   };
 </script>
