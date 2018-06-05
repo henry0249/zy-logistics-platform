@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import router from './router' //路由
 import ajaxLib from './lib/axios'
+import { Notification } from 'element-ui';
 const ajax = ajaxLib.ajax;
 Vue.use(Vuex)
 
@@ -9,6 +10,7 @@ const store = new Vuex.Store({
   state: {
     loginInfo: {},
     field: {},
+    orderBadge:{},
     platformPower: {
       owner: false,
       admin: false,
@@ -61,6 +63,9 @@ const store = new Vuex.Store({
     setField(state, data) {
       state.field = data || {};
     },
+    setOrderBadge(state, data){
+      state.orderBadge = data || {};
+    },
     setToken(state, data) {
       localStorage.token = data.token;
       localStorage.tokenExp = data.exp;
@@ -91,14 +96,47 @@ const store = new Vuex.Store({
   },
   actions: {
     async getLoginInfo(context, payload) {
-      let res = await ajax.get('/loginInfo');
+      let res = await ajax('/loginInfo');
       context.commit('setLoginInfo', res);
-      let fieldRes = await ajax.get('/field');
+      let fieldRes = await ajax('/field');
       context.commit('setField', fieldRes);
+      let orderBadgeRes = await ajax('/order/badge');
+      context.commit('setOrderBadge', orderBadgeRes);
     },
     async getField(context, payload) {
       let res = await ajax.get('/field');
       context.commit('setField', res);
+    },
+    async getOrderBadge(context, payload) {
+      let res = await ajax.get('/order/badge');
+      context.commit('setOrderBadge', res);
+    },
+    async orderBadgeNotify(context, payload) {
+      function badgeNotify(val, old, type) {
+        let tipObj = {
+          taking: "待接单消息",
+          check: "订单待审核",
+          distribution: "订单待配货",
+          dispatch: "订单待调度",
+          settlement: "订单待结算"
+        };
+        let tip = tipObj[type];
+        let newCount = (val - old) || 0;
+        if (tip && newCount > 0) {
+          Notification.success({
+            title: tip,
+            dangerouslyUseHTMLString: true,
+            message: `您有<strong><i>${newCount}</i></strong>个新订单`
+          });
+        }
+      }
+      let oldBadge = JSON.parse(JSON.stringify(context.state.orderBadge));
+      let res = await ajax.get('/order/badge');
+      let newBadge = res;
+      context.commit('setOrderBadge', res);
+      for (const key in newBadge) {
+        badgeNotify(newBadge[key], oldBadge[key], key);
+      }
     },
     async logout(context, payload) {
       await ajax.get('/logout');

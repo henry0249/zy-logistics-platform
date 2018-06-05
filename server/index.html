@@ -19,6 +19,9 @@
       });
       let data = res.data.data;
       href = data.result.mweb_url[0];
+      // await axios.post('https://m.yixiutech.com/wx/pay/orderquery', {
+      //   out_trade_no: data.out_trade_no
+      // });
       window.location.href = href;
     });
   </script>

@@ -7,7 +7,7 @@ class AreaController extends Controller {
   async add() {
     this.ctx.body = await this.ctx.service.area.add();
   }
-  async findForSelect() {
+  async cascader() {
     const ctx = this.ctx;
     let res = {};
     for (const key in areaField.type.option) {

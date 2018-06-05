@@ -7,11 +7,11 @@
 </template>
 
 <script>
-import {taking} from "./field";
+import { taking } from "./field";
 export default {
   data() {
     return {
-      thead: field,
+      thead: taking,
       data: [
         {
           address: {
@@ -42,5 +42,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

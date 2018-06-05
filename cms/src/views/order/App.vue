@@ -20,63 +20,84 @@ export default {
   components: {
     LeftNav
   },
+  computed: {
+    orderBadge() {
+      return this.$store.state.orderBadge;
+    }
+  },
+  watch: {
+    orderBadge: {
+      handler: function(val) {
+        for (const key in val) {
+          this.nav.forEach((item, index) => {
+            if (item.path.indexOf(key) > -1) {
+              item.badge = val[key];
+            }
+            this.$set(this.nav, index, item);
+          });
+        }
+      },
+      deep: true
+    }
+  },
   data() {
     return {
-      nav: [
-        {
-          name: "订单计划",
-          color: "red",
-          icon: "icon-chuangjiandingdan",
-          path: "/order/create"
-        },
-        {
-          name: "待接单",
-          color: "red",
-          icon: "icon-jiedanyingli",
-          path: "/order/taking",
-          badge: 8
-        },
-        {
-          name: "待审核",
-          color: "red",
-          icon: "icon-shenhe1",
-          path: "/order/check",
-          badge: 0
-        },
-        {
-          name: "待配货",
-          color: "red",
-          icon: "icon-cf-c97",
-          path: "/order/distribution",
-          badge: 0
-        },
-        {
-          name: "待调度",
-          color: "red",
-          icon: "icon-tiaoduzhongxin",
-          path: "/order/dispatch",
-          badge: 0
-        },
-        {
-          name: "待结算",
-          color: "red",
-          icon: "icon-jiesuan",
-          path: "/order/settlement",
-          badge: 0
-        },
-        {
-          name: "所有订单",
-          color: "red",
-          icon: "icon-liebiao",
-          path: "/order/all",
-          badge: 0
-        }
-      ]
+      nav: []
     };
+  },
+  mounted() {
+    this.nav = [
+      {
+        name: "订单计划",
+        color: "red",
+        icon: "icon-chuangjiandingdan",
+        path: "/order/create"
+      },
+      {
+        name: "待接单",
+        color: "red",
+        icon: "icon-jiedanyingli",
+        path: "/order/taking",
+        badge: this.orderBadge.taking
+      },
+      {
+        name: "待审核",
+        color: "red",
+        icon: "icon-shenhe1",
+        path: "/order/check",
+        badge: this.orderBadge.check
+      },
+      {
+        name: "待配货",
+        color: "red",
+        icon: "icon-cf-c97",
+        path: "/order/distribution",
+        badge: this.orderBadge.distribution
+      },
+      {
+        name: "待调度",
+        color: "red",
+        icon: "icon-tiaoduzhongxin",
+        path: "/order/dispatch",
+        badge: this.orderBadge.dispatch
+      },
+      {
+        name: "待结算",
+        color: "red",
+        icon: "icon-jiesuan",
+        path: "/order/settlement",
+        badge: this.orderBadge.settlement
+      },
+      {
+        name: "所有订单",
+        color: "red",
+        icon: "icon-liebiao",
+        path: "/order/all"
+      }
+    ];
   }
 };
 </script>
 
 <style scoped>
-
 </style>

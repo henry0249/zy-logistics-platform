@@ -20,8 +20,19 @@ module.exports = app => {
     .all('/refleshToken', checkToken(), 'user.refleshToken') //刷新token
     .all('/logout', 'user.logout') //注销
 
+    .all('/user/cascader', checkToken(), 'user.cascader') //用户级联数据
+
     .post('/area/add', checkToken(), 'area.add') //添加区域
-    .all('/area/select', checkToken(), 'area.findForSelect') //区域数据
+    .post('/area/set', checkToken(), 'area.add') //添加区域
+
+    .all('/area/cascader', checkToken(), 'area.cascader') //区域级联数据
+
+    .all('/goods/cascader', checkToken(), 'goods.cascader') //商品级联数据
+
+    .post('/order/add', checkToken(), 'order.add') //下单
+    .post('/order/set', checkToken(), 'order.add') //下单
+    .get('/order/badge', checkToken(), 'order.badge') //订单标记
+
     .post('/platform/orgTree', checkToken(), 'platform.orgTree') //平台组织结构
 
     .get('/', 'static.views') //根路径匹配

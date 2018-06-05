@@ -41,6 +41,7 @@ module.exports = {
   area: {
     name: '区域',
     type: 'ObjectId',
-    ref: 'Area'
+    ref: 'Area',
+    require: true,
   }
 }

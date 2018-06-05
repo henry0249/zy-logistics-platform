@@ -13,6 +13,7 @@ class CompanyService extends Service {
     return {
       ...param,
       creater: ctx.user._id,
+      owner: ctx.user._id,
     };
   }
   async set(param) {

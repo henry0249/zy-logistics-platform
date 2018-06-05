@@ -15,6 +15,14 @@ module.exports = {
     type: 'String',
     require: true
   },
+  mobile: {
+    name: '手机号',
+    type: 'String'
+  },
+  tel:{
+    name: '固话',
+    type: 'String'
+  },
   auth: {
     name: '资质认证',
     type: 'Boolean'
@@ -69,5 +77,9 @@ module.exports = {
     name: '地址',
     type: 'ObjectId',
     ref: 'Address'
+  },
+  area:{
+    name: '区域',
+    type: 'Object',
   }
 }

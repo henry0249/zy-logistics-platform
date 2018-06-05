@@ -23,25 +23,31 @@ module.exports = {
     name: '下单公司',
     ref: 'Company'
   },
+  creater:{
+    type: 'ObjectId',
+    name: '创建人',
+    ref: 'User'
+  },
   name: {
     type: 'String',
     name: '名称'
   },
-  goods: {
-    type: 'ObjectId',
-    name: '商品名称',
-    require: true,
-  },
-  goodsCount: {
-    type: 'Number',
-    name: '商品数量',
-    require: true,
-  },
-  address: {
+  area: {
     name: '收货地址',
     type: 'ObjectId',
-    ref: 'Address',
-    require: true
+    ref: 'Area'
+  },
+  address: {
+    name: '详细地址',
+    type: 'String',
+  },
+  contactName: {
+    name: '收货人',
+    type: 'String',
+  },
+  contactNumber: {
+    name: '收货人联系方式',
+    type: 'String',
   },
 
   paid: {
@@ -80,7 +86,7 @@ module.exports = {
     name: '已结算',
     type: 'Boolean'
   },
-  invoiced:{
+  invoiced: {
     name: '已开发票',
     type: 'Boolean'
   },
@@ -132,37 +138,30 @@ module.exports = {
     type: 'Date'
   },
 
-
-  parent: {
-    type: 'ObjectId',
-    ref: 'Order'
+  salesman: {
+    name: '市场专员',
+    type: 'ObjectIdArray',
+    ref: 'User'
+  },
+  auditor: {
+    name: '审核人',
+    type: 'ObjectIdArray',
+    ref: 'User'
+  },
+  dispatcher: {
+    name: '调度员',
+    type: 'ObjectIdArray',
+    ref: 'User'
+  },
+  financial: {
+    name: '财务专员',
+    type: 'ObjectIdArray',
+    ref: 'User'
   },
 
-  lastCompany: {
-    type: 'ObjectId',
-    name: '上家公司',
-    ref: 'Company'
-  },
-
-  currentCompany: {
-    type: 'ObjectId',
-    name: '当前公司',
-    ref: 'Company'
-  },
-  nextCompany: {
-    type: 'ObjectId',
-    name: '下家公司',
-    ref: 'Company'
-  },
-
-  purchasePrice: {
-    name: '进价',
-    type: 'Number',
-    require: true
-  },
-  sellPrice: {
-    name: '售价',
-    type: 'Number',
-    require: true
+  documentClerk: {
+    name: '单据文员',
+    type: 'ObjectIdArray',
+    ref: 'User'
   },
 }

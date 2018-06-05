@@ -73,16 +73,13 @@ class PlatformService extends Service {
     }];
     let platformCompany = [{
       name: '物流公司',
-      path: 'logistics',
-      populate: companyUser
+      path: 'logistics'
     }, {
       name: '发货厂商',
-      path: 'shipper',
-      populate: companyUser
+      path: 'shipper'
     }, {
       name: '贸易公司',
-      path: 'trading',
-      populate: companyUser
+      path: 'trading'
     }];
     let platformUser = [{
       name: '管理员',
@@ -104,7 +101,6 @@ class PlatformService extends Service {
       path: 'financial'
     }];
     let platform = await ctx.model.Platform.findById(req._id).populate([
-      ...platformCompany,
       ...platformUser
     ]);
     if (!platform) {

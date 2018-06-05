@@ -90,7 +90,7 @@ export default {
     },
     opWidth: {
       type: [String, Number],
-      default:'90'
+      default: "90"
     }
   },
   data() {

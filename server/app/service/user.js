@@ -82,9 +82,7 @@ class UserService extends Service {
     };
   }
   async registerMobile() {
-    const {
-      ctx
-    } = this;
+    const ctx = this.ctx;
     let req = ctx.request.body;
     if (!req.password) {
       ctx.throw(400, '密码不能为空', req);
@@ -107,9 +105,7 @@ class UserService extends Service {
     return user.mobile
   }
   async logout() {
-    const {
-      ctx
-    } = this;
+    const ctx = this.ctx;
     let {
       header,
       body,
@@ -126,11 +122,40 @@ class UserService extends Service {
     return '成功注销';
   }
   async power() {
-    const {
-      ctx
-    } = this;
+    const ctx = this.ctx;
     let models = require('../field')('ALL');
     return models
+  }
+  async cascader() {
+    const ctx = this.ctx;
+    let res = [{
+      label: '公司',
+      value: 'company',
+      children: []
+    }, {
+      label: '个人',
+      value: 'user',
+      children: []
+    }];
+    let companys = await ctx.model.Company.find();
+    let companyRes = [];
+    companys.forEach((item) => {
+      let temp = JSON.parse(JSON.stringify(item));
+      temp.label = item.name || item.mobile || item.tel;
+      temp.value = item._id;
+      companyRes.push(temp);
+    })
+    let users = await ctx.model.User.find();
+    let userRes = [];
+    users.forEach((item) => {
+      let temp = JSON.parse(JSON.stringify(item));
+      temp.label = item.name || item.mobile;
+      temp.value = item._id;
+      userRes.push(temp);
+    })
+    res[0].children = companyRes;
+    res[1].children = userRes;
+    return res;
   }
 
 }

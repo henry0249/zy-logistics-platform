@@ -70,6 +70,32 @@ export default {
         this.$message.info(item.name + "即将开放");
       }
       this.$router.push(item.path);
+    },
+    async getOrderBadge() {
+      let oldBadge = JSON.parse(JSON.stringify(this.$store.state.orderBadge));
+      await this.$store.dispatch("getOrderBadge");
+      let newBadge = this.$store.state.orderBadge;
+      for (const key in newBadge) {
+        this.badgeNotify(newBadge[key], oldBadge[key], key);
+      }
+    },
+    badgeNotify(val, old, type) {
+      let tipObj = {
+        taking: "待接单消息",
+        check: "订单待审核",
+        distribution: "订单待配货",
+        dispatch: "订单待调度",
+        settlement: "订单待结算"
+      };
+      let tip = tipObj[type];
+      if (tip && val > 0) {
+        let newCount = val - old || val;
+        this.$notify.success({
+          title: tip,
+          dangerouslyUseHTMLString: true,
+          message: `您有<strong><i>${newCount}</i></strong>个新订单`
+        });
+      }
     }
   },
   mounted() {
@@ -116,6 +142,11 @@ export default {
         hide: this.user.isSys !== true
       }
     ];
+    setInterval(async () => {
+      try {
+        await this.$store.dispatch("orderBadgeNotify");
+      } catch (error) {}
+    }, 60000);
   }
 };
 </script>
