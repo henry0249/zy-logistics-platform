@@ -38,12 +38,7 @@ module.exports = {
     ref: 'User'
   },
   dispatcher: {
-    name: '物流专员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
-  documentClerk: {
-    name: '单据文员',
+    name: '调度专员',
     type: 'ObjectIdArray',
     ref: 'User'
   },
@@ -52,20 +47,10 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'User'
   },
-  logistics: {
-    name: '物流公司',
+  documentClerk: {
+    name: '单据文员',
     type: 'ObjectIdArray',
-    ref: 'Company'
-  },
-  shipper: {
-    name: '发货厂商',
-    type: 'ObjectIdArray',
-    ref: 'Company'
-  },
-  trading: {
-    name: '贸易公司',
-    type: 'ObjectIdArray',
-    ref: 'Company'
+    ref: 'User'
   },
   address: {
     name: '地址',

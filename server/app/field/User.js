@@ -70,5 +70,9 @@ module.exports = {
     name: '收货地址',
     type: 'ObjectIdArray',
     ref: 'Address'
+  },
+  area:{
+    name: '区域',
+    type: 'Object',
   }
 }

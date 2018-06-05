@@ -147,7 +147,7 @@ this.areaType = val;
           findOption[this.areaSelectResult.last.type] = this.areaSelectResult.last.key;
         }
         this.data = await this.$ajax.post("/area/find?type=", findOption);
-        this.areaData = await this.$ajax("/area/select");
+        this.areaData = await this.$ajax("/area/cascader");
       } catch (error) {}
       this.laodingText = "";
     },

@@ -41,8 +41,24 @@ class Api {
     delete data.curdType;
     return ajax.post(`/${model}/${curdType}`, data);
   }
-  static async sql(model, curdType, data) {
-    return ajax.post(`/${model}/${curdType}`, data);
+  static async sql(url, data) {
+    let urlArr = url.split('/');
+    let model, curdType;
+    if (urlArr.length === 2 || urlArr.length === 3) {
+      if (urlArr.length === 2) {
+        model = urlArr[0];
+        curdType = urlArr[1];
+      }
+      if (urlArr.length === 3) {
+        model = urlArr[1];
+        curdType = urlArr[2];
+      }
+      if (!data) {
+        return ajax.post(`/${model}/${curdType}`, data);
+      } else {
+        return ajax(`/${model}/${curdType}`, data);
+      }
+    }
   }
   static async logout() {
     return ajax.post('/logout')

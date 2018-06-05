@@ -1,37 +1,39 @@
 module.exports = {
-  create: {
+  goods: {
     // brand: {
     //   name: "品牌",
     //   type: "ObjectId",
     //   readOnly: true
     // },
     goods: {
-      name: "商品名称",
+      name: "商品",
       type: "String",
       require: true,
       readOnly: true,
       slot: true,
       width: "300",
     },
-    goodsCount: {
-      name: "数量"
+    count: {
+      name: "数量",
+      require: true,
     },
     unit: {
       name: "单位",
       readOnly: true,
-      slot: true,
     },
-    sellPrice: {
+    factoryPrice:{
+      name: "出厂单价",
+    },
+    unitPrice: {
       name: "销售单价",
-      readOnly: true
     },
     transportPrice: {
       name: "运输单价",
-      readOnly: true
     },
     totalPrice: {
       name: "合计金额",
-      readOnly: true
+      readOnly: true,
+      slot: true,
     }
   },
   taking: {

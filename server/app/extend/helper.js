@@ -96,5 +96,12 @@ module.exports = {
       }
     })
     return flag;
+  },
+  idArr(arr){
+    let temp = [];
+    arr.forEach((item)=>{
+      temp.push(item.toString());
+    });
+    return temp;
   }
 };

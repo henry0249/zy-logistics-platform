@@ -70,8 +70,11 @@ export default {
     level(val) {
       this.setAreaData();
     },
-    area(){
+    area() {
       this.setAreaData();
+    },
+    value(val) {
+      this.data = val;
     }
   },
   computed: {
@@ -96,7 +99,7 @@ export default {
     },
     areaChange(val) {
       let res = {};
-      let last = 'province';
+      let last = "province";
       if (val[0]) {
         res.province = {
           key: Number(val[0]),
@@ -108,21 +111,21 @@ export default {
           key: Number(val[1]),
           name: pca[val[0]][val[1]]
         };
-        last = 'city';
+        last = "city";
       }
       if (val[2]) {
         res.county = {
           key: Number(val[2]),
           name: pcaa[val[1]][val[2]]
         };
-        last = 'county';
+        last = "county";
       }
       if (val[3]) {
         res.township = {
           key: Number(val[3]),
           name: streetData[val[2]][val[3]]
         };
-        last = 'township';
+        last = "township";
       }
       let areaType = [];
       if (this.is("json", this.area)) {
@@ -130,11 +133,17 @@ export default {
           for (const key in this.field.Area.type.option) {
             if (this.area.hasOwnProperty(key)) {
               this.area[key].forEach(areaItem => {
-                if (this.is("json", areaItem) && Number(item) === areaItem.key) {
+                if (
+                  this.is("json", areaItem) &&
+                  Number(item) === areaItem.key
+                ) {
                   res[key].key = Number(item);
                   res[key]._id = areaItem._id;
                 }
-                if (!this.is("json", areaItem) && Number(item) === Number(areaItem)) {
+                if (
+                  !this.is("json", areaItem) &&
+                  Number(item) === Number(areaItem)
+                ) {
                   res[key]._id = areaItem;
                   res[key].key = Number(item);
                 }

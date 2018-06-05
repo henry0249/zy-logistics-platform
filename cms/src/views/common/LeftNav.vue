@@ -36,75 +36,80 @@
 </template>
 
 <script>
-  export default {
-    props: {
-      nav: {
-        type: Array,
-        default () {
-          return [];
-        }
-      },
-      router: {
-        type: Boolean,
-        default: true
+export default {
+  props: {
+    nav: {
+      type: Array,
+      default() {
+        return [];
       }
     },
-    data() {
-      return {
-        mini: false,
-        isCollapse: false,
-        defaultActive: ""
-      };
+    router: {
+      type: Boolean,
+      default: true
+    }
+  },
+  data() {
+    return {
+      mini: false,
+      isCollapse: false,
+      defaultActive: ""
+    };
+  },
+  methods: {
+    handleOpen(key, keyPath) {
+      console.log(key, keyPath);
     },
-    methods: {
-      handleOpen(key, keyPath) {
-        console.log(key, keyPath);
-      },
-      handleClose(key, keyPath) {
-        console.log(key, keyPath);
-      }
-    },
-    mounted() {
+    handleClose(key, keyPath) {
+      console.log(key, keyPath);
+    }
+  },
+  watch: {
+    $route() {
       this.defaultActive = this.$route.path;
     }
-  };
+  },
+  mounted() {
+    this.defaultActive = this.$route.path;
+  }
+};
 </script>
 
 <style>
-  .g-left-nav {
-    font-size: 14px;
-  }
-  .my-el-menu-vertical:not(.el-menu--collapse) {
-    border-right: 1px solid #545c64;
-    width: 200px;
-    height: calc(100vh - 50px - 37px);
-    overflow-y: auto;
-    overflow-x: hidden;
-    box-sizing: border-box;
-  }
-  .my-el-menu-vertical.el-menu--collapse {
-    border-right: 1px solid #545c64;
-    height: calc(100vh - 50px - 36px);
-    overflow-y: auto;
-    overflow-x: hidden;
-    box-sizing: border-box;
-  }
-  .collapse-change {
-    text-align: center;
-    cursor: pointer;
-    border-bottom: 1px solid #aaa;
-    /* border-right: 1px solid #aaa; */
-    color: #aaa;
-    height: 36px;
-    line-height: 36px;
-    box-sizing: border-box;
-  }
-  .collapse {
-    transform: rotate(90deg);
-  }
-  .badgeNull {
-    background: #eee;
-    display: inline-block;
-    clear: both;
-  }
+.g-left-nav {
+  font-size: 14px;
+}
+.my-el-menu-vertical:not(.el-menu--collapse) {
+  border-right: 1px solid #545c64;
+  width: 200px;
+  height: calc(100vh - 50px - 37px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+.my-el-menu-vertical.el-menu--collapse {
+  border-right: 1px solid #545c64;
+  height: calc(100vh - 50px - 36px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+.collapse-change {
+  text-align: center;
+  cursor: pointer;
+  border-bottom: 1px solid #aaa;
+  /* border-right: 1px solid #aaa; */
+  color: #aaa;
+  height: 36px;
+  line-height: 36px;
+  box-sizing: border-box;
+}
+.collapse {
+  transform: rotate(90deg);
+}
+.badgeNull {
+  background: #eee;
+  display: inline-block;
+  clear: both;
+}
 </style>
