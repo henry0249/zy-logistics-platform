@@ -1,18 +1,20 @@
 let categoryThead = {
   'name': {
     readOnly: true,
-    name: '品牌名'
+    name: '品牌名',
   },
   "tag": {
     readOnly: true,
+    slot:true,
     name: '标签'
   },
   "type": {
     readOnly: true,
     name: '类型'
   },
-  "category.name": {
+  "category": {
     readOnly: true,
+    slot:true,
     name: '分类'
   }
 }

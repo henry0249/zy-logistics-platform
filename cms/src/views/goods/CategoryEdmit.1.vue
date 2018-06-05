@@ -2,7 +2,6 @@
   <loading-box v-model="loadingText">
     <div class="g-order-create">
       <div class="g-order">
-        {{category.name}}
         <my-form size="mini" width="48%" style="margin:15px 0" v-if="!loadingText">
           <div class="flex form-box">
             <my-form-item style="margin-top:20px" class="form-right" input v-model="category.name" filterable label="分类名">
@@ -41,15 +40,9 @@
         type: String,
         default: ''
       },
-      categoryId: {
-        type: String,
-        default: ''
-      },
-      parent: {
-        type: Array,
-        default () {
-          return []
-        }
+      categoryId:{
+        type:String,
+        default:''
       }
     },
     data() {
@@ -62,27 +55,15 @@
           remark: '',
           parent: ''
         },
+        parent: []
       }
     },
     watch: {
-      keyData(val) {
+      $router(val){
         console.log(val);
-        this.loadingText = 'sss'
-        this.category = Object.assign({}, this.category, {
-          name: val.name,
-          remark: val.remark,
-          desc: val.desc,
-        })
-        console.log(this.category);
-        setTimeout(() => {
-          this.loadingText = ''
-        }, 200);
       }
     },
     methods: {
-      // category(data) {
-      //   return this.keyData[data] || ''
-      // },
       async sub() {
         try {
           this.loadingText = '加载中';
@@ -123,7 +104,7 @@
             curdType: 'find',
           }
           let res = await this.$api.curd(data)
-          console.log('res', res);
+          console.log('res',res);
           res.forEach(resItem => {
             let obj = {}
             obj.name = resItem.name
@@ -136,7 +117,7 @@
         this.loadingText = '';
       },
     },
-    async created() {
+    async mounted() {
       for (const key in this.category) {
         if (this.category.hasOwnProperty(key)) {
           if (key === 'parent' && this.str === '/goods/category/2') {
@@ -152,6 +133,9 @@
 </script>
 
 <style scoped>
+  .g-order-create {
+    /* padding: 3% 5%; */
+  }
   .g-order {
     margin: 0 auto;
     padding: 30px;

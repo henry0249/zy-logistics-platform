@@ -3,7 +3,7 @@
     <my-table index size="mini" edit :thead="tableHeader" :data.sync="tableList" op @op="op">
     </my-table>
     <el-dialog :title="title" :visible.sync="show">
-      <component :show.sync="show" :is="componentName" :key-arr="key" :key-data="keyData" :str="str"></component>
+      <component :parent="parent" :categoryId="categoryId" :show.sync="show" :is="componentName" :key-arr="key" :key-data="keyData" :str="str"></component>
     </el-dialog>
   </loading-box>
 </template>
@@ -22,6 +22,8 @@
     },
     data() {
       return {
+        categoryId: '',
+        parent: [],
         str: "",
         show: false,
         title: "",
@@ -111,14 +113,18 @@
           this.componentName = "SeeModel";
           this.title = "查看详情";
           this.show = true;
-          this.keyData = val.value.row;
+          this.keyData = JSON.parse(JSON.stringify(val.value.row));
           this.str = this.$route.path
         } else if (val.type === "edit") {
           this.componentName = "CategoryEdmit";
           this.title = "修改信息";
           this.show = true;
-          this.keyData = val.value.row;
+          this.keyData = JSON.parse(JSON.stringify(val.value.row));
           this.str = this.$route.path
+          if (this.$route.path === '/goods/category/2') {
+            console.log('111111111111111111');
+            this.categoryId = val.value.row.parent._id || ''
+          }
         }
       },
       async getData() {
@@ -148,11 +154,32 @@
           this.tableList = res;
         } catch (error) {}
         this.loadingText = ''
-      }
+      },
+      async getParent() {
+        try {
+          this.loadingText = '加载中';
+          let data = {
+            model: 'category',
+            curdType: 'find',
+          }
+          let res = await this.$api.curd(data)
+          console.log('res', res);
+          res.forEach(resItem => {
+            let obj = {}
+            obj.name = resItem.name
+            obj._id = resItem._id
+            this.parent.push(obj)
+          });
+        } catch (error) {
+          console.log(error);
+        }
+        this.loadingText = '';
+      },
     },
     async created() {
       console.log(this.$route);
       await this.changePath(this.$route);
+      await this.getParent()
     }
   };
 </script>
