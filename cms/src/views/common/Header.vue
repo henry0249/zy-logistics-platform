@@ -82,6 +82,7 @@ export default {
       let tip = tipObj[type];
       let newCount = val - old || 0;
       if (tip && newCount > 0) {
+        let _this = this;
         this.$notify.success({
           title: tip,
           dangerouslyUseHTMLString: true,
@@ -89,9 +90,9 @@ export default {
           message: `您有<strong><i>${newCount}</i></strong>个新订单`,
           onClick: function() {
             console.log(666);
-            console.log(this);
-            console.log(this.$router);
-            this.$router.push("/order/" + type);
+            console.log(_this);
+            console.log(_this.$router);
+            _this.$router.push("/order/" + type);
           }
         });
       }
@@ -147,7 +148,7 @@ export default {
       for (const key in newBadge) {
         this.badgeNotify(newBadge[key], oldBadge[key], key);
       }
-    }, 60000);
+    }, 20000);
   }
 };
 </script>
