@@ -89,6 +89,8 @@ export default {
           message: `您有<strong><i>${newCount}</i></strong>个新订单`,
           onClick: function() {
             console.log(666);
+            console.log(this);
+            console.log(this.$router);
             this.$router.push("/order/" + type);
           }
         });
