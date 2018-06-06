@@ -98,13 +98,7 @@
       tableList: {
         type: Array,
         default () {
-          return [{
-            address: ["5b178c4812a94e87e1d70c2b",
-              "5b178c4812a94e87e1d70c2c",
-              "5b178c4812a94e87e1d70c2d",
-              "5b178c4812a94e87e1d70c2e"
-            ]
-          }]
+          return []
         }
       },
     },
