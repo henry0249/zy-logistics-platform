@@ -2,7 +2,6 @@
   <loading-box v-model="loadingText">
     <div class="g-order-create">
       <div class="g-order">
-        {{category.name}}
         <my-form size="mini" width="48%" style="margin:15px 0" v-if="!loadingText">
           <div class="flex form-box">
             <my-form-item style="margin-top:20px" class="form-right" input v-model="category.name" filterable label="分类名">
@@ -73,32 +72,28 @@
           remark: val.remark,
           desc: val.desc,
         })
-        console.log(this.category);
-        setTimeout(() => {
-          this.loadingText = ''
-        }, 200);
+        this.loadingText = ''
       }
     },
     methods: {
-      // category(data) {
-      //   return this.keyData[data] || ''
-      // },
       async sub() {
         try {
           this.loadingText = '加载中';
+          let update = {
+            name: this.category.name,
+            desc: this.category.desc,
+            remark: this.category.remark,
+          }
+          if (this.str === '/goods/category/2') {
+            update.parent = this.categoryId
+          }
           let res = await this.$api.curd({
             model: 'category',
             curdType: 'update',
             find: {
               _id: this.keyData._id
             },
-            update: {
-              name: this.category.name,
-              desc: this.category.desc,
-              remark: this.category.remark,
-              // cover:this.category.cover,
-              parent: categoryId,
-            }
+            update
           })
           console.log(res);
         } catch (error) {
