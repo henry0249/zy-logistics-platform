@@ -3,18 +3,16 @@
     <div class="g-order-create">
       <div class="g-order">
         <div class="flex ac" style="padding-top:10px;color:#aaa;font-size:14px">
-          <div>
-            订单号：{{$route.params._id}}
-          </div>
+          <div>创建时间：{{orderInfo.createdAt | formatTime}}</div>
           <div class="f1"></div>
-          <div>{{dayjs(orderInfo.createdAt).format('YYYY-MM-DD HH:mm:ss')}}</div>
+          <div>订单号：{{$route.params._id}}</div>
         </div>
         <div class="tc" style="font-size:22px;padding-bottom:15px">
           <strong>订单确认</strong>
         </div>
         <my-form size="mini" width="24%" style="margin:15px 0">
           <div class="flex ac jb">
-            <my-form-item cascader filterable label="客户名称" :options="userCascader" @change="userCascaderChange">
+            <my-form-item cascader v-model="customer" filterable label="客户名称" :options="userCascader" @change="userCascaderChange">
             </my-form-item>
             <my-form-item datetime v-model="order.deliveryTime" label="配送时间">
             </my-form-item>
@@ -30,7 +28,7 @@
             </my-form-item>
             <my-form-item input v-model="order.contactNumber" label="联系电话">
             </my-form-item>
-            <my-form-item :area="areaCascader" :level="3" filterable @change="areaCascaderChange" label="送货地址">
+            <my-form-item v-model="areaSelect" ownerArea filterable @change="areaCascaderChange" label="送货地址">
             </my-form-item>
           </div>
           <my-form-item width="100%" style="margin:15px 0" input v-model="order.address" label="详细地址">
@@ -46,12 +44,14 @@
                   <span v-if="scope.prop === 'totalPrice'">
                     {{goodsTotalPrice(scope.row)}}
                   </span>
-</template>
+            </template>
           </my-table>
         </div>
       </div>
-      <div class="tr" style="margin-top:30px">
-        <el-button size="small" type="primary" @click="createOrder">立即创建</el-button>
+      <div class="flex ac" style="margin-top:30px">
+        <el-button v-if="orderHasChange" size="small" type="primary" icon="el-icon-edit" plain>修改订单</el-button>
+        <div class="f1"></div>
+        <el-button size="small" type="primary">确认接单</el-button>
         <el-button size="small">取消</el-button>
       </div>
     </div>
@@ -70,6 +70,8 @@ export default {
       loadingText: "",
       tableLoading: "",
       orderInfo: {},
+      customer: [],
+      areaSelect:[],
       order: {
         settlementMethod: 1,
         transportModel: 0,
@@ -89,16 +91,54 @@ export default {
       ],
       areaCascader: [],
       userCascader: [],
-      goodsCascader: []
+      goodsCascader: [],
+      orderHasChange: false
     };
+  },
+  watch: {
+    order: {
+      handler: function() {
+        this.orderHasChange = true;
+      },
+      deep: true
+    },
+    goodsData: {
+      handler: function() {
+        this.orderHasChange = true;
+      },
+      deep: true
+    }
   },
   methods: {
     async getOrderInfo() {
       this.loadingText = "正在获取订单数据";
       try {
-        this.orderInfo = await this.$ajax(
-          "/order/findOne/?_id=" + this.$route.params._id
-        );
+        this.orderInfo = await this.$ajax("/order/" + this.$route.params._id);
+        if (this.orderInfo.user) {
+          this.customer = ["user", this.orderInfo.user._id];
+        }
+        if (this.orderInfo.company) {
+          this.customer = ["company", this.orderInfo.company._id];
+        }
+        for (const key in this.order) {
+          if (this.orderInfo.hasOwnProperty(key)) {
+            this.order[key] = this.orderInfo[key];
+          }
+        }
+        this.goodsData = [];
+        this.orderInfo.goods.forEach(item => {
+          this.goodsData.push({
+            goods: [item.value.brand,item.value._id],
+            count: item.count,
+            unit: item.value.unit,
+            factoryPrice: item.factoryPrice,
+            unitPrice: item.unitPrice,
+            transportPrice: item.transportPrice
+          });
+        });
+        setTimeout(() => {
+          this.orderHasChange = false;
+        }, 200);
       } catch (error) {}
       this.loadingText = "";
     },
@@ -145,19 +185,16 @@ export default {
       }
     },
     goodsTotalPrice(row) {
-      let val = row.goods;
-      if (val.length === 2 && this.order.area) {
-        let total = 0;
-        let unitPrice = this.goodsPrice(row, "sell");
-        if (this.is("number", Number(row.count))) {
-          if (this.is("number", Number(row.unitPrice))) {
-            total = Number(row.count) * Number(row.unitPrice);
-          } else if (this.is("number", Number(unitPrice))) {
-            total = Number(row.count) * Number(unitPrice);
-          }
-        }
-        return total;
+      let total = 0;
+      if (
+        this.is("number", Number(row.count)) &&
+        this.is("number", Number(row.unitPrice))
+      ) {
+        let count = Number(row.count),
+          unitPrice = Number(row.unitPrice);
+        total = count * unitPrice;
       }
+      return total;
     },
     goodsCascaderChange(row) {
       setTimeout(() => {

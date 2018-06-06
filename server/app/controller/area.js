@@ -9,15 +9,8 @@ class AreaController extends Controller {
   }
   async cascader() {
     const ctx = this.ctx;
-    let res = {};
-    for (const key in areaField.type.option) {
-      res[key] = await ctx.model.Area.find({
-        type: key
-      }).select('key name').sort({
-        createdAt: 1
-      });
-    }
-    ctx.body = res;
+    this.ctx.body = await this.ctx.service.area.cascader();
+    
   }
 }
 module.exports = AreaController;

@@ -23,7 +23,7 @@
             </my-form-item>
             <my-form-item input v-model="order.contactNumber" label="联系电话">
             </my-form-item>
-            <my-form-item :area="areaCascader" :level="3" filterable @change="areaCascaderChange" label="送货地址">
+            <my-form-item area filterable @change="areaCascaderChange" label="送货地址">
             </my-form-item>
           </div>
           <my-form-item width="100%" style="margin:15px 0" input v-model="order.address" label="详细地址">
@@ -128,19 +128,29 @@ export default {
       }
     },
     goodsTotalPrice(row) {
-      let val = row.goods;
-      if (val.length === 2 && this.order.area) {
-        let total = 0;
-        let unitPrice = this.goodsPrice(row, "sell");
-        if (this.is("number", Number(row.count))) {
-          if (this.is("number", Number(row.unitPrice))) {
-            total = Number(row.count) * Number(row.unitPrice);
-          } else if (this.is("number", Number(unitPrice))) {
-            total = Number(row.count) * Number(unitPrice);
-          }
-        }
-        return total;
+      // let val = row.goods;
+      // if (val.length === 2 && this.order.area) {
+      //   let total = 0;
+      //   let unitPrice = this.goodsPrice(row, "sell");
+      //   if (this.is("number", Number(row.count))) {
+      //     if (this.is("number", Number(row.unitPrice))) {
+      //       total = Number(row.count) * Number(row.unitPrice);
+      //     } else if (this.is("number", Number(unitPrice))) {
+      //       total = Number(row.count) * Number(unitPrice);
+      //     }
+      //   }
+      //   return total;
+      // }
+      let total = 0;
+      if (
+        this.is("number", Number(row.count)) &&
+        this.is("number", Number(row.unitPrice))
+      ) {
+        let count = Number(row.count),
+          unitPrice = Number(row.unitPrice);
+        total = count * unitPrice;
       }
+      return total;
     },
     goodsCascaderChange(row) {
       setTimeout(() => {
@@ -153,7 +163,7 @@ export default {
       }, 200);
     },
     areaCascaderChange(val) {
-      this.order.area = val.last._id;
+      this.order.area = val[val.length-1];
       this.goodsData.forEach(item => {
         this.goodsCascaderChange(item);
       });
@@ -170,10 +180,10 @@ export default {
         }
       });
       this.order[val[0]] = val[1];
-      if (val[0] === 'user') {
+      if (val[0] === "user") {
         delete this.order.company;
       }
-      if (val[1] === 'company') {
+      if (val[1] === "company") {
         delete this.order.user;
       }
       this.order.contactName = data.name;
@@ -203,23 +213,32 @@ export default {
       let goodsCheck = true;
       this.goodsData.forEach(item => {
         if (!item.value) {
-          goodsCheck = '未选择商品';
+          goodsCheck = "未选择商品";
           return;
         }
-        if (!this.is('number',Number(item.count)) || Number(item.count)<=0) {
-          goodsCheck = '商品数量不正确';
+        if (!this.is("number", Number(item.count)) || Number(item.count) <= 0) {
+          goodsCheck = "商品数量不正确";
           return;
         }
-        if (!this.is('number',Number(item.factoryPrice)) || Number(item.factoryPrice)<=0) {
-          goodsCheck = '出厂价格不正确';
+        if (
+          !this.is("number", Number(item.factoryPrice)) ||
+          Number(item.factoryPrice) <= 0
+        ) {
+          goodsCheck = "出厂价格不正确";
           return;
         }
-        if (!this.is('number',Number(item.unitPrice)) || Number(item.unitPrice)<=0) {
-          goodsCheck = '销售单价不正确';
+        if (
+          !this.is("number", Number(item.unitPrice)) ||
+          Number(item.unitPrice) <= 0
+        ) {
+          goodsCheck = "销售单价不正确";
           return;
         }
-        if (!this.is('number',Number(item.transportPrice)) || Number(item.transportPrice)<=0) {
-          goodsCheck = '运输单价不正确';
+        if (
+          !this.is("number", Number(item.transportPrice)) ||
+          Number(item.transportPrice) <= 0
+        ) {
+          goodsCheck = "运输单价不正确";
           return;
         }
       });
@@ -229,16 +248,14 @@ export default {
       }
       this.loadingText = "创建中...";
       try {
-        await this.$ajax.post('/order/add',{
-          order:this.order,
-          goods:this.goodsData
+        await this.$ajax.post("/order/add", {
+          order: this.order,
+          goods: this.goodsData
         });
         await this.$store.dispatch("orderBadgeNotify");
-        this.$message.success('成功创建订单');
-        this.$router.push('/order/taking');
-      } catch (error) {
-        
-      }
+        this.$message.success("成功创建订单");
+        this.$router.push("/order/taking");
+      } catch (error) {}
       this.loadingText = "";
     }
   },

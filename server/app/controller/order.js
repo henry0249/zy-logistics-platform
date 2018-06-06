@@ -12,5 +12,8 @@ class OrderController extends Controller {
   async pending(){
     this.ctx.body = await this.ctx.service.order.pending();
   }
+  async getOrderById(){
+    this.ctx.body = await this.ctx.service.order.getOrderById();
+  }
 }
 module.exports = OrderController;

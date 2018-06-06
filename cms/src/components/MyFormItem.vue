@@ -5,7 +5,7 @@
         {{label}}
       </div>
     </slot>
-    <div class="f1" v-if="area!==undefined?areaLoading:true">
+    <div class="f1">
       <slot>
         <el-select ref="select" style="width:100%" v-if="$attrs.select!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change">
           <el-option v-for="item in json2arr($attrs.options)" :key="item._id||item.value || item.id" :label="item.name || item.label" :value="item._id||item.value">
@@ -21,19 +21,17 @@
         <el-rate v-if="$attrs.rate!==undefined" v-model="data"></el-rate>
         <el-checkbox v-if="$attrs.checkbox!==undefined" v-model="data"></el-checkbox>
         <el-cascader style="width:100%" v-if="$attrs.cascader!==undefined" :options="$attrs.options" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change"></el-cascader>
-        <el-cascader style="width:100%" v-if="area!==undefined" :options="areaData" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="areaChange"></el-cascader>
+        <el-cascader style="width:100%" v-if="$attrs.area!==undefined && !areaLoading" :options="areaData" v-model="data" :props="{value:'_id',label:'name'}" v-bind="$attrs" :size="size||$parent.size" @change="areaChange"></el-cascader>
       </slot>
     </div>
   </div>
 </template>
 
 <script>
-import { pca, pcaa } from "area-data";
-import streetData from "./street.js";
 import MyForm from "./MyForm";
 export default {
   extends: MyForm,
-  props: ["value", "label", "level", "area"],
+  props: ["value", "label"],
   created() {
     let defaultDataOptions = {
       select: "",
@@ -46,33 +44,24 @@ export default {
       color: "",
       rate: 0,
       cascader: [],
-      area: []
+      area: [],
     };
     for (const key in defaultDataOptions) {
       if (this.$attrs.hasOwnProperty(key)) {
         this.data = defaultDataOptions[key];
       }
     }
-    if (this.area !== undefined) {
-      this.data = [];
-    }
   },
   data() {
     return {
       data: "",
       areaData: [],
-      areaLoading: false
+      areaLoading: true,
     };
   },
   watch: {
     data(val) {
       this.$emit("input", val);
-    },
-    level(val) {
-      this.setAreaData();
-    },
-    area() {
-      this.setAreaData();
     },
     value(val) {
       this.data = val;
@@ -99,204 +88,23 @@ export default {
       this.$emit("change", val);
     },
     areaChange(val) {
-      let res = {};
-      let last = "province";
-      if (val[0]) {
-        res.province = {
-          key: Number(val[0]),
-          name: pca["86"][val[0]]
-        };
-      }
-      if (val[1]) {
-        res.city = {
-          key: Number(val[1]),
-          name: pca[val[0]][val[1]]
-        };
-        last = "city";
-      }
-      if (val[2]) {
-        res.county = {
-          key: Number(val[2]),
-          name: pcaa[val[1]][val[2]]
-        };
-        last = "county";
-      }
-      if (val[3]) {
-        res.township = {
-          key: Number(val[3]),
-          name: streetData[val[2]][val[3]]
-        };
-        last = "township";
-      }
-      let areaType = [];
-      if (this.is("json", this.area)) {
-        val.forEach(item => {
-          for (const key in this.field.Area.type.option) {
-            if (this.area.hasOwnProperty(key)) {
-              this.area[key].forEach(areaItem => {
-                if (
-                  this.is("json", areaItem) &&
-                  Number(item) === areaItem.key
-                ) {
-                  res[key].key = Number(item);
-                  res[key]._id = areaItem._id;
-                }
-                if (
-                  !this.is("json", areaItem) &&
-                  Number(item) === Number(areaItem)
-                ) {
-                  res[key]._id = areaItem;
-                  res[key].key = Number(item);
-                }
-              });
-            }
-          }
-        });
-      }
-      res.last = res[last];
-      res.last.type = last;
-      this.$emit("change", res);
+      console.log(val);
+      this.$emit("change", val);
     },
-    setAreaData() {
-      this.areaLoading = false;
-      if (this.area !== undefined) {
-        let area = this.area;
-        this.areaData = [];
-        for (const provinceKey in pca["86"]) {
-          let city = [];
-          if (this.level !== undefined) {
-            let level = Number(this.level);
-            for (const cityKey in pca[provinceKey]) {
-              let district = [];
-              for (const districtKey in pcaa[cityKey]) {
-                let street = [];
-                for (const streetKey in streetData[districtKey]) {
-                  if (this.is("json", this.area)) {
-                    if (area.township) {
-                      let pushStreetFlag = false;
-                      area.township.forEach(item => {
-                        if (this.is("json", item)) {
-                          if (item.key === Number(streetKey)) {
-                            pushStreetFlag = true;
-                          }
-                        }
-                        if (item === Number(streetKey)) {
-                          pushStreetFlag = true;
-                        }
-                      });
-                      if (pushStreetFlag) {
-                        street.push({
-                          value: streetKey,
-                          label: streetData[districtKey][streetKey]
-                        });
-                      }
-                    }
-                  } else {
-                    street.push({
-                      value: streetKey,
-                      label: streetData[districtKey][streetKey]
-                    });
-                  }
-                }
-                let streetItem = {
-                  value: districtKey,
-                  label: pcaa[cityKey][districtKey]
-                };
-                if (street.length > 0 && level >= 3) {
-                  streetItem.children = street;
-                }
-                if (level >= 2) {
-                  if (this.is("json", this.area)) {
-                    if (area.county) {
-                      let pushDistrictFlag = false;
-                      area.county.forEach(item => {
-                        if (this.is("json", item)) {
-                          if (item.key === Number(districtKey)) {
-                            pushDistrictFlag = true;
-                          }
-                        }
-                        if (item === Number(districtKey)) {
-                          pushDistrictFlag = true;
-                        }
-                      });
-                      if (pushDistrictFlag) {
-                        district.push(streetItem);
-                      }
-                    }
-                  } else {
-                    district.push(streetItem);
-                  }
-                }
-              }
-              let districtItem = {
-                value: cityKey,
-                label: pca[provinceKey][cityKey]
-              };
-              if (district.length > 0) {
-                districtItem.children = district;
-              }
-              if (level >= 1) {
-                if (this.is("json", this.area)) {
-                  if (area.city) {
-                    let pushCityFlag = false;
-                    area.city.forEach(item => {
-                      if (this.is("json", item)) {
-                        if (item.key === Number(cityKey)) {
-                          pushCityFlag = true;
-                        }
-                      }
-                      if (item === Number(cityKey)) {
-                        pushCityFlag = true;
-                      }
-                    });
-                    if (pushCityFlag) {
-                      city.push(districtItem);
-                    }
-                  }
-                } else {
-                  city.push(districtItem);
-                }
-              }
-            }
-          }
-          let cityItem = {
-            value: provinceKey,
-            label: pca["86"][provinceKey]
-          };
-          if (city.length > 0) {
-            if (this.level !== undefined && Number(this.level) >= 0) {
-              cityItem.children = city;
-            }
-          }
-          if (this.is("json", this.area)) {
-            if (area.province) {
-              let pushProvinceFlag = false;
-              area.province.forEach(item => {
-                if (this.is("json", item)) {
-                  if (item.key === Number(provinceKey)) {
-                    pushProvinceFlag = true;
-                  }
-                }
-                if (item === Number(provinceKey)) {
-                  pushProvinceFlag = true;
-                }
-              });
-              if (pushProvinceFlag) {
-                this.areaData.push(cityItem);
-              }
-            }
-          } else {
-            this.areaData.push(cityItem);
-          }
+    async getAreaData() {
+      if (this.$attrs.area !== undefined) {
+        this.areaLoading = true;
+        try {
+          this.areaData = await this.$ajax("/area/cascader");
+          this.areaLoading = false;
+        } catch (error) {
+          console.log(error);
         }
-        setTimeout(() => {
-          this.areaLoading = true;
-        }, 300);
       }
     }
   },
-  mounted() {
-    this.setAreaData();
+  async mounted() {
+    await this.getAreaData();
     this.$nextTick(() => {
       this.data = this.value;
     });

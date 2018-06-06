@@ -32,6 +32,7 @@ module.exports = app => {
     .post('/order/add', checkToken(), 'order.add') //下单
     .post('/order/set', checkToken(), 'order.add') //下单
     .get('/order/badge', checkToken(), 'order.badge') //订单标记
+    .get('/order/:_id', checkToken(), 'order.getOrderById') //下单
     .all('/order/pending/:state', checkToken(), 'order.pending') //获取待处理订单
 
     .post('/platform/orgTree', checkToken(), 'platform.orgTree') //平台组织结构

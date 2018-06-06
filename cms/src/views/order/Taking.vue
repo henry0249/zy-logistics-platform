@@ -36,6 +36,7 @@ export default {
     return {
       loadingText: "",
       thead: taking,
+      limit:10,
       data: []
     };
   },
@@ -43,7 +44,7 @@ export default {
     async getData() {
       this.loadingText = "加载中";
       try {
-        this.data = await this.$ajax("/order/pending/taking");
+        this.data = await this.$ajax("/order/pending/taking?limit="+this.limit);
       } catch (error) {}
       this.loadingText = "";
     },
@@ -57,7 +58,12 @@ export default {
       }
       return res;
     },
-    async loadmore() {}
+    async loadmore() {
+      return await this.$ajax.post("/order/pending/taking",{
+        limit:this.limit,
+        skip:this.data.length
+      });
+    }
   },
   mounted() {
     this.getData();

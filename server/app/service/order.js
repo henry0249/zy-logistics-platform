@@ -144,6 +144,9 @@ class OrderService extends Service {
   async pending() {
     const ctx = this.ctx;
     let params = ctx.params;
+    let body = ctx.request.body || ctx.request.query;
+    let limit = Number(body.limit) || 10;
+    let skip = Number(body.skip) || 0;
     let $or = this.getOrderMan(ctx.user._id);
     let orders = await ctx.model.Order.find({
       state: params.state,
@@ -154,7 +157,7 @@ class OrderService extends Service {
       path: 'company'
     }, {
       path: 'area'
-    }]);
+    }]).limit(limit).skip(skip);
     let res = [];
     for (let i = 0; i < orders.length; i++) {
       let orderItem = JSON.parse(JSON.stringify(orders[i]));
@@ -165,6 +168,38 @@ class OrderService extends Service {
       }]);
       res.push(orderItem);
     }
+    return res;
+  }
+  async getOrderById() {
+    const ctx = this.ctx;
+    let params = ctx.params;
+    let order = await ctx.model.Order.findById(params._id).populate([{
+      path: 'user'
+    }, {
+      path: 'company'
+    }, {
+      path: 'area',
+      populate: [{
+        path: 'province'
+      }, {
+        path: 'city'
+      }, {
+        path: 'county'
+      }, {
+        path: 'township'
+      }, {
+        path: 'street'
+      }]
+    }]);
+    if (!order) {
+      ctx.throw(404, "未找到订单", params);
+    }
+    let res = JSON.parse(JSON.stringify(order));
+    res.goods = await ctx.model.OrderGoods.find({
+      order: res._id
+    }).populate([{
+      path: 'value'
+    }]);
     return res;
   }
 }

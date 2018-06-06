@@ -3,7 +3,7 @@ const areaField = require('../field/Area');
 
 class CompanyService extends Service {
 
-  async preAdd0(data){
+  async preAdd0(data) {
     const ctx = this.ctx;
     let hasData = await ctx.model.Area.findOne(data);
     if (hasData) {
@@ -80,6 +80,50 @@ class CompanyService extends Service {
     let areaModel = new ctx.model.Area(newAreaOption);
     await areaModel.save();
     return 'ok';
+  }
+
+  async cascader() {
+    const ctx = this.ctx;
+    let area = [];
+    let provinces = await ctx.model.Area.find({
+      type: 'province'
+    });
+    for (let i = 0; i < provinces.length; i++) {
+      let provinceItem = JSON.parse(JSON.stringify(provinces[i]));
+      let city = [];
+      let citys = await ctx.model.Area.find({
+        type: 'city',
+        province: provinceItem._id
+      });
+      for (let j = 0; j < citys.length; j++) {
+        let cityItem = JSON.parse(JSON.stringify(citys[j]));
+        let county = [];
+        let countys = await ctx.model.Area.find({
+          type: 'county',
+          city: cityItem._id
+        });
+        for (let k = 0; k < countys.length; k++) {
+          let countyItem = JSON.parse(JSON.stringify(countys[k]));
+          let townships = await ctx.model.Area.find({
+            type: 'township',
+            county: countyItem._id
+          });
+          if (townships.length > 0) {
+            countyItem.children = townships;
+          }
+          county.push(countyItem);
+        }
+        if (county.length > 0) {
+          cityItem.children = county;
+          city.push(cityItem);
+        }
+      }
+      if (city.length > 0) {
+        provinceItem.children = city;
+      }
+      area.push(provinceItem);
+    }
+    return area;
   }
 }
 module.exports = CompanyService;

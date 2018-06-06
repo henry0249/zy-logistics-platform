@@ -7,7 +7,7 @@ module.exports = {
       city: '市',
       county: '县',
       township: '乡',
-      street: '街道'
+      // street: '街道'
     },
     require: true
   },
