@@ -5,7 +5,7 @@
         {{label}}
       </div>
     </slot>
-    <div class="f1">
+    <div class="f1" v-if="!slotLoading">
       <slot>
         <el-select ref="select" style="width:100%" v-if="$attrs.select!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change">
           <el-option v-for="item in json2arr($attrs.options)" :key="item._id||item.value || item.id" :label="item.name || item.label" :value="item._id||item.value">
@@ -32,31 +32,12 @@ import MyForm from "./MyForm";
 export default {
   extends: MyForm,
   props: ["value", "label"],
-  created() {
-    let defaultDataOptions = {
-      select: "",
-      input: "",
-      number: 0,
-      switch: false,
-      time: "",
-      date: "",
-      datetime: "",
-      color: "",
-      rate: 0,
-      cascader: [],
-      area: [],
-    };
-    for (const key in defaultDataOptions) {
-      if (this.$attrs.hasOwnProperty(key)) {
-        this.data = defaultDataOptions[key];
-      }
-    }
-  },
   data() {
     return {
       data: "",
       areaData: [],
       areaLoading: true,
+      slotLoading: true
     };
   },
   watch: {
@@ -103,11 +84,13 @@ export default {
       }
     }
   },
-  async mounted() {
+  async created() {
+    this.slotLoading = true;
     await this.getAreaData();
-    this.$nextTick(() => {
-      this.data = this.value;
-    });
+    this.data = this.value;
+    setTimeout(() => {
+      this.slotLoading = false;
+    }, 50);
   }
 };
 </script>

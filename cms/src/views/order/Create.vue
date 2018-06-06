@@ -7,7 +7,7 @@
         </div>
         <my-form size="mini" width="24%" style="margin:15px 0">
           <div class="flex ac jb">
-            <my-form-item cascader filterable label="客户名称" :options="userCascader" @change="userCascaderChange">
+            <my-form-item cascader v-model="customer" filterable label="客户名称" :options="userCascader" @change="userCascaderChange">
             </my-form-item>
             <my-form-item datetime v-model="order.deliveryTime" label="配送时间">
             </my-form-item>
@@ -23,7 +23,7 @@
             </my-form-item>
             <my-form-item input v-model="order.contactNumber" label="联系电话">
             </my-form-item>
-            <my-form-item area filterable @change="areaCascaderChange" label="送货地址">
+            <my-form-item v-model="test" area filterable @change="areaCascaderChange" label="送货地址">
             </my-form-item>
           </div>
           <my-form-item width="100%" style="margin:15px 0" input v-model="order.address" label="详细地址">
@@ -58,10 +58,12 @@ export default {
     let goodsItem = {};
     for (const key in goods) {
       goodsItem[key] = "";
+      goodsItem.goods = [];
     }
     return {
       loadingText: "",
       tableLoading: "",
+      customer:[],
       order: {
         settlementMethod: 1,
         transportModel: 0,
@@ -81,7 +83,8 @@ export default {
       ],
       areaCascader: [],
       userCascader: [],
-      goodsCascader: []
+      goodsCascader: [],
+      test:["5b178c4812a94e87e1d70c2b", "5b178c4812a94e87e1d70c2c", "5b178c4812a94e87e1d70c2d", "5b178c4812a94e87e1d70c2e"]
     };
   },
   methods: {
