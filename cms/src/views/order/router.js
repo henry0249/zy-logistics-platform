@@ -1,6 +1,7 @@
 import App from './App.vue';
 import Create from './Create.vue';
 import Taking from './Taking.vue';
+import TakingEdit from './TakingEdit.vue';
 import Check from './Check.vue';
 import Distribution from './Distribution.vue';
 import Dispatch from './Dispatch.vue';
@@ -35,5 +36,8 @@ export default [{
   }, {
     path: 'settlement',
     component: Settlement,
+  }, {
+    path: '/edit/taking/:_id',
+    component: TakingEdit,
   }]
 }]

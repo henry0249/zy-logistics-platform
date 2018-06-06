@@ -10,9 +10,9 @@
       </div>
     </div>
     <div class="f1"></div>
-    <el-badge value="6" class="item" style="margin:0 20px">
+    <!-- <el-badge value="6" class="item" style="margin:0 20px">
       <i class="el-icon-bell" style="font-size:18px;color:#FFB300"></i>
-    </el-badge>
+    </el-badge> -->
     <el-dropdown>
       <div class="flex ac">
         <icon size="20" style="margin-right:5px" color="#2196F3">face</icon>
@@ -71,14 +71,6 @@ export default {
       }
       this.$router.push(item.path);
     },
-    async getOrderBadge() {
-      let oldBadge = JSON.parse(JSON.stringify(this.$store.state.orderBadge));
-      await this.$store.dispatch("getOrderBadge");
-      let newBadge = this.$store.state.orderBadge;
-      for (const key in newBadge) {
-        this.badgeNotify(newBadge[key], oldBadge[key], key);
-      }
-    },
     badgeNotify(val, old, type) {
       let tipObj = {
         taking: "待接单消息",
@@ -88,12 +80,17 @@ export default {
         settlement: "订单待结算"
       };
       let tip = tipObj[type];
-      if (tip && val > 0) {
-        let newCount = val - old || val;
+      let newCount = val - old || 0;
+      if (tip && newCount > 0) {
         this.$notify.success({
           title: tip,
           dangerouslyUseHTMLString: true,
-          message: `您有<strong><i>${newCount}</i></strong>个新订单`
+          duration: 3000,
+          message: `您有<strong><i>${newCount}</i></strong>个新订单`,
+          onClick: function() {
+            console.log(666);
+            this.$router.push("/order/" + type);
+          }
         });
       }
     }
@@ -143,9 +140,11 @@ export default {
       }
     ];
     setInterval(async () => {
-      try {
-        await this.$store.dispatch("orderBadgeNotify");
-      } catch (error) {}
+      let res = await this.$store.dispatch("orderBadgeNotify");
+      let { newBadge, oldBadge } = res;
+      for (const key in newBadge) {
+        this.badgeNotify(newBadge[key], oldBadge[key], key);
+      }
     }, 60000);
   }
 };

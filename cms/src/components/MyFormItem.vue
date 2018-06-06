@@ -5,7 +5,7 @@
         {{label}}
       </div>
     </slot>
-    <div class="f1">
+    <div class="f1" v-if="area!==undefined?areaLoading:true">
       <slot>
         <el-select ref="select" style="width:100%" v-if="$attrs.select!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change">
           <el-option v-for="item in json2arr($attrs.options)" :key="item._id||item.value || item.id" :label="item.name || item.label" :value="item._id||item.value">
@@ -60,7 +60,8 @@ export default {
   data() {
     return {
       data: "",
-      areaData: []
+      areaData: [],
+      areaLoading: false
     };
   },
   watch: {
@@ -157,6 +158,7 @@ export default {
       this.$emit("change", res);
     },
     setAreaData() {
+      this.areaLoading = false;
       if (this.area !== undefined) {
         let area = this.area;
         this.areaData = [];
@@ -287,6 +289,9 @@ export default {
             this.areaData.push(cityItem);
           }
         }
+        setTimeout(() => {
+          this.areaLoading = true;
+        }, 300);
       }
     }
   },

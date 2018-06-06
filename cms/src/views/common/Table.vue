@@ -1,6 +1,6 @@
 <template>
   <div :style="boxStyle">
-    <el-table stripe size="mini" :data="tableList" style="width: 100%" :height="heightValue">
+    <el-table stripe size="mini" :data="tableList" style="width: 100%;box-sizing: border-box" :height="heightValue">
       <el-table-column v-for="(item,index) in tableHeader" :key="index" :prop="item.key" :label="item.keyValue" :width="item.width>0?item.width:''">
         <div slot-scope="scope">
           <el-tag v-if="item.type == 'Arr'" size="mini" type="success" disable-transitions v-for="(v,i) in scope.row.tag" :key="i" style="margin-right:3px;">{{v}}</el-tag>

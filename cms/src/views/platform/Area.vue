@@ -41,11 +41,7 @@
 </template>
 
 <script>
-import AreaAdd from "./AreaAdd";
 export default {
-  components: {
-    AreaAdd
-  },
   data() {
     return {
       laodingText: "",
@@ -62,9 +58,9 @@ export default {
       limit: 10,
       dialogVisible: false,
       area: [],
-      areaSelect:[],
-      areaSelectResult:{},
-      areaData:'',
+      areaSelect: [],
+      areaSelectResult: {},
+      areaData: "",
       areaLevel: 0,
       streetOtion: {
         key: 0,
@@ -85,8 +81,8 @@ export default {
       };
       this.areaLevel = level[val];
     },
-    areaTypeChange0(val){
-this.areaType = val;
+    areaTypeChange0(val) {
+      this.areaType = val;
       let level = {
         province: 0,
         city: 1,
@@ -101,7 +97,7 @@ this.areaType = val;
       console.log(val);
       this.areaOption = val;
     },
-    areaSelectChange(val){
+    areaSelectChange(val) {
       console.log(val);
       this.areaSelectResult = val;
       this.getAreaTable();
@@ -124,13 +120,14 @@ this.areaType = val;
         };
         if (this.areaType === "street") {
           addOption.street = this.streetOtion;
+          addOption.type = "street";
         }
         await this.$ajax.post("/area/add", addOption);
         this.getAreaTable();
       } catch (error) {}
       this.laodingText = "";
     },
-    areaTypeChange(val){
+    areaTypeChange(val) {
       this.areaType = val;
       this.getAreaTable();
     },
@@ -143,8 +140,10 @@ this.areaType = val;
           limit: this.limit || 10,
           skip: this.data.length
         };
-        if(this.areaSelectResult.last){
-          findOption[this.areaSelectResult.last.type] = this.areaSelectResult.last.key;
+        if (this.areaSelectResult.last) {
+          findOption[
+            this.areaSelectResult.last.type
+          ] = this.areaSelectResult.last._id;
         }
         this.data = await this.$ajax.post("/area/find?type=", findOption);
         this.areaData = await this.$ajax("/area/cascader");
@@ -159,8 +158,10 @@ this.areaType = val;
           limit: this.limit || 10,
           skip: this.data.length
         };
-        if(this.areaSelectResult.last){
-          findOption[this.areaSelectResult.last.type] = this.areaSelectResult.last.key;
+        if (this.areaSelectResult.last) {
+          findOption[
+            this.areaSelectResult.last.type
+          ] = this.areaSelectResult.last.key;
         }
         res = await this.$ajax.post("/area/find", findOption);
       } catch (error) {}

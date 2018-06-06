@@ -85,6 +85,9 @@ class OrderService extends Service {
     }
     order.creater = ctx.user._id;
     order.state = 'taking';
+    if (order.user && order.company) {
+      ctx.throw(422, "下单客户不能同时为个人和公司", body);
+    }
     let orderModel = new ctx.model.Order(order);
     await orderModel.save();
     for (let i = 0; i < body.goods.length; i++) {
@@ -98,11 +101,7 @@ class OrderService extends Service {
     }
     return 'ok';
   }
-
-  async badge() {
-    const ctx = this.ctx;
-    let state = orderField.state.option;
-    let res = {};
+  getOrderMan(user_id) {
     let inMan = {
       salesman: {
 
@@ -121,17 +120,50 @@ class OrderService extends Service {
     for (const key in inMan) {
       $or.push({
         [key]: {
-          $in: [ctx.user._id]
+          $in: [user_id]
         }
       })
     }
-
+    return $or;
+  }
+  async badge() {
+    const ctx = this.ctx;
+    let state = orderField.state.option;
+    let res = {};
+    let $or = this.getOrderMan(ctx.user._id);
     for (const key in state) {
       let count = await ctx.model.Order.count({
         state: key,
         $or: $or
       });
       res[key] = count || 0;
+    }
+    return res;
+  }
+
+  async pending() {
+    const ctx = this.ctx;
+    let params = ctx.params;
+    let $or = this.getOrderMan(ctx.user._id);
+    let orders = await ctx.model.Order.find({
+      state: params.state,
+      $or: $or
+    }).populate([{
+      path: 'user'
+    }, {
+      path: 'company'
+    }, {
+      path: 'area'
+    }]);
+    let res = [];
+    for (let i = 0; i < orders.length; i++) {
+      let orderItem = JSON.parse(JSON.stringify(orders[i]));
+      orderItem.goods = await ctx.model.OrderGoods.find({
+        order: orderItem._id
+      }).populate([{
+        path: 'value'
+      }]);
+      res.push(orderItem);
     }
     return res;
   }

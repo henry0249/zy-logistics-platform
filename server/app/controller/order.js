@@ -9,5 +9,8 @@ class OrderController extends Controller {
   async badge(){
     this.ctx.body = await this.ctx.service.order.badge();
   }
+  async pending(){
+    this.ctx.body = await this.ctx.service.order.pending();
+  }
 }
 module.exports = OrderController;

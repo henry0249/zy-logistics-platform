@@ -2,33 +2,50 @@ const Service = require('egg').Service;
 const areaField = require('../field/Area');
 
 class CompanyService extends Service {
+
+  async preAdd0(data){
+    const ctx = this.ctx;
+    let hasData = await ctx.model.Area.findOne(data);
+    if (hasData) {
+      return hasData._id;
+    }
+    let model = new ctx.model.Area(data);
+    await model.save();
+    return model._id;
+  }
   async preAdd(data, option) {
     const ctx = this.ctx;
     let hasData = await ctx.model.Area.findOne(data);
     if (hasData) {
-      return hasData;
+      return hasData._id;
     }
+    let append = {};
+
     if (data.type === 'city') {
-      data.province = option.province;
+      append.province = await this.preAdd0(option.province);
     }
     if (data.type === 'county') {
-      data.province = option.province;
-      data.city = option.city;
+      append.province = await this.preAdd0(option.province);
+      append.city = await this.preAdd0(option.city);
     }
     if (data.type === 'township') {
-      data.province = option.province;
-      data.city = option.city;
-      data.county = option.county;
+      append.province = await this.preAdd0(option.province);
+      append.city = await this.preAdd0(option.city);
+      append.county = await this.preAdd0(option.county);
     }
     if (data.type === 'street') {
-      data.province = option.province;
-      data.city = option.city;
-      data.county = option.county;
-      data.township = option.township;
+      append.province = await this.preAdd0(option.province);
+      append.city = await this.preAdd0(option.city);
+      append.county = await this.preAdd0(option.county);
+      append.township = await this.preAdd0(option.township);
     }
-    let model = new ctx.model.Area(data);
+
+    let model = new ctx.model.Area({
+      ...data,
+      ...append
+    });
     await model.save();
-    return model;
+    return model._id;
   }
   async add() {
     const ctx = this.ctx;
@@ -45,84 +62,24 @@ class CompanyService extends Service {
     if (hasData) {
       ctx.throw(405, '区域数据已经存在,请勿重复添加', body);
     }
-    let modelOption = {
+    let newAreaOption = {
       type: body.type,
       key: body[body.type].key,
       name: body[body.type].name
     };
-    if (body.type === 'city') {
-      if (body.province) {
-        modelOption.province = body.province.key;
-      } else {
-        modelOption.province = body[body.type].key;
-      }
-    }
-    if (body.type === 'county') {
-      if (body.province) {
-        modelOption.province = body.province.key;
-      } else {
-        modelOption.province = body[body.type].key;
-      }
-      if (body.city) {
-        modelOption.city = body.city.key;
-      } else {
-        modelOption.city = body[body.type].key;
-      }
-    }
-    if (body.type === 'township') {
-      if (body.province) {
-        modelOption.province = body.province.key;
-      } else {
-        modelOption.province = body[body.type].key;
-      }
-      if (body.city) {
-        modelOption.city = body.city.key;
-      } else {
-        modelOption.city = body[body.type].key;
-      }
-      if (body.county) {
-        modelOption.county = body.county.key;
-      } else {
-        modelOption.county = body[body.type].key;
-      }
-    }
-    if (body.type === 'street') {
-      if (body.province) {
-        modelOption.province = body.province.key;
-      } else {
-        modelOption.province = body[body.type].key;
-      }
-      if (body.city) {
-        modelOption.city = body.city.key;
-      } else {
-        modelOption.city = body[body.type].key;
-      }
-      if (body.county) {
-        modelOption.county = body.county.key;
-      } else {
-        modelOption.county = body[body.type].key;
-      }
-      if (body.township) {
-        modelOption.township = body.township.key;
-      } else {
-        modelOption.township = body[body.type].key;
-      }
-    }
-    let model = new ctx.model.Area(modelOption);
-    await model.save();
-    delete body.type;
+    delete body.last;
     delete body[body.type];
-
+    delete body.type;
     for (const key in body) {
-      if (areaField.type.option.hasOwnProperty(key)) {
-        await this.preAdd({
-          type: key,
-          key: body[key].key,
-          name: body[key].name
-        }, modelOption);
-      }
+      newAreaOption[key] = await this.preAdd({
+        key: body[key].key,
+        name: body[key].name,
+        type: key
+      }, body);
     }
-    return '添加成功';
+    let areaModel = new ctx.model.Area(newAreaOption);
+    await areaModel.save();
+    return 'ok';
   }
 }
 module.exports = CompanyService;

@@ -1,6 +1,6 @@
 module.exports = {
   type: {
-    name: 'l类型',
+    name: '类型',
     type: 'String',
     option: {
       province: '省',
@@ -23,18 +23,22 @@ module.exports = {
   },
   province: {
     name: '省',
-    type: 'Number'
+    type: 'ObjectId',
+    ref: 'Area'
   },
   city: {
     name: '市',
-    type: 'Number'
+    type: 'ObjectId',
+    ref: 'Area'
   },
   county: {
     name: '县',
-    type: 'Number'
+    type: 'ObjectId',
+    ref: 'Area'
   },
   township: {
     name: '乡',
-    type: 'Number'
+    type: 'ObjectId',
+    ref: 'Area'
   }
 }

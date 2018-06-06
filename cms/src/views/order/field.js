@@ -39,24 +39,29 @@ module.exports = {
   taking: {
     _id: {
       type: 'ObjectId',
-      name: '订单号'
+      name: '订单号',
+      width:"200",
+      slot: true,
     },
-    author: {
+    customer: {
       type: 'ObjectId',
       name: '客户名称',
-      ref: 'User'
+      slot: true,
     },
-    goods: {
-      type: 'Array',
-      name: '商品信息',
-    },
-    'address.name': {
+    goodsName: {
       type: 'String',
-      name: '收货地址'
+      name: '商品名称',
+      slot: true,
     },
-    deposit: {
-      type: Number,
-      name: '定金'
+    goodsCount: {
+      type: 'Number',
+      name: '商品数量',
+      slot: true,
+    },
+    area: {
+      type: 'String',
+      name: '收货地址',
+      slot: true,
     },
     remark: {
       type: 'String',

@@ -2,8 +2,15 @@
   <loading-box v-model="loadingText">
     <div class="g-order-create">
       <div class="g-order">
-        <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
-          <strong>销售订单</strong>
+        <div class="flex ac" style="padding-top:10px;color:#aaa;font-size:14px">
+          <div>
+            订单号：{{$route.params._id}}
+          </div>
+          <div class="f1"></div>
+          <div>{{dayjs(orderInfo.createdAt).format('YYYY-MM-DD HH:mm:ss')}}</div>
+        </div>
+        <div class="tc" style="font-size:22px;padding-bottom:15px">
+          <strong>订单确认</strong>
         </div>
         <my-form size="mini" width="24%" style="margin:15px 0">
           <div class="flex ac jb">
@@ -34,12 +41,12 @@
         <div>
           <my-table v-if="!tableLoading" size="small" index edit border :thead="thead" :data.sync="goodsData">
             <template slot-scope="scope">
-              <my-form-item v-if="scope.prop === 'goods'" size="mini" cascader v-model="scope.row.goods" filterable :options="goodsCascader" @change="goodsCascaderChange(scope.row)">
-              </my-form-item>
-              <span v-if="scope.prop === 'totalPrice'">
-                {{goodsTotalPrice(scope.row)}}
-              </span>
-            </template>
+                  <my-form-item v-if="scope.prop === 'goods'" size="mini" cascader v-model="scope.row.goods" filterable :options="goodsCascader" @change="goodsCascaderChange(scope.row)">
+                  </my-form-item>
+                  <span v-if="scope.prop === 'totalPrice'">
+                    {{goodsTotalPrice(scope.row)}}
+                  </span>
+</template>
           </my-table>
         </div>
       </div>
@@ -62,6 +69,7 @@ export default {
     return {
       loadingText: "",
       tableLoading: "",
+      orderInfo: {},
       order: {
         settlementMethod: 1,
         transportModel: 0,
@@ -85,6 +93,15 @@ export default {
     };
   },
   methods: {
+    async getOrderInfo() {
+      this.loadingText = "正在获取订单数据";
+      try {
+        this.orderInfo = await this.$ajax(
+          "/order/findOne/?_id=" + this.$route.params._id
+        );
+      } catch (error) {}
+      this.loadingText = "";
+    },
     async getData() {
       this.loadingText = "加载中";
       this.userCascader = [];
@@ -170,12 +187,6 @@ export default {
         }
       });
       this.order[val[0]] = val[1];
-      if (val[0] === 'user') {
-        delete this.order.company;
-      }
-      if (val[1] === 'company') {
-        delete this.order.user;
-      }
       this.order.contactName = data.name;
       this.order.contactNumber = data.mobile || data.tel;
       if (data.area) {
@@ -203,23 +214,32 @@ export default {
       let goodsCheck = true;
       this.goodsData.forEach(item => {
         if (!item.value) {
-          goodsCheck = '未选择商品';
+          goodsCheck = "未选择商品";
           return;
         }
-        if (!this.is('number',Number(item.count)) || Number(item.count)<=0) {
-          goodsCheck = '商品数量不正确';
+        if (!this.is("number", Number(item.count)) || Number(item.count) <= 0) {
+          goodsCheck = "商品数量不正确";
           return;
         }
-        if (!this.is('number',Number(item.factoryPrice)) || Number(item.factoryPrice)<=0) {
-          goodsCheck = '出厂价格不正确';
+        if (
+          !this.is("number", Number(item.factoryPrice)) ||
+          Number(item.factoryPrice) <= 0
+        ) {
+          goodsCheck = "出厂价格不正确";
           return;
         }
-        if (!this.is('number',Number(item.unitPrice)) || Number(item.unitPrice)<=0) {
-          goodsCheck = '销售单价不正确';
+        if (
+          !this.is("number", Number(item.unitPrice)) ||
+          Number(item.unitPrice) <= 0
+        ) {
+          goodsCheck = "销售单价不正确";
           return;
         }
-        if (!this.is('number',Number(item.transportPrice)) || Number(item.transportPrice)<=0) {
-          goodsCheck = '运输单价不正确';
+        if (
+          !this.is("number", Number(item.transportPrice)) ||
+          Number(item.transportPrice) <= 0
+        ) {
+          goodsCheck = "运输单价不正确";
           return;
         }
       });
@@ -229,21 +249,20 @@ export default {
       }
       this.loadingText = "创建中...";
       try {
-        await this.$ajax.post('/order/add',{
-          order:this.order,
-          goods:this.goodsData
+        await this.$ajax.post("/order/add", {
+          order: this.order,
+          goods: this.goodsData
         });
         await this.$store.dispatch("orderBadgeNotify");
-        this.$message.success('成功创建订单');
-        this.$router.push('/order/taking');
-      } catch (error) {
-        
-      }
+        this.$message.success("成功创建订单");
+        this.$router.push("/order/taking");
+      } catch (error) {}
       this.loadingText = "";
     }
   },
-  mounted() {
-    this.getData();
+  async created() {
+    await this.getOrderInfo();
+    await this.getData();
   }
 };
 </script>
@@ -255,6 +274,7 @@ export default {
 .g-order {
   margin: 0 auto;
   padding: 30px;
+  padding-top: 0;
   /* box-shadow: 0 0 10px rgba(0,0,0,.2); */
   border: 1px solid #eee;
   border-radius: 4px;
