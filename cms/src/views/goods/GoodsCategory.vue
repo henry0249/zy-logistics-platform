@@ -1,6 +1,17 @@
 <template>
   <loading-box class="goods-box" v-model="loadingText">
     <my-table index size="mini" edit :thead="tableHeader" :data.sync="tableList" op @op="op">
+      <div slot="header" class="flex header-box">
+        <div class="flex search-box">
+          <el-input size="mini" clearable placeholder="请输入品牌名或类型" @clear="clear" v-model="input">
+            <div slot="append" class="pointer" @click="search">搜索
+            </div>
+          </el-input>
+        </div>
+        <div class="right-box">
+          <el-button type="primary" size="mini" @click="add">添加</el-button>
+        </div>
+      </div>
     </my-table>
     <el-dialog :title="title" :visible.sync="show">
       <component :parent="parent" :categoryId="categoryId" :show.sync="show" :is="componentName" :key-arr="key" :key-data="keyData" :str="str"></component>
@@ -11,6 +22,7 @@
 <script>
   import SeeModel from "../common/SeeModel.vue";
   import CategoryEdmit from './CategoryEdmit';
+  import CategoryAdd from './CategoryAdd';
   import {
     categoryThead,
     keyArr
@@ -18,10 +30,14 @@
   export default {
     components: {
       SeeModel,
-      CategoryEdmit
+      CategoryEdmit,
+      CategoryAdd
     },
     data() {
       return {
+        input: '',
+        skip: 0,
+        limit: 20,
         categoryId: '',
         parent: [],
         str: "",
@@ -67,6 +83,20 @@
       }
     },
     methods: {
+      async clear() {
+        let data = {};
+        await this.getData(data);
+      },
+      async search() {
+        let data = {
+          $or: [{
+            name: {
+              $regex: this.input
+            }
+          }]
+        };
+        await this.getData(data);
+      },
       async changePath(val) {
         let parent = {
           "parent.name": {
@@ -106,7 +136,12 @@
           }
         }
         console.log(val.path);
-        await this.getData()
+        await this.getData({})
+      },
+      add() {
+        this.componentName = "CategoryAdd";
+        this.title = "添加品牌";
+        this.show = true;
       },
       op(val) {
         if (val.type === "read") {
@@ -122,22 +157,19 @@
           this.keyData = JSON.parse(JSON.stringify(val.value.row));
           this.str = this.$route.path
           if (this.$route.path === '/goods/category/2') {
-            console.log('111111111111111111');
             this.categoryId = val.value.row.parent._id || ''
           }
         }
       },
-      async getData() {
+      async getData(data) {
         let i = 0;
         try {
           this.loadingText = '加载中'
-          let data = {
-            model: "category",
-            curdType: "find",
-            populate: this.populate,
-            limit: 20,
-            skip: 0,
-          };
+          data.model = "category";
+          data.curdType = "find";
+          data.limit = this.limt;
+          data.skip = this.skip;
+          data.populate = this.populate;
           if (this.$route.path === '/goods/category/2') {
             data.parent = {
               $exists: true
@@ -161,6 +193,9 @@
           let data = {
             model: 'category',
             curdType: 'find',
+            parent: {
+              $exists: false
+            }
           }
           let res = await this.$api.curd(data)
           console.log('res', res);
@@ -188,5 +223,19 @@
   .goods-box {
     width: calc(100% - 40px);
     margin: 0 auto;
+  }
+  .header-box {
+    height: 36px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+  }
+  .search-box {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
   }
 </style>
