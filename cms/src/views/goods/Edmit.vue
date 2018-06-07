@@ -1,5 +1,5 @@
 <template>
-  <edmit-tem v-model="loadingText" :goods="goods" :category="category" :mfrs="mfrs" :brand="brand" :area="area">
+  <edmit-tem v-model="loadingText" :goods="goods" :category="category" :mfrs="mfrs" :brand="brand" :tableList="tableList" :area="area">
   </edmit-tem>
 </template>
 
