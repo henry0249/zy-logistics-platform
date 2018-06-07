@@ -1,28 +1,20 @@
 module.exports = {
-  type: {
-    name: '类型',
-    type: 'String',
-    require: true,
-    option: [{
-      key: 'factory',
-      value: '出厂价'
-    }, {
-      key: 'sell',
-      value: '销售价'
-    }, {
-      key: 'transport',
-      value: '运输价'
-    }]
+  factory: {
+    name: '出厂价',
+    type: 'Number'
+  },
+  sell: {
+    name: '销售价',
+    type: 'Number'
+  },
+  transport: {
+    name: '运输价',
+    type: 'Number'
   },
   parent: {
     name: '上次价格',
     type: 'ObjectId',
     ref: 'Price'
-  },
-  value: {
-    name: '价格',
-    type: 'Number',
-    require: true
   },
   goods: {
     name: '所属商品',
@@ -35,7 +27,7 @@ module.exports = {
     ref: 'Company'
   },
   name: {
-    name: '价格表',
+    name: '价格表名称',
     type: 'String'
   },
   area: {

@@ -8,6 +8,20 @@ module.exports = {
     name: '设备信息',
     type: 'String',
   },
+  sys: {
+    name: '访问系统',
+    type: 'String',
+  },
+  company: {
+    name: '公司信息',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
+  platform: {
+    name: '平台信息',
+    type: 'ObjectId',
+    ref: 'Platform'
+  },
   ip: {
     name: '访问ip',
     type: 'String',

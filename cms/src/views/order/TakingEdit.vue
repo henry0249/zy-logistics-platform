@@ -5,7 +5,7 @@
         <div class="flex ac" style="padding-top:10px;color:#aaa;font-size:14px">
           <div>创建时间：{{orderInfo.createdAt | formatTime}}</div>
           <div class="f1"></div>
-          <div>订单号：{{$route.params._id}}</div>
+          <div>订单号：{{orderInfo.createdAt | date2no}}</div>
         </div>
         <div class="tc" style="font-size:22px;padding-bottom:15px">
           <strong>订单确认</strong>
@@ -28,7 +28,7 @@
             </my-form-item>
             <my-form-item input v-model="order.contactNumber" label="联系电话">
             </my-form-item>
-            <my-form-item v-model="areaSelect" ownerArea filterable @change="areaCascaderChange" label="送货地址">
+            <my-form-item v-model="areaSelect" area filterable @change="areaCascaderChange" label="送货地址">
             </my-form-item>
           </div>
           <my-form-item width="100%" style="margin:15px 0" input v-model="order.address" label="详细地址">
@@ -62,10 +62,6 @@
 import { goods } from "./field";
 export default {
   data() {
-    let goodsItem = {};
-    for (const key in goods) {
-      goodsItem[key] = "";
-    }
     return {
       loadingText: "",
       tableLoading: "",
@@ -84,11 +80,7 @@ export default {
         remark: ""
       },
       thead: goods,
-      goodsData: [
-        {
-          ...goodsItem
-        }
-      ],
+      goodsData: [],
       areaCascader: [],
       userCascader: [],
       goodsCascader: [],
@@ -120,11 +112,20 @@ export default {
         if (this.orderInfo.company) {
           this.customer = ["company", this.orderInfo.company._id];
         }
+        this.areaSelect = [];
+        let areaSelectType = ['province','city','county','township'];
+        areaSelectType.forEach((item)=>{
+          if (this.orderInfo.area[item]) {
+            this.areaSelect.push(this.orderInfo.area[item]._id);
+          }
+        });
+        this.areaSelect.push(this.orderInfo.area._id);
         for (const key in this.order) {
           if (this.orderInfo.hasOwnProperty(key)) {
             this.order[key] = this.orderInfo[key];
           }
         }
+        this.order.area.area = this.orderInfo.area._id;
         this.goodsData = [];
         this.orderInfo.goods.forEach(item => {
           this.goodsData.push({

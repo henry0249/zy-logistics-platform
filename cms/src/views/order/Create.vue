@@ -84,7 +84,7 @@ export default {
       areaCascader: [],
       userCascader: [],
       goodsCascader: [],
-      test:["5b178c4812a94e87e1d70c2b", "5b178c4812a94e87e1d70c2c", "5b178c4812a94e87e1d70c2d", "5b178c4812a94e87e1d70c2e"]
+      test:[]
     };
   },
   methods: {

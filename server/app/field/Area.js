@@ -14,12 +14,10 @@ module.exports = {
   key: {
     name: '编码',
     type: 'Number',
-    require: true
   },
   name: {
     name: '名称',
     type: 'String',
-    require: true
   },
   province: {
     name: '省',

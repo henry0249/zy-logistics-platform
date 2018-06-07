@@ -1,13 +1,6 @@
 const Service = require('egg').Service;
 
 class CompanyService extends Service {
-  async beforeCurd(curdType, param) {
-    const ctx = this.ctx;
-    const check = ctx.service.check;
-    if (curdType === 'add' || curdType === 'set') {
-      await check.companyAdmin(param);
-    }
-  }
   async add(param) {
     const ctx = this.ctx;
     return {
@@ -18,9 +11,6 @@ class CompanyService extends Service {
   }
   async set(param) {
     return await this.add(param);
-  }
-  async setCallback(param) {
-    return param.data;
   }
 }
 module.exports = CompanyService;

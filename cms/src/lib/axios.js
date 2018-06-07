@@ -54,13 +54,17 @@ ajax.interceptors.response.use(response => {
     confirmButtonText: err.response.status === 401 ? '重新登录' : '确定',
     type: 'error',
     center: true
-  }).then(() => {
-    if (err.response.status === 401) {
-      router.replace('/')
-    }
-  }).catch(() => {
-
   });
+  if(err.response.status === 401){
+    router.replace('/');
+  }
+  // .then(() => {
+  //   if (err.response.status === 401) {
+  //     router.replace('/')
+  //   }
+  // }).catch(() => {
+
+  // });
   return Promise.reject(err)
 })
 

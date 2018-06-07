@@ -4,6 +4,7 @@ import Setting from './Setting.vue';
 import Company from './Company.vue';
 import User from './User.vue';
 import Area from './Area.vue';
+import AreaAdd from './AreaAdd.vue';
 
 export default [{
   path: '/platform',
@@ -24,5 +25,8 @@ export default [{
   }, {
     path: 'area',
     component: Area
+  }, {
+    path: 'areaAdd',
+    component: AreaAdd
   }]
 }]

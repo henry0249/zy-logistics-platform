@@ -69,7 +69,6 @@ export default {
       this.$emit("change", val);
     },
     areaChange(val) {
-      console.log(val);
       this.$emit("change", val);
     },
     async getAreaData() {

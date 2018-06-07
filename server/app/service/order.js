@@ -2,7 +2,9 @@ const Service = require('egg').Service;
 const orderField = require('../field/Order');
 
 class OrderService extends Service {
-
+  async set() {
+    return await this.add();
+  }
   async add() {
     const ctx = this.ctx;
     let body = ctx.request.body;

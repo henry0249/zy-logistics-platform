@@ -83,84 +83,7 @@ class CurdService extends Service {
     }
     return true;
   }
-  checkFiled(fieldName, params = {}, curdType) {
-    let checkParam = JSON.parse(JSON.stringify(params));
-    delete checkParam._id;
-    delete checkParam.sort;
-    delete checkParam.populate;
-    delete checkParam.select;
-    delete checkParam.limit;
-    delete checkParam.skip;
-    delete checkParam.multi;
-    delete checkParam.vd;
 
-    if (curdType === 'update') {
-      checkParam = JSON.parse(JSON.stringify(params.update));
-    }
-
-    const ctx = this.ctx;
-    let fields;
-    try {
-      fields = require('../field/' + fieldName);
-    } catch (error) {
-      this.ctx.throw(422, '无效的数据实体', {
-        model: fieldName
-      });
-    }
-    // if (is.empty(checkParam)) {
-    //   this.ctx.throw(422, '参数不能为空');
-    // }
-
-    const isCheckType = [
-      'Object',
-      'Number',
-      'String',
-      'Array',
-      'Date',
-      'Boolean',
-    ];
-
-    for (const key in checkParam) {
-      if (!fields.hasOwnProperty(key)) {
-        this.ctx.throw(422, '无效的字段', {
-          key
-        });
-      }
-      let field = fields[key],
-        param = checkParam[key];
-      if (!is.json(param)) {
-        if (ctx.helper.inArr(isCheckType, field.type)) {
-          if (!is[field.type.toLowerCase()](param)) {
-            this.ctx.throw(422, `${field ? field.name : key}数据类型错误`, {
-              [key]: param
-            });
-          }
-        } else if (field.type === 'ObjectId') {
-          if (!is.string(param) || param.length !== 24) {
-            this.ctx.throw(422, `${field ? field.name : key}必须是_id格式`, {
-              [key]: param
-            });
-          }
-        } else if (field.type === 'ObjectIdArray') {
-          if (is.array(param)) {
-            let flag = true;
-            param.forEach((item, index) => {
-              if (!is.string(item) || item.length !== 24) {
-                this.ctx.throw(422, `${field.name}必须是全部由_id元素组成,第${index+1}个元素不是_id格式`, {
-                  [key]: param
-                });
-              }
-            });
-          } else {
-            this.ctx.throw(422, `${field ? field.name : key}必须是数组形式`, {
-              [key]: param
-            });
-          }
-        }
-      }
-    }
-    return true;
-  }
   hasService(funName) {
     const ctx = this.ctx;
     let params = ctx.params;
@@ -177,9 +100,9 @@ class CurdService extends Service {
       params
     } = ctx;
     this.checkMethod();
-    let modelName = this.checkModel();
-    let model = ctx.model[modelName];
-    let curdParam = {};
+    let modelName = this.checkModel(),
+      model = ctx.model[modelName],
+      curdParam = {};
     if (method === 'GET') {
       curdParam = ctx.query;
     } else {
@@ -188,16 +111,8 @@ class CurdService extends Service {
 
     let diyService = ctx.service[params.model];
 
-    if (this.hasService('beforeCurd')) {
-      let beforeRes = await diyService['beforeCurd'](params.curdType, curdParam);
-      if (beforeRes) {
-        curdParam = beforeRes;
-      }
-    }
-
     if (this.hasService('require')) {
-      let diyRequireArr = await diyService['require'](params.curdType, curdParam);
-      await this.checkRequire(curdParam, diyRequireArr);
+      await diyService['require']();
     } else {
       if (params.curdType === 'add' || params.curdType === 'set') {
         this.checkRequire(curdParam);
@@ -205,33 +120,13 @@ class CurdService extends Service {
         this.checkRequire(curdParam, []);
       }
     }
-    // this.checkFiled(modelName, curdParam, params.curdType);
-
+    let data = 'ok';
     if (this.hasService(params.curdType)) {
-      curdParam = await diyService[params.curdType](curdParam);
+      data = await diyService[params.curdType]();
+    } else {
+      data = await this[params.curdType](model, curdParam);
     }
 
-    if (this.hasService('beforeExecuted')) {
-      curdParam = await diyService['beforeExecuted'](params.curdType, curdParam);
-    }
-
-    let data = await this[params.curdType](model, curdParam);
-
-    if (this.hasService(params.curdType + 'Callback')) {
-      data = await diyService[params.curdType + 'Callback']({
-        curdType: params.curdType,
-        data,
-        curdParam
-      });
-    }
-
-    if (this.hasService('curdCallback')) {
-      data = await diyService['curdCallback']({
-        curdType: params.curdType,
-        data,
-        curdParam
-      });
-    }
 
     if (!curdParam.withoutLog) {
       let ua = ctx.helper.ua();
@@ -243,6 +138,15 @@ class CurdService extends Service {
       };
       if (ctx.user) {
         logParms.user = ctx.user._id;
+      }
+      if (ctx.platform) {
+        logParms.platform = ctx.platform._id;
+      }
+      if (ctx.company) {
+        logParms.company = ctx.company._id;
+      }
+      if (ctx.sys) {
+        logParms.sys = ctx.tokenData.sys;
       }
       if (curdParam.logRemark) {
         logParms.remark = curdParam.logRemark;

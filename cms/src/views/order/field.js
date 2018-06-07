@@ -40,7 +40,7 @@ module.exports = {
     _id: {
       type: 'ObjectId',
       name: '订单号',
-      width:"200",
+      width:"100",
       slot: true,
     },
     customer: {

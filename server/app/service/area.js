@@ -3,9 +3,12 @@ const areaField = require('../field/Area');
 
 class CompanyService extends Service {
 
-  async preAdd0(data) {
+  async preAdd(data) {
     const ctx = this.ctx;
-    let hasData = await ctx.model.Area.findOne(data);
+    let hasData = await ctx.model.Area.findOne({
+      key:data.key,
+      name:data.name
+    });
     if (hasData) {
       return hasData._id;
     }
@@ -13,69 +16,77 @@ class CompanyService extends Service {
     await model.save();
     return model._id;
   }
-  async preAdd(data, option) {
-    const ctx = this.ctx;
-    let hasData = await ctx.model.Area.findOne(data);
-    if (hasData) {
-      return hasData._id;
-    }
-    let append = {};
 
-    if (data.type === 'city') {
-      append.province = await this.preAdd0(option.province);
-    }
-    if (data.type === 'county') {
-      append.province = await this.preAdd0(option.province);
-      append.city = await this.preAdd0(option.city);
-    }
-    if (data.type === 'township') {
-      append.province = await this.preAdd0(option.province);
-      append.city = await this.preAdd0(option.city);
-      append.county = await this.preAdd0(option.county);
-    }
-    if (data.type === 'street') {
-      append.province = await this.preAdd0(option.province);
-      append.city = await this.preAdd0(option.city);
-      append.county = await this.preAdd0(option.county);
-      append.township = await this.preAdd0(option.township);
-    }
-
-    let model = new ctx.model.Area({
-      ...data,
-      ...append
-    });
-    await model.save();
-    return model._id;
-  }
   async add() {
     const ctx = this.ctx;
     let body = ctx.request.body;
-    if (!body[body.type]) {
-      ctx.throw(422, '信息填写不完整', body);
+    let typeObj = {
+      0: 'province',
+      1: 'city',
+      2: 'county',
+      3: 'township'
+    };
+    if (body.type === undefined) {
+      ctx.throw(422, '区域类型必填', body);
     }
-    let area = {};
+    if (!typeObj[body.type]) {
+      ctx.throw(422, '无此区域类型', body);
+    }
+    if (body.data instanceof Array && body.data.length > 0) {
 
-    let hasData = await ctx.model.Area.findOne({
-      type: body.type,
-      key: body[body.type].key
-    });
+    } else {
+      ctx.throw(422, '未选择区域数据', body);
+    }
+
+
+    let area = {};
+    for (let i = 0; i < body.data.length; i++) {
+      let item = JSON.parse(JSON.stringify(body.data[i]));
+      if (i > 0) {
+        for (let j = 0; j < i; j++) {
+          item[typeObj[j]] = {
+            type: typeObj[j],
+            key: body.data[j].code,
+            name: body.data[j].name
+          };
+        }
+      }
+      if (i === body.data.length - 1) {
+        area = item;
+        area.key = item.code;
+        area.type = typeObj[i];
+      }
+    }
+    let newAreaOption = {
+      type: area.type,
+      key: area.code,
+      name: area.name
+    };
+    let hasData = await ctx.model.Area.findOne(newAreaOption);
     if (hasData) {
       ctx.throw(405, '区域数据已经存在,请勿重复添加', body);
     }
-    let newAreaOption = {
-      type: body.type,
-      key: body[body.type].key,
-      name: body[body.type].name
-    };
-    delete body.last;
-    delete body[body.type];
-    delete body.type;
-    for (const key in body) {
-      newAreaOption[key] = await this.preAdd({
-        key: body[key].key,
-        name: body[key].name,
-        type: key
-      }, body);
+    if (area.type === 'city') {
+      newAreaOption.province = await this.preAdd(area.province);
+    }
+    if (area.type === 'county') {
+      newAreaOption.province = await this.preAdd(area.province);
+      newAreaOption.city = await this.preAdd({
+        ...area.city,
+        province: newAreaOption.province
+      });
+    }
+    if (area.type === 'township') {
+      newAreaOption.province = await this.preAdd(area.province);
+      newAreaOption.city = await this.preAdd({
+        ...area.city,
+        province: newAreaOption.province
+      });
+      newAreaOption.county = await this.preAdd({
+        ...area.county,
+        province: newAreaOption.province,
+        city: newAreaOption.city
+      });
     }
     let areaModel = new ctx.model.Area(newAreaOption);
     await areaModel.save();
