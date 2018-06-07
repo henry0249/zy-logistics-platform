@@ -142,13 +142,18 @@ export default {
         hide: this.user.isSys !== true
       }
     ];
-    setInterval(async () => {
-      let res = await this.$store.dispatch("orderBadgeNotify");
-      let { newBadge, oldBadge } = res;
-      for (const key in newBadge) {
-        this.badgeNotify(newBadge[key], oldBadge[key], key);
-      }
-    }, 20000);
+    let sti;
+    try {
+      sti = setInterval(async () => {
+        let res = await this.$store.dispatch("orderBadgeNotify");
+        let { newBadge, oldBadge } = res;
+        for (const key in newBadge) {
+          this.badgeNotify(newBadge[key], oldBadge[key], key);
+        }
+      }, 20000);
+    } catch (error) {
+      window.clearInterval(sti);
+    }
   }
 };
 </script>
