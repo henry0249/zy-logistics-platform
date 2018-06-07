@@ -5,19 +5,21 @@
       </slot>
     </div>
     <loading-box v-model="loadingText">
-      <el-table ref="table" @cell-click="cellClick" @row-click="rowClick" v-bind="$attrs" :data="data" :height="tableHeight" @selection-change="handleSelectionChange">
+      <el-table style="width:100%" ref="table" @cell-click="cellClick" @row-click="rowClick" v-bind="$attrs" :data="data" :height="tableHeight" @selection-change="handleSelectionChange">
         <el-table-column v-if="selection" type="selection" width="30">
         </el-table-column>
         <el-table-column v-if="index" show-overflow-tooltip type="index" width="30">
         </el-table-column>
-        <el-table-column v-if="item.slot" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'auto')" v-for="(item, key) in thead" :key="key">
-          <template slot-scope="scope">
-            <slot :prop="key" :row="scope.row" :column="scope.column" :index="scope.$index">{{deepKey(scope.row,scope.column.property)}}</slot>
-          </template>
-        </el-table-column>
-        <el-table-column v-else show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'auto')" :key="key">
+        <template  v-for="(item, key) in thead">
+          <el-table-column v-if="item.slot" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
+            <template slot-scope="scope">
+              <slot :prop="key" :row="scope.row" :column="scope.column" :index="scope.$index">{{deepKey(scope.row,scope.column.property)}}</slot>
+            </template>
+          </el-table-column>
+          <el-table-column v-else show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
           
-        </el-table-column>
+          </el-table-column>
+        </template>
 
         <el-table-column label="操作" v-if="op" :width="''+opWidth">
           <div slot-scope="scope">
@@ -128,8 +130,8 @@ export default {
       } else {
         this.currentRow[this.currentRowKey] = this.fixedInputVal;
       }
-      this.data.splice(this.currentRowIndex, 1, this.currentRow);
-      this.$emit("update:data", this.data);
+      // this.data.splice(this.currentRowIndex, 1, this.currentRow);
+      // this.$emit("update:data", this.data);
     },
     handleSelectionChange(val) {
       this.$emit("update:select", val);

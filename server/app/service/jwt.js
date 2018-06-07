@@ -60,37 +60,8 @@ class jwtService extends Service {
       path: 'user'
     }, {
       path: 'company',
-      // populate: [{
-      //   name: '管理员',
-      //   path: 'admin'
-      // }, {
-      //   name: '业务专员',
-      //   path: 'salesman'
-      // }, {
-      //   name: '财务文员',
-      //   path: 'financial'
-      // }]
     }, {
       path: 'platform',
-      // populate: [{
-      //   name: '管理员',
-      //   path: 'admin'
-      // }, {
-      //   name: '市场专员',
-      //   path: 'salesman'
-      // }, {
-      //   name: '审核员',
-      //   path: 'auditor'
-      // }, {
-      //   name: '物流专员',
-      //   path: 'dispatcher'
-      // }, {
-      //   name: '单据文员',
-      //   path: 'documentClerk'
-      // }, {
-      //   name: '财务专员',
-      //   path: 'financial'
-      // }]
     }]);
     if (!tokenData) {
       ctx.throw(401, '登录已失效,请尝试重新登录');
@@ -114,6 +85,10 @@ class jwtService extends Service {
         refleshRange,
         refleshtoken: newToken.value,
         tokenexp: newToken.expAt
+      });
+      await tokenData.update({
+        value:newToken.value,
+        expAt:newToken.expAt
       });
     }
     return tokenData;
