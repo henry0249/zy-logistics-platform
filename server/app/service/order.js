@@ -10,6 +10,9 @@ class OrderService extends Service {
     if (!order.company && !order.user) {
       ctx.throw(422, '未选择客户', body);
     }
+    if (order.user && order.company) {
+      ctx.throw(422, "下单客户不能同时为个人和公司", body);
+    }
     if (!order.contactName) {
       ctx.throw(422, '未填写收货人', body);
     }
@@ -58,7 +61,8 @@ class OrderService extends Service {
   async add() {
     const ctx = this.ctx;
     let body = ctx.request.body;
-    this.orderFieldCheck(body.order);
+    let order = body.order;
+    this.orderFieldCheck(order);
     this.orderGoodsCheck(body.goods);
     let man = {
       salesman: [],
@@ -66,7 +70,6 @@ class OrderService extends Service {
       documentClerk: [],
       financial: []
     };
-    let order = {};
     if (ctx.tokenData.sys === 'cms') {
       function setMan(type) {
         if (ctx[type]) {
@@ -94,9 +97,6 @@ class OrderService extends Service {
       order.state = 'dispatch';
     }
     order.creater = ctx.user._id;
-    if (order.user && order.company) {
-      ctx.throw(422, "下单客户不能同时为个人和公司", body);
-    }
     let orderModel = new ctx.model.Order(order);
     await orderModel.save();
     for (let i = 0; i < body.goods.length; i++) {
@@ -189,16 +189,16 @@ class OrderService extends Service {
       salesman: {
 
       },
-      auditor: {
+      dispatcher: {
 
       },
-      dispatcher: {
+      documentClerk: {
 
       },
       financial: {
 
       }
-    }
+    };
     let $or = [];
     for (const key in inMan) {
       $or.push({

@@ -151,14 +151,14 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'User'
   },
-  financial: {
-    name: '财务专员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
   documentClerk: {
     name: '单据文员',
     type: 'ObjectIdArray',
     ref: 'User'
   },
+  financial: {
+    name: '财务专员',
+    type: 'ObjectIdArray',
+    ref: 'User'
+  }
 }

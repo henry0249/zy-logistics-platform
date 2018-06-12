@@ -169,13 +169,13 @@ export default {
           });
         }
       });
-      this.order[val[0]] = val[1];
       if (val[0] === "user") {
         delete this.order.company;
       }
       if (val[0] === "company") {
         delete this.order.user;
       }
+      this.order[val[0]] = val[1];
       this.order.contactName = data.name;
       this.order.contactNumber = data.mobile || data.tel;
       if (data.area) {
@@ -244,7 +244,7 @@ export default {
         });
         await this.$store.dispatch("orderBadgeNotify");
         this.$message.success("成功创建订单");
-        this.$router.push("/order/taking");
+        this.$router.push("/order/dispatch");
       } catch (error) {}
       this.loadingText = "";
     }
