@@ -2,11 +2,12 @@ module.exports = {
   type: {
     name: '公司类型',
     type: 'Array',
-    option:{
-      common:'一般公司',
-      logistics:'物流公司',
-      shipper:'发货厂商',
-      trading:'贸易公司'
+    option: {
+      common: '一般公司',
+      logistics: '物流公司',
+      shipper: '发货厂商',
+      trading: '贸易公司',
+      associate: '联谊商'
     },
     require: true
   },
@@ -19,7 +20,7 @@ module.exports = {
     name: '手机号',
     type: 'String'
   },
-  tel:{
+  tel: {
     name: '固话',
     type: 'String'
   },
@@ -31,7 +32,7 @@ module.exports = {
     name: '资质认证材料',
     type: 'Object'
   },
-  self:{
+  self: {
     name: '自营',
     type: 'Boolean'
   },
@@ -63,8 +64,8 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'User'
   },
-  auditor: {
-    name: '审核员',
+  documentClerk: {
+    name: '单据文员',
     type: 'ObjectIdArray',
     ref: 'User'
   },
@@ -78,7 +79,7 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Address'
   },
-  area:{
+  area: {
     name: '区域',
     type: 'Object',
   }

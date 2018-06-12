@@ -63,7 +63,7 @@ export default {
     return {
       loadingText: "",
       tableLoading: "",
-      customer:[],
+      customer: [],
       order: {
         settlementMethod: 1,
         transportModel: 0,
@@ -84,7 +84,7 @@ export default {
       areaCascader: [],
       userCascader: [],
       goodsCascader: [],
-      test:[]
+      test: []
     };
   },
   methods: {
@@ -123,27 +123,14 @@ export default {
         let goods = this.getGoodsById(val[1]);
         let price = "-";
         goods.price.forEach(item => {
-          if (this.order.area === item.area && item.type === type) {
-            price = item.value;
+          if (this.order.area === item.area) {
+            price = item[type] || 0;
           }
         });
         return price;
       }
     },
     goodsTotalPrice(row) {
-      // let val = row.goods;
-      // if (val.length === 2 && this.order.area) {
-      //   let total = 0;
-      //   let unitPrice = this.goodsPrice(row, "sell");
-      //   if (this.is("number", Number(row.count))) {
-      //     if (this.is("number", Number(row.unitPrice))) {
-      //       total = Number(row.count) * Number(row.unitPrice);
-      //     } else if (this.is("number", Number(unitPrice))) {
-      //       total = Number(row.count) * Number(unitPrice);
-      //     }
-      //   }
-      //   return total;
-      // }
       let total = 0;
       if (
         this.is("number", Number(row.count)) &&
@@ -166,7 +153,7 @@ export default {
       }, 200);
     },
     areaCascaderChange(val) {
-      this.order.area = val[val.length-1];
+      this.order.area = val[val.length - 1];
       this.goodsData.forEach(item => {
         this.goodsCascaderChange(item);
       });
@@ -186,7 +173,7 @@ export default {
       if (val[0] === "user") {
         delete this.order.company;
       }
-      if (val[1] === "company") {
+      if (val[0] === "company") {
         delete this.order.user;
       }
       this.order.contactName = data.name;

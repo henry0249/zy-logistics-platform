@@ -37,7 +37,6 @@ const store = new Vuex.Store({
     setLoginInfo(state, data) {
       state.loginInfo = data || {};
       let user = data.user;
-
       function setPower(data, stateData) {
         for (let powerKey in stateData) {
           let powerItem = data[powerKey];
@@ -59,6 +58,7 @@ const store = new Vuex.Store({
       }
       setPower(data.platform || {}, state.platformPower);
       setPower(data.company || {}, state.companyPower);
+      state.login = true;
     },
     setField(state, data) {
       state.field = data || {};
@@ -67,8 +67,13 @@ const store = new Vuex.Store({
       state.orderBadge = data || {};
     },
     setToken(state, data) {
-      localStorage.token = data.token;
-      localStorage.tokenExp = data.exp;
+      if (data.token && data.exp) {
+        localStorage.token = data.token;
+        localStorage.tokenExp = data.exp;
+      } else {
+        localStorage.removeItem('token');
+        localStorage.removeItem('tokenExp');
+      }
       state.token = data.token;
       state.tokenExp = data.exp;
     },
@@ -121,7 +126,7 @@ const store = new Vuex.Store({
         oldBadge
       }
     },
-    async logout(context, payload) {
+    async logout(context) {
       await ajax.get('/logout');
       context.commit('logout');
     },

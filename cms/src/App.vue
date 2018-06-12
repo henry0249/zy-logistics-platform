@@ -24,54 +24,56 @@
 </template>
 
 <script>
-  import MyHeader from "./views/common/Header.vue";
-  export default {
-    components: {
-      MyHeader
-    },
-    data() {
-      return {
-        loadingText: "加载中"
-      };
-    },
-    computed: {
-      showHeader() {
-        let flag = true;
-        if (
-          this.$route.path.indexOf("login") > -1 ||
-          this.$route.path.indexOf("chooseCompany") > -1 ||
-          this.$route.path.indexOf("notfound") > -1
-        ) {
-          flag = false;
-        }
-        return flag;
+import MyHeader from "./views/common/Header.vue";
+export default {
+  components: {
+    MyHeader
+  },
+  data() {
+    return {
+      loadingText: "加载中"
+    };
+  },
+  computed: {
+    showHeader() {
+      let flag = true;
+      if (
+        this.$route.path.indexOf("login") > -1 ||
+        this.$route.path.indexOf("chooseCompany") > -1 ||
+        this.$route.path.indexOf("notfound") > -1
+      ) {
+        flag = false;
       }
-    },
-    async created() {
+      return flag;
+    }
+  },
+  async created() {
+    if (localStorage.token) {
       this.$store.commit("getLocalToken");
       if (this.showHeader) {
         try {
           await this.$store.dispatch("getLoginInfo");
         } catch (error) {}
       }
-      this.loadingText = "";
     }
-  };
+    this.loadingText = "";
+  }
+};
 </script>
 
 <style>
-  html,
-  body {
-    min-width: 1024px;
-  }
-  .g-container {
-    height: calc(100vh - 50px);
-    overflow-y: auto;
-  }
-  .g-container::-webkit-scrollbar {
-    display: none;
-  }
-  .base-bg {
-    background: #f3f4f5;
-  }
+html,
+body {
+  min-width: 1024px;
+}
+.g-container {
+  height: calc(100vh - 50px);
+  overflow-y: auto;
+}
+.g-container::-webkit-scrollbar {
+  display: none;
+}
+.base-bg {
+  background: #f3f4f5;
+}
 </style>

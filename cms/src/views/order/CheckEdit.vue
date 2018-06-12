@@ -8,7 +8,7 @@
           <div>订单号：{{orderInfo.createdAt | date2no}}</div>
         </div>
         <div class="tc" style="font-size:22px;padding-bottom:15px">
-          <strong>订单确认</strong>
+          <strong>订单审核</strong>
         </div>
         <my-form size="mini" width="24%" style="margin:15px 0">
           <div class="flex ac jb">
@@ -51,7 +51,7 @@
       <div class="flex ac" style="margin-top:30px">
         <el-button v-if="orderHasChange" size="small" type="primary" icon="el-icon-edit" plain>修改订单</el-button>
         <div class="f1"></div>
-        <el-button size="small" type="primary" @click="takingOrder">确认接单</el-button>
+        <el-button size="small" type="primary" @click="takingOrder">审核通过</el-button>
         <el-button size="small">取消</el-button>
       </div>
     </div>
@@ -288,17 +288,17 @@ export default {
         this.$message.error(goodsCheck);
         return;
       }
-      this.loadingText = "确认中...";
+      this.loadingText = "审核中...";
       try {
-        this.order.state = "check";
+        this.order.state = "distribution";
         this.order._id = this.orderInfo._id;
         await this.$ajax.post("/order/update", {
           order: this.order,
           goods: this.goodsData
         });
         await this.$store.dispatch("orderBadgeNotify");
-        this.$message.success("接单成功");
-        this.$router.push("/order/taking");
+        this.$message.success("订单审核成功");
+        this.$router.push("/order/check");
       } catch (error) {}
       this.loadingText = "";
     }

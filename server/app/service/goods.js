@@ -2,27 +2,30 @@ const Service = require('egg').Service;
 const areaField = require('../field/Area');
 
 class CompanyService extends Service {
-  async add() {
-    const ctx = this.ctx;
-    let body = ctx.request.body;
-    if (!body.name || !body.unit || !body.spec || !body.mfrs) {
-      ctx.throw(422, '商品信息未完善', body);
-    }
-    let hasGoods = await ctx.model.Goods.findOne({
-      name: body.name,
-      mfrs: body.mfrs
-    });
-    if (hasGoods) {
-      ctx.throw(405, '此生产厂商已经存在同名商品', body);
-    }
-    let goodsModel = new ctx.model.Goods(body);
-    await goodsModel.save();
-    if (body.price instanceof Array && body.price.length > 0) {
+  // async add() {
+  //   const ctx = this.ctx;
+  //   let body = ctx.request.body;
+  //   if (!body.name || !body.unit || !body.spec || !body.mfrs) {
+  //     ctx.throw(422, '商品信息未完善', body);
+  //   }
+  //   let hasGoods = await ctx.model.Goods.findOne({
+  //     name: body.name,
+  //     mfrs: body.mfrs
+  //   });
+  //   if (hasGoods) {
+  //     ctx.throw(405, '此生产厂商已经存在同名商品', body);
+  //   }
+  //   let goodsModel = new ctx.model.Goods(body);
+  //   await goodsModel.save();
+  //   if (body.price instanceof Array && body.price.length > 0) {
 
-    } else {
-      ctx.throw(422, '价格信息必填', body);
-    }
-  }
+  //   } else {
+  //     ctx.throw(422, '价格信息必填', body);
+  //   }
+  //   for (let i = 0; i < body.price.length; i++) {
+  //     let priceItem = body.price[i];
+  //   }
+  // }
   async cascader() {
     const ctx = this.ctx;
     let brands = await ctx.model.Brand.find();

@@ -8,9 +8,9 @@
           <div>订单号：{{orderInfo.createdAt | date2no}}</div>
         </div>
         <div class="tc" style="font-size:22px;padding-bottom:15px">
-          <strong>订单确认</strong>
+          <strong>订单配货</strong>
         </div>
-        <my-form size="mini" width="24%" style="margin:15px 0">
+        <my-form v-show="!hideForm" size="mini" width="24%" style="margin-top:15px">
           <div class="flex ac jb">
             <my-form-item cascader v-model="customer" filterable label="客户名称" :options="userCascader" @change="userCascaderChange">
             </my-form-item>
@@ -36,6 +36,10 @@
           <my-form-item width="100%" input type="textarea" v-model="order.remark" autosize label="订单备注">
           </my-form-item>
         </my-form>
+        <div @click="hideForm = !hideForm" class="tc pointer" v-ripple style="color:#aaa;padding:5px 0">
+          <i v-if="!hideForm" class="el-icon-arrow-up"></i>
+          <i v-if="hideForm" class="el-icon-arrow-down"></i>
+        </div>
         <div>
           <my-table v-if="!tableLoading" size="small" index edit border :thead="thead" :data.sync="goodsData">
             <template slot-scope="scope">
@@ -47,11 +51,12 @@
             </template>
           </my-table>
         </div>
+        <business-trains v-if="!loadingText" :order.sync="orderInfo"></business-trains>
       </div>
       <div class="flex ac" style="margin-top:30px">
         <el-button v-if="orderHasChange" size="small" type="primary" icon="el-icon-edit" plain>修改订单</el-button>
         <div class="f1"></div>
-        <el-button size="small" type="primary" @click="takingOrder">确认接单</el-button>
+        <el-button size="small" type="primary" @click="takingOrder">完成配货</el-button>
         <el-button size="small">取消</el-button>
       </div>
     </div>
@@ -60,11 +65,16 @@
 
 <script>
 import { goods } from "./field";
+import BusinessTrains from './BusinessTrains';
 export default {
+  components:{
+    BusinessTrains
+  },
   data() {
     return {
       loadingText: "",
       tableLoading: "",
+      hideForm: false,
       orderInfo: {},
       customer: [],
       areaSelect: [],
@@ -288,17 +298,17 @@ export default {
         this.$message.error(goodsCheck);
         return;
       }
-      this.loadingText = "确认中...";
+      this.loadingText = "审核中...";
       try {
-        this.order.state = "check";
+        this.order.state = "dispatch";
         this.order._id = this.orderInfo._id;
         await this.$ajax.post("/order/update", {
           order: this.order,
           goods: this.goodsData
         });
         await this.$store.dispatch("orderBadgeNotify");
-        this.$message.success("接单成功");
-        this.$router.push("/order/taking");
+        this.$message.success("订单配货成功");
+        this.$router.push("/order/check");
       } catch (error) {}
       this.loadingText = "";
     }

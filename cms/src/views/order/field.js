@@ -21,7 +21,7 @@ module.exports = {
       name: "单位",
       readOnly: true,
     },
-    factoryPrice:{
+    factoryPrice: {
       name: "出厂单价",
     },
     unitPrice: {
@@ -40,7 +40,7 @@ module.exports = {
     _id: {
       type: 'ObjectId',
       name: '订单号',
-      width:"100",
+      width: "100",
       slot: true,
     },
     customer: {
@@ -66,6 +66,46 @@ module.exports = {
     remark: {
       type: 'String',
       name: '备注',
+    }
+  },
+  businessTrains: {
+    lastCompany: {
+      type: 'ObjectId',
+      name: '上家公司',
+      ref: 'Company',
+      readOnly: true
+    },
+    currentCompany: {
+      type: 'ObjectId',
+      name: '联营商',
+      ref: 'Company',
+      readOnly: true
+    },
+    purchasePrice: {
+      name: '进价',
+      type: 'Number',
+      require: true
+    },
+    purchaseCount: {
+      name: '进货数量',
+      type: 'Number',
+      require: true
+    },
+    sellPrice: {
+      name: '售价',
+      type: 'Number',
+      require: true
+    },
+    sellCount: {
+      name: '出货数量',
+      type: 'Number',
+      require: true
+    },
+
+    totalPrice: {
+      name: '结算金额',
+      type: 'Number',
+      require: true
     }
   }
 }

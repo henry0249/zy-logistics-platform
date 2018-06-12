@@ -4,14 +4,14 @@ module.exports = {
     name: '状态',
     option: {
       taking: '待接单',
-      check: '待审核',
-      distribution: '待配货',
       dispatch: '待调度',
-      settlement: '待结算',
+      distribution: '待配送',
       transport: '运输中',
-      finish: '已完成',
+      check: '待审核',
+      finish: '订单完成',
       delete: '已删除'
-    }
+    },
+    default: 'taking'
   },
   user: {
     type: 'ObjectId',
@@ -23,7 +23,7 @@ module.exports = {
     name: '下单公司',
     ref: 'Company'
   },
-  creater:{
+  creater: {
     type: 'ObjectId',
     name: '创建人',
     ref: 'User'
@@ -55,11 +55,6 @@ module.exports = {
     type: 'Number'
   },
 
-  deposit: {
-    name: '定金',
-    type: 'Number'
-  },
-
   paymentModel: {
     name: '付款方式',
     type: 'String',
@@ -86,9 +81,17 @@ module.exports = {
     name: '已结算',
     type: 'Boolean'
   },
+  balancedNumber: {
+    name: '已结算金额',
+    type: 'Number'
+  },
   invoiced: {
     name: '已开发票',
     type: 'Boolean'
+  },
+  invoicedNumber: {
+    name: '已开票金额',
+    type: 'Number'
   },
 
   settlementMethod: {
@@ -143,11 +146,6 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'User'
   },
-  auditor: {
-    name: '审核人',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
   dispatcher: {
     name: '调度员',
     type: 'ObjectIdArray',
@@ -158,7 +156,6 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'User'
   },
-
   documentClerk: {
     name: '单据文员',
     type: 'ObjectIdArray',

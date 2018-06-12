@@ -32,11 +32,6 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'User'
   },
-  auditor: {
-    name: '审核员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
   dispatcher: {
     name: '调度专员',
     type: 'ObjectIdArray',

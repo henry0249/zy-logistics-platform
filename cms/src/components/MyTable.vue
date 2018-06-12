@@ -22,7 +22,7 @@
         </template>
 
         <el-table-column label="操作" v-if="op" :width="''+opWidth">
-          <div slot-scope="scope">
+          <div slot-scope="scope" style="width:100%">
             <slot name="op" :row="scope.row" :column="scope.column" :index="scope.$index">
               <i style="color:#909399" @click="handleOp('read',scope)" class="el-icon-view pointer"></i>
               <i style="color:#409EFF;margin:0 10px" @click="handleOp('edit',scope)" class="el-icon-edit pointer"></i>

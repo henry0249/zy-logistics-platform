@@ -2,19 +2,11 @@ const Service = require('egg').Service;
 const orderField = require('../field/Order');
 
 class OrderService extends Service {
-  async set() {
-    return await this.add();
-  }
-  async add() {
+  orderFieldCheck(order) {
     const ctx = this.ctx;
-    let body = ctx.request.body;
-    if (!body.order) {
+    if (!order) {
       ctx.throw(422, '订单信息未填', body);
     }
-    if (!ctx.helper.is('array', body.goods)) {
-      ctx.throw(422, '商品信息未填', body);
-    }
-    let order = body.order;
     if (!order.company && !order.user) {
       ctx.throw(422, '未选择客户', body);
     }
@@ -27,8 +19,14 @@ class OrderService extends Service {
     if (!order.area) {
       ctx.throw(422, '未选择送货地址', body);
     }
+  }
+  orderGoodsCheck(goods) {
+    const ctx = this.ctx;
     let goodsCheck = true;
-    body.goods.forEach(item => {
+    if (goods instanceof Array && goods.length > 0) {} else {
+      goodsCheck = '未选择商品';
+    }
+    goods.forEach(item => {
       if (!item.value) {
         goodsCheck = '未选择商品';
         return;
@@ -53,13 +51,22 @@ class OrderService extends Service {
     if (goodsCheck !== true) {
       ctx.throw(422, goodsCheck, body);
     }
+  }
+  async set() {
+    return await this.add();
+  }
+  async add() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    this.orderFieldCheck(body.order);
+    this.orderGoodsCheck(body.goods);
     let man = {
       salesman: [],
-      auditor: [],
       dispatcher: [],
+      documentClerk: [],
       financial: []
     };
-
+    let order = {};
     if (ctx.tokenData.sys === 'cms') {
       function setMan(type) {
         if (ctx[type]) {
@@ -84,9 +91,9 @@ class OrderService extends Service {
       for (const key in man) {
         order[key] = man[key];
       }
+      order.state = 'dispatch';
     }
     order.creater = ctx.user._id;
-    order.state = 'taking';
     if (order.user && order.company) {
       ctx.throw(422, "下单客户不能同时为个人和公司", body);
     }
@@ -103,6 +110,80 @@ class OrderService extends Service {
     }
     return 'ok';
   }
+
+  async update() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    this.orderFieldCheck(body.order);
+    if (body.goods instanceof Array && body.goods.length > 0) {
+      this.orderGoodsCheck(body.goods);
+    }
+    if (!body.order._id) {
+      ctx.throw(422, "订单编号必填", body);
+    }
+    let order = await ctx.model.Order.findById(body.order._id);
+    if (!order) {
+      ctx.throw(404, "未找到订单", body);
+    }
+    if (body.state !== undefined) {
+      this.updateState(order);
+    }
+    delete body.order._id;
+    await order.update(body.order);
+    if (body.goods instanceof Array && body.goods.length > 0) {
+      for (let i = 0; i < body.goods.length; i++) {
+        let goodsItem = JSON.parse(JSON.stringify(body.goods[i]));
+        if (!goodsItem._id) {
+          ctx.throw(422, "商品编号必填", body);
+        }
+        delete goodsItem._id;
+        await ctx.model.OrderGoods.update({
+          _id: body.goods[i]._id
+        }, goodsItem);
+      }
+    }
+    return 'ok';
+  }
+
+  updateState(order) {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    let newState = body.state;
+    let newStateStr = orderField.state.option[newState];
+
+    if (!newStateStr) {
+      ctx.throw(422, "无效的订单状态", body);
+    }
+    if (newState === order.state) {
+      ctx.throw(405, `订单已经是【${newStateStr}】，请勿重复修改`, body);
+    }
+    if (newState === 'dispatch') {
+      if (!ctx.helper.inArr(order.salesman, ctx.user._id)) {
+        ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
+      }
+    }
+    if (newState === 'distribution') {
+      if (!ctx.helper.inArr(order.dispatcher, ctx.user._id)) {
+        ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
+      }
+    }
+    if (newState === 'transport') {
+      if (!ctx.helper.inArr(order.dispatcher, ctx.user._id)) {
+        ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
+      }
+    }
+    if (newState === 'check') {
+      if (!ctx.helper.inArr(order.dispatcher, ctx.user._id)) {
+        ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
+      }
+    }
+    if (newState === 'finish') {
+      if (!ctx.helper.inArr(order.financial, ctx.user._id)) {
+        ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
+      }
+    }
+  }
+
   getOrderMan(user_id) {
     let inMan = {
       salesman: {
@@ -200,7 +281,10 @@ class OrderService extends Service {
     res.goods = await ctx.model.OrderGoods.find({
       order: res._id
     }).populate([{
-      path: 'value'
+      path: 'value',
+      populate: [{
+        path: 'mfrs'
+      }]
     }]);
     return res;
   }

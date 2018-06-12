@@ -61,25 +61,25 @@ export default {
         badge: this.orderBadge.taking
       },
       {
-        name: "待审核",
+        name: "待调度",
         color: "red",
-        icon: "icon-shenhe1",
-        path: "/order/check",
-        badge: this.orderBadge.check
+        icon: "icon-tiaoduzhongxin",
+        path: "/order/dispatch",
+        badge: this.orderBadge.dispatch
       },
       {
-        name: "待配货",
+        name: "待配送",
         color: "red",
         icon: "icon-cf-c97",
         path: "/order/distribution",
         badge: this.orderBadge.distribution
       },
       {
-        name: "待调度",
+        name: "待审核",
         color: "red",
-        icon: "icon-tiaoduzhongxin",
-        path: "/order/dispatch",
-        badge: this.orderBadge.dispatch
+        icon: "icon-shenhe1",
+        path: "/order/check",
+        badge: this.orderBadge.check
       },
       {
         name: "待结算",

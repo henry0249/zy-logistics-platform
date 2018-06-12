@@ -11,6 +11,10 @@ module.exports = {
     name: '运输价',
     type: 'Number'
   },
+  history: {
+    name: '历史价格标识',
+    type: 'Boolean'
+  },
   parent: {
     name: '上次价格',
     type: 'ObjectId',

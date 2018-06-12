@@ -45,9 +45,9 @@ ajax.interceptors.response.use(response => {
     store.commit('setToken', {
       token: response.headers.refleshtoken,
       exp: response.headers.tokenexp
-    })
+    });
   }
-  return Promise.resolve(response.data)
+  return Promise.resolve(response.data);
 }, err => {
   MessageBox.confirm(`${err.response.status}:${err.response.data.message || err.message }`, '提示', {
     showCancelButton: false,
@@ -56,6 +56,10 @@ ajax.interceptors.response.use(response => {
     center: true
   });
   if(err.response.status === 401){
+    store.commit('setToken', {
+      token: '',
+      exp: ''
+    });
     router.replace('/');
   }
   // .then(() => {

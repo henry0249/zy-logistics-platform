@@ -1,10 +1,5 @@
 module.exports = {
-  area: {
-    name: '收货地址',
-    type: 'ObjectId',
-    ref: 'Area'
-  },
-  goods:{
+  goods: {
     type: 'ObjectId',
     name: '商品信息',
     ref: 'Goods'
@@ -48,5 +43,21 @@ module.exports = {
     name: '售价',
     type: 'Number',
     require: true
+  },
+  balanced: {
+    name: '已结算',
+    type: 'Boolean'
+  },
+  balancedNumber: {
+    name: '已结算金额',
+    type: 'Number'
+  },
+  invoiced: {
+    name: '已开发票',
+    type: 'Boolean'
+  },
+  invoicedNumber: {
+    name: '已开票金额',
+    type: 'Number'
   },
 }
