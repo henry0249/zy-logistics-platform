@@ -102,5 +102,11 @@ export default {
 <style>
 .g-order-container {
   padding: 3% 5%;
+  min-height: calc(100vh - 50px);
+}
+.g-order-body{
+  padding: 3%;
+  border:1px solid #eee;
+  border-radius: 4px
 }
 </style>

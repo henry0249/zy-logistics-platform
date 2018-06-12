@@ -68,6 +68,9 @@ class PlatformService extends Service {
       name: '业务专员',
       path: 'salesman'
     }, {
+      name: '单据文员',
+      path: 'documentClerk'
+    }, {
       name: '财务文员',
       path: 'financial'
     }];
@@ -87,9 +90,6 @@ class PlatformService extends Service {
     }, {
       name: '市场专员',
       path: 'salesman'
-    }, {
-      name: '审核员',
-      path: 'auditor'
     }, {
       name: '物流专员',
       path: 'dispatcher'
