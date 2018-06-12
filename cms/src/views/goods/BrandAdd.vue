@@ -83,6 +83,7 @@
             console.log(res);
           } catch (error) {}
           this.loadingText = '';
+          this.$router.go(0)
         } else {
           this.$alert('名称必填', '提示', {
             confirmButtonText: '确定',

@@ -4,8 +4,10 @@
       <span class="see-span">{{item.keyValue}}</span>
       <span class="right-span" v-if="item.type == 'switch'">{{item.value?'支持':'不支持'}}</span>
       <span class="right-span" v-else-if="item.type === 'Arr'">{{Arrfilter(item.key)}}</span>
+      <span class="right-span" v-else-if="item.type === 'brankCategory'">{{brandCategoryFilter(item.key)}}</span>
       <span class="right-span" v-else>{{filterMethods(index,item.key)}}</span>
     </div>
+    <div class="flex list-box" v-if="str === 'goods'">goods</div>
   </div>
 </template>
 
@@ -30,6 +32,15 @@
       }
     },
     methods: {
+      brandCategoryFilter(val) {
+        let arr = val.split('.')
+        let str = ''
+        this.keyData[arr[0]].forEach(item => {
+          console.log('item',item[arr[1]]);
+          str += item[arr[1]] + '、';
+        });
+        return str.substr(0, str.length - 1)
+      },
       Arrfilter(key) {
         let str = ''
         this.keyData[key].forEach(keyItem => {
@@ -79,7 +90,7 @@
             curdType: 'find',
             _id: this.myid
           }
-          console.log(res);
+          console.log('111111',res);
         } catch (error) {}
       }
     },

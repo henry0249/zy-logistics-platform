@@ -118,4 +118,10 @@
     align-items: center;
     flex-direction: row;
   }
+  .name-txt {
+    color: #42a5f5;
+  }
+  .name-txt:hover {
+    text-decoration: underline;
+  }
 </style>

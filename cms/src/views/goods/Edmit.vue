@@ -1,5 +1,5 @@
 <template>
-  <edmit-tem v-model="loadingText" :goods="goods" :category="category" :mfrs="mfrs" :brand="brand" :tableList="tableList" :area="area">
+  <edmit-tem v-model="loadingText" :str="str" :goods="goods" @sub="sub" :category="category" :mfrs="mfrs" :brand="brand" :tableList="tableList" :area="area">
   </edmit-tem>
 </template>
 
@@ -8,6 +8,12 @@
   export default {
     components: {
       EdmitTem
+    },
+    props: {
+      str: {
+        type: String,
+        default: ''
+      },
     },
     data() {
       return {
@@ -33,12 +39,69 @@
       }
     },
     methods: {
+      async sub(val) {
+        console.log(val);
+        this.loadingText = '更新中'
+        let io = true
+        try {
+          let goods = await this.$api.curd({
+            model: 'goods',
+            curdType: 'update',
+            find: {
+              _id: this.$route.params._id
+            },
+            update: val.goods
+          })
+          for (let index = 0; index < val.tableList.length; index++) {
+            let price = await this.$api.curd({
+              model: 'price',
+              curdType: 'add',
+              factory: val.tableList[index].factory,
+              sell: val.tableList[index].sell,
+              transport: val.tableList[index].transport,
+              area: val.tableList[index].address[val.tableList[index].address.length - 1],
+              parent: val.tableList[index]._id,
+              goods: this.$route.params._id
+            })
+            console.log('newPrice', price);
+            let addOld = await this.$api.curd({
+              model: 'price',
+              curdType: 'update',
+              find: {
+                _id: val.tableList[index]._id
+              },
+              update: {
+                history: true,
+              }
+            })
+          }
+        } catch (error) {
+          io = false
+        }
+        this.loadingText = ''
+        if (io) {
+          this.$alert('更新成功', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {
+              this.$router.go(-1)
+            }
+          });
+        } else {
+          this.$alert('更新失败', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {
+              // this.$router.go(-1)
+            }
+          });
+        }
+      },
       async getBrand() {
         try {
           let res = await this.$api.curd({
             model: 'brand',
             curdType: 'find',
           })
+          console.log('brand', res);
           res.forEach(item => {
             let obj = {}
             obj.name = item.name
@@ -56,6 +119,7 @@
               $in: ['shipper']
             }
           })
+          console.log('mfrs', res);
           res.forEach(item => {
             let obj = {}
             obj.name = item.name
@@ -73,6 +137,7 @@
               path: 'parent'
             }]
           })
+          console.log('category', res);
           res.forEach(item => {
             let obj = {}
             obj.name = item.name
@@ -97,6 +162,7 @@
               path: 'platform'
             }]
           })
+          console.log('goods', res);
           for (const key in this.goods) {
             if (this.goods.hasOwnProperty(key)) {
               if (key === 'category') {
@@ -122,56 +188,45 @@
           let res = await this.$api.curd({
             model: 'price',
             curdType: 'find',
-            goods: this.$route.params._id
-          })
-          let i = new Set();
-          res.forEach(resItem => {
-            i.add(resItem.area)
-          });
-          for (let index = 0; index < [...i].length; index++) {
-            let obj = {
-              address: [],
-              factory: 0,
-              sell: 0,
-              transport: 0
+            goods: this.$route.params._id,
+            history: {
+              $exists: false
             }
-            let price = await this.$api.curd({
-              model: 'price',
-              curdType: 'find',
-              goods: this.$route.params._id,
-              area: [...i][index],
-              populate: [{
-                path: 'area',
-                // populate: [{
-                //   path: 'city'
-                // }, {
-                //   path: 'county'
-                // }, {
-                //   path: 'province'
-                // }]
-              }],
+          })
+          console.log('price', res);
+          for (let index = 0; index < res.length; index++) {
+            let obj = {};
+            let area = await this.$api.curd({
+              model: 'area',
+              curdType: 'findOne',
+              _id: res[index].area
             })
-            let io = true
-            for (const key in this.field.Area.type.option) {
-              if (this.field.Area.type.option.hasOwnProperty(key)) {
-                if (key === price[0].area.type) {
-                  obj.address.push(price[0].area._id)
-                  io = false
-                } else {
-                  if (io) {
-                    obj.address.push(price[0].area[key])
-                  }
-                }
+            if (area) {
+              obj.address = []
+              if (area.province) {
+                obj.address.push(area.province)
+              }
+              if (area.city) {
+                obj.address.push(area.city)
+              }
+              if (area.county) {
+                obj.address.push(area.county)
+              }
+              if (area.township) {
+                obj.address.push(area.township)
               }
             }
-            price.forEach(priceItem => {
-              obj[priceItem.type] = priceItem.value
-            });
-            console.log('object', obj.address);
+            obj.address.push(area._id)
+            obj._id = res[index]._id;
+            obj.factory = res[index].factory;
+            obj.sell = res[index].sell;
+            obj.transport = res[index].transport;
             this.tableList.push(obj)
           }
           console.log('this.tableList', this.tableList);
-        } catch (error) {}
+        } catch (error) {
+          console.log(error);
+        }
       }
     },
     async created() {
@@ -183,21 +238,6 @@
       await this.getArea();
       await this.getPrice();
       this.loadingText = '';
-      // let arr = [450000, 450800, 450802, 450802101];
-      // let tableList = []
-      // let obj = {
-      //   address: [],
-      //   factory: 0,
-      //   sell: 0,
-      //   transport: 0
-      // }
-      // arr.forEach(item => {
-      //   obj.address.push(item)
-      // });
-      // tableList.push(obj)
-      // console.log(tableList);
-      // this.tableList = JSON.parse(JSON.stringify(tableList))
-      // console.log(this.tableList);
     }
   }
 </script>

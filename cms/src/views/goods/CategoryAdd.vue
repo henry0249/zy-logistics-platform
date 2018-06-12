@@ -6,7 +6,7 @@
           <div class="flex form-box">
             <my-form-item style="margin-top:20px" class="form-right" input v-model="category.name" filterable label="分类名">
             </my-form-item>
-            <my-form-item style="margin-top:20px" select v-model="category.parent" label="上级分类" :options="parent">
+            <my-form-item v-if="parent.length >0 && $route.path ==='/goods/category/2'" style="margin-top:20px" select v-model="category.parent" label="上级分类" :options="parent">
             </my-form-item>
             <my-form-item style="margin-top:20px" type="textarea" autosize class="form-right" input v-model="category.desc" filterable label="描述">
             </my-form-item>
@@ -29,23 +29,23 @@
       parent: {
         type: Array,
         default () {
-          return []
+          return [];
         }
-      },
+      }
     },
     data() {
       return {
-        loadingText: '',
+        loadingText: "",
         category: {
-          name: '',
-          cover: '',
-          desc: '',
-          remark: '',
-          parent: ''
+          name: "",
+          cover: "",
+          desc: "",
+          remark: "",
+          parent: ""
         },
         inputVisible: false,
-        inputValue: "",
-      }
+        inputValue: ""
+      };
     },
     methods: {
       handleInputConfirm(options) {
@@ -66,43 +66,43 @@
         });
       },
       cancel() {
-        this.$emit('update:show', false)
+        this.$emit("update:show", false);
       },
       async sub() {
         if (this.category.name) {
           try {
-            this.loadingText = '加载中';
+            this.loadingText = "加载中";
             let data = {
-              model: 'category',
-              curdType: 'add',
+              model: "category",
+              curdType: "add",
               name: this.category.name,
               desc: this.category.desc,
-              remark: this.category.remark,
-            }
+              remark: this.category.remark
+            };
             if (this.category.parent) {
-              data.parent = this.category.parent
+              data.parent = this.category.parent;
             }
-            let res = await this.$api.curd(data)
+            let res = await this.$api.curd(data);
             console.log(res);
             if (res) {
-              this.$alert('添加成功', '提示', {
-                confirmButtonText: '确定',
+              this.$alert("添加成功", "提示", {
+                confirmButtonText: "确定",
                 callback: action => {
-                  this.$router.go(0)
+                  this.$router.go(0);
                 }
               });
             }
           } catch (error) {}
-          this.loadingText = '';
+          this.loadingText = "";
         } else {
-          this.$alert('名称必填', '提示', {
-            confirmButtonText: '确定',
+          this.$alert("名称必填", "提示", {
+            confirmButtonText: "确定",
             callback: action => {}
           });
         }
-      },
-    },
-  }
+      }
+    }
+  };
 </script>
 
 <style scoped>
@@ -119,7 +119,7 @@
     flex-wrap: wrap;
   }
   .form-right {
-    margin-right: 20px
+    margin-right: 20px;
   }
   .edmit-tag {
     flex-direction: row;

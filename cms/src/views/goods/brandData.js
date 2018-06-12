@@ -1,6 +1,7 @@
 let categoryThead = {
   'name': {
     readOnly: true,
+    slot:true,
     name: '品牌名',
   },
   "tag": {
@@ -45,9 +46,9 @@ let keyArr = [{
   }, {
     key: 'category.name',
     value: null,
-    type: 'select',
+    type: 'brankCategory',
     keyValue: '分类',
-    options: []
+    // options: []
   }
 ]
 module.exports = {

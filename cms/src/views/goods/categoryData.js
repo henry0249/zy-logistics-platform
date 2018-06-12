@@ -1,6 +1,7 @@
 let categoryThead = {
   'name': {
     readOnly: true,
+    slot:true,
     name: '分类名'
   },
   "desc": {

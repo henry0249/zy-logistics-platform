@@ -1,6 +1,6 @@
 <template>
   <loading-box class="goods-box" v-model="loadingText">
-    <my-table index size="mini" edit :thead="tableHeader" :data.sync="tableList" op @op="op">
+    <my-table index size="mini" edit :thead="tableHeader" :data.sync="tableList">
       <div slot="header" class="flex header-box">
         <div class="flex search-box">
           <el-input size="mini" clearable placeholder="请输入品牌名或类型" @clear="clear" v-model="input">
@@ -14,14 +14,15 @@
           <el-button type="primary" size="mini" @click="add">添加</el-button>
         </div>
       </div>
-      <template slot-scope="scope" v-if="scope.column.property === 'category' ||scope.column.property === 'tag' ">
-                                        <el-tag v-if="scope.column.property === 'category'" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['category']" :key="item.id">
-                                          {{item.name}}</el-tag>
-                                        <el-tag v-if="scope.column.property === 'tag'" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+      <template slot-scope="scope" v-if="scope.column.property === 'category' ||scope.column.property === 'tag' || scope.column.property === 'name' ">
+                                            <el-tag v-if="scope.column.property === 'category'" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['category']" :key="item.id">
+                                              {{item.name}}</el-tag>
+                                            <el-tag v-if="scope.column.property === 'tag'" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+                          <i title="点击查看详情" class="pointer name-txt" v-if="scope.column.property === 'name'" @click="op({type:'read',value:scope})">{{scope.row['name']}}</i>
 </template>
     </my-table>
     <el-dialog width="70%" :title="title" :visible.sync="show">
-      <component :show.sync="show" :is="componentName" :key-arr="keyArr" :key-data="keyData" :str="str"></component>
+      <component :show.sync="show" :is="componentName" :key-arr="keyArr" :key-data="keyData" :str="str" :category="category"></component>
     </el-dialog>
   </loading-box>
 </template>
@@ -136,20 +137,12 @@
         this.show = true;
       },
       op(val) {
-        if (val.type === "read") {
-          this.componentName = "SeeModel";
+          this.componentName = "CategoryEdmit";
           this.title = "查看详情";
           this.keyData = val.value.row;
+          console.log(this.keyData);
           this.str = this.$route.path;
           this.show = true;
-        } else if (val.type === "edit") {
-          this.componentName = "CategoryEdmit";
-          this.title = "修改信息";
-          this.keyData = val.value.row;
-          console.log(this.keyData.name);
-          this.str = this.$route.path;
-          this.show = true;
-        }
       },
       async getData(data) {
         try {
@@ -216,5 +209,11 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
+  }
+  .name-txt {
+    color: #42a5f5;
+  }
+  .name-txt:hover {
+    text-decoration: underline;
   }
 </style>

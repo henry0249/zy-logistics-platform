@@ -10,13 +10,11 @@
             </my-form-item>
             <div class="flex form-select-box">
               <div style="width: 60px; font-size: 12px;">分类</div>
-              <el-select size="mini" v-model="brand.category" multiple placeholder="请选择">
+              <el-select size="mini" v-model="brand.category" multiple placeholder="请选择" @change="change">
                 <el-option v-for="item in category" :key="item.id" :label="item.name" :value="item._id">
                 </el-option>
               </el-select>
             </div>
-            <!-- <my-form-item style="margin-top:20px" multiple select v-model="brand.category" label="分类" :options="category">
-                  </my-form-item> -->
           </div>
           <div class="flex edmit-tag">
             <i style="width:60px">标签</i>
@@ -40,6 +38,12 @@
 <script>
   export default {
     props: {
+      category: {
+        type: Array,
+        default () {
+          return []
+        }
+      },
       keyData: {
         type: Object,
         default () {
@@ -58,19 +62,48 @@
     data() {
       return {
         loadingText: '',
-        brand: {
-          name: '',
-          cover: '',
-          type: '',
-          category: ["5b037c655cb52f8438c262b6"],
-          tag: []
-        },
-        category: [],
+        // brand: {
+        //   name: '',
+        //   cover: '',
+        //   type: '',
+        //   category: [],
+        //   tag: []
+        // },
+        // category: [],
         inputVisible: false,
         inputValue: "",
       }
     },
+    computed: {
+      brand() {
+        let obj = {
+          name: '',
+          cover: '',
+          type: '',
+          category: [],
+          tag: []
+        };
+        obj.name = this.keyData.name
+        obj.type = this.keyData.type
+        obj.tag = this.keyData.tag
+        this.keyData.category.forEach(item => {
+          obj.category.push(item._id)
+        });
+        return obj
+      },
+      test() {
+        let arr = []
+        this.keyData.category.forEach(item => {
+          arr.push(item._id)
+        });
+        this.brand.category = arr
+        return arr
+      }
+    },
     methods: {
+      change(val) {
+        console.log(val);
+      },
       handleInputConfirm(options) {
         let inputValue = this.inputValue;
         if (inputValue) {
@@ -142,13 +175,10 @@
     },
     async created() {
       console.log('keyData', this.keyData);
-      this.brand.name = this.keyData.name
-      this.brand.type = this.keyData.type
-      this.brand.tag = this.keyData.tag
       // this.keyData.category.forEach(item => {
       //   this.brand.category.push(item._id)
       // });
-      await this.getData();
+      // await this.getData();
     }
   }
 </script>

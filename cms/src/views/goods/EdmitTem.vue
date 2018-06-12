@@ -2,8 +2,8 @@
   <loading-box v-model="value">
     <div class="g-order-create">
       <div class="g-order">
-        <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
-          <strong>修改商品</strong>
+        <div v-if="!value" class="flex ac jc" style="font-size:22px;padding-bottom:20px">
+          <strong>{{$route.query.str === 'read'?'查看详情':'修改商品'}}</strong>
         </div>
         <my-form size="mini" width="24%" style="margin:15px 0" v-if="!value">
           <div class="flex form-box">
@@ -40,25 +40,25 @@
             </div>
           </div>
         </my-form>
-        <my-form-item size="mini" v-model="goods.detail" width="100%" class="form-right" input type="textarea" autosize label="订单备注">
+        <my-form-item size="mini" v-model="goods.detail" width="100%" class="form-right" input type="textarea" autosize label="商品详情">
         </my-form-item>
-        <my-table v-if="!value" style="margin-top:20px;" border index size="mini" edit :thead="tableTeader" :data.sync="tableList" op>
+        <my-table style="margin-top:20px;" border index size="mini" edit :thead="tableTeader" :data.sync="tableList" op>
           <div slot="op" slot-scope="scope">
             <i v-if="tableList.length>1" title="删除该地区" class="pointer" style="margin-right:10px" @click="delAdr(scope['index'])">
-                                                                              <icon size="16px">icon-ec1</icon>
-                                                                            </i>
+                                                                                  <icon size="16px">icon-ec1</icon>
+                                                                                </i>
             <i v-if="scope['index'] === tableList.length - 1" title="增加一个地区" class="pointer" @click="addAdr">
-                                                                              <icon size="16px">icon-54</icon>
-                                                                            </i>
+                                                                                  <icon size="16px">icon-54</icon>
+                                                                                </i>
           </div>
           <template slot-scope="scope" v-if="scope.column.property === 'address'">
-                  <my-form-item :change-on-select="true" size="mini" style="width:100%" v-model="scope.row[scope.column.property]" area  placeholder="选择数据" @change="areaChange"/>
+                      <my-form-item :change-on-select="true" size="mini" style="width:100%" v-model="scope.row[scope.column.property]" area  placeholder="选择数据" @change="areaChange"/>
 </template>
         </my-table>
       </div>
       <div class="tr" style="margin-top:30px">
-      <el-button size="small" @click="$router.go(-1)">取 消</el-button>
-      <el-button size="small" type="primary" @click="sub">添 加</el-button>
+      <el-button size="small" @click="$router.go(-1)">返 回</el-button>
+      <el-button size="small" type="primary" @click="sub">修 改</el-button>
       </div>
     </div>
   </loading-box>
@@ -67,6 +67,10 @@
 <script>
   export default {
     props: {
+      str: {
+        type: String,
+        default: ''
+      },
       value: {
         type: String,
         default: ''
@@ -106,9 +110,6 @@
       return {
         inputVisible: false,
         inputValue: '',
-        // brand: [],
-        // mfrs: [],
-        // category: [],
         tableTeader: {
           address: {
             name: "地区",
@@ -165,7 +166,12 @@
         let obj = JSON.parse(JSON.stringify(this.tableList[this.tableList.length - 1]));
         this.tableList.push(obj);
       },
-      sub() {},
+      sub() {
+        this.$emit('sub', {
+          goods: this.goods,
+          tableList: this.tableList
+        })
+      },
     },
     async created() {
       this.$emit('input', this.value)

@@ -1,20 +1,26 @@
 let goodsThead = {
+  "name": {
+    readOnly: true,
+    slot: true,
+    name: '名称'
+  },
   "brand.name": {
+    readOnly: true,
     name: '品牌'
   },
   "category.name": {
+    readOnly: true,
     name: '分类'
   },
-  "name": {
-    name: '名称'
-  },
+
   "unit": {
+    readOnly: true,
     name: '单位'
   },
   "tag": {
     name: '标签',
     readOnly: true,
-    slot:true
+    slot: true
   }
 }
 let populate = [{

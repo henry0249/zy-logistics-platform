@@ -45,14 +45,14 @@
         <my-table style="margin-top:20px;" border index size="mini" edit :thead="tableTeader" :data.sync="tableList" op>
           <div slot="op" slot-scope="scope">
             <i v-if="tableList.length>1" title="删除该地区" class="pointer" style="margin-right:10px" @click="delAdr(scope['index'])">
-                                    <icon size="16px">icon-ec1</icon>
-                                  </i>
+                                                              <icon size="16px">icon-ec1</icon>
+                                                            </i>
             <i v-if="scope['index'] === tableList.length - 1" title="增加一个地区" class="pointer" @click="addAdr">
-                                    <icon size="16px">icon-54</icon>
-                                  </i>
+                                                              <icon size="16px">icon-54</icon>
+                                                            </i>
           </div>
           <template slot-scope="scope" v-if="scope.column.property === 'address'">
-                                  <my-form-item :change-on-select="true" size="mini" style="width:100%" label="区域数据" v-model="scope.row[scope.column.property]" :area="area" :level="areaLevel" placeholder="选择数据" @change="areaChange"/>
+                                      <my-form-item :change-on-select="true" size="mini" style="width:100%" v-model="scope.row[scope.column.property]" area  placeholder="选择数据" @change="areaChange"/>
 </template>
         </my-table>
       </div>
@@ -118,7 +118,7 @@
           }
         },
         tableList: [{
-          address: {},
+          address: [],
           factory: 0,
           sell: 0,
           transport: 0
@@ -185,42 +185,65 @@
           let res = await this.$api.curd(obj)
           if (res) {
             await this.addPrice(res._id)
+          } else {
+            this.$alert('添加商品失败', '提示', {
+              confirmButtonText: '确定',
+              callback: action => {}
+            });
           }
-        } catch (error) {
-        }
+        } catch (error) {}
       },
       async addPrice(id) {
+        let io = true
         for (let index = 0; index < this.tableList.length; index++) {
-          for (const key in this.tableList[index]) {
-            if (this.tableList[index].hasOwnProperty(key)) {
-              if (key !== 'address') {
-                let _id = ''
-                for (const k in this.area) {
-                  if (this.area.hasOwnProperty(k)) {
-                    if (this.area[k].length > 0) {
-                      this.area[k].forEach(item => {
-                        if (Number(this.tableList[index].address[this.tableList[index].address.length - 1]) === item.key) {
-                          _id = item._id
-                        }
-                      });
-                    }
-                  }
-                }
-                if (_id !== '') {
-                  let priceOp = {
-                    model: 'price',
-                    curdType: 'add',
-                    area: _id,
-                    goods: id,
-                    value: this.tableList[index][key],
-                    type: key
-                  }
-                  let price = await this.$api.curd(priceOp)
-                } else {
-                }
-              }
-            }
+          let price = await this.$api.curd({
+            model: 'price',
+            curdType: 'set',
+            goods: id,
+            factory: this.tableList[index].factory,
+            sell: this.tableList[index].sell,
+            transport: this.tableList[index].transport,
+            area: this.tableList[index].address[this.tableList[index].address.length - 1],
+          })
+          if (!price) {
+            io = false
           }
+        }
+        if (io) {
+          this.$confirm('添加成功', '提示', {
+            confirmButtonText: '继续添加',
+            cancelButtonText: '前往商品列表',
+            type: 'success'
+          }).then(() => {
+            this.goods = {
+              name: '',
+              unit: '',
+              spec: '',
+              category: '',
+              brand: '',
+              mfrs: '',
+              saleState: '',
+              selfDeliverySupport: false,
+              freeDelivery: false,
+              tag: [],
+              detail: '',
+            }
+            this.tableList = [{
+              address: [],
+              factory: 0,
+              sell: 0,
+              transport: 0
+            }]
+          }).catch(() => {
+            this.$router.push({
+              path: '/goods/list'
+            })
+          });
+        } else {
+          this.$alert('添加失败', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {}
+          });
         }
       },
       async sub() {
@@ -324,8 +347,7 @@
       async getArea() {
         try {
           this.area = await this.$api.getArea()
-        } catch (error) {
-        }
+        } catch (error) {}
       },
     },
     async created() {
