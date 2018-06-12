@@ -1,10 +1,5 @@
 module.exports = {
   goods: {
-    // brand: {
-    //   name: "品牌",
-    //   type: "ObjectId",
-    //   readOnly: true
-    // },
     goods: {
       name: "商品",
       type: "String",
@@ -107,5 +102,41 @@ module.exports = {
       type: 'Number',
       require: true
     }
+  },
+  logistics: {
+    stockOutCount: {
+      name: '出库数量',
+      type: 'Number',
+      require: true
+    },
+    receiptCount: {
+      name: '收货数量',
+      type: 'Number',
+      require: true
+    },
+    unitPrice: {
+      name: '运费单价',
+      type: 'Number',
+      require: true
+    },
+    startAt: {
+      name: '出发时间',
+      type: 'Date',
+    },
+    finishAt: {
+      name: '送达时间',
+      type: 'Date'
+    },
+    state: {
+      type: 'String',
+      name: '状态',
+      option: {
+        0: '接单',
+        1: '待装',
+        2: '在途',
+        3: '待卸',
+        4: '完成'
+      }
+    },
   }
 }

@@ -1,8 +1,5 @@
 <template>
   <div class="g-business-trains">
-    <div style="padding:15px 0">
-      贸易链配置
-    </div>
     <el-tabs type="border-card" style="box-shadow:none">
       <el-tab-pane :label="item.value.name " v-for="item in order.goods" :key="item._id">
         <my-table opWidth="45" size="mini" index border edit op :thead="thead" :data.sync="data">

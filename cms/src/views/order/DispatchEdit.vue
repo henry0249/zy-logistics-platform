@@ -1,8 +1,12 @@
 <template>
-  <loading-box v-model="loadingText" style="min-height:calc(100vh-50px)">
-    <div class="g-order-container" v-if="!loadingText">
+  <loading-box v-model="loadingText" class="g-order-container">
+    <div class="g-order-body" v-if="!loadingText">
+      <div></div>
       <Info title="订单调度" :data.sync="order"></Info>
-      <goods-table :order="order" :data.sync="goods" style="margin-top:15px"></goods-table>
+      <div class="tc sub-title">商品信息</div>
+      <goods-table :order="order" :data.sync="goods"></goods-table>
+      <div class="tc sub-title">物流链</div>
+      <transport-trains  :order="order" :data.sync="transport"></transport-trains>
     </div>
   </loading-box>
 </template>
@@ -10,16 +14,19 @@
 <script>
 import Info from "./Info.vue";
 import GoodsTable from "./GoodsTable.vue";
+import TransportTrains from "./TransportTrains";
 export default {
   components: {
     Info,
-    GoodsTable
+    GoodsTable,
+    TransportTrains
   },
   data() {
     return {
       loadingText: "",
       order: {},
-      goods: []
+      goods: [],
+      transport: []
     };
   },
   methods: {
@@ -38,4 +45,9 @@ export default {
 </script>
 
 <style scoped>
+.sub-title {
+  color: #aaa;
+  font-size: 16px;
+  padding: 15px 0;
+}
 </style>
