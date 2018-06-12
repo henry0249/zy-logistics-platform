@@ -8,7 +8,7 @@
           <div>订单号：{{orderInfo.createdAt | date2no}}</div>
         </div>
         <div class="tc" style="font-size:22px;padding-bottom:15px">
-          <strong>订单配货</strong>
+          <strong>订单详情</strong>
         </div>
         <my-form v-show="!hideForm" size="mini" width="24%" style="margin-top:15px">
           <div class="flex ac jb">

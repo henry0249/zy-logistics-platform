@@ -146,10 +146,14 @@ export default {
     if (localStorage.token) {
       try {
         sti = setInterval(async () => {
-          let res = await this.$store.dispatch("orderBadgeNotify");
-          let { newBadge, oldBadge } = res;
-          for (const key in newBadge) {
-            this.badgeNotify(newBadge[key], oldBadge[key], key);
+          if (localStorage.token) {
+            let res = await this.$store.dispatch("orderBadgeNotify");
+            let { newBadge, oldBadge } = res;
+            for (const key in newBadge) {
+              this.badgeNotify(newBadge[key], oldBadge[key], key);
+            }
+          } else {
+            window.clearInterval(sti);
           }
         }, 20000);
       } catch (error) {}

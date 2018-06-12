@@ -99,5 +99,8 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+.g-order-container {
+  padding: 3% 5%;
+}
 </style>

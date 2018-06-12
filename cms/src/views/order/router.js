@@ -7,6 +7,7 @@ import CheckEdit from './CheckEdit.vue';
 import Distribution from './Distribution.vue';
 import DistributionEdit from './DistributionEdit.vue';
 import Dispatch from './Dispatch.vue';
+import DispatchEdit from './DispatchEdit.vue';
 import Settlement from './Settlement.vue';
 
 export default [{
@@ -42,10 +43,13 @@ export default [{
     path: '/edit/taking/:_id',
     component: TakingEdit,
   }, {
-    path: '/edit/check/:_id',
-    component: CheckEdit,
+    path: '/edit/dispatch/:_id',
+    component: DispatchEdit,
   }, {
     path: '/edit/distribution/:_id',
     component: DistributionEdit,
+  }, {
+    path: '/edit/check/:_id',
+    component: CheckEdit,
   }]
 }]

@@ -3,7 +3,7 @@
     <div>
       <my-table border size="mini" height="100vh - 50px" index :loadmore="loadmore" :thead="thead" :data.sync="data">
         <template slot-scope="scope">
-          <span @click="$router.push('/edit/distribution/'+scope.row._id)" class="link" v-if="scope.prop==='_id'">
+          <span @click="$router.push('/edit/dispatch/'+scope.row._id)" class="link" v-if="scope.prop==='_id'">
             {{scope.row.createdAt | date2no}}
           </span>
           <span v-if="scope.prop==='customer'">
