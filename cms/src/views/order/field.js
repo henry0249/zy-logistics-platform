@@ -104,6 +104,10 @@ module.exports = {
     }
   },
   logistics: {
+    transport: {
+      name: '车/船',
+      slot:true
+    },
     stockOutCount: {
       name: '出库数量',
       type: 'Number',

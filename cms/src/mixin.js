@@ -24,5 +24,10 @@ Vue.mixin({
     $state() {
       return this.$store.state;
     },
+  },
+  methods: {
+    back() {
+      this.$router.go(-1);
+    }
   }
 })

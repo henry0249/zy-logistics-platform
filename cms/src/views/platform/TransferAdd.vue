@@ -1,7 +1,11 @@
 <template>
   <loading-box v-model="loadingText">
     <div class="g-area-add">
-      <h2 class="tc">添加区域</h2>
+      <h2 class="tc">添加中转点</h2>
+      <div>
+        <my-form-item size="small" input v-model="name" label="中转地名称">
+        </my-form-item>
+      </div>
       <div class="flex ac" style="margin:20px 0">
         <div style="padding-right:20px">选择类型</div>
         <el-select style="width:10%" size="small" v-model="type" placeholder="请选择" @change="typeChange">
@@ -26,7 +30,8 @@ export default {
   data() {
     return {
       loadingText: "",
-      areaLoading:"",
+      areaLoading: "",
+      name: "",
       type: 3,
       area: [],
       options: [

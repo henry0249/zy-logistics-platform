@@ -5,6 +5,8 @@ import Company from './Company.vue';
 import User from './User.vue';
 import Area from './Area.vue';
 import AreaAdd from './AreaAdd.vue';
+import Transfer from './Transfer.vue';
+import TransferAdd from './TransferAdd.vue';
 import CompanyEdmit from './CompanyEdmit.vue';
 import CompanyAdd from './CompanyAdd.vue';
 
@@ -30,6 +32,12 @@ export default [{
   }, {
     path: 'areaAdd',
     component: AreaAdd
+  }, {
+    path: 'transfer',
+    component: Transfer
+  }, {
+    path: 'transferAdd',
+    component: TransferAdd
   }, {
     path: 'company_edmit/:_id',
     component: CompanyEdmit

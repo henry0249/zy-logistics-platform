@@ -21,7 +21,7 @@
         </my-form-item>
         <my-form-item input v-model="order.contactNumber" label="联系电话">
         </my-form-item>
-        <my-form-item v-model="areaSelect" area filterable @change="areaCascaderChange" label="送货地址">
+        <my-form-item v-model="areaSelect" area filterable @change="areaCascaderChange" :show-all-levels="false" label="送货地址">
         </my-form-item>
       </div>
       <my-form-item width="100%" style="margin:15px 0" input v-model="order.address" label="详细地址">

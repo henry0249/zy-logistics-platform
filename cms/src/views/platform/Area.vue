@@ -33,7 +33,6 @@ export default {
       },
       data: [],
       limit: 10,
-      dialogVisible: false,
       areaFilter: {}
     };
   },

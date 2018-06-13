@@ -53,6 +53,11 @@ export default {
         name: "区域管理",
         icon: "icon-quyu",
         path: "/platform/area",
+      },
+      {
+        name: "中转点管理",
+        icon: "icon-dibiaozhongzhuan1",
+        path: "/platform/transfer",
       }
     ];
   }

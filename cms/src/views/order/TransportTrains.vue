@@ -8,15 +8,11 @@
               物流链{{index+1}}
             </div>
             <div class="f1"></div>
-            <div class="border-right border-left" style="padding:5px 10px">
-              出发地
-            </div>
-            <input v-model="trainsItem.origin" class="trains-input" type="text" />
-            <div class="border-right border-left" style="padding:5px 10px">
-              目的地
-            </div>
-            <input v-model="trainsItem.destination" class="trains-input" type="text" />
-            <div class="tc" style="width:45px;border-left:1px solid #eee;padding:5px 0">
+            <my-form-item area style="width:30%;padding:0 10px" size="mini" v-model="trainsItem.origin" :show-all-levels="false" label="出发地">
+            </my-form-item>
+            <my-form-item area style="width:30%;padding:0 10px" size="mini" v-model="trainsItem.destination" :show-all-levels="false" label="目的地">
+            </my-form-item>
+            <div class="tc" style="width:45px;border-left:1px solid #eee;padding:10px 0">
               <i @click="transportTrainsAdd(trainsItem,index)" v-if="index === transportTrains.length-1" style="color:#67C23A" class="el-icon-plus pointer"></i>
               <i @click="transportTrainsRemove(index)" v-else style="color:#F56C6C" class="el-icon-delete pointer"></i>
             </div>
@@ -101,7 +97,7 @@ export default {
   color: #333;
 }
 .trains-title {
-  padding: 5px 10px;
+  padding: 10px 10px;
   border-right: 1px solid #eee;
   color: #42a5f5;
 }
@@ -114,7 +110,7 @@ export default {
 .trains-input {
   border: none;
   outline: none;
-  padding: 5px 10px;
+  padding: 10px 10px;
   border-bottom: 1px solid #64b5f6;
   box-sizing: border-box;
 }
