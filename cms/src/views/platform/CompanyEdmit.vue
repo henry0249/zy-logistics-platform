@@ -5,14 +5,14 @@
         <div v-if="!loadingText" class="flex ac jc" style="font-size:22px;padding-bottom:20px">
           <strong>公司详情</strong>
         </div>
-        <company-edmit-item @sub="sub"></company-edmit-item>
+        <company-edmit-item :loadingText.sync="loadingText" @sub="sub" :data="data"></company-edmit-item>
       </div>
     </div>
   </loading-box>
 </template>
 
 <script>
-import CompanyEdmitItem from './CompanyEdmitItem';
+  import CompanyEdmitItem from './CompanyEdmitItem';
   export default {
     components: {
       CompanyEdmitItem
@@ -20,22 +20,27 @@ import CompanyEdmitItem from './CompanyEdmitItem';
     data() {
       return {
         loadingText: '',
-
+        data: {},
       }
     },
     methods: {
-      sub(val){
+      sub(val) {
         console.log(val);
       },
       async getData() {
         try {
-          let res = await this.$api.curd({
+          this.loadingText = '加载中'
+          this.data = await this.$api.curd({
             model: 'company',
             curdType: 'findOne',
-            _id: this.$route.params._id
+            _id: this.$route.params._id,
+            populate: [{
+              path: 'platform'
+            }]
           })
-          console.log(res);
+          console.log(this.data);
         } catch (error) {}
+        this.loadingText = '';
       }
     },
     async created() {

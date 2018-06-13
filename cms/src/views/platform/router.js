@@ -6,6 +6,7 @@ import User from './User.vue';
 import Area from './Area.vue';
 import AreaAdd from './AreaAdd.vue';
 import CompanyEdmit from './CompanyEdmit.vue';
+import CompanyAdd from './CompanyAdd.vue';
 
 export default [{
   path: '/platform',
@@ -32,5 +33,8 @@ export default [{
   }, {
     path: 'company_edmit/:_id',
     component: CompanyEdmit
+  }, {
+    path: 'company_add',
+    component: CompanyAdd
   }]
 }]

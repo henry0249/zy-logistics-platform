@@ -1,6 +1,6 @@
 <template>
   <div>
-    <my-form size="mini" width="24%" style="margin:15px 0">
+    <my-form size="mini" width="24%" style="margin:15px 0" v-if="!loadingText">
       <div class="flex form-box">
         <my-form-item class="form-right" input v-model="companyData.name" filterable label="公司名称"></my-form-item>
       </div>
@@ -14,42 +14,71 @@
 
 <script>
   export default {
-    data() {
-      return {
-        companyData: {
-          name: '',
-          type: '',
-          mobile: '',
-          tel: '',
-          self: '',
-          platform: '',
-          setting: '',
-          info: '',
-          owner: '',
-          admin: '',
-          salesman: '',
-          documentClerk: '',
-          financial: '',
-          address: '',
-          area: '',
+    props: {
+      loadingText:{
+        type:String,
+        default:''
+      },
+      data: {
+        type: Object,
+        default () {
+          return {};
         }
+      }
+    },
+    data() {
+      return {};
+    },
+    computed: {
+      companyData() {
+        let obj = {
+          name: "",
+          type: 0,
+          mobile: "",
+          tel: "",
+          self: false,
+          platform: "",
+          owner: "",
+          admin: [],
+          salesman: [],
+          documentClerk: [],
+          financial: [],
+          address: "",
+          area: ""
+        };
+        for (const key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            if (key === 'platform') {
+              console.log('platform----------');
+              console.log('key',key);
+              console.log('this.data[key]._id',this.data[key]._id);
+              obj[key] = this.data[key]._id
+              console.log('obj[key]',obj[key]);
+            } else {
+              obj[key] = this.data[key]
+            }
+          }
+        }
+        return obj
       }
     },
     methods: {
       sub() {
-        this.$emit('sub', this.companyData)
+        console.log(this.data);
+        this.$emit('update:loadingText','')
+        this.$emit("sub", this.companyData);
       }
     }
-  }
+  };
 </script>
 
 <style scoped>
   .form-box {
     flex-direction: row;
     justify-content: flex-start;
-    align-items: center
+    align-items: center;
   }
   .form-right {
-    margin-right: 20px
+    margin-right: 20px;
   }
 </style>
