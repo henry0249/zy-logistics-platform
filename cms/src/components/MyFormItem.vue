@@ -7,7 +7,7 @@
     </slot>
     <div class="f1" v-if="!slotLoading">
       <slot>
-        <el-select ref="select" style="width:100%" v-if="$attrs.select!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change">
+        <el-select style="width:100%" v-if="$attrs.select!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change">
           <el-option v-for="item in json2arr($attrs.options)" :key="item._id||item.value || item.id" :label="item.name || item.label" :value="item._id||item.value">
           </el-option>
         </el-select>
@@ -22,6 +22,10 @@
         <el-checkbox v-if="$attrs.checkbox!==undefined" v-model="data"></el-checkbox>
         <el-cascader style="width:100%" v-if="$attrs.cascader!==undefined" :options="$attrs.options" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change"></el-cascader>
         <el-cascader style="width:100%" v-if="$attrs.area!==undefined && !areaLoading" :options="areaData" v-model="data" :props="{value:'_id',label:'name'}" v-bind="$attrs" :size="size||$parent.size" @change="areaChange"></el-cascader>
+        <el-select style="width:100%" v-if="$attrs.transfer!==undefined && !areaLoading" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change">
+          <el-option v-for="item in transferData" :key="item._id" :label="item.name" :value="item._id">
+          </el-option>
+        </el-select>
       </slot>
     </div>
   </div>
@@ -36,6 +40,7 @@ export default {
     return {
       data: "",
       areaData: [],
+      transferData: [],
       areaLoading: true,
       slotLoading: true
     };
@@ -72,15 +77,18 @@ export default {
       this.$emit("change", val);
     },
     async getAreaData() {
+      this.areaLoading = true;
       if (this.$attrs.area !== undefined) {
-        this.areaLoading = true;
         try {
           this.areaData = await this.$ajax("/area/cascader");
-          this.areaLoading = false;
-        } catch (error) {
-          console.log(error);
-        }
+        } catch (error) {}
       }
+      if (this.$attrs.transfer !== undefined) {
+        try {
+          this.transferData = await this.$ajax("/transfer/find");
+        } catch (error) {}
+      }
+      this.areaLoading = false;
     }
   },
   async created() {

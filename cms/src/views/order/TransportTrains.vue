@@ -6,15 +6,20 @@
           <div class="flex ac" style="border:1px solid #eee;border-bottom:none;">
             <div class="trains-title">
               物流链{{index+1}}
+              <i @click="transportTrainsRemove(trainsItem,index)" v-if="index===transportTrains.length-1 && index!==0" style="color:#F56C6C" class="el-icon-delete pointer"></i>
             </div>
             <div class="f1"></div>
-            <my-form-item area style="width:30%;padding:0 10px" size="mini" v-model="trainsItem.origin" :show-all-levels="false" label="出发地">
+            <my-form-item v-if="index==0" area style="width:25%;padding:0 10px" size="mini" v-model="trainsItem.origin" :show-all-levels="false" label="出发地">
             </my-form-item>
-            <my-form-item area style="width:30%;padding:0 10px" size="mini" v-model="trainsItem.destination" :show-all-levels="false" label="目的地">
+            <my-form-item :key="index+'transfer1'" v-if="transportTrains.length>1" transfer style="width:25%;padding:0 10px" size="mini" v-model="trainsItem.transfer" label="中转地1" @change="transferChange($event, index)">
+            </my-form-item>
+            <my-form-item :key="index+'transfer2'" v-if="transportTrains.length>1 && index>0 && index !== transportTrains.length-1" transfer style="width:25%;padding:0 10px" size="mini" v-model="trainsItem.transfer2" label="中转地2" @change="transfer2Change($event, index)">
+            </my-form-item>
+            <my-form-item v-if="index===transportTrains.length-1" area style="width:25%;padding:0 10px" size="mini" v-model="trainsItem.destination" :show-all-levels="false" disabled label="目的地">
             </my-form-item>
             <div class="tc" style="width:45px;border-left:1px solid #eee;padding:10px 0">
               <i @click="transportTrainsAdd(trainsItem,index)" v-if="index === transportTrains.length-1" style="color:#67C23A" class="el-icon-plus pointer"></i>
-              <i @click="transportTrainsRemove(index)" v-else style="color:#F56C6C" class="el-icon-delete pointer"></i>
+              <i @click="transportTrainsRemove(trainsItem,index)" v-else style="color:#F56C6C" class="el-icon-delete pointer"></i>
             </div>
           </div>
           <my-table opWidth="45" size="mini" index border edit op :thead="thead" :data.sync="trainsItem.data">
@@ -48,41 +53,105 @@ export default {
     };
   },
   methods: {
-    transportTrainsAdd(item, index) {
-      if (!item.origin) {
-        this.$message.warn(`物流链${index + 1}未填写出发地`);
-        return;
-      }
-      if (!item.destination) {
-        this.$message.warn(`物流链${index + 1}未填写目的地`);
-        return;
-      }
-      this.transportTrains.push({
-        origin: item.destination,
-        destination: "",
-        data: [this.field2data(this.thead)]
-      });
-    },
-    transportTrainsRemove(index) {
-      this.transportTrains.splice(index, 1);
-    },
-    logisticsAdd(scope,trainsItem) {
-      let item = scope.row;
-      trainsItem.data.push(item);
-    },
     field2data(obj) {
       let data = {};
       for (const key in obj) {
         data[key] = "";
       }
       return data;
+    },
+    transportTrainsAdd(item, index) {
+      let pushItem = {
+        origin: [],
+        transfer: "",
+        transfer2: "",
+        destination: [],
+        data: [this.field2data(this.thead)]
+      };
+      if (index === 0) {
+        if (item.origin.length === 0) {
+          this.$message.warn(`物流链${index + 1}未填写出发地`);
+          return;
+        }
+        pushItem.destination = [...item.destination];
+        item.destination = [];
+      } else if (index === this.transportTrains.length - 1) {
+        if (!item.transfer) {
+          this.$message.warn(`物流链${index + 1}未填写中转地`);
+          return;
+        }
+        if (
+          this.transportTrains[index - 1].transfer &&
+          this.transportTrains[index - 1].transfer2
+        ) {
+          if (
+            this.transportTrains[index - 1].transfer ===
+            this.transportTrains[index - 1].transfer2
+          ) {
+            this.$message.warn(`物流链${index}中转地不能相同`);
+            return;
+          }
+        }
+        pushItem.destination = [...item.destination];
+        item.destination = [];
+      }
+
+      this.transportTrains.push(pushItem);
+    },
+    transportTrainsRemove(item, index) {
+      if (index === 0) {
+        this.transportTrains[index + 1].origin = item.origin;
+        this.transportTrains[index + 1].transfer = "";
+        this.transportTrains[index + 1].transfer2 = "";
+      } else if (index === this.transportTrains.length - 1) {
+        this.transportTrains[index - 1].destination = item.destination;
+        this.transportTrains[index - 1].transfer = "";
+        this.transportTrains[index - 1].transfer2 = "";
+      } else {
+        if (index - 1 === 0) {
+          this.transportTrains[index - 1].transfer2 = "";
+          this.transportTrains[index + 1].transfer2 = "";
+          this.transportTrains[index + 1].transfer = this.transportTrains[
+            index - 1
+          ].transfer;
+        } else {
+          this.transportTrains[index + 1].transfer = this.transportTrains[
+            index - 1
+          ].transfer2;
+        }
+      }
+      this.transportTrains.splice(index, 1);
+    },
+    logisticsAdd(scope, trainsItem) {
+      let item = scope.row;
+      trainsItem.data.push(item);
+    },
+    transferChange(val, index) {
+      if (index === 0) {
+        this.transportTrains[index + 1].transfer = val;
+      } else {
+        if (index - 1 > 0) {
+          this.transportTrains[index - 1].transfer2 = val;
+        } else {
+          this.transportTrains[index - 1].transfer = val;
+        }
+      }
+    },
+    transfer2Change(val, index) {
+      this.transportTrains[index + 1].transfer = val;
     }
   },
   created() {
     this.transportTrains.push({
-      origin: "",
-      destination: "",
-      data: [{ ...this.field2data(this.thead) }]
+      origin: [],
+      transfer: "",
+      transfer2: "",
+      destination: this.area2arr(this.order.area),
+      data: [
+        {
+          ...this.field2data(this.thead)
+        }
+      ]
     });
     console.log(this.transportTrains);
     if (this.order.goods) {

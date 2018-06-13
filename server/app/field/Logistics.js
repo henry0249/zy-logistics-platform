@@ -25,6 +25,26 @@ module.exports = {
     name: '所属物流链',
     ref: 'TransportTrains'
   },
+  origin: {
+    type: 'ObjectId',
+    name: '出发地',
+    ref: 'Area'
+  },
+  transfer:{
+    type: 'ObjectId',
+    name: '中转地',
+    ref: 'Transfer'
+  },
+  transfer2:{
+    type: 'ObjectId',
+    name: '第二中转地',
+    ref: 'Transfer'
+  },
+  destination: {
+    type: 'ObjectId',
+    name: '目的地',
+    ref: 'Area'
+  },
   truck: {
     type: 'ObjectId',
     name: '车辆',

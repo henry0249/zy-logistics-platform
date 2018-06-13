@@ -56,5 +56,4 @@
 </script>
 
 <style scoped>
-  .g-business-trains {}
 </style>

@@ -23,7 +23,7 @@ module.exports = app => {
     .get('/field', checkToken(), 'field.index') //获取数据库字段信息
     .all('/user/cascader', checkToken(), 'user.cascader') //用户级联数据
     //区域接口
-    .all('/area/cascader', checkToken(), 'area.cascader') //区域级联数据
+    .all('/area/cascader', 'area.cascader') //区域级联数据
     //商品接口
     .all('/goods/cascader', checkToken(), 'goods.cascader') //商品级联数据
     //订单接口

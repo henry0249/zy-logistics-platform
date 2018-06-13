@@ -2,8 +2,8 @@
   <loading-box v-model="loadingText">
     <div class="g-area-add">
       <h2 class="tc">添加中转点</h2>
-      <div>
-        <my-form-item size="small" input v-model="name" label="中转地名称">
+      <div  style="margin-top:20px">
+        <my-form-item labelWidth="75px" size="small" input v-model="name" label="中转名称">
         </my-form-item>
       </div>
       <div class="flex ac" style="margin:20px 0">
@@ -54,11 +54,6 @@ export default {
       ]
     };
   },
-  watch: {
-    type(val) {
-      // this.area = [];
-    }
-  },
   methods: {
     typeChange(val) {
       this.loadingText = "加载中...";
@@ -71,11 +66,13 @@ export default {
     async addArea() {
       this.loadingText = "正在添加...";
       try {
-        await this.$ajax.post("/area/add", {
+        await this.$ajax.post("/transfer/add", {
           type: this.type,
-          data: this.area
+          data: this.area,
+          name: this.name
         });
         this.$message.success("添加成功!");
+        this.back();
       } catch (error) {}
       this.loadingText = "";
     }

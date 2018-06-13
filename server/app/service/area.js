@@ -17,7 +17,7 @@ class CompanyService extends Service {
     return model._id;
   }
 
-  async add() {
+  async add(skipSet) {
     const ctx = this.ctx;
     let body = ctx.request.body;
     let typeObj = {
@@ -63,6 +63,9 @@ class CompanyService extends Service {
       name: area.name
     };
     let hasData = await ctx.model.Area.findOne(newAreaOption);
+    if (skipSet && hasData) {
+      return hasData._id;
+    }
     if (hasData) {
       ctx.throw(405, '区域数据已经存在,请勿重复添加', body);
     }
@@ -90,7 +93,7 @@ class CompanyService extends Service {
     }
     let areaModel = new ctx.model.Area(newAreaOption);
     await areaModel.save();
-    return 'ok';
+    return areaModel._id;
   }
 
   async cascader() {

@@ -4,8 +4,13 @@
       <my-table style="padding:0 1%" size="mini" height="100vh - 50px" index border :loadmore="loadmore" :thead="thead" :data.sync="data">
         <div class="flex ac" slot="header" style="padding:1% 0">
           <div class="f1"></div>
-          <el-button icon="el-icon-plus" style="margin-left:20px" size="mini" type="primary" @click="$router.push('/platform/transfer')">添加中转点</el-button>
+          <el-button icon="el-icon-plus" style="margin-left:20px" size="mini" type="primary" @click="$router.push('/platform/transferAdd')">添加中转点</el-button>
         </div>
+        <template slot-scope="scope">
+          <span v-if="scope.prop==='area'">
+            {{area2name(scope.row.area)}}
+          </span>
+        </template>
       </my-table>
     </loading-box>
   </div>
@@ -17,7 +22,6 @@ export default {
     return {
       laodingText: "",
       thead: {
-        key: "编码",
         name: "名称",
         area: {
           name: "地址",
@@ -35,9 +39,28 @@ export default {
       try {
         let findOption = {
           limit: this.limit || 10,
-          skip: this.data.length
+          skip: this.data.length,
+          populate: [
+            {
+              path: "area",
+              populate: [
+                {
+                  path: "province"
+                },
+                {
+                  path: "city"
+                },
+                {
+                  path: "county"
+                },
+                {
+                  path: "township"
+                }
+              ]
+            }
+          ]
         };
-        this.data = await this.$ajax.post("/area/find", findOption);
+        this.data = await this.$ajax.post("/transfer/find", findOption);
       } catch (error) {}
       this.laodingText = "";
     },
@@ -46,9 +69,28 @@ export default {
       try {
         let findOption = {
           limit: this.limit || 10,
-          skip: this.data.length
+          skip: this.data.length,
+          populate: [
+            {
+              path: "area",
+              populate: [
+                {
+                  path: "province"
+                },
+                {
+                  path: "city"
+                },
+                {
+                  path: "county"
+                },
+                {
+                  path: "township"
+                }
+              ]
+            }
+          ]
         };
-        res = await this.$ajax.post("/area/find", findOption);
+        res = await this.$ajax.post("/transfer/find", findOption);
       } catch (error) {}
       return res;
     }

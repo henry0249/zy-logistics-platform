@@ -28,6 +28,28 @@ Vue.mixin({
   methods: {
     back() {
       this.$router.go(-1);
+    },
+    area2arr(data) {
+      let res = [];
+      let areaSelectType = ["province", "city", "county", "township"];
+      areaSelectType.forEach(item => {
+        if (data[item]) {
+          res.push(data[item]._id || data[item]);
+        }
+      });
+      res.push(data._id);
+      return res;
+    },
+    area2name(data) {
+      let res = [];
+      let areaSelectType = ["province", "city", "county", "township"];
+      areaSelectType.forEach(item => {
+        if (data[item] && data[item].name) {
+          res.push(data[item].name);
+        }
+      });
+      res.push(data.name);
+      return res.join('-');
     }
   }
 })

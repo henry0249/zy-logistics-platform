@@ -76,11 +76,11 @@ module.exports = {
   },
   address: {
     name: '地址',
-    type: 'ObjectId',
-    ref: 'Address'
+    type: 'String',
   },
   area: {
     name: '区域',
-    type: 'Object',
+    type: 'ObjectId',
+    ref: 'Area'
   }
 }

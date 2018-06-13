@@ -1,11 +1,6 @@
 <template>
   <div>
     test
-    <div>
-      <slot :data="test">
-        666
-      </slot>
-    </div>
   </div>
 </template>
 
