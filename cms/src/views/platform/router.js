@@ -9,6 +9,8 @@ import Transfer from './Transfer.vue';
 import TransferAdd from './TransferAdd.vue';
 import CompanyEdmit from './CompanyEdmit.vue';
 import CompanyAdd from './CompanyAdd.vue';
+import UserEdmit from './UserEdmit.vue';
+import UserAdd from './UserAdd.vue';
 
 export default [{
   path: '/platform',
@@ -42,7 +44,13 @@ export default [{
     path: 'company_edmit/:_id',
     component: CompanyEdmit
   }, {
+    path: 'user_edmit/:_id',
+    component: UserEdmit
+  }, {
     path: 'company_add',
     component: CompanyAdd
+  }, {
+    path: 'user_add',
+    component: UserAdd
   }]
 }]

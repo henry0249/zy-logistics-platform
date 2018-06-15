@@ -1,6 +1,6 @@
 <template>
   <loading-box class="goods-box" v-model="loadingText">
-    <my-table :span-method='spanMethods' index size="mini" edit :thead="tableHeader" :data.sync="tableList">
+    <my-table index size="mini" edit :thead="tableHeader" :data.sync="tableList">
       <template slot-scope="scope" v-if="scope.column.property === 'tag'||scope.column.property === 'name'">
                       <el-tag  v-if="scope.column.property === 'tag'" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['tag']" :key="item.id">{{item}}</el-tag>
                       <i title="点击查看详情" class="pointer name-txt" v-if="scope.column.property === 'name'" @click="op({type:'read',value:scope})">{{scope.row['name']}}</i>
@@ -60,9 +60,6 @@
       }
     },
     methods: {
-      spanMethods(row, column, rowIndex, columnIndex) {
-        console.log('1111111', row, column, rowIndex, columnIndex);
-      },
       async test() {},
       op(val) {
         this.$router.push({

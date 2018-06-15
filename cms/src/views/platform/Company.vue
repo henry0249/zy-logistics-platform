@@ -3,13 +3,12 @@
     <my-table index size="mini" edit :thead="tableHeader" :data.sync="tableList">
       <div slot="header" class="flex company-header-box">
         <div class="search-box">
-          <el-input  size="mini" placeholder="请输入内容" v-model="input4">
-            <div slot="append">.com
-            </div>
+          <el-input  size="mini" placeholder="请输入内容" v-model="input">
+            <div slot="append">搜 索</div>
           </el-input>
         </div>
         <div class="add-box">
-          <el-button type="primary" size="mini">主要按钮</el-button>
+          <el-button type="primary" size="mini"  @click="$router.push({path:'/platform/company_add'})">添 加</el-button>
         </div>
       </div>
       <template slot-scope="scope" v-if="scope.column.property === 'name'||scope.column.property === 'type'">
@@ -29,6 +28,7 @@
     data() {
       return {
         loadingText: "",
+        input:'',
         skip: 0,
         tableHeader: company,
         companyData: []
@@ -91,7 +91,7 @@
 .company-box{
   width: 100%;
   height: 100%;
-  padding: 0 40px;
+  padding: 0 20px;
 }
   .name-txt {
     color: #42a5f5;
