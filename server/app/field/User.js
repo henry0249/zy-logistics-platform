@@ -40,6 +40,14 @@ module.exports = {
   role: {
     name: '角色',
     type: 'Array',
+    option: {
+      common: '普通用户',
+      admin: '系统管理员',
+      platformAdmin: '平台管理员',
+      companyAdmin: '公司管理员',
+      truck: '货车司机',
+      ship: '货船船员'
+    },
     default: ['common']
   },
   recommendedByUser: {
@@ -71,7 +79,7 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'Address'
   },
-  area:{
+  area: {
     name: '区域',
     type: 'ObjectIdArray',
   }

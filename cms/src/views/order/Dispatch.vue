@@ -1,7 +1,20 @@
 <template>
   <loading-box v-model="loadingText">
-    <div>
+    <div style="padding:0 3%">
       <my-table border size="mini" height="100vh - 50px" index :loadmore="loadmore" :thead="thead" :data.sync="data">
+        <div class="flex ac jb" slot="header" style="padding:15px 0">
+          <div style="width:20%">
+            <my-form-item label="订单号" size="mini" ></my-form-item>
+          </div>
+          <div style="width:20%">
+            <my-form-item label="客户类型" size="mini" ></my-form-item>
+          </div>
+          <div style="width:20%">
+            <my-form-item label="收货区域" size="mini" ></my-form-item>
+          </div>
+          <el-button type="primary" icon="el-icon-search" size="mini">搜索</el-button>
+          <div style="width:25%"></div>
+        </div>
         <template slot-scope="scope">
           <span @click="$router.push('/edit/dispatch/'+scope.row._id)" class="link" v-if="scope.prop==='_id'">
             {{scope.row.createdAt | date2no}}

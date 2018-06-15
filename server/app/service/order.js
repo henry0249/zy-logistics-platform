@@ -240,7 +240,9 @@ class OrderService extends Service {
       path: 'company'
     }, {
       path: 'area'
-    }]).limit(limit).skip(skip);
+    }]).sort({
+      updatedAt: -1
+    }).limit(limit).skip(skip);
     let res = [];
     for (let i = 0; i < orders.length; i++) {
       let orderItem = JSON.parse(JSON.stringify(orders[i]));
