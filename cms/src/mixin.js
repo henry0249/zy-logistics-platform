@@ -49,7 +49,7 @@ Vue.mixin({
         }
       });
       res.push(data.name);
-      return res.join('-');
+      return res.join('/');
     }
   }
 })

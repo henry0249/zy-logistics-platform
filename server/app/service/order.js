@@ -283,7 +283,21 @@ class OrderService extends Service {
     }).populate([{
       path: 'value',
       populate: [{
-        path: 'mfrs'
+        path: 'mfrs',
+        populate: [{
+          path: 'area',
+          populate: [{
+            path: 'province'
+          }, {
+            path: 'city'
+          }, {
+            path: 'county'
+          }, {
+            path: 'township'
+          }, {
+            path: 'street'
+          }]
+        }]
       }]
     }]);
     return res;

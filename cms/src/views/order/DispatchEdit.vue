@@ -1,12 +1,11 @@
 <template>
   <loading-box v-model="loadingText" class="g-order-container">
     <div class="g-order-body" v-if="!loadingText">
-      <div></div>
       <Info title="订单调度" :data.sync="order"></Info>
       <div class="tc sub-title">商品信息</div>
       <goods-table :order="order" :data.sync="goods"></goods-table>
       <div class="tc sub-title">物流链</div>
-      <transport-trains  :order="order" :data.sync="transport"></transport-trains>
+      <transport-trains :goods="order.goods[0]" :order="order" :data.sync="transportTrainsData"></transport-trains>
     </div>
   </loading-box>
 </template>
@@ -23,10 +22,10 @@ export default {
   },
   data() {
     return {
-      loadingText: "",
+      loadingText: "加载中",
       order: {},
       goods: [],
-      transport: []
+      transportTrainsData: []
     };
   },
   methods: {

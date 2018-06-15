@@ -17,7 +17,10 @@
       <div class="flex ac jb" style="margin:15px 0">
         <my-form-item select v-model="order.invoiceType" label="发票类型" :options="field.Order.invoiceType.option">
         </my-form-item>
-        <my-form-item input v-model="order.contactName" label="收货人">
+        <my-form-item input :popover="companyUserCascader.length>0?true:undefined" v-model="order.contactName" label="收货人">
+          <div slot="inputPopover">
+            <free-select :data="companyUserCascader" @change="companyUserCascaderChange"></free-select>
+          </div>
         </my-form-item>
         <my-form-item input v-model="order.contactNumber" label="联系电话">
         </my-form-item>
@@ -73,7 +76,8 @@ export default {
       customer: [],
       areaSelect: [],
       areaCascader: [],
-      userCascader: []
+      userCascader: [],
+      companyUserCascader: []
     };
   },
   methods: {
@@ -87,8 +91,29 @@ export default {
       } catch (error) {}
       this.loadingText = "";
     },
-    areaCascaderChange(val) {
+    async areaCascaderChange(val) {
       this.order.area = val[val.length - 1];
+      let area = await this.$ajax.post("/area/findOne", {
+        _id: val[val.length - 1],
+        populate: [
+          {
+            path: "province"
+          },
+          {
+            path: "city"
+          },
+          {
+            path: "county"
+          },
+          {
+            path: "township"
+          },
+          {
+            path: "street"
+          }
+        ]
+      });
+      this.order.address = this.area2name(area);
     },
     async userCascaderChange(val) {
       let data = {};
@@ -110,8 +135,23 @@ export default {
       this.order[val[0]] = val[1];
       this.order.contactName = data.name;
       this.order.contactNumber = data.mobile || data.tel;
+      if (val[0] === "company") {
+        this.companyUserCascader = await this.$ajax(
+          "/company/user/cascader?company=" + val[1]
+        );
+      }
     },
-    async check() {
+    companyUserCascaderChange(val){
+      if (val) {
+        if (val.name) {
+          this.order.contactName = val.name;
+        }
+        if (val.mobile || val.tel) {
+          this.order.contactNumber = val.mobile || val.tel;
+        }
+      }
+    },
+    check() {
       let order = this.order;
       if (!order.company && !order.user) {
         this.$message.error("未选择客户");
@@ -155,14 +195,16 @@ export default {
       this.customer = ["company", this.data.company._id];
     }
     //初始化区域选择
-    this.areaSelect = [];
-    let areaSelectType = ["province", "city", "county", "township"];
-    areaSelectType.forEach(item => {
-      if (this.data.area[item]) {
-        this.areaSelect.push(this.data.area[item]._id);
-      }
-    });
-    this.areaSelect.push(this.data.area._id);
+    if (this.data.area) {
+      this.areaSelect = [];
+      let areaSelectType = ["province", "city", "county", "township"];
+      areaSelectType.forEach(item => {
+        if (this.data.area[item]) {
+          this.areaSelect.push(this.data.area[item]._id);
+        }
+      });
+      this.areaSelect.push(this.data.area._id);
+    }
   }
 };
 </script>

@@ -106,7 +106,8 @@ module.exports = {
   logistics: {
     transport: {
       name: '车/船',
-      slot:true
+      slot: true,
+      readOnly: true
     },
     stockOutCount: {
       name: '出库数量',
@@ -118,7 +119,7 @@ module.exports = {
       type: 'Number',
       require: true
     },
-    unitPrice: {
+    transportPrice: {
       name: '运费单价',
       type: 'Number',
       require: true
@@ -126,14 +127,20 @@ module.exports = {
     startAt: {
       name: '出发时间',
       type: 'Date',
+      slot: true,
+      readOnly: true
     },
     finishAt: {
       name: '送达时间',
-      type: 'Date'
+      type: 'Date',
+      slot: true,
+      readOnly: true
     },
     state: {
       type: 'String',
       name: '状态',
+      slot: true,
+      readOnly: true,
       option: {
         0: '接单',
         1: '待装',

@@ -130,7 +130,7 @@ export default {
         row.value = row.goods[1];
       }, 200);
     },
-    async check() {
+    check() {
       let goodsCheck = true;
       this.goodsData.forEach(item => {
         if (!item.value) {

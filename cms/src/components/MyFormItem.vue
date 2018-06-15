@@ -11,21 +11,27 @@
           <el-option v-for="item in json2arr($attrs.options)" :key="item._id||item.value || item.id" :label="item.name || item.label" :value="item._id||item.value">
           </el-option>
         </el-select>
-        <el-input style="width:100%" v-if="$attrs.input!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-input>
-        <el-input-number style="width:100%" v-if="$attrs.number!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-input-number>
-        <el-switch v-if="$attrs.switch!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-switch>
-        <el-time-select style="width:100%" v-if="$attrs.time!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-time-select>
-        <el-date-picker style="width:100%" v-if="$attrs.date!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-date-picker>
-        <el-date-picker style="width:100%" v-if="$attrs.datetime!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size" type="datetime"></el-date-picker>
-        <el-color-picker style="width:100%" v-if="$attrs.color!==undefined" v-model="data"></el-color-picker>
-        <el-rate v-if="$attrs.rate!==undefined" v-model="data"></el-rate>
-        <el-checkbox v-if="$attrs.checkbox!==undefined" v-model="data"></el-checkbox>
-        <el-cascader style="width:100%" v-if="$attrs.cascader!==undefined" :options="$attrs.options" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change"></el-cascader>
-        <el-cascader style="width:100%" v-if="$attrs.area!==undefined && !areaLoading" :options="areaData" v-model="data" :props="{value:'_id',label:'name'}" v-bind="$attrs" :size="size||$parent.size" @change="areaChange"></el-cascader>
-        <el-select style="width:100%" v-if="$attrs.transfer!==undefined && !areaLoading" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change">
+        <el-input-number style="width:100%" v-else-if="$attrs.number!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-input-number>
+        <el-switch v-else-if="$attrs.switch!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-switch>
+        <el-time-select style="width:100%" v-else-if="$attrs.time!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-time-select>
+        <el-date-picker style="width:100%" v-else-if="$attrs.date!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-date-picker>
+        <el-date-picker style="width:100%" v-else-if="$attrs.datetime!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size" type="datetime"></el-date-picker>
+        <el-color-picker style="width:100%" v-else-if="$attrs.color!==undefined" v-model="data"></el-color-picker>
+        <el-rate v-else-if="$attrs.rate!==undefined" v-model="data"></el-rate>
+        <el-checkbox v-else-if="$attrs.checkbox!==undefined" v-model="data"></el-checkbox>
+        <el-cascader style="width:100%" v-else-if="$attrs.cascader!==undefined" :options="$attrs.options" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change"></el-cascader>
+        <el-cascader style="width:100%" v-else-if="$attrs.area!==undefined && !areaLoading" :options="areaData" v-model="data" :props="{value:'_id',label:'name'}" v-bind="$attrs" :size="size||$parent.size" @change="areaChange"></el-cascader>
+        <el-cascader style="width:100%" v-else-if="$attrs.transfer!==undefined && !areaLoading" :options="transferData" v-model="data" :props="{value:'_id',label:'name'}" v-bind="$attrs" :size="size||$parent.size" @change="transferChange"></el-cascader>
+        <!-- <el-select style="width:100%" v-else-if="$attrs.transfer!==undefined && !areaLoading" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change">
           <el-option v-for="item in transferData" :key="item._id" :label="item.name" :value="item._id">
           </el-option>
-        </el-select>
+        </el-select> -->
+        <el-popover v-else-if="$attrs.input!==undefined && $attrs.popover!==undefined" placement="bottom" trigger="click">
+          <el-input slot="reference" style="width:100%" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-input>
+          <slot name="inputPopover">
+          </slot>
+        </el-popover>
+        <el-input style="width:100%" v-else v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-input>
       </slot>
     </div>
   </div>
@@ -68,12 +74,14 @@ export default {
       }
     }
   },
-
   methods: {
     change(val) {
       this.$emit("change", val);
     },
     areaChange(val) {
+      this.$emit("change", val);
+    },
+    transferChange(val) {
       this.$emit("change", val);
     },
     async getAreaData() {
@@ -85,7 +93,7 @@ export default {
       }
       if (this.$attrs.transfer !== undefined) {
         try {
-          this.transferData = await this.$ajax("/transfer/find");
+          this.transferData = await this.$ajax("/transfer/cascader");
         } catch (error) {}
       }
       this.areaLoading = false;

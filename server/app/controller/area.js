@@ -1,7 +1,6 @@
 'use strict';
 
 const Controller = require('egg').Controller;
-const areaField = require('../field/Area');
 
 class AreaController extends Controller {
   async add() {

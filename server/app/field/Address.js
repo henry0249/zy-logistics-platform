@@ -1,4 +1,14 @@
 module.exports = {
+  user: {
+    name: '所属用户',
+    type: 'ObjectId',
+    ref: 'User'
+  },
+  company: {
+    name: '所属公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
   default: {
     name: '默认',
     type: 'Boolean'
@@ -7,21 +17,10 @@ module.exports = {
     name: '详情',
     type: 'String'
   },
-  province: {
-    name: '省份',
-    type: 'String'
-  },
-  city: {
-    name: '城市',
-    type: 'String'
-  },
-  county: {
-    name: '县',
-    type: 'String'
-  },
-  stree: {
-    name: '街道',
-    type: 'String'
+  area: {
+    name: '区域',
+    type: 'ObjectId',
+    ref: 'Area'
   },
   contactName: {
     type: 'String',
