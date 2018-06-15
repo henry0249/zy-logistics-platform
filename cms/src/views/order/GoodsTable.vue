@@ -2,7 +2,7 @@
   <loading-box v-model="loadingText" style="min-height:20px">
     <my-table size="small" index :edit="edit?true:undefined" border :thead="thead" :data.sync="goodsData">
       <template slot-scope="scope">
-        <my-form-item :disabled="edit?undefined:true" v-if="scope.prop === 'goods'" size="mini" cascader v-model="scope.row.goods" filterable :options="goodsCascader" @change="goodsCascaderChange(scope.row)">
+        <my-form-item :edit="edit" v-if="scope.prop === 'goods'" size="mini" cascader v-model="scope.row.goods" filterable :options="goodsCascader" @change="goodsCascaderChange(scope.row)">
         </my-form-item>
         <span v-if="scope.prop === 'totalPrice'">
           {{goodsTotalPrice(scope.row)}}

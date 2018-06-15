@@ -162,16 +162,16 @@ class OrderService extends Service {
         ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
       }
     }
-    if (newState === 'distribution') {
-      if (!ctx.helper.inArr(order.dispatcher, ctx.user._id)) {
-        ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
-      }
-    }
-    if (newState === 'transport') {
-      if (!ctx.helper.inArr(order.dispatcher, ctx.user._id)) {
-        ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
-      }
-    }
+    // if (newState === 'distribution') {
+    //   if (!ctx.helper.inArr(order.dispatcher, ctx.user._id)) {
+    //     ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
+    //   }
+    // }
+    // if (newState === 'transport') {
+    //   if (!ctx.helper.inArr(order.dispatcher, ctx.user._id)) {
+    //     ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
+    //   }
+    // }
     if (newState === 'check') {
       if (!ctx.helper.inArr(order.dispatcher, ctx.user._id)) {
         ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);

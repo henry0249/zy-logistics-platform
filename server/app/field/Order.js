@@ -5,8 +5,8 @@ module.exports = {
     option: {
       taking: '待接单',
       dispatch: '待调度',
-      distribution: '待配送',
-      transport: '运输中',
+      // distribution: '待配送',
+      // transport: '运输中',
       check: '待审核',
       finish: '订单完成',
       delete: '已删除'

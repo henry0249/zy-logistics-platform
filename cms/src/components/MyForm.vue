@@ -22,6 +22,10 @@ export default {
     width: {
       type: String,
       default: ""
+    },
+    edit: {
+      type: [Boolean],
+      default: true
     }
   }
 };

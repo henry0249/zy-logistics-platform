@@ -1,7 +1,7 @@
 <template>
   <loading-box v-model="loadingText" class="g-order-container">
     <div class="g-order-body" v-if="!loadingText">
-      <Info title="订单调度" :data.sync="order"></Info>
+      <Info title="订单调度" :data.sync="order" :edit="false"></Info>
       <div class="tc sub-title">商品信息</div>
       <goods-table :order="order" :data.sync="goods" :edit="false"></goods-table>
       <div class="tc sub-title">物流链</div>
@@ -12,7 +12,7 @@
     <div class="flex ac">
       <div class="f1"></div>
       <el-button size="small" @click="back()">返回</el-button>
-      <el-button size="small" type="primary">调度完成</el-button>
+      <el-button size="small" type="primary">确认调度</el-button>
     </div>
   </loading-box>
 </template>

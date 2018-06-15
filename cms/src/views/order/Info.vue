@@ -3,7 +3,7 @@
     <div v-if="title" class="order-title" style="margin-bottom:15px">
       <strong>{{title}}</strong>
     </div>
-    <my-form v-show="!hideForm" size="mini" width="24%">
+    <my-form v-show="!hideForm" size="mini" width="24%" :edit="edit">
       <div class="flex ac jb">
         <my-form-item cascader v-model="customer" filterable label="客户名称" :options="userCascader" @change="userCascaderChange">
         </my-form-item>
@@ -48,6 +48,10 @@ export default {
       default() {
         return {};
       }
+    },
+    edit: {
+      type: Boolean,
+      default: true
     }
   },
   watch: {

@@ -5,14 +5,17 @@
         {{label}}
       </div>
     </slot>
-    <div class="f1" v-if="!slotLoading">
+    <div style="position:relative" class="f1" v-if="!slotLoading" >
+      <div class="disable-hide" v-if="$parent.edit===false || edit===false">
+
+      </div>
       <slot>
         <el-select style="width:100%" v-if="$attrs.select!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change">
           <el-option v-for="item in json2arr($attrs.options)" :key="item._id||item.value || item.id" :label="item.name || item.label" :value="item._id||item.value">
           </el-option>
         </el-select>
         <el-input-number style="width:100%" v-else-if="$attrs.number!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-input-number>
-        <el-switch v-else-if="$attrs.switch!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-switch>
+        <el-switch v-else-if="$attrs.switch!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change"></el-switch>
         <el-time-select style="width:100%" v-else-if="$attrs.time!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-time-select>
         <el-date-picker style="width:100%" v-else-if="$attrs.date!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-date-picker>
         <el-date-picker style="width:100%" v-else-if="$attrs.datetime!==undefined" v-model="data" v-bind="$attrs" :size="size||$parent.size" type="datetime"></el-date-picker>
@@ -113,5 +116,13 @@ export default {
 <style scoped>
 .g-form-item {
   color: #606266;
+}
+.disable-hide {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: transparent;
+  z-index: 100;
+  cursor: not-allowed;
 }
 </style>
