@@ -122,37 +122,6 @@
     },
     methods: {
       async changeCascader(event,index){
-        console.log(event,index);
-        console.log(event.length);
-        if (event.length === 4) {
-          let area = await this.$api.curd({
-            model:'area',
-            curdType:'findOne',
-            _id:event[3],
-            populate:[
-              {path:'province'},
-              {path:'city'},
-              {path:'county'},
-              ]
-          })
-          if (this.areaArr.length>0) {
-            
-          }else{
-            let obj = {
-              label:area.province.name,
-              value:area.province._id,
-              children:[{
-                label:area.city.name,
-                value:area.city._id,
-                children:[{
-                  label:area.county.name,
-                  value:area.county._id,
-                }]
-              }]
-            }
-          }
-          console.log(area);
-        }
 
       },
       test(){
