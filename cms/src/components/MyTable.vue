@@ -72,8 +72,8 @@ export default {
       default: false
     },
     edit: {
-      type: Boolean,
-      default: false
+      type: [Boolean,Object],
+      default: undefined
     },
     thead: {
       type: [Object, Array],

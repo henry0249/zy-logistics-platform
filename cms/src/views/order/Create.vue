@@ -2,7 +2,12 @@
   <loading-box v-model="loadingText">
     <div class="g-order-create">
       <div class="g-order">
-        <Info title="销售订单" ref="orderInfo" :data.sync="order"></Info>
+        <div class="my-title">销售订单</div>
+        <el-alert title="订单信息" type="info" :closable="false" style="margin:15px 0">
+        </el-alert>
+        <Info ref="orderInfo" :data.sync="order"></Info>
+        <el-alert title="订单商品信息" type="info" :closable="false" style="margin:15px 0">
+        </el-alert>
         <goods-table ref="orderGoods" :order="order" :data.sync="goods" style="margin-top:15px"></goods-table>
       </div>
       <div class="tr" style="margin-top:30px">

@@ -11,8 +11,8 @@
     </div>
     <div class="f1"></div>
     <!-- <el-badge value="6" class="item" style="margin:0 20px">
-      <i class="el-icon-bell" style="font-size:18px;color:#FFB300"></i>
-    </el-badge> -->
+          <i class="el-icon-bell" style="font-size:18px;color:#FFB300"></i>
+        </el-badge> -->
     <el-dropdown>
       <div class="flex ac">
         <icon size="20" style="margin-right:5px" color="#2196F3">face</icon>
@@ -89,12 +89,22 @@ export default {
           duration: 3000,
           message: `您有<strong><i>${newCount}</i></strong>个新订单`,
           onClick: function() {
-            console.log(666);
             console.log(_this);
             console.log(_this.$router);
             _this.$router.push("/order/" + type);
           }
         });
+      }
+    }
+  },
+  watch: {
+    async $route() {
+      if (localStorage.token) {
+        let res = await this.$store.dispatch("orderBadgeNotify");
+        let { newBadge, oldBadge } = res;
+        for (const key in newBadge) {
+          this.badgeNotify(newBadge[key], oldBadge[key], key);
+        }
       }
     }
   },
@@ -142,24 +152,24 @@ export default {
         hide: this.user.isSys !== true
       }
     ];
-    let sti;
-    if (localStorage.token) {
-      try {
-        sti = setInterval(async () => {
-          if (localStorage.token) {
-            let res = await this.$store.dispatch("orderBadgeNotify");
-            let { newBadge, oldBadge } = res;
-            for (const key in newBadge) {
-              this.badgeNotify(newBadge[key], oldBadge[key], key);
-            }
-          } else {
-            window.clearInterval(sti);
-          }
-        }, 20000);
-      } catch (error) {}
-    } else {
-      window.clearInterval(sti);
-    }
+    // let sti;
+    // if (localStorage.token) {
+    //   try {
+    //     sti = setInterval(async () => {
+    //       if (localStorage.token) {
+    //         let res = await this.$store.dispatch("orderBadgeNotify");
+    //         let { newBadge, oldBadge } = res;
+    //         for (const key in newBadge) {
+    //           this.badgeNotify(newBadge[key], oldBadge[key], key);
+    //         }
+    //       } else {
+    //         window.clearInterval(sti);
+    //       }
+    //     }, 20000);
+    //   } catch (error) {}
+    // } else {
+    //   window.clearInterval(sti);
+    // }
   }
 };
 </script>

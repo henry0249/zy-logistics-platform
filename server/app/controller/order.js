@@ -15,5 +15,8 @@ class OrderController extends Controller {
   async getOrderById(){
     this.ctx.body = await this.ctx.service.order.getOrderById();
   }
+  async dispatch(){
+    this.ctx.body = await this.ctx.service.order.dispatch();
+  }
 }
 module.exports = OrderController;

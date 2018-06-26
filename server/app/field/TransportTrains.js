@@ -14,12 +14,12 @@ module.exports = {
     name: '出发地',
     ref: 'Area'
   },
-  transfer:{
+  transfer: {
     type: 'ObjectId',
     name: '中转地',
     ref: 'Transfer'
   },
-  transfer2:{
+  transfer2: {
     type: 'ObjectId',
     name: '第二中转地',
     ref: 'Transfer'
@@ -29,7 +29,7 @@ module.exports = {
     name: '目的地',
     ref: 'Area'
   },
-  sort:{
+  sort: {
     type: 'Number',
     name: '排序',
   }

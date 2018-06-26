@@ -3,11 +3,12 @@ module.exports = {
     type: 'String',
     name: '状态',
     option: {
-      0: '接单',
-      1: '待装',
-      2: '在途',
-      3: '待卸',
-      4: '完成'
+      0: '待接单',
+      1: '接单',
+      2: '待装',
+      3: '在途',
+      4: '待卸',
+      5: '完成'
     }
   },
   goods: {
@@ -60,30 +61,44 @@ module.exports = {
     name: '承运商',
     ref: 'Company'
   },
-  stockOutCount: {
-    name: '出库数量',
+  loading: {
+    name: '装货数量',
     type: 'Number',
-    require: true
   },
-  receiptCount: {
-    name: '收货数量',
+  landed: {
+    name: '卸货数量',
+    type: 'Number',
+  },
+  settlementCount:{
+    name: '结算数量',
+    type: 'Number',
+  },
+  unitPrice: {
+    name: '运费单价',
     type: 'Number',
     require: true
   },
   receiptUser: {
     type: 'ObjectId',
     name: '收货人',
-    ref: 'Company'
+    ref: 'User'
   },
   receiptCompany: {
     type: 'ObjectId',
     name: '收货公司',
     ref: 'Company'
   },
-  unitPrice: {
-    name: '运费单价',
-    type: 'Number',
-    require: true
+  contactName: {
+    name: '收货人',
+    type: 'String',
+  },
+  contactNumber: {
+    name: '收货人联系方式',
+    type: 'String',
+  },
+  address:{
+    name: '详细地址',
+    type: 'String',
   },
   startAt: {
     name: '出发时间',

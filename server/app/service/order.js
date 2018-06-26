@@ -144,7 +144,45 @@ class OrderService extends Service {
     }
     return 'ok';
   }
-
+  async dispatch() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    if (!body.order) {
+      ctx.throw(422, "订单编号必填", body);
+    }
+    let transportTrains = body.transportTrains;
+    if (!(transportTrains && transportTrains.length>0)) {
+      ctx.throw(422, "物流链信息必填", body);
+    }
+    let order = await ctx.model.Order.findById(body.order);
+    if (!order) {
+      ctx.throw(404, "订单不存在", body);
+    }
+    for (let i = 0; i < transportTrains.length; i++) {
+      let item = transportTrains[i];
+      if (item.origin) {
+        item.origin = item.origin._id || item.origin;
+      }else{
+        delete item.origin;
+      }
+      if (item.destination) {
+        item.destination = item.destination._id || item.destination;
+      }else{
+        delete item.destination;
+      }
+      if (item.transfer instanceof Array && item.transfer.length>0) {
+        item.transfer = item.transfer[item.transfer.length-1];
+      }else{
+        delete item.transfer;
+      }
+      if (item.transfer2 instanceof Array && item.transfer2.length>0) {
+        item.transfer2 = item.transfer[item.transfer2.length-1];
+      }else{
+        delete item.transfer2;
+      }
+    }
+    return 'ok';
+  }
   updateState(order) {
     const ctx = this.ctx;
     let body = ctx.request.body;
@@ -302,6 +340,17 @@ class OrderService extends Service {
         }]
       }]
     }]);
+    let transportTrainsData = await ctx.model.TransportTrains.find({
+      order: res._id
+    });
+    let transportTrains = JSON.parse(JSON.stringify(transportTrainsData));
+    for (let i = 0; i < transportTrains.length; i++) {
+      let item = transportTrains[i];
+      item.data = await ctx.model.Logistics.find({
+        transportTrains: item._id,
+        order: res._id
+      });
+    }
     return res;
   }
 }

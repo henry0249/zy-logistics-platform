@@ -76,4 +76,13 @@ body {
 .base-bg {
   background: #f3f4f5;
 }
+.my-div {
+  padding: 15px;
+  background: #aaa;
+  color: #fff;
+}
+.my-title {
+  font-size: 20px;
+  text-align: center;
+}
 </style>

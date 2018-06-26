@@ -29,9 +29,9 @@ const ajax = axios.create({
 })
 // 注册请求拦截器
 ajax.interceptors.request.use(async config => {
-  if (window.sessionStorage && window.localStorage) {
-    if (localStorage.token || sessionStorage.token) {
-      config.headers['Authorization'] = localStorage.token || sessionStorage.token;
+  if (window.localStorage) {
+    if (localStorage.token) {
+      config.headers['Authorization'] = localStorage.token;
     }
   }
   // config.headers['csrfToken'] = getCookie('csrfToken');
@@ -42,10 +42,13 @@ ajax.interceptors.request.use(async config => {
 // 注册响应拦截器
 ajax.interceptors.response.use(response => {
   if (response.headers.refleshtoken) {
+    alert('有新的token' + response.headers.refleshtoken);
     store.commit('setToken', {
       token: response.headers.refleshtoken,
       exp: response.headers.tokenexp
     });
+    localStorage.token = response.headers.refleshtoken;
+    localStorage.tokenExp = response.headers.tokenexp;
   }
   return Promise.resolve(response.data);
 }, err => {
@@ -55,7 +58,7 @@ ajax.interceptors.response.use(response => {
     type: 'error',
     center: true
   });
-  if(err.response.status === 401){
+  if (err.response.status === 401) {
     store.commit('setToken', {
       token: '',
       exp: ''

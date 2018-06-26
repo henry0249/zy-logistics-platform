@@ -30,11 +30,11 @@
           </el-option>
         </el-select> -->
         <el-popover v-else-if="$attrs.input!==undefined && $attrs.popover!==undefined" placement="bottom" trigger="click">
-          <el-input slot="reference" style="width:100%" v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-input>
+          <el-input slot="reference" style="width:100%" v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change"></el-input>
           <slot name="inputPopover">
           </slot>
         </el-popover>
-        <el-input style="width:100%" v-else v-model="data" v-bind="$attrs" :size="size||$parent.size"></el-input>
+        <el-input style="width:100%" v-else v-model="data" v-bind="$attrs" :size="size||$parent.size" @change="change"></el-input>
       </slot>
     </div>
   </div>

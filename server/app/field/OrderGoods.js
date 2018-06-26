@@ -5,7 +5,11 @@ module.exports = {
     ref: 'Goods'
   },
   count: {
-    name: '数量',
+    name: '订货数量',
+    type: 'Number',
+  },
+  settlementCount:{
+    name: '结算数量',
     type: 'Number',
   },
   factoryPrice: {

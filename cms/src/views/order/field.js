@@ -104,20 +104,18 @@ module.exports = {
     }
   },
   logistics: {
-    transport: {
+    ts: {
       name: '车/船',
       slot: true,
       readOnly: true
     },
-    stockOutCount: {
-      name: '出库数量',
+    loading: {
+      name: '装货数量',
       type: 'Number',
-      require: true
     },
-    receiptCount: {
-      name: '收货数量',
+    landed: {
+      name: '卸货数量',
       type: 'Number',
-      require: true
     },
     transportPrice: {
       name: '运费单价',
