@@ -1,5 +1,6 @@
 <template>
   <my-form v-if="!value" slot="form" size="mini" width="24%" style="margin:15px 0">
+    <el-alert title="用户信息" type="info" :closable="false" style="margin:15px 0"></el-alert>
     <div class="flex form-box">
       <my-form-item class="form-right" input v-model="userObj.name" filterable label="用户名称"></my-form-item>
       <my-form-item class="form-right" input v-model="userObj.mobile" filterable label="手机号"></my-form-item>
@@ -31,21 +32,21 @@
       <my-form-item @change="changeCascader($event,index)" class="form-right" v-for="(item,index) in userObj.area" :key="index" size="mini" width="calc(24% - 60px)" filterable :change-on-select="true" v-model="item.value" area placeholder="选择区域"></my-form-item>
       <el-button size="mini" class="button-new-tag" @click="test">添加</el-button>
     </div>
-    <div style="margin-top:20px;">地址列表</div>
+    <el-alert title="地址列表" type="info" :closable="false" style="margin:15px 0"></el-alert>
     <my-table style="margin-top:20px;" border index size="mini" :thead="thead" edit :data.sync="data" op>
       <div slot="op" slot-scope="scope">
         <i v-if="data.length>1" title="删除该地区" class="pointer" style="margin-right:10px" @click="delAdr(scope['index'],data)">
-          <icon size="16px">icon-ec1</icon>
-        </i>
+            <icon size="16px">icon-ec1</icon>
+          </i>
         <i v-if="scope['index'] === data.length - 1" title="增加一个地址" class="pointer" @click="addAdr(data)">
-          <icon size="16px">icon-54</icon>
-        </i>
+            <icon size="16px">icon-54</icon>
+          </i>
       </div>
       <template slot-scope="scope" v-if="scope.column.property === 'default' || scope.column.property === 'area'">
-        <my-form-item @change="change($event,scope.index)" size="mini" v-if="scope.column.property === 'default'" active-text="设为默认地址"
-          inactive-text="非默认地址" switch v-model="scope.row[scope.column.property]"></my-form-item>
-        <my-form-item size="mini" v-if="scope.column.property === 'area'" filterable :change-on-select="true" v-model="scope.row[scope.column.property]" area placeholder="选择区域"></my-form-item>
-      </template>
+          <my-form-item @change="change($event,scope.index)" size="mini" v-if="scope.column.property === 'default'" active-text="设为默认地址"
+            inactive-text="非默认地址" switch v-model="scope.row[scope.column.property]"></my-form-item>
+          <my-form-item size="mini" v-if="scope.column.property === 'area'" filterable :change-on-select="true" v-model="scope.row[scope.column.property]" area placeholder="选择区域"></my-form-item>
+</template>
     </my-table>
   </my-form>
 </template>
@@ -53,94 +54,95 @@
 <script>
   export default {
     props: {
-      value:{
-        type:String,
-        default:''
+      value: {
+        type: String,
+        default: ''
       },
       userObj: {
         type: Object,
-        default(){
+        default () {
           return {}
         }
       },
       thead: {
         type: Object,
-        default(){
+        default () {
           return {}
         }
       },
       data: {
         type: Array,
-        default(){
+        default () {
           return []
         }
       },
-      platformArr:{
-        type:Array,
-        default(){
+      platformArr: {
+        type: Array,
+        default () {
           return []
         }
       },
-      companyArr:{
-        type:Array,
-        default(){
+      companyArr: {
+        type: Array,
+        default () {
           return []
         }
       },
-      userArr:{
-        type:Array,
-        default(){
+      userArr: {
+        type: Array,
+        default () {
           return []
         }
       }
     },
-    data () {
+    data() {
       return {
         inputVisible: false,
         inputValue: "",
-        areaArr:[]
+        areaArr: []
       }
     },
     watch: {
-      'userObj.name'(val){
+      'userObj.name' (val) {
         console.log(val);
         this.data.forEach(item => {
           item.contactName = val
         });
       },
-      'userObj.mobile'(val){
+      'userObj.mobile' (val) {
         this.data.forEach(item => {
           item.contactMobile = val
         });
       },
-      data(val){
-        this.$emit('update:data',val)        
+      data(val) {
+        this.$emit('update:data', val)
       },
-      userObj(val){
-        this.$emit('update:userObj',val)        
+      userObj(val) {
+        this.$emit('update:userObj', val)
       }
     },
     methods: {
-      async changeCascader(event,index){
-
+      async changeCascader(event, index) {
       },
-      test(){
-        this.userObj.area.push({value:[]})
+      test() {
+        this.userObj.area.push({
+          value: []
+        })
       },
-      change(event,index){
-        console.log(event,index);
-        this.data.forEach((item,i) => {
+      change(event, index) {
+        console.log(event, index);
+        this.data.forEach((item, i) => {
           if (index !== i && item.default === true) {
             this.$alert(`只能拥有一个默认地址`, "提示", {
-            confirmButtonText: "确定",
-            callback: () => {
-              this.data[index].default = false
-            }
-          });
+              confirmButtonText: "确定",
+              callback: () => {
+                this.data[index].default = false
+              }
+            });
           }
         });
       },
-      delAdr(i,arr) {
+      delAdr(i, arr) {
         if (arr.length > 1) {
           arr.splice(i, 1);
         } else {

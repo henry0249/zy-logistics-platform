@@ -1,7 +1,7 @@
 <template>
   <loading-box v-model="loadingText">
     <div class="g-order-create">
-      <company-edmit-item :userArr="userArr" :companyType="type" :ship="ship" :truck="truck" :platformArr="platformArr" :loadingText.sync="loadingText" @sub="sub" :data="data"></company-edmit-item>
+      <company-edmit-item :companyType="type" :ship="ship" :truck="truck" :platformArr="platformArr" :loadingText.sync="loadingText" @sub="sub" :data="data"></company-edmit-item>
     </div>
   </loading-box>
 </template>
@@ -18,9 +18,9 @@
         data: {},
         platformArr: [],
         userArr: [],
-        truck:[],
-        ship:[],
-        type:false,
+        truck: [],
+        ship: [],
+        type: false,
       }
     },
     methods: {
@@ -53,35 +53,33 @@
           if (res) {
             let io = true;
             for (let index = 0; index < val.truck.length; index++) {
-              if (!val.truck[index].name || !val.truck[index].type || !val.truck[index].owner) {
-                
-              }else{
+              if (!val.truck[index].name || !val.truck[index].type || !val.truck[index].owner) {} else {
                 if (!val.truck[index]._id) {
                   let addTruck = await this.$api.curd({
-                    model:'truck',
-                    curdType:'set',
-                    name:val.truck[index].name,
-                    type:val.truck[index].type,
-                    owner:val.truck[index].owner,
-                    no:val.truck[index].no,
-                    company:this.$route.params._id
+                    model: 'truck',
+                    curdType: 'set',
+                    name: val.truck[index].name,
+                    type: val.truck[index].type,
+                    owner: val.truck[index].owner,
+                    no: val.truck[index].no,
+                    company: this.$route.params._id
                   })
                   if (!addTruck) {
                     io = false
                   }
-                }else{
+                } else {
                   let updateTruck = await this.$api.curd({
-                    model:'truck',
-                    curdType:'update',
-                    find:{
-                      _id:val.truck[index]._id
+                    model: 'truck',
+                    curdType: 'update',
+                    find: {
+                      _id: val.truck[index]._id
                     },
-                    update:{
-                      no:val.truck[index].no,
-                      name:val.truck[index].name,
-                      type:val.truck[index].type,
-                      owner:val.truck[index].owner,
-                      company:this.$route.params._id
+                    update: {
+                      no: val.truck[index].no,
+                      name: val.truck[index].name,
+                      type: val.truck[index].type,
+                      owner: val.truck[index].owner,
+                      company: this.$route.params._id
                     }
                   })
                   if (!updateTruck) {
@@ -91,34 +89,33 @@
               }
             }
             for (let index = 0; index < val.ship.length; index++) {
-              if (!val.ship[index].name || !val.ship[index].type || !val.ship[index].owner) {
-              }else{
+              if (!val.ship[index].name || !val.ship[index].type || !val.ship[index].owner) {} else {
                 if (!val.ship[index]._id) {
                   let addship = await this.$api.curd({
-                    model:'ship',
-                    curdType:'set',
-                    name:val.ship[index].name,
-                    type:val.ship[index].type,
-                    owner:val.ship[index].owner,
-                    no:val.ship[index].no,
-                    company:this.$route.params._id
+                    model: 'ship',
+                    curdType: 'set',
+                    name: val.ship[index].name,
+                    type: val.ship[index].type,
+                    owner: val.ship[index].owner,
+                    no: val.ship[index].no,
+                    company: this.$route.params._id
                   })
                   if (!addship) {
                     io = false
                   }
-                }else{
+                } else {
                   let updateship = await this.$api.curd({
-                    model:'ship',
-                    curdType:'update',
-                    find:{
-                      _id:val.ship[index]._id
+                    model: 'ship',
+                    curdType: 'update',
+                    find: {
+                      _id: val.ship[index]._id
                     },
-                    update:{
-                      no:val.ship[index].no,
-                      name:val.ship[index].name,
-                      type:val.ship[index].type,
-                      owner:val.ship[index].owner,
-                      company:this.$route.params._id
+                    update: {
+                      no: val.ship[index].no,
+                      name: val.ship[index].name,
+                      type: val.ship[index].type,
+                      owner: val.ship[index].owner,
+                      company: this.$route.params._id
                     }
                   })
                   if (!updateship) {
@@ -129,18 +126,17 @@
             }
             if (io) {
               this.$confirm("修改成功", "提示", {
-                confirmButtonText: "留在本页面",
-                cancelButtonText: "返回列表",
-                type: "success "
-              })
-              .then(() => {
-                this.$router.go(0);
-              })
-              .catch(() => {
-                this.$router.go(-1);
-              });
+                  confirmButtonText: "留在本页面",
+                  cancelButtonText: "返回列表",
+                  type: "success "
+                })
+                .then(() => {
+                  this.$router.go(0);
+                })
+                .catch(() => {
+                  this.$router.go(-1);
+                });
             }
-            
           }
         } catch (error) {}
         this.loadingText = ''
@@ -150,7 +146,10 @@
           this.ship = await this.$api.curd({
             model: 'ship',
             curdType: 'find',
-            company: this.$route.params._id
+            company: this.$route.params._id,
+            populate: [{
+              path: 'owner'
+            }]
           })
           if (this.ship.length === 0) {
             this.ship = [{
@@ -158,19 +157,21 @@
               name: '',
               type: [],
               owner: [],
-              _id:''
+              _id: ''
             }]
           }
-          console.log('this.ship',this.ship);
-        } catch (error) {
-        }
+          console.log('this.ship', this.ship);
+        } catch (error) {}
       },
       async getTruck() {
         try {
           this.truck = await this.$api.curd({
             model: 'truck',
             curdType: 'find',
-            company: this.$route.params._id
+            company: this.$route.params._id,
+            populate: [{
+              path: 'owner'
+            }]
           })
           if (this.truck.length === 0) {
             this.truck = [{
@@ -178,12 +179,11 @@
               name: '',
               type: [],
               owner: [],
-              _id:''
+              _id: '',
             }]
           }
-          console.log('this.truck',this.truck);
-        } catch (error) {
-        }
+          console.log('this.truck', this.truck);
+        } catch (error) {}
       },
       async getData() {
         try {
@@ -193,9 +193,18 @@
             _id: this.$route.params._id,
             populate: [{
               path: 'area'
+            }, {
+              path: 'owner'
+            }, {
+              path: 'admin'
+            }, {
+              path: 'salesman'
+            }, {
+              path: 'documentClerk'
+            }, {
+              path: 'financial'
             }]
           })
-          console.log('res', res);
           this.data = res
           res.type.forEach(item => {
             if (item === 'logistics') {
@@ -212,7 +221,6 @@
               }
             }
           }
-          console.log(11111);
           this.data.area = arr
           console.log('this.data', this.data);
         } catch (error) {
@@ -223,7 +231,7 @@
         try {
           this.userArr = await this.$api.curd({
             model: "user",
-            curdType: "find"
+            curdType: "find",
           });
           console.log(this.userArr);
         } catch (error) {}

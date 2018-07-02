@@ -5,7 +5,7 @@
         <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
           <strong>添加商品</strong>
         </div>
-        <my-form size="mini" width="24%" style="margin:15px 0" v-if="!loadingText">
+        <my-form size="mini" width="25%" style="margin:15px 0" v-if="!loadingText">
           <div class="flex form-box">
             <my-form-item class="form-right" input v-model="goods.name" filterable label="商品名">
             </my-form-item>
@@ -21,7 +21,7 @@
             </my-form-item>
             <my-form-item class="form-right" select v-model="goods.mfrs" filterable label="生产厂商" :options="mfrs">
             </my-form-item>
-            <my-form-item select v-model="goods.saleState" filterable label="售卖状态" :options="field.Goods.saleState.option">
+            <my-form-item  class="form-right" select v-model="goods.saleState" filterable label="售卖状态" :options="field.Goods.saleState.option">
             </my-form-item>
           </div>
           <div class="flex form-box" style="margin-top:20px;">
@@ -40,7 +40,7 @@
             </div>
           </div>
         </my-form>
-        <my-form-item size="mini" v-model="goods.detail" width="100%" class="form-right" input type="textarea" autosize label="订单备注">
+        <my-form-item size="mini" v-model="goods.detail" width="100%" input type="textarea" autosize label="订单备注">
         </my-form-item>
         <my-table style="margin-top:20px;" border index size="mini" edit :thead="tableTeader" :data.sync="tableList" op>
           <div slot="op" slot-scope="scope">
@@ -389,6 +389,6 @@
     align-items: center
   }
   .form-right {
-    margin-right: 20px
+    padding-right: 20px
   }
 </style>
