@@ -17,9 +17,11 @@
       <div class="flex ac jb" style="margin:15px 0">
         <my-form-item select v-model="order.invoiceType" label="发票类型" :options="field.Order.invoiceType.option">
         </my-form-item>
-        <my-form-item input :popover="companyUserCascader.length>0?true:undefined" v-model="order.contactName" label="收货人">
+        <my-form-item @click.native="showCompanyUserCascader" input :popover="customer[0]==='company'?true:undefined" v-model="order.contactName" label="收货人">
           <div slot="inputPopover">
-            <free-select :data="companyUserCascader" @change="companyUserCascaderChange"></free-select>
+            <loading-box v-model="companyUserCascaderLoaidng">
+              <free-select :data="companyUserCascader" @change="companyUserCascaderChange"></free-select>
+            </loading-box>
           </div>
         </my-form-item>
         <my-form-item input v-model="order.contactNumber" label="联系电话">
@@ -42,6 +44,12 @@ export default {
     title: {
       type: String,
       default: ""
+    },
+    val: {
+      type: Object,
+      default() {
+        return {};
+      }
     },
     data: {
       type: Object,
@@ -81,6 +89,7 @@ export default {
       areaSelect: [],
       areaCascader: [],
       userCascader: [],
+      companyUserCascaderLoaidng: "加载中...",
       companyUserCascader: []
     };
   },
@@ -130,22 +139,30 @@ export default {
           });
         }
       });
-      if (val[0] === "user") {
-        delete this.order.company;
-      }
-      if (val[0] === "company") {
-        delete this.order.user;
-      }
+      delete this.order.company;
+      delete this.order.user;
       this.order[val[0]] = val[1];
       this.order.contactName = data.name;
       this.order.contactNumber = data.mobile || data.tel;
-      if (val[0] === "company") {
-        this.companyUserCascader = await this.$ajax(
-          "/company/user/cascader?company=" + val[1]
-        );
+      // if (val[0] === "company") {
+      //   this.companyUserCascader = await this.$ajax(
+      //     "/company/user/cascader?company=" + val[1]
+      //   );
+      // }
+    },
+    async showCompanyUserCascader() {
+      if (this.customer[0] === "company") {
+        console.log(666);
+        this.companyUserCascaderLoaidng = "加载中...";
+        try {
+          this.companyUserCascader = await this.$ajax(
+            "/company/user/cascader?company=" + this.customer[1]
+          );
+        } catch (error) {}
+        this.companyUserCascaderLoaidng = "";
       }
     },
-    companyUserCascaderChange(val){
+    companyUserCascaderChange(val) {
       if (val) {
         if (val.name) {
           this.order.contactName = val.name;
@@ -187,27 +204,27 @@ export default {
   async created() {
     await this.getData();
     for (const key in this.order) {
-      if (this.data.hasOwnProperty(key)) {
-        this.order[key] = this.data[key];
+      if (this.val.hasOwnProperty(key)) {
+        this.order[key] = this.val[key];
       }
     }
     //初始化客户选择
-    if (this.data.user) {
-      this.customer = ["user", this.data.user._id];
+    if (this.val.user) {
+      this.customer = ["user", this.val.user._id];
     }
-    if (this.data.company) {
-      this.customer = ["company", this.data.company._id];
+    if (this.val.company) {
+      this.customer = ["company", this.val.company._id];
     }
     //初始化区域选择
-    if (this.data.area) {
+    if (this.val.area) {
       this.areaSelect = [];
       let areaSelectType = ["province", "city", "county", "township"];
       areaSelectType.forEach(item => {
-        if (this.data.area[item]) {
-          this.areaSelect.push(this.data.area[item]._id);
+        if (this.val.area[item]) {
+          this.areaSelect.push(this.val.area[item]._id);
         }
       });
-      this.areaSelect.push(this.data.area._id);
+      this.areaSelect.push(this.val.area._id);
     }
   }
 };

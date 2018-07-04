@@ -14,6 +14,7 @@ module.exports = app => {
     //lib
     .post('/sms/send', 'lib.smsSend') //发送验证码
     .post('/sms/validate', 'lib.smsValidate') //验证验证码
+    .post('/map/geocoder', 'lib.geocoder') //百度地图经纬度转地址信息
     //用户接口
     .post('/register/mobile', 'user.registerMobile') //手机号注册
     .all('/logout', 'user.logout') //注销

@@ -1,17 +1,16 @@
 <template>
   <loading-box v-model="loadingText" class="g-order-container">
     <div class="g-order-body" v-if="!bodyLoading">
-      <div class="my-title">订单调度</div>
+      <div class="my-title">订单{{order.no}}调度</div>
       <el-alert title="订单信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
-      <Info :data.sync="order" :edit="false"></Info>
+      <Info :val="order" :edit="false"></Info>
       <el-alert title="订单商品信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
       <goods-table :order="order" :edit="false"></goods-table>
       <el-alert title="订单物流链" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
       <div v-for="item in goods" :key="item.id">
-        <!-- <div class="tc sub-title">{{item.value.name}} 物流链</div> -->
         <transport-trains :key="item.id" ref="trains" :goods="item" :order="order" :val="item.transportTrainsData" :data.sync="item.transportTrains"></transport-trains>
       </div>
     </div>
@@ -55,7 +54,6 @@ export default {
           item.transportTrains = [];
           this.goods.push(item);
         });
-        // this.goods = this.order.goods;
       } catch (error) {}
       setTimeout(() => {
         this.loadingText = "";
@@ -74,16 +72,55 @@ export default {
         if (flag) {
           let transportTrains = [];
           this.goods.forEach(item => {
-            item.transportTrains.forEach(trainsItem => {
+            item.transportTrains.forEach((titem, trainsIndex) => {
+              let trainsItem = JSON.parse(JSON.stringify(titem));
+              delete trainsItem.origin;
+              delete trainsItem.destination;
+              if (trainsItem.transfer && trainsItem.transfer instanceof Array) {
+                trainsItem.transfer = trainsItem.transfer[trainsItem.transfer.length-1];
+              }else{
+                delete trainsItem.transfer;
+              }
+              if (trainsItem.transfer2 && trainsItem.transfer2 instanceof Array) {
+                trainsItem.transfer2 = trainsItem.transfer2[trainsItem.transfer2.length-1];
+              }else{
+                delete trainsItem.transfer2;
+              }
+              if (trainsIndex === 0) {
+                trainsItem.origin = item.value.mfrs.area._id;
+              }
+              if (trainsIndex === item.transportTrains.length - 1) {
+                trainsItem.destination = this.order.area._id;
+              }
+              trainsItem.logistics.forEach((litem, lindex) => {
+                delete litem.origin;
+                delete litem.destination;
+                if (trainsIndex === 0) {
+                  litem.origin = item.value.mfrs.area._id;
+                }
+                if (trainsIndex === item.transportTrains.length - 1) {
+                  litem.destination = this.order.area._id;
+                }
+                if (trainsItem.transfer) {
+                  litem.transfer = trainsItem.transfer;
+                }
+                if (trainsItem.transfer2) {
+                  litem.transfer2 = trainsItem.transfer2;
+                }
+              });
               transportTrains.push(trainsItem);
             });
           });
+          console.log(transportTrains);
           await this.$ajax.post("/order/dispatch", {
             order: this.$route.params._id,
             transportTrains: transportTrains
           });
+          // this.$router.push("/order/distribution");
         }
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
       this.loadingText = "";
     }
   },

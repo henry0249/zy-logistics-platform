@@ -74,27 +74,27 @@ export default {
     badgeNotify(val, old, type) {
       let tipObj = {
         taking: "待接单消息",
-        check: "订单待审核",
-        distribution: "订单待配货",
         dispatch: "订单待调度",
+        distribution: "订单待配送",
+        check: "订单待审核",
         settlement: "订单待结算"
       };
-      let tip = tipObj[type];
-      let newCount = val - old || 0;
-      if (tip && newCount > 0) {
-        let _this = this;
-        this.$notify.success({
-          title: tip,
-          dangerouslyUseHTMLString: true,
-          duration: 3000,
-          message: `您有<strong><i>${newCount}</i></strong>个新订单`,
-          onClick: function() {
-            console.log(_this);
-            console.log(_this.$router);
-            _this.$router.push("/order/" + type);
-          }
-        });
-      }
+      // let tip = tipObj[type];
+      // let newCount = val - old || 0;
+      // if (tip && newCount > 0) {
+      //   let _this = this;
+      //   this.$notify.success({
+      //     title: tip,
+      //     dangerouslyUseHTMLString: true,
+      //     duration: 3000,
+      //     message: `您有<strong><i>${newCount}</i></strong>个新订单`,
+      //     onClick: function() {
+      //       console.log(_this);
+      //       console.log(_this.$router);
+      //       _this.$router.push("/order/" + type);
+      //     }
+      //   });
+      // }
     }
   },
   watch: {

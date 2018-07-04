@@ -3,14 +3,14 @@
     <div v-for="(trainsItem,index) in transportTrains" :key="index" style="margin-bottom:15px">
       <div class="flex ac" style="border:1px solid #eee;border-bottom:1px dashed #E6A23C;border-top:2px solid #E6A23C;">
         <div class="trains-title">
-          物流链{{index+1}}
+          #{{index+1}}&nbsp;物流链
           <i @click="transportTrainsRemove(trainsItem,index)" v-if="index===transportTrains.length-1 && index!==0" style="color:#F56C6C" class="el-icon-delete pointer"></i>
         </div>
         <div v-if="index===0" class="border-right border-left" style="padding:10px;font-size:12px;color:#606266">
           出发地
         </div>
         <div v-if="index===0" class="tf1 f1" style="width:30%;padding:0 10px;font-size:12px;color:#606266">
-          {{area2name(trainsItem.origin)}}
+          {{area2name(goods.value.mfrs.area)}}
         </div>
         <div v-if="transportTrains.length>1" class="border-right border-left" style="padding:10px;font-size:12px;color:#606266">
           中转地
@@ -30,7 +30,7 @@
           目的地
         </div>
         <div v-if="index===transportTrains.length-1" class="tf1 f1"  style="width:30%;padding:0 10px;font-size:12px;color:#606266">
-          {{area2name(trainsItem.destination)}}
+          {{area2name(order.area)}}
         </div>
         <div class="tc" style="width:45px;border-left:1px solid #eee;padding:10px 0">
           <!-- <i style="color:#67C23A" class="el-icon-plus pointer"></i> -->
@@ -38,18 +38,22 @@
           <i @click="transportTrainsRemove(trainsItem,index)" v-else style="color:#F56C6C" class="el-icon-delete pointer"></i>
         </div>
       </div>
-      <my-table opWidth="45" size="mini" index border edit op :thead="thead" :data.sync="trainsItem.data">
+      <my-table opWidth="45" size="mini" index border edit op :thead="thead" :data.sync="trainsItem.logistics">
         <div class="tc" slot="op" slot-scope="scope">
-          <icon size="13" @click.native="logisticsAdd(scope,trainsItem)" v-if="scope.index === trainsItem.data.length-1" style="color:#67C23A;margin-top:2px" class="pointer">icon-tianjiawuliu</icon>
+          <icon size="13" @click.native="logisticsAdd(scope,trainsItem)" v-if="scope.index === trainsItem.logistics.length-1" style="color:#67C23A;margin-top:2px" class="pointer">icon-tianjiawuliu</icon>
           <!-- <i @click="logisticsAdd(scope,trainsItem)" v-if="scope.index === trainsItem.data.length-1" style="color:#67C23A" class="el-icon-plus pointer"></i> -->
           <i @click="logisticsRemove(scope,trainsItem)" v-else style="color:#F56C6C" class="el-icon-minus pointer"></i>
         </div>
-        <template slot-scope="scope">
-          <my-form-item v-if="scope.prop==='ts' && !loadingText" cascader :options="truckAndShipCascader" :props="{value:'_id',label:'no'}" :show-all-levels="false" size="mini" v-model="scope.row.ts">
+        <template slot-scope="scope"  style="background:red">
+          <span v-if="scope.prop==='no'">
+            <span v-if="scope.row.no">{{scope.row.no}}</span>
+            <span v-else>-</span>
+          </span>
+          <my-form-item v-if="scope.prop==='ts' && !loadingText" cascader  v-model="scope.row.ts" @change="tsChange($event,scope.row)" :options="truckAndShipCascader" :props="{value:'_id',label:'no'}" :show-all-levels="false" clearable size="mini">
           </my-form-item>
-          <my-form-item v-if="scope.prop==='startAt'" datetime size="mini" v-model="scope.row.startAt">
+          <my-form-item v-if="scope.prop==='startAt'" datetime size="mini" v-model="scope.row.startAt" format="MM-dd HH:mm">
           </my-form-item>
-          <my-form-item v-if="scope.prop==='finishAt'" datetime size="mini" v-model="scope.row.finishAt">
+          <my-form-item v-if="scope.prop==='finishAt'" datetime size="mini" v-model="scope.row.finishAt" format="MM-dd HH:mm">
           </my-form-item>
           <my-form-item v-if="scope.prop==='state'" select size="mini" v-model="scope.row.state" :options="field.Logistics.state.option">
           </my-form-item>
@@ -57,20 +61,20 @@
       </my-table>
       <div class="flex ac bob bor bol" style="font-size:13px;color:#606266;padding:8px 0;background:#FAFAFA">
         <div class="tc" style="width:150px">
-          剩余分配装货量：<span style="color:#F56C6C">{{count(trainsItem.data).less}}</span>
+          剩余分配装货量：<span style="color:#F56C6C">{{count(trainsItem.logistics).less}}</span>
         </div>
         <div class="f1"></div>
         <div class="tc" style="width:120px">
           订货数量：<span style="color:#409EFF">{{goods.count}}</span>
         </div>
         <div class="tc" style="width:120px">
-          总装货量：<span style="color:#67C23A">{{count(trainsItem.data).totalLoding}}</span>
+          总装货量：<span style="color:#67C23A">{{count(trainsItem.logistics).totalLoding}}</span>
         </div>
         <div class="tc" style="width:120px">
-          总卸货量：<span style="color:#E6A23C">{{count(trainsItem.data).totalLanded}}</span>
+          总卸货量：<span style="color:#E6A23C">{{count(trainsItem.logistics).totalLanded}}</span>
         </div>
         <div class="tc" style="width:240px">
-          总运费：<span style="color:#F56C6C">{{count(trainsItem.data).totalPrice}}</span>
+          总运费：<span style="color:#F56C6C">{{count(trainsItem.logistics).totalPrice}}</span>
           <span style="color:#aaa">（卸货量*单价）</span>
         </div>
       </div>
@@ -111,7 +115,7 @@ export default {
     return {
       loadingText: "加载中...",
       transportTrains: [],
-      thead: logistics,
+      thead: JSON.parse(JSON.stringify(logistics)),
       truckAndShipCascader: []
     };
   },
@@ -121,11 +125,14 @@ export default {
         this.$emit("update:data", val);
       },
       deep: true
-    },
-    "order.area"(val, old) {}
+    }
   },
-  computed: {},
   methods: {
+    tsChange(val, item) {
+      delete item.truck;
+      delete item.ship;
+      item[val[1]] = val[2];
+    },
     count(data = []) {
       let res = {
         less: this.goods.count || 0,
@@ -144,20 +151,6 @@ export default {
           res.totalPrice += Number(lItem.landed) * Number(lItem.transportPrice);
         }
       });
-      // this.transportTrains.forEach(item => {
-      //   item.data.forEach(lItem => {
-      //     if (Number(lItem.loading) > 0) {
-      //       res.totalLoding += Number(lItem.loading);
-      //     }
-      //     if (Number(lItem.landed) > 0) {
-      //       res.totalLanded += Number(lItem.landed);
-      //     }
-      //     if (Number(lItem.transportPrice) > 0 && Number(lItem.landed) > 0) {
-      //       res.totalPrice +=
-      //         Number(lItem.landed) * Number(lItem.transportPrice);
-      //     }
-      //   });
-      // });
       res.less = this.goods.count - res.totalLoding;
       return res;
     },
@@ -170,6 +163,19 @@ export default {
       data.landed = 0;
       data.state = 0;
       data.ts = [];
+      data.goods = this.goods.value._id;
+      data.order = this.order._id;
+      data.transportPrice = this.goods.transportPrice;
+      if (this.order.company) {
+        data.company = this.order.company._id;
+      }
+      if (this.order.user) {
+        data.user = this.order.user._id;
+      }
+      data.contactName = this.order.contactName;
+      data.contactNumber = this.order.contactNumber;
+      data.area = this.order.area._id;
+      data.address = this.order.address;
       return data;
     },
     transportTrainsAdd(item, index) {
@@ -178,16 +184,15 @@ export default {
         transfer: [],
         transfer2: [],
         destination: "",
-        data: [{ ...this.field2data(this.thead) }],
-        goods: this.goods._id
+        logistics: [{ ...this.field2data(this.thead) }],
+        goods: this.goods.value._id,
+        order: this.order._id
       };
       if (index === 0) {
         if (!item.origin) {
           this.$message.warn(`物流链${index + 1}未填写出发地`);
           return;
         }
-        pushItem.destination = item.destination;
-        item.destination = "";
       } else if (index === this.transportTrains.length - 1) {
         if (!item.transfer || item.transfer.length === 0) {
           this.$message.warn(`物流链${index + 1}未填写中转地`);
@@ -206,18 +211,14 @@ export default {
             return;
           }
         }
-        pushItem.destination = item.destination;
-        item.destination = "";
       }
       this.transportTrains.push(pushItem);
     },
-    transportTrainsRemove(item, index) {
+    transportTrainsRemove(item, index, check = true) {
       if (index === 0) {
-        this.transportTrains[index + 1].origin = item.origin;
         this.transportTrains[index + 1].transfer = [];
         this.transportTrains[index + 1].transfer2 = [];
       } else if (index === this.transportTrains.length - 1) {
-        this.transportTrains[index - 1].destination = item.destination;
         this.transportTrains[index - 1].transfer = [];
         this.transportTrains[index - 1].transfer2 = [];
       } else {
@@ -240,14 +241,13 @@ export default {
       let pushItem = {
         ...this.field2data(this.thead)
       };
-      pushItem.goods = this.goods._id;
       if (item.transportPrice) {
         pushItem.transportPrice = item.transportPrice;
       }
-      trainsItem.data.push(pushItem);
+      trainsItem.logistics.push(pushItem);
     },
     logisticsRemove(scope, trainsItem) {
-      trainsItem.data.splice(scope.index, 1);
+      trainsItem.logistics.splice(scope.index, 1);
     },
     transferChange(val, index) {
       if (index === 0) {
@@ -265,23 +265,43 @@ export default {
     },
     initLogistics() {
       if (this.val && this.val instanceof Array && this.val.length > 0) {
-        this.transportTrains = val;
+        this.transportTrains = this.val;
+        this.transportTrains.forEach(item => {
+          if (item.transfer) {
+            let transfer = this.area2arr(item.transfer.area);
+            transfer[transfer.length - 1] = item.transfer._id;
+            item.transfer = transfer;
+          }
+          if (item.transfer2) {
+            let transfer2 = this.area2arr(item.transfer2.area);
+            transfer2[transfer2.length - 1] = item.transfer2._id;
+            item.transfer2 = transfer2;
+          }
+          item.logistics.forEach(litem => {
+            if (litem.truck) {
+              litem.ts = [litem.truck.company, "truck", litem.truck._id];
+            }
+            if (litem.ship) {
+              litem.ts = [litem.ship.company, "ship", litem.ship._id];
+            }
+            litem.startAt = new Date(litem.startAt);
+            litem.finishAt = new Date(litem.finishAt);
+          });
+        });
       } else {
+        delete this.thead.no;
         this.transportTrains = [];
         let dataItem = {
           ...this.field2data(this.thead)
         };
-        if (this.goods.transportPrice) {
-          dataItem.transportPrice = this.goods.transportPrice;
-        }
-        dataItem.goods = this.goods._id;
+        dataItem.transportPrice = this.goods.transportPrice;
+        dataItem.goods = this.goods.value._id;
         let pushItem = {
-          goods: this.goods._id,
-          origin: this.goods.value.mfrs.area,
+          order: this.order._id,
+          goods: this.goods.value._id,
           transfer: [],
           transfer2: [],
-          destination: this.order.area,
-          data: [
+          logistics: [
             {
               ...dataItem
             }
@@ -298,8 +318,8 @@ export default {
     },
     check() {
       let errText = "";
-      this.transportTrains.forEach((item,index) => {
-        let count = this.count(item.data);
+      this.transportTrains.forEach((item, index) => {
+        let count = this.count(item.logistics);
         if (count.less < 0) {
           errText = `物流链${index + 1}总装货量不能大于订货数量`;
           return;
@@ -315,7 +335,12 @@ export default {
       });
 
       this.transportTrains.forEach((trains, trainsIndex) => {
-        trains.data.forEach((item, index) => {
+        trains.logistics.forEach((item, index) => {
+          if (item.state > 0 && item.ts.length === 0) {
+            errText = `物流链${trainsIndex + 1}的第${index +
+              1}除了发布状态的运单,车船信息不能为空`;
+            return;
+          }
           if (this.is("number", Number(item.loading))) {
             if (Number(item.loading) <= 0) {
               errText = `物流链${trainsIndex + 1}的第${index +
@@ -327,8 +352,7 @@ export default {
               1}张运单装货量必须为数字`;
             return;
           }
-          if (this.is("number", Number(item.landed))) {
-          } else {
+          if (!this.is("number", Number(item.landed))) {
             errText = `物流链${trainsIndex + 1}的第${index +
               1}张运单卸货量必须为数字`;
             return;

@@ -31,7 +31,7 @@ module.exports = {
     return decrypted;
   },
   async jwtSign(user_info, option = {}) {
-    let exp = option.exp || Math.floor(Date.now() / 1000) + (2 * 60 * 60);
+    let exp = option.exp || Math.floor(Date.now() / 1000) + (24 * 60 * 60);
     delete option.exp;
     let token = await jwt.sign({
       user: {
@@ -97,11 +97,45 @@ module.exports = {
     })
     return flag;
   },
-  idArr(arr){
+  idArr(arr) {
     let temp = [];
-    arr.forEach((item)=>{
+    arr.forEach((item) => {
       temp.push(item.toString());
     });
     return temp;
+  },
+  randomNum(minNum, maxNum) {
+    switch (arguments.length) {
+      case 1:
+        return parseInt(Math.random() * minNum + 1, 10);
+        break;
+      case 2:
+        return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
+        break;
+      default:
+        return 0;
+        break;
+    }
+  },
+  no(goods_id, user_id, pre = "1") {
+    let goods_str = this.objectid2random(goods_id);
+    let user_str = this.objectid2random(user_id);
+    let timestrap = new Date().getTime().toString().substr(13 - 2);
+    let random = this.randomNum(1000,9999);
+    let res = goods_str + user_str + timestrap + random.toString();
+    return pre.toString() + res;
+  },
+  objectid2random(_id) {
+    let val = _id.toString().slice(18);
+    let str = parseInt(val, 16).toString();
+    if (str.length < 2) {
+      let temp = {
+        1: '0' + str,
+        0: '00'
+      };
+      return temp[str.length];
+    } else {
+      return str.substr(str.length - 2);
+    }
   }
 };

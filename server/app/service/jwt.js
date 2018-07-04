@@ -68,7 +68,7 @@ class jwtService extends Service {
     }
     let dayjs = require('dayjs');
     let refleshRange = dayjs(tokenData.expAt).diff(dayjs(), 'second');
-    if (refleshRange > 0 && refleshRange <= 600) {
+    if (refleshRange > 0 && refleshRange <= 60 * 60) {
       let option = {};
       if (!ctx.tokenData) {
         ctx.throw(401, '登录已失效,请尝试重新登录');
@@ -87,8 +87,8 @@ class jwtService extends Service {
         tokenexp: newToken.expAt
       });
       await tokenData.update({
-        value:newToken.value,
-        expAt:newToken.expAt
+        value: newToken.value,
+        expAt: newToken.expAt
       });
     }
     return tokenData;

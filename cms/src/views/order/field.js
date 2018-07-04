@@ -32,8 +32,7 @@ module.exports = {
     }
   },
   taking: {
-    _id: {
-      type: 'ObjectId',
+    no: {
       name: '订单号',
       width: "100",
       slot: true,
@@ -104,22 +103,32 @@ module.exports = {
     }
   },
   logistics: {
+    no: {
+      name: '运单号',
+      slot: true,
+      readOnly: true,
+      width: "100",
+    },
     ts: {
       name: '车/船',
       slot: true,
+      width: "120",
       readOnly: true
     },
     loading: {
-      name: '装货数量',
+      name: '装货量',
       type: 'Number',
+      width: "70",
     },
     landed: {
-      name: '卸货数量',
+      name: '卸货量',
       type: 'Number',
+      width: "70",
     },
     transportPrice: {
       name: '运费单价',
       type: 'Number',
+      width: "80",
       require: true
     },
     startAt: {
@@ -139,6 +148,7 @@ module.exports = {
       name: '状态',
       slot: true,
       readOnly: true,
+      width: "100",
       option: {
         0: '接单',
         1: '待装',

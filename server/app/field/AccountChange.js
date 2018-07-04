@@ -8,8 +8,9 @@ module.exports = {
     type: 'Number',
     option: {
       0: '充值',
-      1: '退款',
-      2: '发票'
+      1: '扣款',
+      2: '退款',
+      3: '发票'
     }
   },
   from: {
@@ -20,19 +21,20 @@ module.exports = {
     name: '收款信息',
     type: 'Object',
   },
+  user: {
+    name: '所属用户',
+    type: 'ObjectId',
+    ref: 'User'
+  },
+  company: {
+    name: '所属公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
   author: {
     name: '操作人',
     type: 'ObjectId',
     ref: 'User'
-  },
-  area: {
-    name: '收货地址',
-    type: 'ObjectId',
-    ref: 'Area'
-  },
-  address: {
-    name: '详细地址',
-    type: 'String',
   },
   invoiceType: {
     type: 'Number',

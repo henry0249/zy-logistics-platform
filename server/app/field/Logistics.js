@@ -1,9 +1,13 @@
 module.exports = {
-  state: {
+  no: {
     type: 'String',
+    name: '单号',
+  },
+  state: {
+    type: 'Number',
     name: '状态',
     option: {
-      0: '待接单',
+      0: '发布',
       1: '接单',
       2: '待装',
       3: '在途',
@@ -31,12 +35,12 @@ module.exports = {
     name: '出发地',
     ref: 'Area'
   },
-  transfer:{
+  transfer: {
     type: 'ObjectId',
     name: '中转地',
     ref: 'Transfer'
   },
-  transfer2:{
+  transfer2: {
     type: 'ObjectId',
     name: '第二中转地',
     ref: 'Transfer'
@@ -69,21 +73,21 @@ module.exports = {
     name: '卸货数量',
     type: 'Number',
   },
-  settlementCount:{
+  settlementCount: {
     name: '结算数量',
     type: 'Number',
   },
-  unitPrice: {
+  transportPrice: {
     name: '运费单价',
     type: 'Number',
     require: true
   },
-  receiptUser: {
+  user: {
     type: 'ObjectId',
     name: '收货人',
     ref: 'User'
   },
-  receiptCompany: {
+  company: {
     type: 'ObjectId',
     name: '收货公司',
     ref: 'Company'
@@ -96,7 +100,12 @@ module.exports = {
     name: '收货人联系方式',
     type: 'String',
   },
-  address:{
+  area: {
+    name: '收货地址',
+    type: 'ObjectId',
+    ref: 'Area'
+  },
+  address: {
     name: '详细地址',
     type: 'String',
   },

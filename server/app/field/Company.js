@@ -16,6 +16,14 @@ module.exports = {
     type: 'String',
     require: true
   },
+  nick: {
+    name: '简称',
+    type: 'String',
+  },
+  code: {
+    name: '代码',
+    type: 'String',
+  },
   mobile: {
     name: '手机号',
     type: 'String'

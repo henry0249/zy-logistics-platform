@@ -99,6 +99,7 @@ class OrderService extends Service {
     order.creater = ctx.user._id;
     let orderModel = new ctx.model.Order(order);
     await orderModel.save();
+    let goods_id;
     for (let i = 0; i < body.goods.length; i++) {
       const goodsItem = body.goods[i];
       let goodsModel = new ctx.model.OrderGoods({
@@ -107,7 +108,13 @@ class OrderService extends Service {
         area: orderModel.area
       });
       await goodsModel.save();
+      goods_id = goodsModel._id;
     }
+    await ctx.model.Order.update({
+      _id: orderModel._id
+    }, {
+      no: ctx.helper.no(goods_id, ctx.user._id)
+    })
     return 'ok';
   }
 
@@ -151,7 +158,7 @@ class OrderService extends Service {
       ctx.throw(422, "订单编号必填", body);
     }
     let transportTrains = body.transportTrains;
-    if (!(transportTrains && transportTrains.length>0)) {
+    if (!(transportTrains && transportTrains.length > 0)) {
       ctx.throw(422, "物流链信息必填", body);
     }
     let order = await ctx.model.Order.findById(body.order);
@@ -160,25 +167,54 @@ class OrderService extends Service {
     }
     for (let i = 0; i < transportTrains.length; i++) {
       let item = transportTrains[i];
-      if (item.origin) {
-        item.origin = item.origin._id || item.origin;
-      }else{
-        delete item.origin;
+      if (!(item.logistics instanceof Array && item.logistics.length > 0)) {
+        ctx.throw(422, "运单数量不能为0", body);
       }
-      if (item.destination) {
-        item.destination = item.destination._id || item.destination;
-      }else{
-        delete item.destination;
+      let transportTrains_id;
+      let $unset = {};
+      if (!item.origin) {
+        $unset.origin = 1;
       }
-      if (item.transfer instanceof Array && item.transfer.length>0) {
-        item.transfer = item.transfer[item.transfer.length-1];
-      }else{
-        delete item.transfer;
+      if (!item.transfer) {
+        $unset.transfer = 1;
       }
-      if (item.transfer2 instanceof Array && item.transfer2.length>0) {
-        item.transfer2 = item.transfer[item.transfer2.length-1];
-      }else{
-        delete item.transfer2;
+      if (!item.transfer2) {
+        $unset.transfer2 = 1;
+      }
+      if (!item.destination) {
+        $unset.destination = 1;
+      }
+      if (item._id) {
+        transportTrains_id = item._id;
+        delete item._id;
+        await ctx.model.TransportTrains.update({
+          _id: transportTrains_id
+        }, { ...item,
+          $unset: $unset
+        });
+      } else {
+        let transportTrainsModel = new ctx.model.TransportTrains(item);
+        await transportTrainsModel.save();
+        transportTrains_id = transportTrainsModel._id;
+      }
+      for (let j = 0; j < item.logistics.length; j++) {
+        let lg = item.logistics[j];
+        lg.transportTrains = transportTrains_id;
+        delete lg.ts;
+        if (lg._id) {
+          let logistics_id = lg._id;
+          delete lg._id;
+          await ctx.model.Logistics.update({
+            _id: logistics_id
+          }, {
+            ...lg,
+            $unset: $unset
+          });
+        } else {
+          lg.no = ctx.helper.no(lg.goods, ctx.user._id, '6');
+          let logisticsModel = new ctx.model.Logistics(lg);
+          await logisticsModel.save();
+        }
       }
     }
     return 'ok';
@@ -200,16 +236,6 @@ class OrderService extends Service {
         ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
       }
     }
-    // if (newState === 'distribution') {
-    //   if (!ctx.helper.inArr(order.dispatcher, ctx.user._id)) {
-    //     ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
-    //   }
-    // }
-    // if (newState === 'transport') {
-    //   if (!ctx.helper.inArr(order.dispatcher, ctx.user._id)) {
-    //     ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
-    //   }
-    // }
     if (newState === 'check') {
       if (!ctx.helper.inArr(order.dispatcher, ctx.user._id)) {
         ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
@@ -253,12 +279,16 @@ class OrderService extends Service {
     let res = {};
     let $or = this.getOrderMan(ctx.user._id);
     for (const key in state) {
-      let count = await ctx.model.Order.count({
+      res[key] = await ctx.model.Order.count({
         state: key,
         $or: $or
       });
-      res[key] = count || 0;
     }
+    res.distribution = await ctx.model.Logistics.count({
+      state: {
+        $nin: [5]
+      }
+    });
     return res;
   }
 
@@ -296,29 +326,30 @@ class OrderService extends Service {
   async getOrderById() {
     const ctx = this.ctx;
     let params = ctx.params;
+    let areaPopulate = [{
+      path: 'province'
+    }, {
+      path: 'city'
+    }, {
+      path: 'county'
+    }, {
+      path: 'township'
+    }, {
+      path: 'street'
+    }];
     let order = await ctx.model.Order.findById(params._id).populate([{
       path: 'user'
     }, {
       path: 'company'
     }, {
       path: 'area',
-      populate: [{
-        path: 'province'
-      }, {
-        path: 'city'
-      }, {
-        path: 'county'
-      }, {
-        path: 'township'
-      }, {
-        path: 'street'
-      }]
+      populate: areaPopulate
     }]);
     if (!order) {
       ctx.throw(404, "未找到订单", params);
     }
     let res = JSON.parse(JSON.stringify(order));
-    res.goods = await ctx.model.OrderGoods.find({
+    let goodsData = await ctx.model.OrderGoods.find({
       order: res._id
     }).populate([{
       path: 'value',
@@ -326,30 +357,50 @@ class OrderService extends Service {
         path: 'mfrs',
         populate: [{
           path: 'area',
-          populate: [{
-            path: 'province'
-          }, {
-            path: 'city'
-          }, {
-            path: 'county'
-          }, {
-            path: 'township'
-          }, {
-            path: 'street'
-          }]
+          populate: areaPopulate
         }]
       }]
-    }]);
-    let transportTrainsData = await ctx.model.TransportTrains.find({
-      order: res._id
-    });
-    let transportTrains = JSON.parse(JSON.stringify(transportTrainsData));
-    for (let i = 0; i < transportTrains.length; i++) {
-      let item = transportTrains[i];
-      item.data = await ctx.model.Logistics.find({
-        transportTrains: item._id,
-        order: res._id
-      });
+    }])
+    res.goods = JSON.parse(JSON.stringify(goodsData));
+    for (let i = 0; i < res.goods.length; i++) {
+      let goodsItem = res.goods[i];
+      let transportTrainsData = await ctx.model.TransportTrains.find({
+        order: res._id,
+        goods: goodsItem.value._id
+      }).populate([{
+        path: 'origin',
+        populate: areaPopulate
+      }, {
+        path: 'transfer',
+        populate: [{
+          path: 'area',
+          populate: areaPopulate
+        }]
+      }, {
+        path: 'transfer2',
+        populate: areaPopulate,
+        populate: [{
+          path: 'area',
+          populate: areaPopulate
+        }]
+      }, {
+        path: 'destination',
+        populate: areaPopulate
+      }]);
+      let transportTrains = JSON.parse(JSON.stringify(transportTrainsData));
+      for (let j = 0; j < transportTrains.length; j++) {
+        let item = transportTrains[j];
+        item.logistics = await ctx.model.Logistics.find({
+          transportTrains: item._id,
+          order: res._id,
+          goods: goodsItem.value._id
+        }).populate([{
+          path: 'truck'
+        }, {
+          path: 'ship'
+        }]);
+      }
+      goodsItem.transportTrainsData = transportTrains;
     }
     return res;
   }

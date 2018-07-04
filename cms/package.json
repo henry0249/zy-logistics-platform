@@ -19,6 +19,7 @@
     "iview-area": "^1.5.17",
     "js-md5": "^0.7.3",
     "vue": "^2.5.16",
+    "vue-baidu-map": "^0.21.10",
     "vue-echarts": "^3.0.7",
     "vue-router": "^3.0.1",
     "vue-sticky": "^3.3.3",

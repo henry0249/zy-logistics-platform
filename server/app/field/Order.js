@@ -1,4 +1,8 @@
 module.exports = {
+  no:{
+    type: 'String',
+    name: '单号',
+  },
   state: {
     type: 'String',
     name: '状态',
@@ -49,12 +53,10 @@ module.exports = {
     name: '收货人联系方式',
     type: 'String',
   },
-
   paid: {
     name: '实付款',
     type: 'Number'
   },
-
   paymentModel: {
     name: '付款方式',
     type: 'String',

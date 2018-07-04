@@ -4,6 +4,6 @@ let date2no = (val) => {
     date = new Date(val);
   }
   let unix = date.getTime().toString();
-  return '1' + unix.substring(4, unix.length);
+  return '6' + unix.substring(4, unix.length);
 }
 export default date2no;

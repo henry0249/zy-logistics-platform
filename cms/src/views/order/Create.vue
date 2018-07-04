@@ -23,15 +23,15 @@ import Info from "./Info.vue";
 import GoodsTable from "./GoodsTable.vue";
 
 export default {
-  components:{
+  components: {
     Info,
     GoodsTable
   },
   data() {
     return {
-      loadingText:"",
+      loadingText: "",
       order: {},
-      goods:[]
+      goods: []
     };
   },
   methods: {

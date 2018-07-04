@@ -20,14 +20,5 @@ module.exports = {
   invoiceCompany: {
     name: '开票公司',
     type: 'ObjectId'
-  },
-  invoice: {
-    name: '已开票',
-    type: 'Boolean',
-    default: false
-  },
-  order: {
-    name: '关联订单',
-    type: 'ObjectIdArray'
   }
 }
