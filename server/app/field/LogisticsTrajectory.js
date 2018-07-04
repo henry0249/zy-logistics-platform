@@ -60,8 +60,13 @@ module.exports = {
     type: 'String',
     name: '纬度'
   },
-  time:{
+  time: {
     type: 'Date',
     name: '时间'
+  },
+  author: {
+    type: 'ObjectId',
+    name: '操作人',
+    ref: 'User'
   }
 }

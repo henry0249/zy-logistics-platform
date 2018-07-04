@@ -1,4 +1,12 @@
 module.exports = {
+  type:{
+    name: '账户类型',
+    type: 'String',
+    option:{
+      user:'个人账户',
+      company:'公司账户'
+    }
+  },
   value: {
     name: '金额',
     type: 'Number',
@@ -16,9 +24,5 @@ module.exports = {
     name: '所属公司',
     type: 'ObjectId',
     ref: 'Company'
-  },
-  invoiceCompany: {
-    name: '开票公司',
-    type: 'ObjectId'
   }
 }

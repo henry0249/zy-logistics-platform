@@ -43,10 +43,9 @@
       </div>
     </div>
     <div class="flex ac" style="padding:10px 0" v-if="stepData.length>0">
-      <el-button v-if="!edit" @click="edit=true" size="mini" type="primary" icon="el-icon-edit">编辑</el-button>
-      <el-button v-if="edit" @click="save" size="mini" type="success" icon="el-icon-success">保存</el-button>
+      <el-button @click="edit=!edit" size="mini" type="primary" :icon="edit?'el-icon-back':'el-icon-edit'">{{edit?'退出编辑':'编辑'}}</el-button>
       <div class="f1"></div>
-      <el-button v-if="edit" size="mini" type="danger" icon="el-icon-refresh">重置</el-button>
+      <el-button @click="save" size="mini" type="success" icon="el-icon-success">提交数据</el-button>
     </div>
   </loading-box>
 </template>
@@ -70,9 +69,9 @@ export default {
   watch: {
     data(val) {
       this.stepData = [];
-      this.data.forEach(item => {
-        this.stepData.unshift(JSON.parse(JSON.stringify(item)));
-      });
+      let temp = [];
+      temp = JSON.parse(JSON.stringify(this.data));
+      this.stepData = temp.reverse();
     }
   },
   data() {

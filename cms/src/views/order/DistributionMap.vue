@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="laodingText">
-    <div class="flex jb">
+    <div class="flex jb" style="min-height:420px">
       <div style="width:33%;font-size:12px">
         <distribution-step @save="save" :data.sync="points"></distribution-step>
       </div>
@@ -55,7 +55,7 @@ export default {
       showPoint: false,
       showPointIndex: false,
       points: [],
-      mapLoading: "加载中..."
+      mapLoading: ""
     };
   },
   watch: {
@@ -164,15 +164,29 @@ export default {
           logistics: this.$route.params._id,
           point: data
         });
+        await this.setPoint();
       } catch (error) {}
       this.laodingText = "";
+    },
+    async setPoint() {
+      this.laodingText = "加载中...";
+      try {
+        this.points = [];
+        let res = await this.$ajax.post("/logisticsTrajectory/find", {
+          logistics: this.$route.params._id,
+          sort: {
+            time: 1
+          }
+        });
+        this.points = res;
+      } catch (error) {}
+      setTimeout(() => {
+        this.laodingText = "";
+      }, 500);
     }
   },
   created() {
-    setTimeout(() => {
-      this.laodingText = "";
-      this.mapLoading = "";
-    }, 1000);
+    this.setPoint();
   }
 };
 </script>

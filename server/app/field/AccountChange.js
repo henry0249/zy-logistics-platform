@@ -21,6 +21,11 @@ module.exports = {
     name: '收款信息',
     type: 'Object',
   },
+  account:{
+    name: '所属账户',
+    type: 'ObjectId',
+    ref: 'Account'
+  },
   user: {
     name: '所属用户',
     type: 'ObjectId',
