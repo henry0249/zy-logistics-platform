@@ -5,7 +5,6 @@
         <div v-if="!loadingText" class="flex ac jc" style="font-size:22px;padding-bottom:20px">
           <strong>账户管理</strong>
         </div>
-        <!-- <el-alert title="账户明细" type="info" :closable="false" style="margin:15px 0"></el-alert> -->
         <user-account-edmit-item v-if="!loadingText" :accountValue="value" @recharge="recharge" :data="data" :accountObj.sync="accountObj"></user-account-edmit-item>
       </div>
       <div class="je" style="margin-top:20px;">

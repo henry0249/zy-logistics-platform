@@ -13,29 +13,29 @@
             </my-form-item>
             <my-form-item style="width:25%;padding-right:20px;" input v-model="companyData.tel" filterable label="公司固话">
             </my-form-item>
-            <my-form-item @change="change" style="width:25%;" size="mini" label="公司类型" multiple collapse-tags select v-model="companyData.type"  :options="field.Company.type.option"></my-form-item>
+            <my-form-item @change="change" style="width:25%;" size="mini" label="公司类型" multiple collapse-tags select v-model="companyData.type" :options="field.Company.type.option"></my-form-item>
           </div>
           <div class="flex form-box" style="margin-top:20px;">
             <my-form-item style="width:25%;padding-right:20px;" input v-model="companyData.nick" filterable label="公司别称">
             </my-form-item>
             <my-form-item style="width:25%;padding-right:20px;" input v-model="companyData.code" filterable label="公司代码">
             </my-form-item>
-            <select-item style="width:50%" v-once v-model="companyData.owner" label="主管理员" :loadingText="loadingText"></select-item>
+            <my-form-item style="width:25%;padding-right:20px;" filterable :change-on-select="true" v-model="companyData.area" area placeholder="选择区域" label="公司地址"></my-form-item>
+            <my-form-item style="width:25%;" input v-model="companyData.address" filterable label="详细地址">
+            </my-form-item>
           </div>
           <div class="flex form-box" style="margin-top:20px;">
             <select-item style="width:50%;padding-right:20px;" v-once v-model="companyData.admin" label="管理员" :loadingText="loadingText"></select-item>
             <select-item style="width:50%;" v-once v-model="companyData.salesman" label="业务专员" :loadingText="loadingText"></select-item>
             <!-- <select-item style="width:25%;padding-right:20px;" v-once v-model="companyData.documentClerk" label="单据文员" :loadingText="loadingText"></select-item>
-                          <select-item style="width:25%;" v-once v-model="companyData.financial" label="财务文员" :loadingText="loadingText"></select-item> -->
+                                <select-item style="width:25%;" v-once v-model="companyData.financial" label="财务文员" :loadingText="loadingText"></select-item> -->
           </div>
           <div class="flex form-box" style="margin-top:20px;">
             <select-item style="width:50%;padding-right:20px;" v-once v-model="companyData.documentClerk" label="单据文员" :loadingText="loadingText"></select-item>
             <select-item style="width:50%;" v-once v-model="companyData.financial" label="财务文员" :loadingText="loadingText"></select-item>
           </div>
           <div class="flex form-box" style="margin-top:20px;">
-            <my-form-item style="width:25%;padding-right:20px;" filterable :change-on-select="true" v-model="companyData.area" area placeholder="选择区域" label="公司地址"></my-form-item>
-            <my-form-item style="width:25%;padding-right:20px;" input v-model="companyData.address" filterable label="详细地址">
-            </my-form-item>
+            <select-item style="width:50%;padding-right:20px;" v-once v-model="companyData.owner" label="主管理员" :loadingText="loadingText"></select-item>
             <my-form-item style="width:25%;padding-right:20px;" select v-model="companyData.platform" label="所属平台" :options="platformArr">
             </my-form-item>
             <my-form-item switch v-model="companyData.self" filterable label="是否自营" active-text="是" inactive-text="否">
@@ -46,15 +46,15 @@
           <my-table v-if="io" style="margin-top:20px;" border index size="mini" :thead="tableHeader" edit :data.sync="tableList" op>
             <div slot="op" slot-scope="scope">
               <i v-if="tableList.length>1" title="删除该地区" class="pointer" style="margin-right:10px" @click="delAdr(scope['index'],tableList)">
-                                                    <icon size="16px">icon-ec1</icon>
-                                                  </i>
+                                                          <icon size="16px">icon-ec1</icon>
+                                                        </i>
               <i v-if="scope['index'] === tableList.length - 1" title="增加一个地区" class="pointer" @click="addAdr(tableList)">
-                                                    <icon size="16px">icon-54</icon>
-                                                  </i>
+                                                          <icon size="16px">icon-54</icon>
+                                                        </i>
             </div>
             <template slot-scope="scope" v-if="scope.column.property === 'owner' || scope.column.property === 'type'">
-                                                  <my-form-item size="mini" v-if="scope.column.property === 'type'" multiple collapse-tags select v-model="scope.row[scope.column.property]" filterable :options="field.Truck.type.option"></my-form-item>
-                <select-item style="width:100%;margin-right:20px;" v-if="scope.column.property === 'owner'" v-model="scope.row[scope.column.property]" :loadingText="loadingText"></select-item>
+                                                        <my-form-item size="mini" v-if="scope.column.property === 'type'" multiple collapse-tags select v-model="scope.row[scope.column.property]" filterable :options="field.Truck.type.option"></my-form-item>
+                      <select-item style="width:100%;margin-right:20px;" v-if="scope.column.property === 'owner'" v-model="scope.row[scope.column.property]" :loadingText="loadingText"></select-item>
 </template>
           </my-table>
         <el-alert v-if="io" title="船只列表" type="info" :closable="false" style="margin:15px 0"></el-alert>
@@ -267,7 +267,6 @@
                 console.log(index);
                 if (!this.shipList[index].name && !this.shipList[index].no && !this.shipList[index].type && !this.shipList[index].owner) {
                   console.log(index, 'shipListrkong');
-
                 } else {
                   console.log(index, '执行');
                   let setShip = await this.$api.curd({
