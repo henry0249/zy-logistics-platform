@@ -1,6 +1,6 @@
 <template>
-  <div style="width:100%;">
-    <div>{{data.title}}</div>
+  <div style="width:100%;border:1px solid #ccc;box-sizing:border-box;">
+    <div style="height:35px;width:100%;">{{data.title}}</div>
   </div>
 </template>
 

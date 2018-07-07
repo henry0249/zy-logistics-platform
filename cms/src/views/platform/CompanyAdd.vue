@@ -13,7 +13,7 @@
             </my-form-item>
             <my-form-item style="width:25%;padding-right:20px;" input v-model="companyData.tel" filterable label="公司固话">
             </my-form-item>
-            <my-form-item @change="change" style="width:25%;" size="mini" label="公司类型" multiple collapse-tags select v-model="companyData.type" filterable :options="field.Company.type.option"></my-form-item>
+            <my-form-item @change="change" style="width:25%;" size="mini" label="公司类型" multiple collapse-tags select v-model="companyData.type"  :options="field.Company.type.option"></my-form-item>
           </div>
           <div class="flex form-box" style="margin-top:20px;">
             <my-form-item style="width:25%;padding-right:20px;" input v-model="companyData.nick" filterable label="公司别称">

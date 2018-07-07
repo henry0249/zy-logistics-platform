@@ -42,7 +42,7 @@
         </div>
       </div>
     </div>
-    <el-dialog title="收货地址" :visible.sync="dialogTableVisible">
+    <el-dialog :visible.sync="dialogTableVisible">
       <account-dan></account-dan>
     </el-dialog>
   </div>
@@ -71,6 +71,7 @@ import AccountDan from './AccountDan.vue';
     },
     data() {
       return {
+        dialogTableVisible:false,
         thead: {
           name: {
             name: '公司名称',
