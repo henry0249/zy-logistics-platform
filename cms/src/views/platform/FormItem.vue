@@ -9,8 +9,8 @@
     </div>
     <div class="flex form-box" style="margin-top:20px;">
       <!-- <my-form-item class="form-right" input v-model.number="obj.balance" filterable label="账户余额"></my-form-item> -->
-      <my-form-item class="form-right" size="mini" label="平台" multiple collapse-tags select v-model="obj.platform" filterable :options="platformArr"></my-form-item>
-      <my-form-item class="form-right" size="mini" label="公司" multiple collapse-tags select v-model="obj.company" filterable :options="companyArr"></my-form-item>
+      <my-form-item class="form-right" size="mini" label="平台" multiple collapse-tags select v-model="obj.platform"  :options="platformArr"></my-form-item>
+      <my-form-item class="form-right" size="mini" label="公司" multiple collapse-tags select v-model="obj.company"  :options="companyArr"></my-form-item>
       <div class="flex edmit-tag" style="flex:0 0 24%;">
         <div style="width:60px;fontSize:12px;">标签</div>
         <el-tag size="mini" style="margin-right:10px;" :key="tag" v-for="tag in obj.tag" closable :disable-transitions="false" @close="handleClose(obj.tag,tag)">
