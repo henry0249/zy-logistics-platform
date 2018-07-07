@@ -86,7 +86,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    height: 36px;
+    height: 55px;
     border-bottom: 1px solid #d6d6d6;
     box-sizing: border-box;
   }

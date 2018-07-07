@@ -1,5 +1,5 @@
 <template>
-  <platform-table class="auto" v-model="loadingText" :thead="thead" :data="data" @op="op" @search="search" @add="add">
+  <platform-table class="auto" v-model="loadingText" border :thead="thead" :data="data" @op="op" @search="search" @add="add">
     <template slot="tem" slot-scope="scope" v-if="scope.column.property === 'platform'||scope.column.property === 'company'||scope.column.property === 'tag'">
             <el-tag v-if="scope.column.property === 'platform'||scope.column.property === 'company'" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row[scope.column.property]" :key="item.id">
             {{item.name}}</el-tag>

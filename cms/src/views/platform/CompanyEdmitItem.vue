@@ -80,10 +80,15 @@
           </my-table> 
       </my-form>
     </div>
-    <div class="tr" style="margin-top:30px">
-      <el-button size="small" @click="back()">返 回</el-button>
-      <el-button size="small" type="primary" @click="sub">修 改</el-button>
-    </div>
+      <div class="tr jb" style="margin-top:30px">
+        <div>
+          <el-button size="small" @click="$router.push({path:`/platform/user_account_edmit/${$route.params._id}`})">账户管理</el-button>
+        </div>
+        <div>
+          <el-button size="small" @click="back()">返 回</el-button>
+          <el-button size="small" type="primary" @click="sub" :disabled="disabled">修 改</el-button>
+        </div>
+      </div>
   </div>
 </template>
 
