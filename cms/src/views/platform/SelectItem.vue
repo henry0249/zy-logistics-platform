@@ -10,7 +10,7 @@
     </div>
     <el-button style="margin-left:10px;" size="mini" class="button-new-tag" @click="edmit">编辑</el-button>
     <el-dialog @close="close" width="70%" :visible.sync="dialogVisible">
-      <dialog-item v-if="dialogVisible" :io="io" :label="label" :newsValue="newsValue" :startValue.sync="startValue" :thead="thead" :dialogVisible.sync="dialogVisible" :admin="value"></dialog-item>
+      <dialog-item v-if="dialogVisible" :op="op" :io="io" :label="label" :newsValue="newsValue" :startValue.sync="startValue" :thead="thead" :dialogVisible.sync="dialogVisible" :admin="value"></dialog-item>
       <div slot="footer" class="dialog-footer">
         <el-button size="mini" @click="res" type="primary">确 定</el-button>
       </div>
@@ -25,6 +25,12 @@
       DialogItem
     },
     props: {
+      op: {
+        type: Object,
+        default () {
+          return {}
+        }
+      },
       loadingText: {
         type: String,
         default: ''
@@ -47,7 +53,7 @@
         default: ''
       },
       value: {
-        type: [Object, Array],
+        type: [String, Object, Array],
         default () {
           return {}
         }
@@ -64,7 +70,7 @@
         startValue: [],
         newsValue: [],
         dialogVisible: false,
-        io:false,
+        io: false,
       }
     },
     watch: {
@@ -73,10 +79,6 @@
       },
       newsValue(val) {
         this.$emit('input', val);
-      },
-      startValue(val) {
-        console.log('111', val);
-        // this.newsValue = val
       }
     },
     methods: {
@@ -94,22 +96,41 @@
       },
     },
     async created() {
-      if (this.label === '') {
-        console.log(this.value instanceof Array);
-      }
       if (this.value instanceof Array) {
         this.io = true;
-        this.newsValue = [];
-        this.value.forEach(item => {
-          this.newsValue.push({
-            _id: item._id,
-            name: item.name,
-          })
-        });
-      } else {
+        if (this.value.length > 0) {
+          this.newsValue = [];
+          this.value.forEach(item => {
+            this.newsValue.push({
+              _id: item._id,
+              name: item.name,
+            })
+          });
+        } else {
+          this.newsValue = [];
+        }
+      } else if (this.value instanceof Object) {
         this.io = false;
-        this.newsValue = [];
-        this.newsValue.push(this.value)
+        if (Object.keys(this.value).length > 0) {
+          this.newsValue = [];
+          this.newsValue.push(this.value)
+        } else {
+          this.newsValue = [];
+        }
+      } else {
+        if (this.value) {
+          let res = await this.$api.curd({
+            model: 'user',
+            curdType: 'findOne',
+            _id: this.value
+          })
+          this.newsValue.push({
+            _id: res._id,
+            name: res.name
+          })
+        } else {
+          this.newsValue = [];
+        }
       }
       if (this.label === '主管理员') {
         console.log('!!!!', this.newsValue);

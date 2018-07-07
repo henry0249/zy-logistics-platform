@@ -8,8 +8,8 @@
       </el-tag>
     </div>
     <el-alert title="全部用户" type="info" :closable="false" style="margin:15px 0"></el-alert>
-    <div>
-      <my-table size="mini" border index height="calc(70vh - 160px - 140px - 100px)" :select.sync="select" selection v-model="loadingText" :thead="thead" :data="data" :loadmore="loadmore">
+    <div v-if="!loadingText">
+      <my-table size="mini" border index height="calc(70vh - 160px - 300px)" :select.sync="select" selection v-model="loadingText" :thead="thead" :data="data" :loadmore="loadmore">
         <div class="search-box" slot="header">
           <el-input size="mini" placeholder="请输入姓名或手机号" v-model="input">
             <div slot="append" class="pointer" @click="search">搜 索</div>
@@ -23,9 +23,15 @@
 <script>
   export default {
     props: {
-      io:{
-        type:Boolean,
-        default:false
+      op: {
+        type: Object,
+        default () {
+          return {}
+        }
+      },
+      io: {
+        type: Boolean,
+        default: false
       },
       label: {
         type: String,
@@ -54,7 +60,7 @@
         }
       },
       admin: {
-        type: [Object, Array],
+        type: [String, Object, Array],
         default () {
           return {}
         }
@@ -70,6 +76,11 @@
       }
     },
     watch: {
+      async input(val){
+        if (val === '') {
+          await this.getData()
+        }
+      },
       tags(val) {
         this.$emit('update:startValue', val);
       },
@@ -80,8 +91,7 @@
         }
       },
       select(val) {
-        if (val.length === 0) {
-        } else {
+        if (val.length === 0) {} else {
           if (this.io) {
             val.forEach(item => {
               this.tags.push({
@@ -111,10 +121,37 @@
         this.tags.splice(this.tags.indexOf(tag), 1);
       },
       async loadmore() {
-        return await this.$ajax.post("/user/find", {
-          limit: 1,
-          skip: this.data.length,
-          $or: [{
+        let op = {};
+        if (Object.keys(this.op).length > 0) {
+          for (const key in this.op) {
+            op[key] = this.op[key]
+          }
+        }
+        op.skip = this.data.length;
+        op.limit = 10;
+        op.$or = [{
+            name: {
+              $regex: this.input
+            }
+          },
+          {
+            mobile: {
+              $regex: this.input
+            }
+          }
+        ];
+        return await this.$ajax.post("/user/find", op);
+      },
+      async search() {
+        try {
+          this.loadingText = '加载中';
+          let op = {};
+          if (Object.keys(this.op).length > 0) {
+            for (const key in this.op) {
+              op[key] = this.op[key]
+            }
+          }
+          op.$or = [{
               name: {
                 $regex: this.input
               }
@@ -124,20 +161,29 @@
                 $regex: this.input
               }
             }
-          ]
-        });
+          ];
+          op.model = 'user';
+          op.curdType = 'find';
+          op.limit = 10;
+          op.skip = 0;
+          this.data = await this.$api.curd(op)
+        } catch (error) {}
+        this.loadingText = '';
       },
-      search() {},
       async getData() {
         try {
           this.loadingText = '加载中';
-          this.data = await this.$api.curd({
-            model: 'user',
-            curdType: 'find',
-            company: this.$route.params._id,
-            limit: 1,
-            skip: 0
-          })
+          let op = {};
+          if (Object.keys(this.op).length > 0) {
+            for (const key in this.op) {
+              op[key] = this.op[key]
+            }
+          }
+          op.model = 'user';
+          op.curdType = 'find';
+          op.limit = 10;
+          op.skip = 0;
+          this.data = await this.$api.curd(op)
         } catch (error) {}
         this.loadingText = '';
       }

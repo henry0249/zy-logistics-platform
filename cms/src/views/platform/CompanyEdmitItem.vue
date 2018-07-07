@@ -7,11 +7,11 @@
       <my-form size="mini" width="24%" style="margin:15px 0" v-if="!loadingText">
         <el-alert title="公司信息" type="info" :closable="false" style="margin:15px 0"></el-alert>
         <div class="flex ac jb">
-          <my-form-item input v-model="companyData.name" filterable label="公司名称">
+          <my-form-item style="width:25%;padding-right:20px;" input v-model="companyData.name" filterable label="公司名称">
           </my-form-item>
-          <my-form-item input v-model="companyData.mobile" filterable label="手机号">
+          <my-form-item style="width:25%;padding-right:20px;" input v-model="companyData.mobile" filterable label="手机号">
           </my-form-item>
-          <my-form-item input v-model="companyData.tel" filterable label="公司固话">
+          <my-form-item style="width:25%;padding-right:20px;" input v-model="companyData.tel" filterable label="公司固话">
           </my-form-item>
           <div class="flex form-select-box">
             <div style="width: 60px; font-size: 12px;">公司类型</div>
@@ -22,37 +22,43 @@
           </div>
         </div>
         <div class="flex ac jb" style="margin-top:20px;" v-if="platformArr.length>0">
-          <my-form-item class="form-right" filterable :change-on-select="true" v-model="companyData.area" area placeholder="选择区域" label="公司地址"></my-form-item>
-          <my-form-item class="form-right" input v-model="companyData.address" filterable label="详细地址">
+          <my-form-item style="width:25%;padding-right:20px;" input v-model="companyData.nick" filterable label="公司别称">
           </my-form-item>
-          <my-form-item class="form-right" filterable select v-model="companyData.platform" label="所属平台" :options="platformArr">
+          <my-form-item style="width:25%;padding-right:20px;" input v-model="companyData.code" filterable label="公司代码">
+          </my-form-item>
+          <my-form-item style="width:25%;padding-right:20px;" filterable select v-model="companyData.platform" label="所属平台" :options="platformArr">
           </my-form-item>
           <!-- <my-form-item select v-model="companyData.owner" filterable label="主管理员">
-                                            </my-form-item> -->
-          <select-item style="width:24%;" v-once v-model="companyData.owner" label="主管理员" :loadingText="loadingText"></select-item>
+                                                </my-form-item> -->
+          <select-item style="width:25%;" v-once v-model="companyData.owner" label="主管理员" :loadingText="loadingText"></select-item>
           <!-- <add-input style="width:24%;" label="主管理员" v-model="companyData.owner" str="user"></add-input> -->
         </div>
         <div class="flex form-box" style="margin-top:20px;">
-          <select-item style="width:24%;margin-right:20px;" v-once v-model="companyData.admin" label="管理员" :loadingText="loadingText"></select-item>
-          <select-item style="width:24%;margin-right:20px;" v-once v-model="companyData.salesman" label="业务专员" :loadingText="loadingText"></select-item>
-          <select-item style="width:24%;margin-right:20px;" v-once v-model="companyData.documentClerk" label="单据文员" :loadingText="loadingText"></select-item>
-          <select-item style="width:24%;" v-once v-model="companyData.financial" label="财务文员" :loadingText="loadingText"></select-item>
+          <select-item style="width:25%;padding-right:20px;" :op="op" v-once v-model="companyData.admin" label="管理员" :loadingText="loadingText"></select-item>
+          <select-item style="width:25%;padding-right:20px;" :op="op" v-once v-model="companyData.salesman" label="业务专员" :loadingText="loadingText"></select-item>
+          <select-item style="width:25%;padding-right:20px;" :op="op" v-once v-model="companyData.documentClerk" label="单据文员" :loadingText="loadingText"></select-item>
+          <select-item style="width:25%;" v-once v-model="companyData.financial" label="财务文员" :loadingText="loadingText"></select-item>
         </div>
-        <my-form-item style="margin-top:20px;" switch v-model="companyData.self" filterable label="是否自营" active-text="是" inactive-text="否">
-        </my-form-item>
+        <div class="flex form-box" style="margin-top:20px;">
+          <my-form-item style="width:25%;padding-right:20px;" filterable :change-on-select="true" v-model="companyData.area" area placeholder="选择区域" label="公司地址"></my-form-item>
+          <my-form-item style="width:25%;padding-right:20px;" input v-model="companyData.address" filterable label="详细地址">
+          </my-form-item>
+          <my-form-item switch v-model="companyData.self" filterable label="是否自营" active-text="是" inactive-text="否">
+          </my-form-item>
+        </div>
         <el-alert title="车辆列表" type="info" :closable="false" style="margin:15px 0"></el-alert>
         <my-table v-if="companyType" style="margin-top:20px;" border index size="mini" :thead="tableHeader" edit :data.sync="tableList" op>
           <div slot="op" slot-scope="scope">
             <i v-if="tableList.length>1" title="删除该地区" class="pointer" style="margin-right:10px" @click="delAdr(scope['index'],tableList)">
-                                                    <icon size="16px">icon-ec1</icon>
-                                                  </i>
+                                                        <icon size="16px">icon-ec1</icon>
+                                                      </i>
             <i v-if="scope['index'] === tableList.length - 1" title="增加一个地区" class="pointer" @click="addAdr(tableList)">
-                                                    <icon size="16px">icon-54</icon>
-                                                  </i>
+                                                        <icon size="16px">icon-54</icon>
+                                                      </i>
           </div>
           <template slot-scope="scope" v-if="scope.column.property === 'owner' || scope.column.property === 'type'">
-                      <my-form-item size="mini" v-if="scope.column.property === 'type'" multiple collapse-tags select v-model="scope.row[scope.column.property]" filterable :options="field.Truck.type.option"></my-form-item>
-                      <select-item style="width:100%;margin-right:20px;" v-if="scope.column.property === 'owner'" v-model="scope.row[scope.column.property]" :loadingText="loadingText"></select-item>
+                          <my-form-item size="mini" v-if="scope.column.property === 'type'" multiple collapse-tags select v-model="scope.row[scope.column.property]" filterable :options="field.Truck.type.option"></my-form-item>
+                          <select-item style="width:100%;margin-right:20px;" v-if="scope.column.property === 'owner'" v-model="scope.row[scope.column.property]" :loadingText="loadingText"></select-item>
 </template>
         </my-table>
         <el-alert title="船只列表" type="info" :closable="false" style="margin:15px 0"></el-alert>
@@ -125,12 +131,15 @@
     },
     data() {
       return {
+        op: {},
         admin: [],
         owner: {},
         salesman: [],
         documentClerk: [],
         financial: [],
         companyData: {
+          nick: '',
+          code: '',
           name: "",
           type: 0,
           mobile: "",
@@ -318,6 +327,9 @@
           this.companyData[key] = this.data[key]
         }
       }
+      this.op = {
+        company: this.$route.params._id,
+      }
       this.tableList = JSON.parse(JSON.stringify(this.truck));
       this.shipList = JSON.parse(JSON.stringify(this.ship));
     }
@@ -345,8 +357,8 @@
     align-items: center;
   }
   .form-select-box {
-    width: 24%;
-    flex: 0 0 24%;
+    width: 25%;
+    flex: 0 0 25%;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;

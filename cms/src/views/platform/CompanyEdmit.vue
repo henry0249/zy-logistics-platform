@@ -48,6 +48,8 @@
               self: val.data.self,
               tel: val.data.tel,
               type: val.data.type,
+              nick: val.data.nick,
+              code: val.data.code,
             }
           });
           if (res) {

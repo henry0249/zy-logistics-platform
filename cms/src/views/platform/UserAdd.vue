@@ -31,68 +31,91 @@
           recommendedByUser: '',
           superior: '',
           parent: '',
-          role:[],
+          role: [],
           defaultAddress: '',
           address: [],
-          area:[{
-            value:[]
+          area: [{
+            value: []
           }]
         },
         platformArr: [],
         companyArr: [],
         userArr: [],
         address: [],
-        data:[{
-          default:false,
-          contactName:'',
-          area:[],
-          name:'',
-          contactMobile:''
+        data: [{
+          default: false,
+          contactName: '',
+          area: [],
+          name: '',
+          contactMobile: ''
         }],
-        thead:{
-          default:{
-            name:'默认地址',
-            readOnly:true,
-            slot:true,
+        thead: {
+          default: {
+            name: '默认地址',
+            readOnly: true,
+            slot: true,
           },
-          contactName:{
-            name:'联系人',
+          contactName: {
+            name: '联系人',
           },
-          area:{
-            name:'区域',
-            readOnly:true,
-            slot:true,
+          area: {
+            name: '区域',
+            readOnly: true,
+            slot: true,
           },
-          name:{
-            name:'详细地址',
+          name: {
+            name: '详细地址',
           },
-          contactMobile:{
-            name:'联系电话',
+          contactMobile: {
+            name: '联系电话',
           }
         }
       }
     },
     watch: {
-      'userObj.name'(val){
+      'userObj.name' (val) {
         console.log(this.userObj);
       }
     },
     methods: {
-      async sub(){
+      async sub() {
+        console.log(1);
         if (this.userObj.mobile) {
+          console.log(2);
           let io = true;
           try {
+            console.log(3);
             this.loadingText = '添加中';
             let userop = {}
             for (const key in this.userObj) {
               if (this.userObj.hasOwnProperty(key)) {
-
-                userop[key] = this.userObj[key]
+                if (key === 'area') {
+                  userop[key] = [];
+                  let io = true
+                  this.userObj[key].forEach(item => {
+                    if (item.value.length > 0) {
+                      userop[key].push(item.value[0])
+                    } else {
+                      io = false
+                    }
+                  });
+                  if (!io) {
+                    delete userop[key]
+                  }
+                } else if (this.userObj[key] === '' || this.userObj[key].length === 0) {} else {
+                  userop[key] = this.userObj[key];
+                }
               }
             }
-            userop.model="user";
-            userop.curdType="set";
+            userop.model = 'user';
+            userop.curdType = 'set';
             delete userop.defaultAddress
+            console.log('userop', userop);
+            for (const key in userop) {
+              if (userop[key] === '' || userop[key].length === 0) {
+                delete userop[key]
+              }
+            }
             let user = await this.$api.curd(userop)
             if (user) {
               for (let index = 0; index < this.data.length; index++) {
@@ -101,23 +124,29 @@
                   if (this.data[index].hasOwnProperty(key)) {
                     if (key === 'area') {
                       addressop[key] = this.data[index][key][this.data[index][key].length - 1]
-                    }else{
+                    } else {
                       addressop[key] = this.data[index][key]
                     }
                   }
                 }
-                addressop.model="address";
-                addressop.curdType="set";
-                addressop.company=this.userObj.company;
-                addressop.user=user._id;
+                addressop.model = "address";
+                addressop.curdType = "set";
+                if (this.userObj.company.length > 0) {
+                  addressop.company = this.userObj.company;
+                } else {
+                  delete addressop.company
+                }
+                addressop.user = user._id;
                 let address = await this.$api.curd(addressop);
-                if (address&&this.data[index].default) {
+                if (address && this.data[index].default) {
                   let updateUser = await this.$api.curd({
-                    model:'user',
-                    curdType:'update',
-                    find:{_id:user._id},
-                    update:{
-                      defaultAddress:address._id
+                    model: 'user',
+                    curdType: 'update',
+                    find: {
+                      _id: user._id
+                    },
+                    update: {
+                      defaultAddress: address._id
                     }
                   })
                 };
@@ -141,12 +170,11 @@
                 this.$router.go(-1);
               });
           }
-        }else{
-           this.$alert('手机号码必填', '提示', {
-          confirmButtonText: '确定',
-          callback: action => {
-          }
-        });
+        } else {
+          this.$alert('手机号码必填', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {}
+          });
         }
       },
       async getPlatform() {

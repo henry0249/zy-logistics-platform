@@ -1,8 +1,16 @@
 let company = {
+  code:{
+    readOnly: true,
+    name:'公司代码'
+  },
   name: {
     readOnly: true,
     slot:true,
     name: '公司名'
+  },
+  nick:{
+    readOnly: true,
+    name:'公司别名'
   },
   type: {
     readOnly: true,

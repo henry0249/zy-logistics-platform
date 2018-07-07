@@ -1,5 +1,5 @@
 <template>
-  <edmit-tem v-model="loadingText" :str="str" :goods="goods" @sub="sub" :category="category" :mfrs="mfrs" :brand="brand" :tableList="tableList" :area="area">
+  <edmit-tem style="height:calc(100vh - 50px);overflow: auto;" v-model="loadingText" :str="str" :goods="goods" @sub="sub" :category="category" :mfrs="mfrs" :brand="brand" :tableList="tableList" :area="area">
   </edmit-tem>
 </template>
 
@@ -248,5 +248,6 @@
     justify-content: flex-end;
     align-items: center;
     margin-top: 20px;
+    
   }
 </style>

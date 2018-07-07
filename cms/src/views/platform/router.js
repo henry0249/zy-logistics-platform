@@ -11,6 +11,7 @@ import CompanyEdmit from './CompanyEdmit.vue';
 import CompanyAdd from './CompanyAdd.vue';
 import UserEdmit from './UserEdmit.vue';
 import UserAdd from './UserAdd.vue';
+import UserAccountEdmit from './UserAccountEdmit.vue';
 
 export default [{
   path: '/platform',
@@ -52,5 +53,8 @@ export default [{
   }, {
     path: 'user_add',
     component: UserAdd
+  }, {
+    path: 'user_account_edmit/:_id',
+    component: UserAccountEdmit
   }]
 }]
