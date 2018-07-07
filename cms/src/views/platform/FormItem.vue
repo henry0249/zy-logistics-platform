@@ -1,5 +1,5 @@
 <template>
-  <my-form v-if="!value" slot="form" size="mini" width="24%" style="margin:15px 0">
+  <my-form v-if="!value" slot="form" size="mini" width="25%" style="margin:15px 0">
     <el-alert title="用户信息" type="info" :closable="false" style="margin:15px 0"></el-alert>
     <div class="flex form-box">
       <my-form-item class="form-right" input v-model="obj.name" filterable label="用户名称"></my-form-item>
@@ -23,10 +23,10 @@
     </div>
     <div class="flex form-box" style="margin-top:20px;">
       <!-- <my-form-item class="form-right" size="mini" label="推荐人" select v-model="obj.recommendedByUser" filterable :options="userArr"></my-form-item> -->
-      <select-item style="width:24%;margin-right:20px;" v-once v-model="obj.recommendedByUser" label="推荐人" :loadingText="value"></select-item>
+      <select-item style="width:25%;padding-right:20px;" v-once v-model="obj.recommendedByUser" label="推荐人" :loadingText="value"></select-item>
       <!-- <my-form-item class="form-right" size="mini" label="上级" select v-model="obj.superior" filterable :options="userArr"></my-form-item>
         <my-form-item class="form-right" size="mini" label="父级" select v-model="obj.parent" filterable :options="userArr"></my-form-item> -->
-      <my-form-item size="mini" label="角色" multiple collapse-tags select v-model="obj.role" filterable :options="field.User.role.option"></my-form-item>
+      <my-form-item class="form-right" size="mini" label="角色" multiple collapse-tags select v-model="obj.role" filterable :options="field.User.role.option"></my-form-item>
     </div>
     <div class="flex form-box" style="margin-top:20px;">
       <div style="flex:0 0 60px;fontSize:12px;">可选区域</div>
@@ -246,7 +246,7 @@
 
 <style scoped>
   .form-right {
-    margin-right: 20px;
+    padding-right: 20px;
   }
   .form-box {
     flex-direction: row;
