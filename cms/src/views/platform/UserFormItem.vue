@@ -1,16 +1,15 @@
 <template>
   <div>
     <div class="flex form-box">
-      <my-form-item width="24%" size="mini" class="form-right" input v-model="obj.name" filterable label="用户名称"></my-form-item>
-      <my-form-item width="24%" size="mini" class="form-right" input v-model="obj.mobile" filterable label="手机号"></my-form-item>
-      <my-form-item width="24%" size="mini" class="form-right" input v-model="obj.type" filterable label="类型"></my-form-item>
-      <my-form-item width="24%" size="mini" input v-model="obj.email" filterable label="邮箱"></my-form-item>
+      <my-form-item width="25%" size="mini" class="form-right" input v-model="obj.name"  label="用户名称"></my-form-item>
+      <my-form-item width="25%" size="mini" class="form-right" input v-model="obj.mobile"  label="手机号"></my-form-item>
+      <my-form-item width="25%" size="mini" class="form-right" input v-model="obj.type"  label="类型"></my-form-item>
+      <my-form-item width="25%" size="mini" input v-model="obj.email" filterable label="邮箱"></my-form-item>
     </div>
     <div class="flex form-box" style="margin-top:20px;">
-      <!-- <my-form-item class="form-right" size="mini" input v-model.number="obj.balance" filterable label="账户余额"></my-form-item> -->
-      <my-form-item width="24%" class="form-right" size="mini" label="平台" multiple collapse-tags select v-model="obj.platform" filterable :options="platformArr"></my-form-item>
-      <my-form-item width="24%" class="form-right" size="mini" label="公司" multiple collapse-tags select v-model="obj.company" filterable :options="companyArr"></my-form-item>
-      <div class="flex edmit-tag" style="flex:0 0 24%;">
+      <my-form-item width="25%" class="form-right" size="mini" label="平台" multiple collapse-tags select v-model="obj.platform"  :options="platformArr"></my-form-item>
+      <my-form-item width="25%" class="form-right" size="mini" label="公司" multiple collapse-tags select v-model="obj.company"  :options="companyArr"></my-form-item>
+      <div class="flex edmit-tag" style="flex:0 0 25%;">
         <div style="width:60px;fontSize:12px;">标签</div>
         <el-tag size="mini" style="margin-right:10px;" :key="tag" v-for="tag in obj.tag" closable :disable-transitions="false" @close="handleClose(obj.tag,tag)">
           {{tag}}
@@ -22,10 +21,10 @@
     </div>
     <div class="flex form-box" style="margin-top:20px;">
       <!-- <my-form-item width="24%"  class="form-right" size="mini" label="推荐人" select v-model="obj.recommendedByUser" filterable :options="newUserArr"></my-form-item> -->
-      <select-item style="width:24%;margin-right:20px;" v-once v-model="obj.recommendedByUser" label="推荐人" :loadingText="value"></select-item>
+      <select-item style="width:25%;padding-right:20px;" v-once v-model="obj.recommendedByUser" label="推荐人" :loadingText="value"></select-item>
       <!-- <my-form-item class="form-right" size="mini" label="上级" select v-model="obj.superior" filterable :options="newUserArr"></my-form-item>
       <my-form-item class="form-right" size="mini" label="父级" select v-model="obj.parent" filterable :options="newUserArr"></my-form-item> -->
-      <my-form-item width="24%" size="mini" label="角色" multiple collapse-tags select v-model="obj.role" filterable :options="field.User.role.option"></my-form-item>
+      <my-form-item class="form-right" width="25%" size="mini" label="角色" multiple collapse-tags select v-model="obj.role" filterable :options="field.User.role.option"></my-form-item>
     </div>
     <div class="flex form-box" style="margin-top:20px;">
       <div style="flex:0 0 60px;fontSize:12px;">可选区域</div>
@@ -185,7 +184,7 @@
 
 <style scoped>
   .form-right {
-    margin-right: 20px;
+    padding-right: 20px;
   }
   .form-box {
     flex-direction: row;
