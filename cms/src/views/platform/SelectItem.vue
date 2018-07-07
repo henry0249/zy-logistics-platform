@@ -1,15 +1,15 @@
 <template>
   <loading-box v-model="loadingText" class="flex ac js">
     <div style="width:60px;font-size:12px;" v-if="label" ref="div">{{label}}</div>
-    <div class="flex js ac f1 span-bor">
+    <div class="flex js ac f1 span-bor" ref="div">
       <p v-if="newsValue.length > 0" style="background:#f0f2f5;border-radius: 4px;padding: 0 5px">
-        {{newsValue[0].name}}
-        <i class="el-icon-error pointer add-icon" @click="del"></i>
+        {{newsValue[0].name?newsValue[0].name:newsValue[0].mobile}}
+        <i class="el-icon-error pointer add-icon" @click="del" ref="i"></i>
       </p>
-      <p style="background:#f0f2f5;border-radius: 4px;padding: 0 5px;margin-left:5px;" v-if="newsValue.length > 1">+ {{newsValue.length - 1}}</p>
+      <p ref="length" style="background:#f0f2f5;border-radius: 4px;padding: 0 5px;margin-left:5px;" v-if="newsValue.length > 1">+ {{newsValue.length - 1}}</p>
     </div>
-    <el-button style="margin-left:10px;" size="mini" class="button-new-tag" @click="edmit">编辑</el-button>
-    <el-dialog @close="close" width="70%" :visible.sync="dialogVisible">
+    <i style="margin-left:10px;color:#409EFF" size="mini" class="button-new-tag el-icon-edit pointer" @click="edmit"></i>
+    <el-dialog @close="close" :top="top" width="70%" :visible.sync="dialogVisible">
       <dialog-item v-if="dialogVisible" :op="op" :io="io" :label="label" :newsValue="newsValue" :startValue.sync="startValue" :thead="thead" :dialogVisible.sync="dialogVisible" :admin="value"></dialog-item>
       <div slot="footer" class="dialog-footer">
         <el-button size="mini" @click="res" type="primary">确 定</el-button>
@@ -67,6 +67,7 @@
     },
     data() {
       return {
+        top: (window.innerHeight - 680) / 2 + 'px',
         startValue: [],
         newsValue: [],
         dialogVisible: false,
@@ -78,14 +79,22 @@
         console.log(val);
       },
       newsValue(val) {
-        this.$emit('input', val);
+        if (this.value instanceof Array) {
+          this.$emit('input', val);
+        } else if (this.value instanceof Object) {
+          this.$emit('input', val[0]);
+        } else {
+          if (val[0]) {
+            this.$emit('input', val[0]._id);
+          }
+        }
       }
     },
     methods: {
       close() {},
       res() {
         this.dialogVisible = false;
-        this.newsValue = this.startValue;
+        this.newsValue = JSON.parse(JSON.stringify(this.startValue));
       },
       del() {
         console.log('del');
@@ -104,6 +113,7 @@
             this.newsValue.push({
               _id: item._id,
               name: item.name,
+              mobile: item.mobile,
             })
           });
         } else {
@@ -118,6 +128,7 @@
           this.newsValue = [];
         }
       } else {
+        this.io = false;
         if (this.value) {
           let res = await this.$api.curd({
             model: 'user',
@@ -126,7 +137,8 @@
           })
           this.newsValue.push({
             _id: res._id,
-            name: res.name
+            mobile: item.mobile,
+            name: res.name,
           })
         } else {
           this.newsValue = [];

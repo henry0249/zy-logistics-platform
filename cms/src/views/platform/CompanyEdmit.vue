@@ -251,7 +251,7 @@
     async created() {
       this.loadingText = '加载中'
       await this.getData();
-      await this.getUser();
+      // await this.getUser();
       await this.getPlatform();
       await this.getTruck();
       await this.getShip();

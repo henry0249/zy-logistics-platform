@@ -3,7 +3,7 @@
     <div>
       <left-nav :nav="nav" :default-active="path"></left-nav>
     </div>
-    <div class="f1">
+    <div class="f1 g-container">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
           <!-- 这里是会被缓存的视图组件-->

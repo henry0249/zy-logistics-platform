@@ -1,15 +1,15 @@
 <template>
-  <div style="width:100%;height:calc(70vh - 160px)">
+  <div style="width:100%;height:530px;overflow: hidden;">
     <h2 style=" text-align: center">{{label}}</h2>
     <el-alert :title="io?'已选用户':'已选用户(只能选一个用户)'" type="info" :closable="false" style="margin:15px 0"></el-alert>
     <div style="padding:0 10px 10px 10px;border:1px solid #dcdfe6;border-radius: 4px;box-sizing: border-box;height:100px;overflow: auto;">
       <el-tag style="margin:10px 5px 0 0;" size="mini" v-if="tags.length > 0" v-for="tag in tags" :key="tag.id" closable type="info" @close="close(tag)">
-        {{tag.name}}
+        {{tag.name?tag.name:tag.mobile}}
       </el-tag>
     </div>
     <el-alert title="全部用户" type="info" :closable="false" style="margin:15px 0"></el-alert>
     <div v-if="!loadingText">
-      <my-table size="mini" border index height="calc(70vh - 160px - 300px)" :select.sync="select" selection v-model="loadingText" :thead="thead" :data="data" :loadmore="loadmore">
+      <my-table size="mini" border index height="250px" :select.sync="select" selection v-model="loadingText" :thead="thead" :data="data" :loadmore="loadmore">
         <div class="search-box" slot="header">
           <el-input size="mini" placeholder="请输入姓名或手机号" v-model="input">
             <div slot="append" class="pointer" @click="search">搜 索</div>
@@ -76,7 +76,7 @@
       }
     },
     watch: {
-      async input(val){
+      async input(val) {
         if (val === '') {
           await this.getData()
         }
@@ -96,6 +96,7 @@
             val.forEach(item => {
               this.tags.push({
                 _id: item._id,
+                mobile: item.mobile,
                 name: item.name,
               })
             });
@@ -110,6 +111,7 @@
             this.tags.length = 0;
             this.tags.push({
               _id: val[val.length - 1]._id,
+              mobile: val[val.length - 1].mobile,
               name: val[val.length - 1].name,
             })
           }
@@ -189,7 +191,6 @@
       }
     },
     async created() {
-      console.log('object', this.newsValue);
       this.tags = JSON.parse(JSON.stringify(this.newsValue));
       await this.getData();
     }
