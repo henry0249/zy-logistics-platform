@@ -67,7 +67,6 @@ const store = new Vuex.Store({
       state.orderBadge = data || {};
     },
     setToken(state, data) {
-      console.log('设置了token'+JSON.stringify(data));
       if (data.token && data.exp) {
         localStorage.token = data.token;
         localStorage.tokenExp = data.exp;

@@ -63,18 +63,6 @@ module.exports = {
     }
   },
   businessTrains: {
-    lastCompany: {
-      type: 'ObjectId',
-      name: '上家公司',
-      ref: 'Company',
-      readOnly: true
-    },
-    currentCompany: {
-      type: 'ObjectId',
-      name: '联营商',
-      ref: 'Company',
-      readOnly: true
-    },
     purchasePrice: {
       name: '进价',
       type: 'Number',
@@ -95,10 +83,16 @@ module.exports = {
       type: 'Number',
       require: true
     },
-
     totalPrice: {
       name: '结算金额',
       type: 'Number',
+      require: true,
+      readOnly: true
+    },
+    remark: {
+      name: '备注',
+      type: 'String',
+      slot: true,
       require: true
     }
   },

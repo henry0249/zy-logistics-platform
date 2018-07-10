@@ -9,19 +9,29 @@ module.exports = {
     name: '所属订单',
     ref: 'Order'
   },
-  lastCompany: {
+  mfrs: {
+    name: '生产厂商',
     type: 'ObjectId',
-    name: '上家公司',
-    ref: 'Company'
+    ref: 'Company',
   },
-  currentCompany: {
+  associate: {
+    name: '联营商',
     type: 'ObjectId',
-    name: '当前公司',
-    ref: 'Company'
+    ref: 'Company',
   },
-  nextCompany: {
+  associate2: {
+    name: '第二联营商',
     type: 'ObjectId',
-    name: '下家公司',
+    ref: 'Company',
+  },
+  user: {
+    name: '收货人',
+    type: 'ObjectId',
+    ref: 'User'
+  },
+  company: {
+    name: '收货公司',
+    type: 'ObjectId',
     ref: 'Company'
   },
   purchaseCount: {

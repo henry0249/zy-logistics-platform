@@ -5,19 +5,19 @@
       <el-alert title="订单信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
       <Info :val="order" :edit="false"></Info>
-      <el-alert title="订单商品信息" type="info" :closable="false" style="margin:15px 0">
+      <el-alert title="商品信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
       <goods-table :order="order" :edit="false"></goods-table>
-      <el-alert title="订单物流链" type="info" :closable="false" style="margin:15px 0">
+      <el-alert title="物流链" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
       <div v-for="item in goods" :key="item.id">
-        <transport-trains :key="item.id" ref="trains" :goods="item" :order="order" :val="item.transportTrainsData" :data.sync="item.transportTrains"></transport-trains>
+        <transport-trains :key="item.id" ref="trains" :goods="item" :order="order" :val="item.transportTrainsData" :data.sync="item.transportTrains" :removeTrains.sync="removeTrains" :removeLogistics.sync="removeLogistics"></transport-trains>
       </div>
     </div>
     <el-alert style="margin:15px 0" title="确认调度后接单状态的运单将进入待配送列表" type="info" center show-icon :closable="false">
     </el-alert>
     <div class="flex ac">
-      <el-button size="small" type="success">配送完成</el-button>
+      <el-button size="small" type="success" @click="finish">配送完成</el-button>
       <div class="f1"></div>
       <el-button size="small" @click="back()">返回</el-button>
       <el-button size="small" type="primary" @click="dispatch">确认调度</el-button>
@@ -40,7 +40,9 @@ export default {
       loadingText: "加载中",
       bodyLoading: true,
       order: {},
-      goods: []
+      goods: [],
+      removeTrains: [],
+      removeLogistics: []
     };
   },
   methods: {
@@ -77,13 +79,18 @@ export default {
               delete trainsItem.origin;
               delete trainsItem.destination;
               if (trainsItem.transfer && trainsItem.transfer instanceof Array) {
-                trainsItem.transfer = trainsItem.transfer[trainsItem.transfer.length-1];
-              }else{
+                trainsItem.transfer =
+                  trainsItem.transfer[trainsItem.transfer.length - 1];
+              } else {
                 delete trainsItem.transfer;
               }
-              if (trainsItem.transfer2 && trainsItem.transfer2 instanceof Array) {
-                trainsItem.transfer2 = trainsItem.transfer2[trainsItem.transfer2.length-1];
-              }else{
+              if (
+                trainsItem.transfer2 &&
+                trainsItem.transfer2 instanceof Array
+              ) {
+                trainsItem.transfer2 =
+                  trainsItem.transfer2[trainsItem.transfer2.length - 1];
+              } else {
                 delete trainsItem.transfer2;
               }
               if (trainsIndex === 0) {
@@ -111,16 +118,30 @@ export default {
               transportTrains.push(trainsItem);
             });
           });
-          console.log(transportTrains);
           await this.$ajax.post("/order/dispatch", {
             order: this.$route.params._id,
-            transportTrains: transportTrains
+            transportTrains: transportTrains,
+            removeTrains: this.removeTrains,
+            removeLogistics: this.removeLogistics
           });
-          // this.$router.push("/order/distribution");
+          this.$router.push("/order/distribution");
         }
       } catch (error) {
         console.log(error);
       }
+      this.loadingText = "";
+    },
+    async finish() {
+      this.loadingText = "正在提交";
+      try {
+        await this.$ajax.post("/order/update", {
+          order: {
+            _id:this.$route.params._id,
+          },
+          state: "check"
+        });
+        this.$router.push("/order/check");
+      } catch (error) {}
       this.loadingText = "";
     }
   },

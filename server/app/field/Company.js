@@ -7,7 +7,7 @@ module.exports = {
       logistics: '物流公司',
       shipper: '发货厂商',
       trading: '贸易公司',
-      associate: '联谊商'
+      associate: '联营商'
     },
     require: true
   },

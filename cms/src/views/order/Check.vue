@@ -16,8 +16,8 @@
           <div style="width:25%"></div>
         </div>
         <template slot-scope="scope">
-          <span @click="$router.push('/edit/dispatch/'+scope.row._id)" class="link" v-if="scope.prop==='_id'">
-            {{scope.row.createdAt | date2no}}
+          <span @click="$router.push('/edit/check/'+scope.row._id)" class="link" v-if="scope.prop==='no'">
+            {{scope.row.no}}
           </span>
           <span v-if="scope.prop==='customer'">
             <el-tag v-if="scope.row.user" size="mini" style="margin-right:5px" type="warning">个人</el-tag>
@@ -56,7 +56,7 @@ export default {
       this.loadingText = "加载中";
       try {
         this.data = await this.$ajax(
-          "/order/pending/dispatch?limit=" + this.limit
+          "/order/pending/check?limit=" + this.limit
         );
       } catch (error) {}
       this.loadingText = "";

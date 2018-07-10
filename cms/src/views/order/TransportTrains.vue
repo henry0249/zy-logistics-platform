@@ -4,7 +4,7 @@
       <div class="flex ac" style="border:1px solid #eee;border-bottom:1px dashed #E6A23C;border-top:2px solid #E6A23C;">
         <div class="trains-title">
           #{{index+1}}&nbsp;物流链
-          <i @click="transportTrainsRemove(trainsItem,index)" v-if="index===transportTrains.length-1 && index!==0" style="color:#F56C6C" class="el-icon-delete pointer"></i>
+          <!-- <i @click="transportTrainsRemove(trainsItem,index)" v-if="index===transportTrains.length-1 && index!==0" style="color:#F56C6C" class="el-icon-delete pointer"></i> -->
         </div>
         <div v-if="index===0" class="border-right border-left" style="padding:10px;font-size:12px;color:#606266">
           出发地
@@ -29,33 +29,43 @@
         <div v-if="index===transportTrains.length-1" class="border-right border-left" style="padding:10px;font-size:12px;color:#606266">
           目的地
         </div>
-        <div v-if="index===transportTrains.length-1" class="tf1 f1"  style="width:30%;padding:0 10px;font-size:12px;color:#606266">
+        <div v-if="index===transportTrains.length-1" class="tf1 f1" style="width:30%;padding:0 10px;font-size:12px;color:#606266">
           {{area2name(order.area)}}
         </div>
-        <div class="tc" style="width:45px;border-left:1px solid #eee;padding:10px 0">
-          <!-- <i style="color:#67C23A" class="el-icon-plus pointer"></i> -->
-          <icon size="20" @click.native="transportTrainsAdd(trainsItem,index)" v-if="index === transportTrains.length-1"  color="#42a5f5" class="pointer">icon-zengjiahang</icon>
+        <div class="tc" style="width:45px;border-left:1px solid #eee;padding:10px 0" v-if="!disabled">
+          <el-dropdown v-if="index === transportTrains.length-1">
+            <span>
+              <icon size="20" @click.native="transportTrainsAdd(trainsItem,index)" color="#42a5f5" class="pointer">icon-zengjiahang</icon>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item  style="color:#F56C6C;font-size:12px" @click.native="transportTrainsRemove(trainsItem,index)">删除此链</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
           <i @click="transportTrainsRemove(trainsItem,index)" v-else style="color:#F56C6C" class="el-icon-delete pointer"></i>
         </div>
       </div>
-      <my-table opWidth="45" size="mini" index border edit op :thead="thead" :data.sync="trainsItem.logistics">
+      <my-table opWidth="45" size="mini" index border :edit="disabled?undefined:true" :op="disabled?undefined:true" :thead="thead" :data.sync="trainsItem.logistics">
         <div class="tc" slot="op" slot-scope="scope">
-          <icon size="13" @click.native="logisticsAdd(scope,trainsItem)" v-if="scope.index === trainsItem.logistics.length-1" style="color:#67C23A;margin-top:2px" class="pointer">icon-tianjiawuliu</icon>
-          <!-- <i @click="logisticsAdd(scope,trainsItem)" v-if="scope.index === trainsItem.data.length-1" style="color:#67C23A" class="el-icon-plus pointer"></i> -->
+          <el-dropdown  v-if="scope.index === trainsItem.logistics.length-1">
+            <icon size="13" @click.native="logisticsAdd(scope,trainsItem)" v-if="scope.index === trainsItem.logistics.length-1" style="color:#67C23A;margin-top:2px" class="pointer">icon-tianjiawuliu</icon>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item  style="color:#F56C6C;font-size:12px" @click.native="logisticsRemove(scope,trainsItem)">删除此运单</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
           <i @click="logisticsRemove(scope,trainsItem)" v-else style="color:#F56C6C" class="el-icon-minus pointer"></i>
         </div>
-        <template slot-scope="scope"  style="background:red">
+        <template slot-scope="scope" style="background:red">
           <span v-if="scope.prop==='no'">
             <span v-if="scope.row.no">{{scope.row.no}}</span>
             <span v-else>-</span>
           </span>
-          <my-form-item v-if="scope.prop==='ts' && !loadingText" cascader  v-model="scope.row.ts" @change="tsChange($event,scope.row)" :options="truckAndShipCascader" :props="{value:'_id',label:'no'}" :show-all-levels="false" clearable size="mini">
+          <my-form-item :edit="!disabled" v-if="scope.prop==='ts' && !loadingText" cascader  v-model="scope.row.ts" @change="tsChange($event,scope.row)" :options="truckAndShipCascader" :props="{value:'_id',label:'no'}" :show-all-levels="false" clearable size="mini">
           </my-form-item>
-          <my-form-item v-if="scope.prop==='startAt'" datetime size="mini" v-model="scope.row.startAt" format="MM-dd HH:mm">
+          <my-form-item :edit="!disabled" v-if="scope.prop==='startAt'" datetime size="mini" v-model="scope.row.startAt" format="MM-dd HH:mm">
           </my-form-item>
-          <my-form-item v-if="scope.prop==='finishAt'" datetime size="mini" v-model="scope.row.finishAt" format="MM-dd HH:mm">
+          <my-form-item :edit="!disabled" v-if="scope.prop==='finishAt'" datetime size="mini" v-model="scope.row.finishAt" format="MM-dd HH:mm">
           </my-form-item>
-          <my-form-item v-if="scope.prop==='state'" select size="mini" v-model="scope.row.state" :options="field.Logistics.state.option">
+          <my-form-item :edit="!disabled" v-if="scope.prop==='state'" select size="mini" v-model="scope.row.state" :options="field.Logistics.state.option">
           </my-form-item>
         </template>
       </my-table>
@@ -86,6 +96,10 @@
 import { logistics } from "./field";
 export default {
   props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    },
     order: {
       type: Object,
       default() {
@@ -105,6 +119,18 @@ export default {
       }
     },
     val: {
+      type: Array,
+      default() {
+        return [];
+      }
+    },
+    removeTrains: {
+      type: Array,
+      default() {
+        return [];
+      }
+    },
+    removeLogistics: {
       type: Array,
       default() {
         return [];
@@ -184,7 +210,11 @@ export default {
         transfer: [],
         transfer2: [],
         destination: "",
-        logistics: [{ ...this.field2data(this.thead) }],
+        logistics: [
+          {
+            ...this.field2data(this.thead)
+          }
+        ],
         goods: this.goods.value._id,
         order: this.order._id
       };
@@ -215,6 +245,18 @@ export default {
       this.transportTrains.push(pushItem);
     },
     transportTrainsRemove(item, index, check = true) {
+      if (this.transportTrains.length === 1) {
+        this.$message.warn(`至少保留一条物流链`);
+        return;
+      }
+      if (item._id) {
+        this.removeTrains.push(item);
+        item.logistics.forEach(logisticsItem => {
+          if (logisticsItem._id) {
+            this.removeLogistics.push(logisticsItem);
+          }
+        });
+      }
       if (index === 0) {
         this.transportTrains[index + 1].transfer = [];
         this.transportTrains[index + 1].transfer2 = [];
@@ -247,6 +289,13 @@ export default {
       trainsItem.logistics.push(pushItem);
     },
     logisticsRemove(scope, trainsItem) {
+      if (trainsItem.logistics.length === 1) {
+        this.$message.warn(`至少保留一条运单`);
+        return;
+      }
+      if (scope.row._id) {
+        this.removeLogistics.push(scope.row);
+      }
       trainsItem.logistics.splice(scope.index, 1);
     },
     transferChange(val, index) {
@@ -333,7 +382,6 @@ export default {
           return;
         }
       });
-
       this.transportTrains.forEach((trains, trainsIndex) => {
         trains.logistics.forEach((item, index) => {
           if (item.state > 0 && item.ts.length === 0) {

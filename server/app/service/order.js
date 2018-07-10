@@ -4,6 +4,7 @@ const orderField = require('../field/Order');
 class OrderService extends Service {
   orderFieldCheck(order) {
     const ctx = this.ctx;
+    let body = ctx.request.body;
     if (!order) {
       ctx.throw(422, '订单信息未填', body);
     }
@@ -94,7 +95,8 @@ class OrderService extends Service {
       for (const key in man) {
         order[key] = man[key];
       }
-      order.state = 'dispatch';
+
+      // order.state = 'dispatch';
     }
     order.creater = ctx.user._id;
     let orderModel = new ctx.model.Order(order);
@@ -121,22 +123,27 @@ class OrderService extends Service {
   async update() {
     const ctx = this.ctx;
     let body = ctx.request.body;
-    this.orderFieldCheck(body.order);
+    let _id = body.order._id;
+    delete body.order._id;
+    if (!ctx.helper.is('empty', body.order)) {
+      this.orderFieldCheck(body.order);
+    }
     if (body.goods instanceof Array && body.goods.length > 0) {
       this.orderGoodsCheck(body.goods);
     }
-    if (!body.order._id) {
+    if (!_id) {
       ctx.throw(422, "订单编号必填", body);
     }
-    let order = await ctx.model.Order.findById(body.order._id);
+    let order = await ctx.model.Order.findById(_id);
     if (!order) {
       ctx.throw(404, "未找到订单", body);
     }
     if (body.state !== undefined) {
-      this.updateState(order);
+      await this.updateState(order);
     }
-    delete body.order._id;
-    await order.update(body.order);
+    if (!ctx.helper.is('empty', body.order)) {
+      await order.update(body.order);
+    }
     if (body.goods instanceof Array && body.goods.length > 0) {
       for (let i = 0; i < body.goods.length; i++) {
         let goodsItem = JSON.parse(JSON.stringify(body.goods[i]));
@@ -164,6 +171,27 @@ class OrderService extends Service {
     let order = await ctx.model.Order.findById(body.order);
     if (!order) {
       ctx.throw(404, "订单不存在", body);
+    }
+    if (order.state !== 'dispatch') {
+      ctx.throw(403, "此订单已经完成调度", body);
+    }
+    if (body.removeTrains instanceof Array && body.removeTrains.length > 0) {
+      for (let i = 0; i < body.removeTrains.length; i++) {
+        if (body.removeTrains[i]._id) {
+          await ctx.model.TransportTrains.remove({
+            _id: body.removeTrains[i]._id
+          })
+        }
+      }
+    }
+    if (body.removeLogistics instanceof Array && body.removeLogistics.length > 0) {
+      for (let i = 0; i < body.removeLogistics.length; i++) {
+        if (body.removeLogistics[i]._id) {
+          await ctx.model.Logistics.remove({
+            _id: body.removeLogistics[i]._id
+          })
+        }
+      }
     }
     for (let i = 0; i < transportTrains.length; i++) {
       let item = transportTrains[i];
@@ -199,6 +227,9 @@ class OrderService extends Service {
       }
       for (let j = 0; j < item.logistics.length; j++) {
         let lg = item.logistics[j];
+        if (lg.state > 0 && !(lg.truck || lg.ship)) {
+          ctx.throw(422, "接单后必须填写车船信息", body);
+        }
         lg.transportTrains = transportTrains_id;
         delete lg.ts;
         if (lg._id) {
@@ -219,7 +250,7 @@ class OrderService extends Service {
     }
     return 'ok';
   }
-  updateState(order) {
+  async updateState(order) {
     const ctx = this.ctx;
     let body = ctx.request.body;
     let newState = body.state;
@@ -246,6 +277,26 @@ class OrderService extends Service {
         ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
       }
     }
+    if (newState === 'check') {
+      let hasLogistics = await ctx.model.Logistics.findOne();
+      if (!hasLogistics) {
+        ctx.throw(404, `该订单尚未添加任何物流运输单`, body);
+      }
+      let logistics = await ctx.model.Logistics.findOne({
+        order: order._id,
+        state: {
+          $in: [0, 1, 2, 3, 4]
+        }
+      });
+      if (logistics) {
+        ctx.throw(403, `该订单存在尚未完成的物流运输单`, body);
+      }
+    }
+    await ctx.model.Order.update({
+      _id: order._id
+    }, {
+      state: newState
+    });
   }
 
   getOrderMan(user_id) {
@@ -299,8 +350,14 @@ class OrderService extends Service {
     let limit = Number(body.limit) || 10;
     let skip = Number(body.skip) || 0;
     let $or = this.getOrderMan(ctx.user._id);
+    let state = params.state;
+    if (state === 'all') {
+      state = {
+        $exists: true
+      }
+    }
     let orders = await ctx.model.Order.find({
-      state: params.state,
+      state: state,
       $or: $or
     }).populate([{
       path: 'user'
@@ -359,6 +416,8 @@ class OrderService extends Service {
           path: 'area',
           populate: areaPopulate
         }]
+      },{
+        path: 'brand'
       }]
     }])
     res.goods = JSON.parse(JSON.stringify(goodsData));

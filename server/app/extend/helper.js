@@ -91,7 +91,7 @@ module.exports = {
       return false;
     }
     arr.forEach((item) => {
-      if (item === obj) {
+      if (item.toString() === obj.toString()) {
         flag = true;
       }
     })

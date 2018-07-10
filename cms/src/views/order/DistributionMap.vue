@@ -2,7 +2,7 @@
   <loading-box v-model="laodingText">
     <div class="flex jb" style="min-height:420px">
       <div style="width:33%;font-size:12px">
-        <distribution-step @save="save" :data.sync="points"></distribution-step>
+        <distribution-step @save="save" :data.sync="points" :removeData.sync="removeData"></distribution-step>
       </div>
       <div style="width:65%">
         <loading-box v-model="mapLoading">
@@ -16,8 +16,6 @@
                 <el-switch style="margin:10px" v-model="showPointIndex" active-color="#13ce66" inactive-color="#ff4949">
                 </el-switch>
               </el-tooltip>
-              <!-- <el-checkbox v-model="showPoint">轨迹点</el-checkbox> -->
-              <!-- <el-checkbox v-if="showPoint" v-model="showPointIndex">轨迹索引</el-checkbox> -->
             </bm-control>
             <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
             <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
@@ -33,7 +31,7 @@
             <div class="hide-baidu">
               <div class="flex ac" style="padding:10px 0">
                 <div class="f1"></div>
-                <el-button size="mini" type="primary" icon="el-icon-refresh">刷新</el-button>
+                <el-button size="mini" type="primary" icon="el-icon-refresh" @click="setPoint">刷新</el-button>
               </div>
             </div>
           </baidu-map>
@@ -55,7 +53,8 @@ export default {
       showPoint: false,
       showPointIndex: false,
       points: [],
-      mapLoading: ""
+      mapLoading: "",
+      removeData: []
     };
   },
   watch: {
@@ -157,12 +156,12 @@ export default {
       this.points.push(item);
     },
     async save(data) {
-      console.log(data);
       this.laodingText = "正在保存...";
       try {
         let res = await this.$ajax.post("/logisticsTrajectory/add", {
           logistics: this.$route.params._id,
-          point: data
+          point: data,
+          remove:this.removeData
         });
         await this.setPoint();
       } catch (error) {}
@@ -174,9 +173,6 @@ export default {
         this.points = [];
         let res = await this.$ajax.post("/logisticsTrajectory/find", {
           logistics: this.$route.params._id,
-          sort: {
-            time: 1
-          }
         });
         this.points = res;
       } catch (error) {}

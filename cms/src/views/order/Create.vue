@@ -10,7 +10,11 @@
         </el-alert>
         <goods-table ref="orderGoods" :order="order" :data.sync="goods" style="margin-top:15px"></goods-table>
       </div>
-      <div class="tr" style="margin-top:30px">
+      <div class="flex ac" style="margin-top:30px">
+        跳过接单
+        <el-switch v-model="skipTaking" active-color="#13ce66" inactive-color="#ff4949">
+        </el-switch>
+        <div class="f1"></div>
         <el-button size="small" type="primary" @click="createOrder">立即创建</el-button>
         <!-- <el-button size="small" @click="back()">重置</el-button> -->
       </div>
@@ -21,7 +25,6 @@
 <script>
 import Info from "./Info.vue";
 import GoodsTable from "./GoodsTable.vue";
-
 export default {
   components: {
     Info,
@@ -31,7 +34,8 @@ export default {
     return {
       loadingText: "",
       order: {},
-      goods: []
+      goods: [],
+      skipTaking: true
     };
   },
   methods: {
@@ -44,6 +48,11 @@ export default {
       }
       this.loadingText = "创建中...";
       try {
+        if (this.skipTaking) {
+          this.order.state = "dispatch";
+        } else {
+          this.order.state = "taking";
+        }
         await this.$ajax.post("/order/add", {
           order: this.order,
           goods: this.goods

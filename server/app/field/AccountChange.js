@@ -1,4 +1,9 @@
 module.exports = {
+  check: {
+    name: '是否已审核',
+    type: 'Boolean',
+    default: false
+  },
   value: {
     name: '金额',
     type: 'Number'
@@ -21,7 +26,7 @@ module.exports = {
     name: '收款信息',
     type: 'Object',
   },
-  account:{
+  account: {
     name: '所属账户',
     type: 'ObjectId',
     ref: 'Account'

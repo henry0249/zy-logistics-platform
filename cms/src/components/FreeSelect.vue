@@ -1,6 +1,6 @@
 <template>
   <div style="min-width:200px">
-    <div class="tc" style="color:#909399;font-size:12px">
+    <div class="tc" style="color:#909399;font-size:12px" v-if="data.length===0">
       暂无推荐数据
     </div>
     <my-form-item v-if="data.length>0" v-model="search" size="mini"></my-form-item>

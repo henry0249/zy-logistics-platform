@@ -42,10 +42,10 @@
         </el-steps>
       </div>
     </div>
-    <div class="flex ac" style="padding:10px 0" v-if="stepData.length>0">
-      <el-button @click="edit=!edit" size="mini" type="primary" :icon="edit?'el-icon-back':'el-icon-edit'">{{edit?'退出编辑':'编辑'}}</el-button>
+    <div class="flex ac" style="padding:10px 0">
+      <el-button :disabled="stepData.length===0" @click="edit=!edit" size="mini" type="primary" :icon="edit?'el-icon-back':'el-icon-edit'">{{edit?'退出编辑':'编辑'}}</el-button>
       <div class="f1"></div>
-      <el-button @click="save" size="mini" type="success" icon="el-icon-success">提交数据</el-button>
+      <el-button :disabled="stepData.length===0" @click="save" size="mini" type="success" icon="el-icon-refresh">更新物流</el-button>
     </div>
   </loading-box>
 </template>
@@ -64,6 +64,12 @@ export default {
       default() {
         return [];
       }
+    },
+    removeData: {
+      type: Array,
+      default() {
+        return [];
+      }
     }
   },
   watch: {
@@ -77,28 +83,34 @@ export default {
   data() {
     return {
       stepData: [],
+      removeList: [],
       edit: false
     };
   },
   methods: {
     remove(item, index) {
-      let removeIndex = this.data.indexOf(item);
+      if (item._id) {
+        this.removeData.push(item);
+      }
+      let removeIndex = this.data.length - 1 - index;
       this.data.splice(removeIndex, 1);
-      if (item.type === 0) {
-        let newItem = this.data[0];
-        newItem.type = 0;
-        this.data.splice(0, 1, newItem);
+      if (this.data.length > 0) {
+        let newStart = this.data[0];
+        newStart.type = 0;
+        this.data.splice(0, 1, newStart);
       }
     },
     save() {
       this.edit = false;
-      this.$emit('save',this.stepData);
+      let temp = [];
+      temp = JSON.parse(JSON.stringify(this.stepData));
+      this.$emit("save", temp.reverse());
     }
   },
   created() {
     this.stepData = [];
     if (this.val.length > 0) {
-      this.stepData = [];
+      this.stepData = JSON.parse(JSON.stringify(this.val));
     }
   }
 };

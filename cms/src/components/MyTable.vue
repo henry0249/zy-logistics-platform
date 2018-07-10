@@ -5,7 +5,7 @@
       </slot>
     </div>
     <loading-box v-model="loadingText">
-      <el-table ref="table" @cell-click="cellClick" @row-click="rowClick" v-bind="$attrs" :data="data" :height="tableHeight" @selection-change="handleSelectionChange">
+      <el-table ref="table" @cell-click="cellClick" @row-click="rowClick" v-bind="$attrs" :data="data" :height="tableHeight" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
         <el-table-column v-if="selection" type="selection" width="30">
         </el-table-column>
         <el-table-column v-if="index" show-overflow-tooltip type="index" width="30">
@@ -72,7 +72,7 @@ export default {
       default: false
     },
     edit: {
-      type: [Boolean,Object],
+      type: [Boolean, Object],
       default: undefined
     },
     thead: {
@@ -234,6 +234,9 @@ export default {
         }
       } catch (error) {}
       this.loadingText = "";
+    },
+    handleCurrentChange(val) {
+      this.$emit("current-change", val);
     }
   },
   mounted() {

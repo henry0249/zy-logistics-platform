@@ -181,7 +181,7 @@ export default {
         this.goodsData.push({
           _id: item._id,
           value: item.value._id,
-          goods: [item.value.brand, item.value._id],
+          goods: [item.value.brand._id || item.value.brand, item.value._id],
           count: item.count,
           unit: item.value.unit,
           factoryPrice: item.factoryPrice,

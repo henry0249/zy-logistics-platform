@@ -82,5 +82,6 @@ module.exports = {
   area: {
     name: '区域',
     type: 'ObjectIdArray',
+    ref: 'Area'
   }
 }

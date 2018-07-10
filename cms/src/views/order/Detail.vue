@@ -1,7 +1,7 @@
 <template>
   <loading-box v-model="loadingText" class="g-order-container">
     <div class="g-order-body" v-if="!bodyLoading">
-      <div class="my-title">订单{{order.no}}完成审核</div>
+      <div class="my-title">订单{{order.no}}详情</div>
       <el-alert title="订单信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
       <Info :val="order"></Info>
@@ -19,12 +19,12 @@
         <business-trains :order="order" :goods="item"></business-trains>
       </div>
     </div>
-    <el-alert style="margin:15px 0" title="订单审核后的进入待结算列表" type="info" center show-icon :closable="false">
+    <el-alert style="margin:15px 0" title="订单修改后,请注意流程变化" type="info" center show-icon :closable="false">
     </el-alert>
     <div class="flex ac">
       <div class="f1"></div>
       <el-button size="small" @click="back()">返回</el-button>
-      <el-button size="small" type="primary" @click="finish">审核完成</el-button>
+      <el-button size="small" type="primary" @click="finish">修改</el-button>
     </div>
   </loading-box>
 </template>

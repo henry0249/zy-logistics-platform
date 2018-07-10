@@ -86,7 +86,7 @@ export default {
         color: "red",
         icon: "icon-jiesuan",
         path: "/order/settlement",
-        badge: this.orderBadge.settlement
+        badge: this.orderBadge.finish
       },
       {
         name: "所有订单",

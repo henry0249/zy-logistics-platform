@@ -1,7 +1,7 @@
 import App from './App.vue';
 import Create from './Create.vue';
 import Taking from './Taking.vue';
-// import TakingEdit from './TakingEdit.vue';
+import TakingEdit from './TakingEdit.vue';
 import Check from './Check.vue';
 import CheckEdit from './CheckEdit.vue';
 import Distribution from './Distribution.vue';
@@ -9,6 +9,8 @@ import DistributionEdit from './DistributionEdit.vue';
 import Dispatch from './Dispatch.vue';
 import DispatchEdit from './DispatchEdit.vue';
 import Settlement from './Settlement.vue';
+import All from './All.vue';
+import Detail from './Detail.vue';
 
 export default [{
   path: '/order',
@@ -40,8 +42,11 @@ export default [{
     path: 'settlement',
     component: Settlement,
   }, {
+    path: 'all',
+    component: All,
+  }, {
     path: '/edit/taking/:_id',
-    // component: TakingEdit,
+    component: TakingEdit,
   }, {
     path: '/edit/dispatch/:_id',
     component: DispatchEdit,
@@ -51,5 +56,8 @@ export default [{
   }, {
     path: '/edit/check/:_id',
     component: CheckEdit,
+  }, {
+    path: '/edit/detail/:_id',
+    component: Detail,
   }]
 }]

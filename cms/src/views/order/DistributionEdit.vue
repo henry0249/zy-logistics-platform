@@ -1,44 +1,49 @@
 <template>
   <loading-box v-model="loadingText" class="g-order-container">
-    <div class="g-order-body" v-if="!bodyLoading">
+    <div class="g-order-body">
       <div class="my-title">运单{{logistics.no}}详情</div>
+      <el-alert title="商品信息" type="info" :closable="false" style="margin:15px 0">
+      </el-alert>
+      <goods-table v-if="!goodsLoading" :order="order" :edit="false"></goods-table>
       <el-alert title="运单信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
       <my-form size="mini" width="24%">
         <div class="flex ac jb">
-          <my-form-item v-if="!loadingText" :label="tsLabel" v-model="ts" cascader :options="truckAndShipCascader" :props="{value:'_id',label:'no'}" :show-all-levels="false" size="mini">
+          <my-form-item v-if="!loadingText" :label="tsLabel" v-model="ts" cascader :options="truckAndShipCascader" :props="{value:'_id',label:'no'}" @change="tsChange" :show-all-levels="false" size="mini">
           </my-form-item>
-          <my-form-item label="装货数量" v-model="logistics.loading">
+          <my-form-item label="装货数量" v-model="logisticsForm.loading">
           </my-form-item>
-          <my-form-item label="卸货数量" v-model="logistics.landed">
+          <my-form-item label="卸货数量" v-model="logisticsForm.landed">
           </my-form-item>
-          <my-form-item label="运费单价" v-model="logistics.transportPrice">
-          </my-form-item>
-        </div>
-        <div class="flex ac jb" style="margin-top:15px">
-          <my-form-item label="收货人" v-model="logistics.contactName">
-          </my-form-item>
-          <my-form-item label="联系电话" v-model="logistics.contactNumber">
-          </my-form-item>
-          <my-form-item label="配送时间" datetime size="mini" v-model="logistics.startAt">
-          </my-form-item>
-          <my-form-item label="送达时间" datetime size="mini" v-model="logistics.finishAt">
+          <my-form-item label="运费单价" v-model="logisticsForm.transportPrice">
           </my-form-item>
         </div>
         <div class="flex ac jb" style="margin-top:15px">
-          <my-form-item label="运单状态" select size="mini" v-model="logistics.state" :options="field.Logistics.state.option">
+          <my-form-item label="收货人" v-model="logisticsForm.contactName">
+          </my-form-item>
+          <my-form-item label="联系电话" v-model="logisticsForm.contactNumber">
+          </my-form-item>
+          <my-form-item label="配送时间" datetime size="mini" v-model="logisticsForm.startAt">
+          </my-form-item>
+          <my-form-item label="送达时间" datetime size="mini" v-model="logisticsForm.finishAt">
+          </my-form-item>
+        </div>
+        <div class="flex ac jb" style="margin-top:15px">
+          <my-form-item label="运单状态" select size="mini" v-model="logisticsForm.state" :options="field.Logistics.state.option">
           </my-form-item>
           <my-form-item v-model="areaSelect" area filterable @change="areaCascaderChange" :show-all-levels="false" label="送货地址">
           </my-form-item>
-          <my-form-item width="50%" label="详细地址" size="mini" v-model="logistics.address">
+          <my-form-item width="50%" label="详细地址" size="mini" v-model="logisticsForm.address">
           </my-form-item>
         </div>
-        <my-form-item style="margin-top:15px" width="100%" label="运单备注" v-model="logistics.remark">
+        <my-form-item style="margin-top:15px" width="100%" label="运单备注" v-model="logisticsForm.remark">
         </my-form-item>
       </my-form>
-      <el-alert title="商品信息" type="info" :closable="false" style="margin:15px 0">
-      </el-alert>
-      <goods-table :order="order" :edit="false"></goods-table>
+      <div class="flex ac" style="margin-top:15px">
+        <el-button size="mini" type="primary" icon="el-icon-refresh" @click="getOrderInfo">刷新</el-button>
+        <div class="f1"></div>
+        <el-button :disabled="!hasUpdate" size="mini" type="success" icon="el-icon-edit" @click="update">更新信息</el-button>
+      </div>
       <el-alert title="物流信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
       <div>
@@ -49,7 +54,7 @@
     </el-alert>
     <div class="tr">
       <el-button size="small" @click="back()">返回</el-button>
-      <el-button size="small" type="success" @click="dispatch">运单完成</el-button>
+      <el-button size="small" type="success" @click="finish()">运单完成</el-button>
     </div>
   </loading-box>
 </template>
@@ -67,14 +72,27 @@ export default {
   data() {
     return {
       loadingText: "加载中",
-      bodyLoading: true,
+      goodsLoading: true,
       truckAndShipCascader: [],
       ts: [],
-      areaSelect:[],
+      areaSelect: [],
       logistics: {},
+      logisticsForm: {
+        loading: 0,
+        landed: 0,
+        transportPrice: 0,
+        contactName: "",
+        contactNumber: "",
+        startAt: "",
+        finishAt: "",
+        area: "",
+        state: 0,
+        address: "",
+        remark: ""
+      },
       order: {},
       goods: [],
-      
+      hasUpdate: false
     };
   },
   computed: {
@@ -89,12 +107,25 @@ export default {
       return res;
     }
   },
+  watch: {
+    logisticsForm: {
+      handler: function() {
+        this.hasUpdate = true;
+      },
+      deep: true
+    }
+  },
   methods: {
-    areaCascaderChange(){
-
+    tsChange(val) {
+      delete this.logisticsForm.ship;
+      delete this.logisticsForm.truck;
+      this.logisticsForm[val[1]] = val[2];
+    },
+    areaCascaderChange(val) {
+      this.logisticsForm.area = val[val.length - 1];
     },
     async getOrderInfo() {
-      this.bodyLoading = true;
+      this.goodsLoading = true;
       this.loadingText = "正在获取订单数据";
       try {
         this.truckAndShipCascader = await this.$ajax("/company/ts/cascader");
@@ -132,6 +163,12 @@ export default {
             this.logistics.ship._id
           ];
         }
+        for (const key in this.logistics) {
+          if (this.logisticsForm.hasOwnProperty(key)) {
+            this.logisticsForm[key] = this.logistics[key];
+          }
+        }
+        this.logisticsForm.area = this.logistics.area._id;
         this.areaSelect = this.area2arr(this.logistics.area);
         this.order = await this.$ajax(
           "/order/info/" + this.logistics.order._id
@@ -141,30 +178,31 @@ export default {
       } catch (error) {}
       setTimeout(() => {
         this.loadingText = "";
-        this.bodyLoading = false;
+        this.goodsLoading = false;
+        this.hasUpdate = false;
       }, 200);
     },
-    async dispatch() {
-      this.loadingText = "调度中";
+    async update() {
+      this.loadingText = "正在修改";
       try {
-        let flag = true;
-        this.$refs.trains.forEach(item => {
-          if (item.check() !== true) {
-            flag = false;
-          }
+        await this.$ajax.post("/logistics/update", {
+          _id: this.$route.params._id,
+          ...this.logisticsForm
         });
-        if (flag) {
-          let transportTrains = [];
-          this.goods.forEach(item => {
-            item.transportTrains.forEach(trainsItem => {
-              transportTrains.push(trainsItem);
-            });
-          });
-          await this.$ajax.post("/order/dispatch", {
-            order: this.$route.params._id,
-            transportTrains: transportTrains
-          });
-        }
+        await this.getOrderInfo();
+      } catch (error) {}
+      this.loadingText = "";
+    },
+    async finish(){
+      this.logisticsForm.state = 5;
+      this.loadingText = "正在修改";
+      try {
+        let res = await this.$ajax.post("/logistics/update", {
+          _id: this.$route.params._id,
+          ...this.logisticsForm
+        });
+        this.back();
+        console.log(res);
       } catch (error) {}
       this.loadingText = "";
     }

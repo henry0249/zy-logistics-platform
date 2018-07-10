@@ -16,7 +16,7 @@
           <div style="width:25%"></div>
         </div>
         <template slot-scope="scope">
-          <span @click="$router.push('/edit/taking/'+scope.row._id)" class="link" v-if="scope.prop==='no'">
+          <span @click="$router.push('/edit/detail/'+scope.row._id)" class="link" v-if="scope.prop==='no'">
             {{scope.row.no}}
           </span>
           <span v-if="scope.prop==='customer'">
@@ -55,9 +55,9 @@ export default {
     async getData() {
       this.loadingText = "加载中";
       try {
-        this.data = await this.$ajax(
-          "/order/pending/taking?limit=" + this.limit
-        );
+        this.data = await this.$ajax.post("/order/pending/all", {
+          limit: this.limit
+        });
       } catch (error) {}
       this.loadingText = "";
     },
@@ -72,7 +72,7 @@ export default {
       return res;
     },
     async loadmore() {
-      return await this.$ajax.post("/order/pending/taking", {
+      return await this.$ajax.post("/order/pending/all", {
         limit: this.limit,
         skip: this.data.length
       });

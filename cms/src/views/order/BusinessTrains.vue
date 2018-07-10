@@ -1,59 +1,163 @@
 <template>
   <div class="g-business-trains">
-    <el-tabs type="border-card" style="box-shadow:none">
-      <el-tab-pane :label="item.value.name " v-for="item in order.goods" :key="item._id">
-        <my-table opWidth="45" size="mini" index border edit op :thead="thead" :data.sync="data">
-          <div class="tc" slot="op" slot-scope="scope">
-            <i @click="add(scope)" v-if="scope.index === data.length-1" style="color:#67C23A" class="el-icon-plus pointer"></i>
-            <i v-else style="color:#F56C6C" class="el-icon-delete pointer"></i>
-          </div>
-        </my-table>
-      </el-tab-pane>
-    </el-tabs>
+    <div class="flex ac jb" style="color:#909399;padding:8px 10px;background:#F2F6FC">
+      <div class="goods-info-padding">商品名称：<span style="color:#606266">{{goods.value.name}}</span></div>
+      <div class="goods-info-padding">品牌：{{goods.value.brand.name}}</div>
+      <div class="goods-info-padding">规格：{{goods.value.spec}}</div>
+      <div class="goods-info-padding">单位：{{goods.value.unit}}</div>
+      <div class="f1"></div>
+      <div v-if="goods.value.freeDelivery" style="color:#67C23A">包配送</div>
+      <div v-if="!goods.value.freeDelivery" style="color:#F56C6C">不包配送</div>
+    </div>
+    <div v-for="(item,index) in data" :key="item.id">
+      <div class="flex ac goods-title" v-if="goods._id">
+        <div class="bor tc" style="padding:8px 0;width:50px;color:#409EFF">
+          # {{index+1}}
+        </div>
+        <div class="tc bor t-bg" style="width:100px;padding:8px 0">
+          {{index === 0 ? '生产厂商' : '联营商'}}
+        </div>
+        <div v-if="index === 0" class="f1" style="padding:8px 10px">
+          {{goods.value.mfrs.name}}
+        </div>
+        <div v-if="index > 0" class="f1" style="padding:8px 10px">
+          <company-select @change="associate1change($event,index)" title="选择联营商" :data.sync="item.associate"></company-select>
+        </div>
+        <div class="tc bor bol t-bg" style="width:100px;padding:8px 0">
+          {{index === data.length-1 ? '收货客户' : '联营商'}}
+        </div>
+        <div v-if="index === data.length-1" class="f1" style="padding:8px 10px">
+          {{order.user?order.user.name :order.company.name}}
+        </div>
+        <div v-if="index === 0 && data.length>1" class="f1" style="padding:8px 10px">
+          <company-select @change="associate1change($event,index)" title="选择联营商" :data.sync="item.associate"></company-select>
+        </div>
+        <div v-if="index > 0 && index !== data.length-1" class="f1" style="padding:8px 10px">
+          <company-select @change="associate2change($event,index)" title="选择联营商" :data.sync="item.associate2"></company-select>
+        </div>
+        <div class="tc bol" style="width:45px;padding:8px 0">
+          <i @click="add(item,index)" style="color:#67C23A" class="el-icon-plus pointer"></i>
+        </div>
+      </div>
+      <my-table opWidth="45" size="mini" border edit op :thead="thead" :data.sync="item.info">
+        <div class="tc" slot="op" slot-scope="scope">
+          <i @click="remove(item,index)" style="color:#F56C6C" class="el-icon-delete pointer"></i>
+        </div>
+      </my-table>
+    </div>
+    <div class="fle ac" style="margin-top:15px">
+      <el-button type="primary" icon="el-icon-refresh" size="mini">刷新</el-button>
+      <div class="f1"></div>
+      <el-button type="success" icon="el-icon-save" size="mini" @click="save">保存贸易链</el-button>
+    </div>
   </div>
 </template>
 
 <script>
-  import {
-    businessTrains
-  } from "./field";
-  export default {
-    props: {
-      order: {
-        type: Object,
-        default () {
-          return {};
-        }
+import { businessTrains } from "./field";
+export default {
+  props: {
+    goods: {
+      type: Object,
+      default() {
+        return {};
       }
     },
-    data() {
-      return {
-        thead: businessTrains,
-        data: []
-      };
-    },
-    methods: {
-      add(scope) {
-        let item = scope.row;
-        this.data.push({
-          purchasePrice: item.purchasePrice,
-          purchaseCount: item.purchaseCount,
-          sellPrice: item.purchasePrice,
-          sellCount: item.purchaseCount
-        });
+    order: {
+      type: Object,
+      default() {
+        return {};
       }
     },
-    created() {
-      this.order.goods.forEach(item => {
-        this.data.push({
-          purchasePrice: item.unitPrice,
-          purchaseCount: item.count,
-          lastCompany: item.value.mfrs.name
-        });
-      });
+    val: {
+      type: Array,
+      default() {
+        return [];
+      }
     }
-  };
+  },
+  data() {
+    return {
+      thead: businessTrains,
+      data: []
+    };
+  },
+  methods: {
+    add(item, index) {
+      this.pushItem();
+    },
+    remove(item, index) {
+      if (this.data.length === 1) {
+        this.$message.warn(`至少保留一条贸易链`);
+        return;
+      }
+      this.data.splice(index, 1);
+    },
+    pushItem() {
+      this.data.push({
+        goods: this.goods._id,
+        order: this.order._id,
+        info: [
+          {
+            purchasePrice: this.goods.unitPrice,
+            purchaseCount: this.goods.count,
+            sellPrice: 0,
+            sellCount: 0,
+            totalPrice: 0,
+            remark: "",
+            associate: "",
+            associate2: ""
+          }
+        ]
+      });
+    },
+    associate1change(val, index) {
+      if (index - 1 > 0) {
+        this.data[index - 1].associate = val;
+        this.data.splice(index, 1, this.data[index - 1]);
+      } else {
+        this.data[index + 1].associate = val;
+        this.data.splice(index, 1, this.data[index + 1]);
+      }
+    },
+    associate2change(val, index) {
+      console.log(val, index);
+    },
+    save() {
+      console.log(this.data);
+    }
+  },
+  created() {
+    if (this.val.length > 0) {
+      this.data = JSON.parse(JSON.stringify(this.val));
+    } else {
+      this.pushItem();
+    }
+  }
+};
 </script>
 
 <style scoped>
+.goods-title {
+  font-size: 12px;
+  border: 1px solid #eee;
+  border-bottom: 1px dashed #67c23a;
+  border-top: 2px solid #67c23a;
+  color: #606266;
+}
+.bob {
+  border-bottom: 1px solid #eee;
+}
+.bor {
+  border-right: 1px solid #eee;
+}
+.bol {
+  border-left: 1px solid #eee;
+}
+.goods-info-padding {
+  width: 20%;
+}
+.t-bg {
+  background: #f2f6fc;
+}
 </style>
