@@ -8,7 +8,7 @@ module.exports = {
     name: '订货数量',
     type: 'Number',
   },
-  settlementCount:{
+  settlementCount: {
     name: '结算数量',
     type: 'Number',
   },

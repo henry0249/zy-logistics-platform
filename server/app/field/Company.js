@@ -3,11 +3,13 @@ module.exports = {
     name: '公司类型',
     type: 'Array',
     option: {
-      common: '一般公司',
-      logistics: '物流公司',
+      common: '客户',
       shipper: '发货厂商',
-      trading: '贸易公司',
-      associate: '联营商'
+      logistics: '物流公司',
+      // trading: '贸易公司',
+      0:'联营商',
+      1:'中转库',
+      2:'分销点'
     },
     require: true
   },

@@ -8,7 +8,7 @@
       <el-table ref="table" @cell-click="cellClick" @row-click="rowClick" v-bind="$attrs" :data="data" :height="tableHeight" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
         <el-table-column v-if="selection" type="selection" width="30">
         </el-table-column>
-        <el-table-column v-if="index" show-overflow-tooltip type="index" width="30">
+        <el-table-column class="point" v-if="index" show-overflow-tooltip type="index" width="30">
         </el-table-column>
         <template  v-for="(item, key) in thead">
           <el-table-column v-if="item.slot" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
@@ -119,6 +119,9 @@ export default {
           this.$refs.fixedInput.focus();
         });
       }
+    },
+    data() {
+      this.loadmoreText = "加载更多";
     }
   },
   methods: {
@@ -134,7 +137,8 @@ export default {
       // this.$emit("update:data", this.data);
     },
     handleSelectionChange(val) {
-      this.$emit("update:select", val);
+      this.$emit("selection-change", val);
+      // this.$emit("update:select", val);
     },
     handleOp(type, value) {
       this.$emit("op", {

@@ -35,7 +35,7 @@ module.exports = {
     ref: 'Company'
   },
   purchaseCount: {
-    name: '进货数量',
+    name: '采购数量',
     type: 'Number',
     require: true
   },
@@ -45,12 +45,22 @@ module.exports = {
     require: true
   },
   sellCount: {
-    name: '出货数量',
+    name: '销售数量',
     type: 'Number',
     require: true
   },
   sellPrice: {
     name: '售价',
+    type: 'Number',
+    require: true
+  },
+  balancedNumber0:{
+    name: '采购结算数量',
+    type: 'Number',
+    require: true
+  },
+  balancedNumber1:{
+    name: '销售结算数量',
     type: 'Number',
     require: true
   },

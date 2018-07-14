@@ -95,7 +95,6 @@ class OrderService extends Service {
       for (const key in man) {
         order[key] = man[key];
       }
-
       // order.state = 'dispatch';
     }
     order.creater = ctx.user._id;
@@ -356,9 +355,12 @@ class OrderService extends Service {
         $exists: true
       }
     }
+    delete body.limit;
+    delete body.skip;
     let orders = await ctx.model.Order.find({
       state: state,
-      $or: $or
+      $or: $or,
+      ...body
     }).populate([{
       path: 'user'
     }, {
