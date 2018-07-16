@@ -7,7 +7,7 @@
           {{tagTxt(tag)}}
         </el-tag>
       </div>
-      <span v-if="tags.length === 0">未选择{{str}}</span>
+      <span v-else style="color:#ccc;">未选择{{str}}</span>
     </div>
     <div class="f1" style="margin-top:20px;overflow: hidden;">
       <CommonTable style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
@@ -62,6 +62,41 @@
       }
     },
     watch: {
+      input(val) {
+        if (val) {
+          if (this.type === 'user') {
+            this.option['$or'] = [{
+              name: {
+                $regex: this.input
+              }
+            }, {
+              mobile: {
+                $regex: this.input
+              }
+            }, {
+              email: {
+                $regex: this.input
+              }
+            }]
+          } else if (this.type === 'company') {
+            this.option['$or'] = [{
+              name: {
+                $regex: this.input
+              }
+            }, {
+              nick: {
+                $regex: this.input
+              }
+            }]
+          } else if (this.type === 'goods') {
+            this.option['$or'] = [{
+              name: {
+                $regex: this.input
+              }
+            }]
+          }
+        }
+      },
       divHeight(val) {
         console.log(val);
       },
@@ -119,12 +154,16 @@
     },
     async created() {
       if (Object.prototype.toString.call(this.startData) === '[object Object]') {
-        this.tags.push(this.startData);
+        if (this.startData._id) {
+          this.tags.push(this.startData);
+        }
         this.selection = false;
       } else if (Object.prototype.toString.call(this.startData) === '[object Array]') {
-        this.startData.forEach(item => {
-          this.tags.push(item);
-        });
+        if (this.startData.length > 0) {
+          this.startData.forEach(item => {
+            this.tags.push(item);
+          });
+        }
         this.selection = true;
       }
       this.tableHeight = 740 - 120 - 320 + 'px';

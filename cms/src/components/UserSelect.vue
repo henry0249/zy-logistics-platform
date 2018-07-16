@@ -38,7 +38,7 @@
       },
       option: {
         type: Object,
-        default(){
+        default () {
           return {}
         }
       },
@@ -156,7 +156,11 @@
       go() {
         this.dialogVisible = false;
         console.log(this.itemData);
-        this.$emit('update:data', this.itemData);
+        if (Object.prototype.toString.call(this.data) === '[object Object]') {
+          this.$emit('update:data', this.itemData[0]);
+        } else if (Object.prototype.toString.call(this.data) === '[object Array]') {
+          this.$emit('update:data', this.itemData);
+        }
       },
       del() {
         this.data.splice(0, 1);

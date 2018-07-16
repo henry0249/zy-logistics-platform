@@ -1,6 +1,6 @@
 <template>
   <div>
-    <user-select label="选择" :data.sync="value1" border width="25%" title="用户选择" type="user"></user-select>
+    <user-select label="选择" :data.sync="value2" border width="25%" title="用户选择" type="user"></user-select>
   </div>
 </template>
 
@@ -8,6 +8,7 @@
   export default {
     data() {
       return {
+        value2:{},
         value: {
           email: "75776584@com",
           name: "用户2",
