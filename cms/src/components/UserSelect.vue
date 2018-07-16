@@ -3,7 +3,7 @@
     <div class="tf1" v-if="label" :style="{width:labelWidth || $parent.labelWidth,fontSize:fontSize}">
       {{label}}
     </div>
-    <div :class="border?'border':''" :style="newSelectStyle" class="flex jc jb select-box">
+    <div :class="border?'border':''" :style="newSelectStyle" class="flex f1 jc jb select-box">
       <div class="f1 flex">
         <div style="padding:0 5px 0 10px;" :class="typeIo?'io':''">
           {{selectTxt}}

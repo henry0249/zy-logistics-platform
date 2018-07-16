@@ -62,53 +62,6 @@
       }
     },
     watch: {
-      // input(val) {
-      //   if (val) {
-      //     if (this.type === 'user') {
-      //       this.option = {
-      //         user: this.id,
-      //         $or: [{
-      //           name: {
-      //             $regex: this.input
-      //           }
-      //         }, {
-      //           mobile: {
-      //             $regex: this.input
-      //           }
-      //         }, {
-      //           email: {
-      //             $regex: this.input
-      //           }
-      //         }]
-      //       }
-      //     } else if (this.type === 'company') {
-      //       this.option = {
-      //         company: this.id,
-      //         $or: [{
-      //           name: {
-      //             $regex: this.input
-      //           }
-      //         }, {
-      //           nick: {
-      //             $regex: this.input
-      //           }
-      //         }]
-      //       };
-      //     } else if (this.type === 'goods') {
-      //       this.option = {
-      //         goods: this.id,
-      //         $or: [{
-      //           name: {
-      //             $regex: this.input
-      //           }
-      //         }],
-      //         populate: [{
-      //           path: 'category'
-      //         }]
-      //       };
-      //     }
-      //   }
-      // },
       divHeight(val) {
         console.log(val);
       },
