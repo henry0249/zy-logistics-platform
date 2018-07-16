@@ -13,8 +13,6 @@
       <CommonTable style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
         <my-form-item size="mini" width='200px' :placeholder="placeholder" input v-model="input" slot="header"></my-form-item>
       </CommonTable>
-      <!-- <commom-table :path="path" :thead="thead"></commom-table> -->
-      <!-- <my-table :select.sync="select" selection :height="tableHeight" size="mini" border index :thead="thead" :data="tableData"></my-table> -->
     </div>
   </div>
 </template>
@@ -22,9 +20,11 @@
 <script>
   export default {
     props: {
-      id: {
-        type: String,
-        default: ''
+      option: {
+        type: Object,
+        default () {
+          return {}
+        }
       },
       type: {
         type: String,
@@ -59,7 +59,6 @@
         thead: {},
         path: '',
         input: '',
-        option: {},
       }
     },
     watch: {

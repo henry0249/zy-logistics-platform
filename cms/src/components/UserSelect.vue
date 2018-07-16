@@ -16,7 +16,7 @@
     </div>
     <el-dialog :visible.sync="dialogVisible" width="800px">
       <span style="fontSize:16px;" slot="title">{{title}}</span>
-      <user-select-item v-if="dialogVisible" :one="one" :type="type" :data.sync="itemData" :startData="data"></user-select-item>
+      <user-select-item :option="option" v-if="dialogVisible" :one="one" :type="type" :data.sync="itemData" :startData="data"></user-select-item>
       <div slot="footer" class="dialog-footer jb">
         <el-button size="mini" @click="dialogVisible = false">取 消</el-button>
         <el-button size="mini" type="primary" :disabled="disabled" @click="go">确 定</el-button>
@@ -36,9 +36,11 @@
         type: String,
         default: ''
       },
-      id: {
-        type: String,
-        default: ''
+      option: {
+        type: Object,
+        default(){
+          return {}
+        }
       },
       title: {
         type: String,
@@ -121,9 +123,6 @@
       },
       selectStyle() {
         let style = {};
-        // if (this.typeIo) {
-        //   style.padding = '0 10px';
-        // }
         if (this.width) {
           style.width = this.width
         }
