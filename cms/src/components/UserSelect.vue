@@ -1,7 +1,9 @@
 <template>
-  <div class="jc js" :style="selectStyle">
-    <span v-if="label" style="width:60px;">{{label}}</span>
-    <div :class="border?'border':''" class="flex jc jb select-box">
+  <div class="jc js g-form-item" :style="selectStyle">
+    <div class="tf1" v-if="label" :style="{width:labelWidth || $parent.labelWidth,fontSize:fontSize}">
+      {{label}}
+    </div>
+    <div :class="border?'border':''" :style="newSelectStyle" class="flex jc jb select-box">
       <div class="f1 flex">
         <div style="padding:0 5px 0 10px;" :class="typeIo?'io':''">
           {{selectTxt}}
@@ -26,9 +28,9 @@
 <script>
   export default {
     props: {
-      labelWidth:{
-        type:String,
-        default:'60px'
+      labelWidth: {
+        type: String,
+        default: '60px'
       },
       label: {
         type: String,
@@ -97,11 +99,31 @@
       }
     },
     computed: {
-      selectStyle() {
+      fontSize() {
+        let option = {
+          large: "15px",
+          medium: "14px",
+          small: "13px",
+          mini: "12px"
+        };
+        if (this.labelSize) {
+          return this.labelSize;
+        } else {
+          return option[this.size || this.$parent.size] || "15px";
+        }
+      },
+      newSelectStyle() {
         let style = {};
         if (this.typeIo) {
           style.padding = '0 10px';
         }
+        return style
+      },
+      selectStyle() {
+        let style = {};
+        // if (this.typeIo) {
+        //   style.padding = '0 10px';
+        // }
         if (this.width) {
           style.width = this.width
         }
@@ -154,6 +176,9 @@
 </script>
 
 <style scoped>
+  .g-form-item {
+    color: #606266;
+  }
   .select-box {
     box-sizing: border-box;
     height: 28px;
