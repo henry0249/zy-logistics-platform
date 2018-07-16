@@ -62,53 +62,53 @@
       }
     },
     watch: {
-      input(val) {
-        if (val) {
-          if (this.type === 'user') {
-            this.option = {
-              user: this.id,
-              $or: [{
-                name: {
-                  $regex: this.input
-                }
-              }, {
-                mobile: {
-                  $regex: this.input
-                }
-              }, {
-                email: {
-                  $regex: this.input
-                }
-              }]
-            }
-          } else if (this.type === 'company') {
-            this.option = {
-              company: this.id,
-              $or: [{
-                name: {
-                  $regex: this.input
-                }
-              }, {
-                nick: {
-                  $regex: this.input
-                }
-              }]
-            };
-          } else if (this.type === 'goods') {
-            this.option = {
-              goods: this.id,
-              $or: [{
-                name: {
-                  $regex: this.input
-                }
-              }],
-              populate: [{
-                path: 'category'
-              }]
-            };
-          }
-        }
-      },
+      // input(val) {
+      //   if (val) {
+      //     if (this.type === 'user') {
+      //       this.option = {
+      //         user: this.id,
+      //         $or: [{
+      //           name: {
+      //             $regex: this.input
+      //           }
+      //         }, {
+      //           mobile: {
+      //             $regex: this.input
+      //           }
+      //         }, {
+      //           email: {
+      //             $regex: this.input
+      //           }
+      //         }]
+      //       }
+      //     } else if (this.type === 'company') {
+      //       this.option = {
+      //         company: this.id,
+      //         $or: [{
+      //           name: {
+      //             $regex: this.input
+      //           }
+      //         }, {
+      //           nick: {
+      //             $regex: this.input
+      //           }
+      //         }]
+      //       };
+      //     } else if (this.type === 'goods') {
+      //       this.option = {
+      //         goods: this.id,
+      //         $or: [{
+      //           name: {
+      //             $regex: this.input
+      //           }
+      //         }],
+      //         populate: [{
+      //           path: 'category'
+      //         }]
+      //       };
+      //     }
+      //   }
+      // },
       divHeight(val) {
         console.log(val);
       },
@@ -191,11 +191,6 @@
             name: '邮箱'
           }
         };
-        if (this.id) {
-          this.option = {
-            user: this.id
-          }
-        }
         this.placeholder = '请输入用户名、手机号、邮箱';
       } else if (this.type === 'company') {
         this.thead = {
@@ -208,11 +203,6 @@
             name: '公司别称'
           }
         };
-        if (this.id) {
-          this.option = {
-            company: this.id
-          }
-        }
         this.placeholder = '请输入公司名称或公司别称';
       } else if (this.type === 'goods') {
         this.thead = {
@@ -225,14 +215,6 @@
             name: '分类'
           }
         };
-        this.option = {
-          populate: [{
-            path: 'category'
-          }]
-        };
-        if (this.id) {
-          this.option.goods = this.id
-        }
         this.placeholder = '请输入商品名';
       }
     },
