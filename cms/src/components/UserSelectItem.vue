@@ -1,6 +1,6 @@
 <template>
   <div class="col-flex" style="width:100%;height:400px">
-    <div class="js as">
+    <div class="js as" ref="div">
       <span style="margin-right:10px;">已选择</span>
       <div class="f1" style="flex-wrap:wrap;max-height:120px;overflow: auto;" ref="div" v-if="tags.length > 0">
         <el-tag style="margin-right:10px;" @close="closeTag(tag)" size="mini" v-for="tag in tags" :key="tag.id" closable>
@@ -166,7 +166,9 @@
         }
         this.selection = true;
       }
-      this.tableHeight = 740 - 120 - 320 + 'px';
+      this.$nextTick(() => {
+        this.tableHeight = 740 - this.$refs.div.offsetHeight - 372 + 'px';
+      })
       this.path = '/' + this.type + '/find';
       if (this.type === 'user') {
         this.thead = {

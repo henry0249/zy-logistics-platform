@@ -5,12 +5,12 @@
     </div>
     <div :class="border?'border':''" :style="newSelectStyle" class="flex f1 jc jb select-box">
       <div class="f1 flex">
-        <div style="padding:0 5px 0 10px;" :class="typeIo?'io':''">
+        <div class="f1 tf1" style="padding:0 5px 0 10px;" :class="typeIo?'io':''">
           {{selectTxt}}
           <i v-if="typeIo" class="el-icon-error pointer del" @click="del"></i>
         </div>
         <div style="background: #E4E7ED;border-radius: 5px;padding:0 5px;margin-left:5px;" v-if="typeIo && data.length >1">+{{data.length - 1}}</div>
-        <div class="f1" style="height:100%;"></div>
+        <!-- <div class="f1" style="height:100%;"></div> -->
       </div>
       <i class="el-icon-edit pointer" style="color:#409eff;fontSize:12px" @click="dialogVisible = true"></i>
     </div>
