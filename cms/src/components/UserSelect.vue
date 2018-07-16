@@ -79,6 +79,7 @@
       }
     },
     watch: {
+      data(val) {},
       itemData(val, old) {
         console.log(val, this.data);
         let io = true;
@@ -157,9 +158,11 @@
         this.dialogVisible = false;
         console.log(this.itemData);
         if (Object.prototype.toString.call(this.data) === '[object Object]') {
+          this.$emit('change', this.itemData[0]);
           this.$emit('update:data', this.itemData[0]);
         } else if (Object.prototype.toString.call(this.data) === '[object Array]') {
           this.$emit('update:data', this.itemData);
+          this.$emit('change', this.itemData);
         }
       },
       del() {
