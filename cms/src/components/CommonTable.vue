@@ -1,7 +1,7 @@
 <template>
   <loading-box class="g-common-table" v-model="loadingText">
     <my-table highlight-current-row :selection="selection" index border size="mini" :height="height" :loadmore="loadmore" :thead="thead" :data.sync="data"  @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
-      <div class="flex jb" style="padding:15px 0" slot="header" v-if="showSearch">
+      <div class="flex jb" style="padding:12px 0" slot="header" v-if="showSearch">
         <div class="f1">
           <slot name="header"></slot>
         </div>

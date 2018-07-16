@@ -2,13 +2,15 @@ import App from './App.vue';
 import Create from './Create.vue';
 import Taking from './Taking.vue';
 import TakingEdit from './TakingEdit.vue';
-import Check from './Check.vue';
-import CheckEdit from './CheckEdit.vue';
+import DispatchCheck from './DispatchCheck.vue';
 import Distribution from './Distribution.vue';
 import DistributionEdit from './DistributionEdit.vue';
 import Dispatch from './Dispatch.vue';
 import DispatchEdit from './DispatchEdit.vue';
-import Settlement from './Settlement.vue';
+import Check from './Check.vue';
+import CheckEdit from './CheckEdit.vue';
+import FinishCheck from './FinishCheck.vue';
+import Finish from './Finish.vue';
 import All from './All.vue';
 import Detail from './Detail.vue';
 
@@ -25,37 +27,39 @@ export default [{
   }, {
     path: 'taking',
     component: Taking,
-
-  }, {
-    path: 'check',
-    component: Check,
-
-  }, {
-    path: 'distribution',
-    component: Distribution,
-
-  }, {
-    path: 'dispatch',
-    component: Dispatch,
-
-  }, {
-    path: 'settlement',
-    component: Settlement,
-  }, {
-    path: 'all',
-    component: All,
   }, {
     path: '/edit/taking/:_id',
     component: TakingEdit,
   }, {
+    path: 'dispatchCheck',
+    component: DispatchCheck,
+  }, {
+    path: 'dispatch',
+    component: Dispatch,
+  }, {
     path: '/edit/dispatch/:_id',
     component: DispatchEdit,
+  }, {
+    path: 'distribution',
+    component: Distribution,
   }, {
     path: '/edit/distribution/:_id',
     component: DistributionEdit,
   }, {
+    path: 'check',
+    component: Check,
+  }, {
     path: '/edit/check/:_id',
     component: CheckEdit,
+  },{
+    path: 'finishCheck',
+    component: FinishCheck,
+  }, {
+    path: 'Finish',
+    component: Finish,
+  }, {
+    path: 'all',
+    component: All,
   }, {
     path: '/edit/detail/:_id',
     component: Detail,

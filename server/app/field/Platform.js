@@ -32,6 +32,11 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'User'
   },
+  dispatchCheck: {
+    name: '调度审核员',
+    type: 'ObjectIdArray',
+    ref: 'User'
+  },
   dispatcher: {
     name: '调度专员',
     type: 'ObjectIdArray',

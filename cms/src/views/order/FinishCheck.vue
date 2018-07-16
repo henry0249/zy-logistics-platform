@@ -1,5 +1,5 @@
 <template>
-  <All state="dispatch"></All>
+  <All state="finishCheck"></All>
 </template>
 
 <script>

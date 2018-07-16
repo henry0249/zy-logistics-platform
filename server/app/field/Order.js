@@ -1,5 +1,5 @@
 module.exports = {
-  no:{
+  no: {
     type: 'String',
     name: '单号',
   },
@@ -8,8 +8,10 @@ module.exports = {
     name: '状态',
     option: {
       taking: '待接单',
+      dispatchCheck: '调度审核',
       dispatch: '待调度',
       check: '待审核',
+      finishCheck: '完成审核',
       finish: '订单完成',
       delete: '已删除'
     },
@@ -140,9 +142,13 @@ module.exports = {
     name: '完成时间',
     type: 'Date'
   },
-
   salesman: {
     name: '市场专员',
+    type: 'ObjectIdArray',
+    ref: 'User'
+  },
+  dispatchCheck: {
+    name: '调度审核员',
     type: 'ObjectIdArray',
     ref: 'User'
   },
@@ -153,6 +159,11 @@ module.exports = {
   },
   documentClerk: {
     name: '单据文员',
+    type: 'ObjectIdArray',
+    ref: 'User'
+  },
+  finishCheck: {
+    name: '完成审核员',
     type: 'ObjectIdArray',
     ref: 'User'
   },

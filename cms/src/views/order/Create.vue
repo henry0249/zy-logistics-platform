@@ -51,7 +51,7 @@ export default {
         if (this.skipTaking) {
           this.order.state = "dispatch";
         } else {
-          this.order.state = "taking";
+          this.order.state = "dispatchCheck";
         }
         await this.$ajax.post("/order/add", {
           order: this.order,

@@ -1,5 +1,16 @@
 const Service = require('egg').Service;
 const orderField = require('../field/Order');
+const areaPopulate = [{
+  path: 'province'
+}, {
+  path: 'city'
+}, {
+  path: 'county'
+}, {
+  path: 'township'
+}, {
+  path: 'street'
+}];
 
 class OrderService extends Service {
   orderFieldCheck(order) {
@@ -95,7 +106,6 @@ class OrderService extends Service {
       for (const key in man) {
         order[key] = man[key];
       }
-      // order.state = 'dispatch';
     }
     order.creater = ctx.user._id;
     let orderModel = new ctx.model.Order(order);
@@ -261,8 +271,13 @@ class OrderService extends Service {
     if (newState === order.state) {
       ctx.throw(405, `订单已经是【${newStateStr}】，请勿重复修改`, body);
     }
-    if (newState === 'dispatch') {
+    if (newState === 'dispatchCheck') {
       if (!ctx.helper.inArr(order.salesman, ctx.user._id)) {
+        ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
+      }
+    }
+    if (newState === 'dispatch') {
+      if (!ctx.helper.inArr(order.dispatchCheck, ctx.user._id)) {
         ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
       }
     }
@@ -366,7 +381,8 @@ class OrderService extends Service {
     }, {
       path: 'company'
     }, {
-      path: 'area'
+      path: 'area',
+      populate: areaPopulate
     }]).sort({
       updatedAt: -1
     }).limit(limit).skip(skip);
@@ -385,17 +401,7 @@ class OrderService extends Service {
   async getOrderById() {
     const ctx = this.ctx;
     let params = ctx.params;
-    let areaPopulate = [{
-      path: 'province'
-    }, {
-      path: 'city'
-    }, {
-      path: 'county'
-    }, {
-      path: 'township'
-    }, {
-      path: 'street'
-    }];
+
     let order = await ctx.model.Order.findById(params._id).populate([{
       path: 'user'
     }, {
@@ -418,7 +424,7 @@ class OrderService extends Service {
           path: 'area',
           populate: areaPopulate
         }]
-      },{
+      }, {
         path: 'brand'
       }]
     }])

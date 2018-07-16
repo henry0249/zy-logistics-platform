@@ -1,4 +1,47 @@
 module.exports = {
+  customerName: function (row) {
+    let res = "-";
+    if (row.user) {
+      res = row.user.name || row.user.nick || row.user.mobile;
+    }
+    if (row.company) {
+      res = row.company.nick || row.company.name || row.company.mobile || row.company.tel || row.code;
+    }
+    return res;
+  },
+  table: {
+    no: {
+      name: '订单号',
+      width: "100",
+      slot: true,
+    },
+    customer: {
+      type: 'ObjectId',
+      name: '客户名称',
+      slot: true,
+    },
+    goodsName: {
+      type: 'String',
+      name: '商品名称',
+      slot: true,
+    },
+    goodsCount: {
+      type: 'Number',
+      name: '商品数量',
+      slot: true,
+    },
+    area: {
+      type: 'String',
+      name: '收货地址',
+      slot: true,
+      width: 300
+    },
+    remark: {
+      type: 'String',
+      name: '备注',
+      width: 150
+    }
+  },
   goods: {
     goods: {
       name: "商品",
@@ -56,10 +99,12 @@ module.exports = {
       type: 'String',
       name: '收货地址',
       slot: true,
+      width: 300
     },
     remark: {
       type: 'String',
       name: '备注',
+      width: 150
     }
   },
   businessTrains: {

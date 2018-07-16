@@ -61,6 +61,13 @@ export default {
         badge: this.orderBadge.taking
       },
       {
+        name: "调度前审核",
+        color: "red",
+        icon: "icon-shenhe1",
+        path: "/order/dispatchCheck",
+        badge: this.orderBadge.dispatchCheck
+      },
+      {
         name: "待调度",
         color: "red",
         icon: "icon-tiaoduzhongxin",
@@ -82,10 +89,17 @@ export default {
         badge: this.orderBadge.check
       },
       {
+        name: "结算前审核",
+        color: "red",
+        icon: "icon-shenhe1",
+        path: "/order/finishCheck",
+        badge: this.orderBadge.finishCheck
+      },
+      {
         name: "待结算",
         color: "red",
         icon: "icon-jiesuan",
-        path: "/order/settlement",
+        path: "/order/finish",
         badge: this.orderBadge.finish
       },
       {
@@ -104,9 +118,9 @@ export default {
   padding: 3% 5%;
   min-height: calc(100vh - 50px);
 }
-.g-order-body{
+.g-order-body {
   padding: 3%;
-  border:1px solid #eee;
-  border-radius: 4px
+  border: 1px solid #eee;
+  border-radius: 4px;
 }
 </style>
