@@ -3,7 +3,7 @@
     <div class="js as">
       <span style="margin-right:10px;">已选择</span>
       <div class="f1" style="flex-wrap:wrap;max-height:120px;overflow: auto;" ref="div" v-if="tags.length > 0">
-        <el-tag style="margin-right:10px;" @close="closeTag(tag)" size="mini" v-for="tag in tags" :key="tag.id" closable :type="tag.type">
+        <el-tag style="margin-right:10px;" @close="closeTag(tag)" size="mini" v-for="tag in tags" :key="tag.id" closable>
           {{tagTxt(tag)}}
         </el-tag>
       </div>
