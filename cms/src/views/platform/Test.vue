@@ -1,6 +1,6 @@
 <template>
   <div>
-    <user-select :data.sync="value1" border width="25%" title="用户选择" type="user"></user-select>
+    <user-select label="选择" :data.sync="value1" border width="25%" title="用户选择" type="user"></user-select>
   </div>
 </template>
 

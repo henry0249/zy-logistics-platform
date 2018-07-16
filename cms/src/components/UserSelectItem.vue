@@ -10,7 +10,6 @@
       <span v-if="tags.length === 0">未选择{{str}}</span>
     </div>
     <div class="f1" style="margin-top:20px;overflow: hidden;">
-      <el-alert :title="title" type="info" :closable="false"></el-alert>
       <CommonTable style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
         <my-form-item size="mini" width='200px' :placeholder="placeholder" input v-model="input" slot="header"></my-form-item>
       </CommonTable>
@@ -61,7 +60,6 @@
         path: '',
         input: '',
         option: {},
-        title: ''
       }
     },
     watch: {
@@ -180,7 +178,6 @@
       this.tableHeight = 740 - 120 - 320 + 'px';
       this.path = '/' + this.type + '/find';
       if (this.type === 'user') {
-        this.title = '可选用户';
         this.thead = {
           name: {
             readOnly: true,
@@ -202,7 +199,6 @@
         }
         this.placeholder = '请输入用户名、手机号、邮箱';
       } else if (this.type === 'company') {
-        this.title = '可选公司';
         this.thead = {
           name: {
             readOnly: true,
@@ -220,7 +216,6 @@
         }
         this.placeholder = '请输入公司名称或公司别称';
       } else if (this.type === 'goods') {
-        this.title = '可选商品';
         this.thead = {
           name: {
             readOnly: true,
