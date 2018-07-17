@@ -5,18 +5,17 @@
     </div>
     <div :class="border?'border':''" :style="newSelectStyle" class="flex f1 jc jb select-box">
       <div class="f1 flex">
-        <div class="f1 tf1" style="padding:0 5px 0 10px;" :class="typeIo?'io':''">
+        <div class="tf1" style="padding:0 5px 0 10px;" :class="typeIo?'io':''">
           {{selectTxt}}
           <i v-if="typeIo" class="el-icon-error pointer del" @click="del"></i>
         </div>
         <div style="background: #E4E7ED;border-radius: 5px;padding:0 5px;margin-left:5px;" v-if="typeIo && data.length >1">+{{data.length - 1}}</div>
-        <!-- <div class="f1" style="height:100%;"></div> -->
       </div>
       <i class="el-icon-edit pointer" style="color:#409eff;fontSize:12px" @click="dialogVisible = true"></i>
     </div>
     <el-dialog :visible.sync="dialogVisible" width="800px">
       <span style="fontSize:16px;" slot="title">{{title}}</span>
-      <user-select-item :option="option" v-if="dialogVisible" :one="one" :type="type" :data.sync="itemData" :startData="data"></user-select-item>
+      <common-select-item :option="option" v-if="dialogVisible" :one="one" :type="type" :data.sync="itemData" :startData="data"></common-select-item>
       <div slot="footer" class="dialog-footer jb">
         <el-button size="mini" @click="dialogVisible = false">取 消</el-button>
         <el-button size="mini" type="primary" :disabled="disabled" @click="go">确 定</el-button>
@@ -81,8 +80,10 @@
     watch: {
       data(val) {},
       itemData(val, old) {
-        console.log(val, this.data);
         let io = true;
+        if (val.length > 0) {
+          this.typeIo = true;
+        }
         if (val.length === this.data.length) {
           val.forEach((item, index) => {
             if (item._id === this.data[index]._id) {
@@ -138,6 +139,19 @@
               return this.data.name || this.data.nick;
             } else if (this.type === 'goods') {
               return this.data.name;
+            } else if (this.type === 'area') {
+              let str = '';
+              if (this.data.province) {
+                str += this.data.province;
+              }
+              if (this.data.city) {
+                str += '/' + this.data.city;
+              }
+              if (this.data.county) {
+                str += '/' + this.data.county;
+              }
+              str += '/' + this.data.name
+              return str;
             }
           } else if (Object.prototype.toString.call(this.data) === '[object Array]') {
             if (this.type === 'user') {
@@ -146,6 +160,8 @@
               return this.data[0].name || this.data[0].nick;
             } else if (this.type === 'goods') {
               return this.data[0].name;
+            } else if (this.type === 'area') {
+              return this.data[0].name || this.data[0].key;
             }
           }
         } else {
@@ -170,8 +186,20 @@
       },
     },
     created() {
+      if (this.type === 'area') {
+        this.option.populate = [{
+          path:'province'
+        },{
+          path:'city'
+        },{
+          path:'county'
+        }];
+        this.option.type = 'township'
+      }
       if (Object.prototype.toString.call(this.data) === '[object Array]') {
-        this.typeIo = true;
+        if (this.data.length > 0) {
+          this.typeIo = true;
+        }
         this.one = false;
       } else if (Object.prototype.toString.call(this.data) === '[object Object]') {
         this.one = true;

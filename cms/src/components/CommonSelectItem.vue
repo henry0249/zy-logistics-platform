@@ -146,6 +146,8 @@
           return tag.name || tag.nick;
         } else if (this.type === 'goods') {
           return tag.name;
+        } else if (this.type === 'area') {
+          return tag.name;
         }
       },
       closeTag(tag) {
@@ -207,6 +209,30 @@
           'category.name': {
             readOnly: true,
             name: '分类'
+          }
+        };
+        this.placeholder = '请输入商品名';
+      } else if (this.type === 'area') {
+        this.thead = {
+          'province.name': {
+            readOnly: true,
+            name: '省份'
+          },
+          'city.name': {
+            readOnly: true,
+            name: '市'
+          },
+          'county.name': {
+            readOnly: true,
+            name: '县'
+          },
+          name: {
+            readOnly: true,
+            name: '地址名'
+          },
+          key: {
+            readOnly: true,
+            name: '编码'
           }
         };
         this.placeholder = '请输入商品名';
