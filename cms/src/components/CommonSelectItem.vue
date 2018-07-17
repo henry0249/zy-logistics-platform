@@ -11,7 +11,10 @@
     </div>
     <div class="f1" style="margin-top:20px;overflow: hidden;">
       <CommonTable style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
-        <my-form-item size="mini" width='200px' :placeholder="placeholder" input v-model="input" slot="header"></my-form-item>
+        <div v-if="type === 'area'" slot="header">
+          <common-select-area></common-select-area>
+        </div>
+        <my-form-item v-else size="mini" width='200px' :placeholder="placeholder" input v-model="input" slot="header"></my-form-item>
       </CommonTable>
     </div>
   </div>
@@ -228,14 +231,10 @@
           },
           name: {
             readOnly: true,
-            name: '地址名'
-          },
-          key: {
-            readOnly: true,
-            name: '编码'
+            name: '乡/镇'
           }
         };
-        this.placeholder = '请输入商品名';
+        this.placeholder = '请输入地名';
       }
     },
   }

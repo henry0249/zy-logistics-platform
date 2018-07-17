@@ -1,6 +1,6 @@
 <template>
   <div>
-    <common-select label="选择" :data.sync="value3" border width="25%" title="用户选择" type="area"></common-select>
+    <common-select label="选择" :data.sync="value" border width="25%" title="用户选择" type="area"></common-select>
   </div>
 </template>
 

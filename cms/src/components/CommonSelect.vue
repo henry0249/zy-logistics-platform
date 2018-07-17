@@ -81,9 +81,6 @@
       data(val) {},
       itemData(val, old) {
         let io = true;
-        if (val.length > 0) {
-          this.typeIo = true;
-        }
         if (val.length === this.data.length) {
           val.forEach((item, index) => {
             if (item._id === this.data[index]._id) {
@@ -140,18 +137,7 @@
             } else if (this.type === 'goods') {
               return this.data.name;
             } else if (this.type === 'area') {
-              let str = '';
-              if (this.data.province) {
-                str += this.data.province;
-              }
-              if (this.data.city) {
-                str += '/' + this.data.city;
-              }
-              if (this.data.county) {
-                str += '/' + this.data.county;
-              }
-              str += '/' + this.data.name
-              return str;
+              return this.data.name || this.data.key
             }
           } else if (Object.prototype.toString.call(this.data) === '[object Array]') {
             if (this.type === 'user') {
@@ -172,13 +158,14 @@
     methods: {
       go() {
         this.dialogVisible = false;
-        console.log(this.itemData);
         if (Object.prototype.toString.call(this.data) === '[object Object]') {
           this.$emit('change', this.itemData[0]);
           this.$emit('update:data', this.itemData[0]);
+          this.typeIo = false;
         } else if (Object.prototype.toString.call(this.data) === '[object Array]') {
           this.$emit('update:data', this.itemData);
           this.$emit('change', this.itemData);
+          this.typeIo = true;
         }
       },
       del() {
@@ -188,11 +175,11 @@
     created() {
       if (this.type === 'area') {
         this.option.populate = [{
-          path:'province'
-        },{
-          path:'city'
-        },{
-          path:'county'
+          path: 'province'
+        }, {
+          path: 'city'
+        }, {
+          path: 'county'
         }];
         this.option.type = 'township'
       }
