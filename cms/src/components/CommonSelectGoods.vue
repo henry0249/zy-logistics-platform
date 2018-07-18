@@ -63,6 +63,10 @@
     async created() {
       await this.getBrand();
       await this.getCompany();
+      delete this.data.input;
+      delete this.data.brand;
+      delete this.data.mfrs;
+      console.log(this.data);
     }
   }
 </script>

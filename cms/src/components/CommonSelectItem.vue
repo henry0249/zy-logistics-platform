@@ -67,17 +67,22 @@
     },
     watch: {
       goodsData(val) {
-        console.log(val);
-        for (const key in val) {
-          if (key === 'input') {
-            this.option['$or'] = [{
-              name: {
-                $regex: val.input
-              }
-            }]
-          } else {
-            this.option[key] = val[key];
+        if (Object.keys(val).length > 0) {
+          for (const key in val) {
+            if (key === 'input') {
+              this.option['$or'] = [{
+                name: {
+                  $regex: val.input
+                }
+              }]
+            } else {
+              this.option[key] = val[key];
+            }
           }
+        } else {
+          delete this.option.input;
+          delete this.option.brand;
+          delete this.option.mfrs;
         }
       },
       areaData(val) {
@@ -242,6 +247,9 @@
             name: '分类'
           }
         };
+        delete this.option.input;
+        delete this.option.brand;
+        delete this.option.mfrs;
         this.placeholder = '请输入商品名';
       } else if (this.type === 'area') {
         this.thead = {
