@@ -1,8 +1,8 @@
 <template>
   <div class="fex jc js">
-    <my-form-item style="padding-right:10px;" @change="proChange" width="33%" size="mini" label="选择省" v-model="province" :options="provinceArr" select></my-form-item>
-    <my-form-item style="padding-right:10px;" @change="cityChange" v-loading="cityLoading" width="33%" size="mini" label="选择市" v-model="city" :options="cityArr" select></my-form-item>
-    <my-form-item @change="countyChange" v-loading="countyLoading" width="33%" size="mini" label="选择县" v-model="county" :options="countyArr" select></my-form-item>
+    <my-form-item style="padding-right:10px;" @change="proChange" filterable width="33%" size="mini" placeholder="选择省" v-model="province" :options="provinceArr" select></my-form-item>
+    <my-form-item style="padding-right:10px;" @change="cityChange" filterable v-loading="cityLoading" width="33%" size="mini" placeholder="选择市" v-model="city" :options="cityArr" select></my-form-item>
+    <my-form-item @change="countyChange" v-loading="countyLoading" filterable width="33%" size="mini" placeholder="选择县" v-model="county" :options="countyArr" select></my-form-item>
   </div>
 </template>
 
