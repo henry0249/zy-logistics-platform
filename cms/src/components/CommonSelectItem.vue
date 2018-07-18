@@ -223,6 +223,7 @@
             name: '邮箱'
           }
         };
+        delete this.option.$or;
         this.placeholder = '请输入用户名、手机号、邮箱';
       } else if (this.type === 'company') {
         this.thead = {
@@ -235,6 +236,7 @@
             name: '公司别称'
           }
         };
+        delete this.option.$or;
         this.placeholder = '请输入公司名称或公司别称';
       } else if (this.type === 'goods') {
         this.thead = {
@@ -247,6 +249,7 @@
             name: '分类'
           }
         };
+        delete this.option.$or;
         delete this.option.input;
         delete this.option.brand;
         delete this.option.mfrs;
@@ -270,6 +273,10 @@
             name: '乡/镇'
           }
         };
+        delete this.option.$or;
+        delete this.option.province;
+        delete this.option.city;
+        delete this.option.county;
         this.placeholder = '请输入地名';
       }
     },
