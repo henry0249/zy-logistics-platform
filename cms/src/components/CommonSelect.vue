@@ -5,20 +5,20 @@
     </div>
     <div :class="border?'border':''" :style="newSelectStyle" class="flex f1 jc jb select-box">
       <div class="f1 flex">
-        <div class="tf1" style="padding:0 5px 0 10px;" :class="typeIo?'io':''">
+        <div v-if="data._id||data.length > 0" class="tf1 io" style="padding:0 5px 0 10px;">
           {{selectTxt}}
-          <i v-if="typeIo" class="el-icon-error pointer del" @click="del"></i>
+          <i v-if="!disabled" class="el-icon-error pointer del" @click="del"></i>
         </div>
         <div style="background: #E4E7ED;border-radius: 5px;padding:0 5px;margin-left:5px;" v-if="typeIo && data.length >1">+{{data.length - 1}}</div>
       </div>
-      <i class="el-icon-edit pointer" style="color:#409eff;fontSize:12px" @click="dialogVisible = true"></i>
+      <i v-if="!disabled" class="el-icon-edit pointer" style="color:#409eff;fontSize:12px" @click="dialogVisible = true"></i>
     </div>
     <el-dialog :visible.sync="dialogVisible" width="800px">
       <span style="fontSize:16px;" slot="title">{{title}}</span>
       <common-select-item :option="option" v-if="dialogVisible" :one="one" :type="type" :data.sync="itemData" :startData="data"></common-select-item>
       <div slot="footer" class="dialog-footer jb">
         <el-button size="mini" @click="dialogVisible = false">取 消</el-button>
-        <el-button size="mini" type="primary" :disabled="disabled" @click="go">确 定</el-button>
+        <el-button size="mini" type="primary" :disabled="btmDisabled" @click="go">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -27,6 +27,10 @@
 <script>
   export default {
     props: {
+      disabled: {
+        type: Boolean,
+        default: false
+      },
       labelWidth: {
         type: String,
         default: '60px'
@@ -73,7 +77,7 @@
         typeIo: false,
         one: false,
         dialogVisible: false,
-        disabled: true,
+        btmDisabled: true,
         itemData: [],
       }
     },
@@ -93,9 +97,9 @@
           io = false;
         }
         if (io) {
-          this.disabled = true;
+          this.btmDisabled = true;
         } else {
-          this.disabled = false;
+          this.btmDisabled = false;
         }
       }
     },
@@ -115,9 +119,7 @@
       },
       newSelectStyle() {
         let style = {};
-        if (this.typeIo) {
-          style.padding = '0 10px';
-        }
+        style.padding = '0 10px';
         return style
       },
       selectStyle() {
@@ -150,8 +152,6 @@
               return this.data[0].name || this.data[0].key;
             }
           }
-        } else {
-          return ''
         }
       }
     },
@@ -169,7 +169,12 @@
         }
       },
       del() {
-        this.data.splice(0, 1);
+        console.log(Object.prototype.toString.call(this.data) === '[object Object]');
+        if (Object.prototype.toString.call(this.data) === '[object Object]') {
+          this.$emit('update:data', {});
+        } else {
+          this.data.splice(0, 1);
+        }
       },
     },
     created() {
@@ -182,6 +187,11 @@
           path: 'county'
         }];
         this.option.type = 'township'
+      }
+      if (this.type === 'goods') {
+        // this.option.populate = [{
+        //   path: 'category'
+        // }]
       }
       if (Object.prototype.toString.call(this.data) === '[object Array]') {
         if (this.data.length > 0) {

@@ -11,9 +11,8 @@
     </div>
     <div class="f1" style="margin-top:20px;overflow: hidden;">
       <CommonTable style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
-        <div v-if="type === 'area'" slot="header">
-          <common-select-area></common-select-area>
-        </div>
+        <common-select-area v-if="type === 'area'" slot="header" :areaData.sync="areaData"></common-select-area>
+        <common-select-goods v-else-if="type === 'goods'" slot="header" :data.sync="goodsData"></common-select-goods>
         <my-form-item v-else size="mini" width='200px' :placeholder="placeholder" input v-model="input" slot="header"></my-form-item>
       </CommonTable>
     </div>
@@ -62,9 +61,32 @@
         thead: {},
         path: '',
         input: '',
+        areaData: {},
+        goodsData: {},
       }
     },
     watch: {
+      goodsData(val) {
+        console.log(val);
+        for (const key in val) {
+          if (key === 'input') {
+            this.option['$or'] = [{
+              name: {
+                $regex: val.input
+              }
+            }]
+          } else {
+            this.option[key] = val[key];
+          }
+        }
+      },
+      areaData(val) {
+        if (Object.keys(val).length > 0) {
+          for (const key in val) {
+            this.option[key] = val[key];
+          }
+        }
+      },
       input(val) {
         if (val) {
           if (this.type === 'user') {
@@ -92,6 +114,12 @@
               }
             }]
           } else if (this.type === 'goods') {
+            this.option['$or'] = [{
+              name: {
+                $regex: this.input
+              }
+            }]
+          } else if (this.type === 'area') {
             this.option['$or'] = [{
               name: {
                 $regex: this.input

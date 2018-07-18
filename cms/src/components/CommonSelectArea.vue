@@ -1,13 +1,21 @@
 <template>
   <div class="fex jc js">
     <my-form-item style="padding-right:10px;" @change="proChange" width="33%" size="mini" label="选择省" v-model="province" :options="provinceArr" select></my-form-item>
-    <my-form-item style="padding-right:10px;"  @change="cityChange" v-loading="cityLoading" width="33%" size="mini" label="选择市" v-model="city" :options="cityArr" select></my-form-item>
-    <my-form-item v-loading="countyLoading" width="33%" size="mini" label="选择县" v-model="county" :options="countyArr" select></my-form-item>
+    <my-form-item style="padding-right:10px;" @change="cityChange" v-loading="cityLoading" width="33%" size="mini" label="选择市" v-model="city" :options="cityArr" select></my-form-item>
+    <my-form-item @change="countyChange" v-loading="countyLoading" width="33%" size="mini" label="选择县" v-model="county" :options="countyArr" select></my-form-item>
   </div>
 </template>
 
 <script>
   export default {
+    props: {
+      areaData: {
+        type: Object,
+        default () {
+          return {}
+        }
+      },
+    },
     data() {
       return {
         province: '',
@@ -21,7 +29,15 @@
       }
     },
     methods: {
+      countyChange(val) {
+        let obj = JSON.parse(JSON.stringify(this.areaData));
+        obj.county = val;
+        this.$emit('update:areaData', obj);
+      },
       async cityChange(val) {
+        let obj = JSON.parse(JSON.stringify(this.areaData));
+        obj.city = val;
+        this.$emit('update:areaData', obj);
         let op = {
           model: 'area',
           curdType: 'find',
@@ -31,6 +47,9 @@
         await this.getCounty(op);
       },
       async proChange(val) {
+        let obj = JSON.parse(JSON.stringify(this.areaData));
+        obj.province = val;
+        this.$emit('update:areaData', obj);
         let op = {
           model: 'area',
           curdType: 'find',
