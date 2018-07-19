@@ -4,7 +4,7 @@
       {{label}}
     </div>
     <div :class="border?'border':''" :style="newSelectStyle" class="flex f1 jc jb select-box">
-      <div class="f1 flex">
+      <div class="f1 flex" style="height:20px;">
         <div v-if="data._id||data.length > 0" class="tf1 io" style="padding:0 5px 0 10px;">
           {{selectTxt}}
           <i v-if="!disabled" class="el-icon-error pointer del" @click="del"></i>

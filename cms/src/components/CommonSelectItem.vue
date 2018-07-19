@@ -10,11 +10,11 @@
       <span v-else style="color:#ccc;">未选择{{str}}</span>
     </div>
     <div class="f1" style="margin-top:20px;overflow: hidden;">
-      <CommonTable style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
+      <common-table style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
         <common-select-area v-if="type === 'area'" slot="header" :areaData.sync="areaData"></common-select-area>
         <common-select-goods v-else-if="type === 'goods'" slot="header" :data.sync="goodsData"></common-select-goods>
         <my-form-item v-else size="mini" width='200px' :placeholder="placeholder" input v-model="input" slot="header"></my-form-item>
-      </CommonTable>
+      </common-table>
     </div>
   </div>
 </template>
