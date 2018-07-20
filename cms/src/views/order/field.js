@@ -1,14 +1,4 @@
 module.exports = {
-  customerName: function (row) {
-    let res = "-";
-    if (row.user) {
-      res = row.user.name || row.user.nick || row.user.mobile;
-    }
-    if (row.company) {
-      res = row.company.nick || row.company.name || row.company.mobile || row.company.tel || row.code;
-    }
-    return res;
-  },
   table: {
     no: {
       name: '订单号',
@@ -42,22 +32,26 @@ module.exports = {
       width: 150
     }
   },
-  goods: {
-    goods: {
+  orderGoods: {
+    value: {
       name: "商品",
       type: "String",
       require: true,
       readOnly: true,
       slot: true,
-      width: "300",
+      width: 200
     },
-    count: {
-      name: "数量",
-      require: true,
+    brand: {
+      name: "品牌",
+      readOnly: true,
     },
     unit: {
       name: "单位",
       readOnly: true,
+    },
+    count: {
+      name: "数量",
+      require: true,
     },
     factoryPrice: {
       name: "出厂单价",
@@ -72,39 +66,6 @@ module.exports = {
       name: "合计金额",
       readOnly: true,
       slot: true,
-    }
-  },
-  taking: {
-    no: {
-      name: '订单号',
-      width: "100",
-      slot: true,
-    },
-    customer: {
-      type: 'ObjectId',
-      name: '客户名称',
-      slot: true,
-    },
-    goodsName: {
-      type: 'String',
-      name: '商品名称',
-      slot: true,
-    },
-    goodsCount: {
-      type: 'Number',
-      name: '商品数量',
-      slot: true,
-    },
-    area: {
-      type: 'String',
-      name: '收货地址',
-      slot: true,
-      width: 300
-    },
-    remark: {
-      type: 'String',
-      name: '备注',
-      width: 150
     }
   },
   businessTrains: {
@@ -127,12 +88,6 @@ module.exports = {
       name: '出货数量',
       type: 'Number',
       require: true
-    },
-    totalPrice: {
-      name: '结算金额',
-      type: 'Number',
-      require: true,
-      readOnly: true
     },
     remark: {
       name: '备注',

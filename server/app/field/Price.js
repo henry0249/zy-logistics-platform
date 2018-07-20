@@ -1,4 +1,8 @@
 module.exports = {
+  name: {
+    name: '价格表名称',
+    type: 'String'
+  },
   factory: {
     name: '出厂价',
     type: 'Number'
@@ -11,28 +15,18 @@ module.exports = {
     name: '运输价',
     type: 'Number'
   },
-  history: {
-    name: '历史价格标识',
-    type: 'Boolean'
+  brokerBonus: {
+    name: '经纪人提成',
+    type: 'Number',
   },
-  parent: {
-    name: '上次价格',
-    type: 'ObjectId',
-    ref: 'Price'
+  temporaryBrokerBonus: {
+    name: '临时经纪人提成',
+    type: 'Number',
   },
   goods: {
     name: '所属商品',
     type: 'ObjectId',
     ref: 'Goods'
-  },
-  mfrs: {
-    name: '生产厂商',
-    type: 'ObjectId',
-    ref: 'Company'
-  },
-  name: {
-    name: '价格表名称',
-    type: 'String'
   },
   area: {
     name: '区域',

@@ -58,9 +58,9 @@ export default {
           order: {
             _id:this.$route.params._id,
           },
-          state: "dispatch"
+          state: "dispatchCheck"
         });
-        this.$router.push("/order/dispatch");
+        this.$router.push("/order/dispatchCheck");
       } catch (error) {}
       this.loadingText = "";
     }

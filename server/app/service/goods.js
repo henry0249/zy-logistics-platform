@@ -56,5 +56,33 @@ class CompanyService extends Service {
     }
     return res;
   }
+  async find(){
+    const ctx = this.ctx;
+    let body = ctx.request.body || ctx.request.query;
+    let limit = Number(body.limit) || 10;
+    let skip = Number(body.skip) || 0;
+    delete body.limit;
+    delete body.skip;
+    let goods = await ctx.model.Goods.find({
+      ...body
+    }).populate([{
+      path: 'brand'
+    }, {
+      path: 'category'
+    }, {
+      path: 'mfrs',
+    }]).sort({
+      updatedAt: -1
+    }).limit(limit).skip(skip);
+    let res = [];
+    for (let i = 0; i < goods.length; i++) {
+      let goodsItem = JSON.parse(JSON.stringify(goods[i]));
+      goodsItem.price = await ctx.model.Price.find({
+        goods: goodsItem._id
+      });
+      res.push(goodsItem);
+    }
+    return res;
+  }
 }
 module.exports = CompanyService;

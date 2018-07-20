@@ -3,10 +3,14 @@
     <div v-if="title" class="order-title" style="margin-bottom:15px">
       <strong>{{title}}</strong>
     </div>
+    <el-alert v-if="alert" title="订单信息" type="info" :closable="false" style="margin:15px 0">
+      <el-checkbox v-model="isCompany" style="margin-left:50px;color:#909399;font-size:10px">公司订单</el-checkbox>
+    </el-alert>
     <my-form v-show="!hideForm" size="mini" width="24%" :edit="edit">
       <div class="flex ac jb">
-        <my-form-item cascader v-model="customer" filterable label="客户名称" :options="userCascader" @change="userCascaderChange">
-        </my-form-item>
+        <div style="width:24%">
+          <common-select title="选择一个客户" :label="isCompany?'下单公司':'下单用户'" border :data.sync="customer" :type="order.type" @change="customerChange"></common-select>
+        </div>
         <my-form-item datetime v-model="order.deliveryTime" label="配送时间">
         </my-form-item>
         <my-form-item select v-model="order.settlementMethod" label="结算方式" :options="field.Order.settlementMethod.option">
@@ -17,7 +21,7 @@
       <div class="flex ac jb" style="margin:15px 0">
         <my-form-item select v-model="order.invoiceType" label="发票类型" :options="field.Order.invoiceType.option">
         </my-form-item>
-        <my-form-item @click.native="showCompanyUserCascader" input :popover="customer[0]==='company'?true:undefined" v-model="order.contactName" label="收货人">
+        <my-form-item @click.native="showCompanyUserCascader" input :popover="isCompany?true:undefined" v-model="order.contactName" label="收货人">
           <div slot="inputPopover">
             <loading-box v-model="companyUserCascaderLoaidng">
               <free-select :data="companyUserCascader" @change="companyUserCascaderChange"></free-select>
@@ -26,8 +30,7 @@
         </my-form-item>
         <my-form-item input v-model="order.contactNumber" label="联系电话">
         </my-form-item>
-        <my-form-item v-model="areaSelect" area filterable @change="areaCascaderChange" :show-all-levels="false" label="送货地址">
-        </my-form-item>
+        <common-select style="width:24%" title="选择送货地址" label="送货地址" border :data.sync="order.area" type="area" @change="areaChange"></common-select>
       </div>
       <my-form-item width="100%" style="margin:15px 0" input v-model="order.address" label="详细地址">
       </my-form-item>
@@ -41,6 +44,14 @@
 import { goods } from "./field";
 export default {
   props: {
+    alert: {
+      type: Boolean,
+      default: true
+    },
+    selectType: {
+      type: Boolean,
+      default: false
+    },
     title: {
       type: String,
       default: ""
@@ -62,103 +73,58 @@ export default {
       default: true
     }
   },
-  watch: {
-    order: {
-      handler: function(val) {
-        this.$emit("update:data", val);
-      },
-      deep: true
-    }
-  },
   data() {
     return {
       order: {
+        type:'company',
         settlementMethod: 1,
         transportModel: 0,
         deliveryTime: "",
         invoiceType: 0,
         contactName: "",
         contactNumber: "",
-        area: "",
+        area: {},
         address: "",
         remark: ""
       },
       loadingText: "",
       hideForm: false,
-      customer: [],
-      areaSelect: [],
-      areaCascader: [],
-      userCascader: [],
+      customer: {},
+      isCompany: true,
+      areaSelect: {},
       companyUserCascaderLoaidng: "加载中...",
       companyUserCascader: []
     };
   },
-  methods: {
-    async getData() {
-      this.loadingText = "加载中";
-      this.userCascader = [];
-      this.areaCascader = [];
-      try {
-        this.userCascader = await this.$ajax("/user/cascader");
-        this.areaCascader = await this.$ajax("/area/cascader");
-      } catch (error) {}
-      this.loadingText = "";
+  watch: {
+    order: {
+      handler: function(val) {
+        this.$emit("update:data", val);
+      },
+      deep: true
     },
-    async areaCascaderChange(val) {
-      this.order.area = val[val.length - 1];
-      let area = await this.$ajax.post("/area/findOne", {
-        _id: val[val.length - 1],
-        populate: [
-          {
-            path: "province"
-          },
-          {
-            path: "city"
-          },
-          {
-            path: "county"
-          },
-          {
-            path: "township"
-          },
-          {
-            path: "street"
-          }
-        ]
-      });
-      this.order.address = this.area2name(area);
-    },
-    async userCascaderChange(val) {
-      let data = {};
-      this.userCascader.forEach(item => {
-        if (item.value === val[0]) {
-          item.children.forEach(childrenItem => {
-            if (childrenItem._id === val[1]) {
-              data = childrenItem;
-            }
-          });
-        }
-      });
-      delete this.order.company;
+    isCompany(val) {
       delete this.order.user;
-      this.order[val[0]] = val[1];
-      this.order.contactName = data.name;
-      this.order.contactNumber = data.mobile || data.tel;
-      // if (val[0] === "company") {
-      //   this.companyUserCascader = await this.$ajax(
-      //     "/company/user/cascader?company=" + val[1]
-      //   );
-      // }
-    },
+      delete this.order.company;
+      if (val) {
+        this.order.type = "company";
+      } else {
+        this.order.type = "user";
+      }
+      this.customer = {};
+    }
+  },
+  methods: {
     async showCompanyUserCascader() {
-      if (this.customer[0] === "company") {
-        console.log(666);
+      if (this.isCompany && this.customer._id) {
         this.companyUserCascaderLoaidng = "加载中...";
         try {
           this.companyUserCascader = await this.$ajax(
-            "/company/user/cascader?company=" + this.customer[1]
+            "/company/user/cascader?company=" + this.customer._id
           );
         } catch (error) {}
+        this.companyUserCascaderLoaidng = "";
+      } else {
         this.companyUserCascaderLoaidng = "";
       }
     },
@@ -171,6 +137,14 @@ export default {
           this.order.contactNumber = val.mobile || val.tel;
         }
       }
+    },
+    customerChange(val){
+      delete this.order.user;
+      delete this.order.company;
+      this.order[this.order.type] = val;
+    },
+    areaChange(val) {
+      this.order.address = this.area2name(val) + " ";
     },
     check() {
       let order = this.order;
@@ -202,30 +176,15 @@ export default {
     }
   },
   async created() {
-    await this.getData();
     for (const key in this.order) {
       if (this.val.hasOwnProperty(key)) {
         this.order[key] = this.val[key];
       }
     }
-    //初始化客户选择
-    if (this.val.user) {
-      this.customer = ["user", this.val.user._id];
-    }
-    if (this.val.company) {
-      this.customer = ["company", this.val.company._id];
-    }
-    //初始化区域选择
-    if (this.val.area) {
-      this.areaSelect = [];
-      let areaSelectType = ["province", "city", "county", "township"];
-      areaSelectType.forEach(item => {
-        if (this.val.area[item]) {
-          this.areaSelect.push(this.val.area[item]._id);
-        }
-      });
-      this.areaSelect.push(this.val.area._id);
-    }
+    this.loadingText = "加载中";
+    setTimeout(() => {
+      this.loadingText = "";
+    }, 200);
   }
 };
 </script>

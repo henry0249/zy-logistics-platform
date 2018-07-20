@@ -1,54 +1,59 @@
 <template>
   <div class="g-business-trains">
-    <div class="flex ac jb" style="color:#909399;padding:8px 10px;background:#F2F6FC">
-      <div class="goods-info-padding">商品名称：<span style="color:#606266">{{goods.value.name}}</span></div>
+    <div v-if="goods.value" class="flex ac jb" style="color:#909399;padding-left:20px;background:#F2F6FC;font-size:13px">
+      <div class="goods-info-padding">商品名称：{{goods.value.name}}</div>
       <div class="goods-info-padding">品牌：{{goods.value.brand.name}}</div>
       <div class="goods-info-padding">规格：{{goods.value.spec}}</div>
       <div class="goods-info-padding">单位：{{goods.value.unit}}</div>
       <div class="f1"></div>
-      <div v-if="goods.value.freeDelivery" style="color:#67C23A">包配送</div>
-      <div v-if="!goods.value.freeDelivery" style="color:#F56C6C">不包配送</div>
-    </div>
-    <div v-for="(item,index) in data" :key="item.id">
-      <div class="flex ac goods-title" v-if="goods._id">
-        <div class="bor tc" style="padding:8px 0;width:50px;color:#409EFF">
-          # {{index+1}}
-        </div>
-        <div class="tc bor t-bg" style="width:100px;padding:8px 0">
-          {{index === 0 ? '生产厂商' : '联营商'}}
-        </div>
-        <div v-if="index === 0" class="f1" style="padding:8px 10px">
-          {{goods.value.mfrs.name}}
-        </div>
-        <div v-if="index > 0" class="f1" style="padding:8px 10px">
-          <company-select @change="associate1change($event,index)" title="选择联营商" :data.sync="item.associate"></company-select>
-        </div>
-        <div class="tc bor bol t-bg" style="width:100px;padding:8px 0">
-          {{index === data.length-1 ? '收货客户' : '联营商'}}
-        </div>
-        <div v-if="index === data.length-1" class="f1" style="padding:8px 10px">
-          {{order.user?order.user.name :order.company.name}}
-        </div>
-        <div v-if="index === 0 && data.length>1" class="f1" style="padding:8px 10px">
-          <company-select @change="associate1change($event,index)" title="选择联营商" :data.sync="item.associate"></company-select>
-        </div>
-        <div v-if="index > 0 && index !== data.length-1" class="f1" style="padding:8px 10px">
-          <company-select @change="associate2change($event,index)" title="选择联营商" :data.sync="item.associate2"></company-select>
-        </div>
-        <div class="tc bol" style="width:45px;padding:8px 0">
-          <i @click="add(item,index)" style="color:#67C23A" class="el-icon-plus pointer"></i>
-        </div>
+      <div class="tc bol" style="width:45px;padding:8px 0">
+        <i @click="add" style="color:#67C23A" class="el-icon-plus pointer"></i>
       </div>
-      <my-table opWidth="45" size="mini" border edit op :thead="thead" :data.sync="item.info">
-        <div class="tc" slot="op" slot-scope="scope">
-          <i @click="remove(item,index)" style="color:#F56C6C" class="el-icon-delete pointer"></i>
-        </div>
-      </my-table>
+      <!-- <div v-if="goods.value.freeDelivery" style="color:#67C23A">包配送</div>
+      <div v-if="!goods.value.freeDelivery" style="color:#F56C6C">不包配送</div> -->
     </div>
-    <div class="fle ac" style="margin-top:15px">
-      <el-button type="primary" icon="el-icon-refresh" size="mini">刷新</el-button>
-      <div class="f1"></div>
-      <el-button type="success" icon="el-icon-save" size="mini" @click="save">保存贸易链</el-button>
+    <div v-if="order.type || order._id">
+      <div v-for="(item,index) in data" :key="index">
+        <div class="flex ac goods-title" v-if="goods.value">
+          <div class="bor tc" style="padding:8px 0;width:50px;color:#409EFF">
+            # {{index+1}}
+          </div>
+          <div class="tc bor t-bg" style="width:100px;padding:8px 0">
+            {{index === 0 ? '生产厂商' : '联营商'}}
+          </div>
+          <div v-if="index === 0" class="f1" style="padding:8px 10px">
+            {{goods.value.mfrs.name}}
+          </div>
+          <div v-if="index > 0" class="f1" style="padding:0px 10px">
+            <common-select type="company" border @change="associate1change($event,index)" title="选择联营商" :data.sync="item.associate"></common-select>
+          </div>
+          <div class="tc bor bol t-bg" style="width:100px;padding:8px 0">
+            {{index === data.length-1 ? '收货客户' : '联营商'}}
+          </div>
+          <div v-if="index === data.length-1" class="f1" style="padding:5px 10px">
+            <span v-if="order.type==='company'">{{order.company?order.company.name:'未选择下单公司'}}</span>
+            <span v-else-if="order.type==='user'">{{order.user?order.user.name:'未选择下单用户'}}</span>
+            <span v-else>未知类型订单</span>
+          </div>
+          <div v-if="index === 0 && data.length>1" class="f1" style="padding:0px 10px">
+            <common-select type="company" border @change="associate1change($event,index)" title="选择联营商" :data.sync="item.associate"></common-select>
+          </div>
+          <div v-if="index > 0 && index !== data.length-1" class="f1" style="padding:0px 10px">
+            <common-select type="company" border @change="associate2change($event,index)" title="选择联营商" :data.sync="item.associate2"></common-select>
+          </div>
+          <!-- <div class="tc bol" style="width:45px;padding:8px 0">
+            <i @click="add(item,index)" style="color:#67C23A" class="el-icon-plus pointer"></i>
+          </div> -->
+        </div>
+        <my-table opWidth="45" size="mini" border edit op :thead="thead" :data.sync="item.info">
+          <div class="tc" slot="op" slot-scope="scope">
+            <i @click="remove(item,index)" style="color:#F56C6C" class="el-icon-delete pointer"></i>
+          </div>
+        </my-table>
+      </div>
+    </div>
+    <div class="tc" style="color:#ccc;padding:10px 0" v-else>
+      订单信息未完善
     </div>
   </div>
 </template>
@@ -83,7 +88,7 @@ export default {
     };
   },
   methods: {
-    add(item, index) {
+    add() {
       this.pushItem();
     },
     remove(item, index) {

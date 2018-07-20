@@ -1,4 +1,13 @@
 module.exports = {
+  type: {
+    type: 'String',
+    name: '订单类型',
+    default: 'company',
+    option: {
+      user: '个人订单',
+      company: '公司订单'
+    }
+  },
   no: {
     type: 'String',
     name: '单号',
@@ -37,7 +46,7 @@ module.exports = {
     name: '名称'
   },
   area: {
-    name: '收货地址',
+    name: '收货区域',
     type: 'ObjectId',
     ref: 'Area'
   },
@@ -53,49 +62,6 @@ module.exports = {
     name: '收货人联系方式',
     type: 'String',
   },
-  paid: {
-    name: '实付款',
-    type: 'Number'
-  },
-  paymentModel: {
-    name: '付款方式',
-    type: 'String',
-    option: {
-      cash: '现金',
-      check: '支票',
-      bankTransfer: '银行转账',
-      alipay: '支付宝',
-      wechatPay: '微信支付'
-    }
-  },
-
-  selfDelivery: {
-    name: '客户选择自提',
-    type: 'Boolean'
-  },
-
-  freeDelivery: {
-    name: '客户选择包邮',
-    type: 'Boolean'
-  },
-
-  balanced: {
-    name: '已结算',
-    type: 'Boolean'
-  },
-  balancedNumber: {
-    name: '已结算金额',
-    type: 'Number'
-  },
-  invoiced: {
-    name: '已开发票',
-    type: 'Boolean'
-  },
-  invoicedNumber: {
-    name: '已开票金额',
-    type: 'Number'
-  },
-
   settlementMethod: {
     type: 'Number',
     name: '结算方式',
@@ -107,7 +73,6 @@ module.exports = {
       4: '活动搭赠'
     }
   },
-
   transportModel: {
     type: 'Number',
     name: '运输方式',
@@ -142,6 +107,27 @@ module.exports = {
     name: '完成时间',
     type: 'Date'
   },
+  goods: {
+    name: '商品',
+    type: 'ObjectId',
+    ref: 'Goods'
+  },
+  count: {
+    name: '订货数量',
+    type: 'Number',
+  },
+  factoryPrice: {
+    name: '出厂单价',
+    type: 'Number',
+  },
+  unitPrice: {
+    name: '销售单价',
+    type: 'Number',
+  },
+  transportPrice: {
+    name: '运输单单价',
+    type: 'Number',
+  },
   salesman: {
     name: '市场专员',
     type: 'ObjectIdArray',
@@ -171,5 +157,23 @@ module.exports = {
     name: '财务专员',
     type: 'ObjectIdArray',
     ref: 'User'
+  },
+  broker: {
+    name: '经纪人',
+    type: 'ObjectId',
+    ref: 'Broker'
+  },
+  temporaryBroker: {
+    name: '临时经纪人',
+    type: 'ObjectId',
+    ref: 'User'
+  },
+  brokerBonus: {
+    name: '经纪人提成',
+    type: 'Number',
+  },
+  temporaryBrokerBonus: {
+    name: '临时经纪人提成',
+    type: 'Number',
   }
 }

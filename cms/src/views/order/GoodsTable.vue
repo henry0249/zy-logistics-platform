@@ -1,9 +1,8 @@
 <template>
   <loading-box v-model="loadingText" style="min-height:20px">
-    <my-table size="small" index :edit="edit?true:undefined" border :thead="thead" :data.sync="goodsData">
+    <my-table size="small" :edit="edit?true:undefined" border :thead="thead" :data.sync="goodsData">
       <template slot-scope="scope">
-        <my-form-item :edit="edit" v-if="scope.prop === 'goods'" size="mini" cascader v-model="scope.row.goods" filterable :options="goodsCascader" @change="goodsCascaderChange(scope.row)">
-        </my-form-item>
+        <common-select :data.sync="scope.row.value" border v-if="scope.prop === 'value'" type="goods" @change="goodsChange($event,scope.index)"></common-select>
         <span v-if="scope.prop === 'totalPrice'">
           {{goodsTotalPrice(scope.row)}}
         </span>
@@ -13,7 +12,7 @@
 </template>
 
 <script>
-import { goods } from "./field";
+import { orderGoods } from "./field";
 export default {
   props: {
     data: {
@@ -31,86 +30,65 @@ export default {
     edit: {
       type: Boolean,
       default: true
+    },
+    thead: {
+      type: Object,
+      default() {
+        return orderGoods;
+      }
     }
   },
   watch: {
+    goodsData: {
+      handler: function(val) {
+        console.log(val);
+        this.$emit("update:data", val);
+      },
+      deep: true
+    },
     "order.area"(val, old) {
-      this.goodsData.forEach(item => {
-        this.goodsCascaderChange(item);
+      this.goodsData.forEach((item,index) => {
+        if (item.value && item.value._id) {
+          this.goodsChange(item.value,index);
+        }
       });
     }
   },
   data() {
     let goodsItem = {};
-    for (const key in goods) {
+    for (const key in orderGoods) {
       goodsItem[key] = "";
-      goodsItem.goods = [];
+      goodsItem.value = {};
+      goodsItem.order = this.order._id;
     }
     return {
       loadingText: "加载中",
-      thead: goods,
       goodsData: [
         {
           ...goodsItem
         }
-      ],
-      goodsCascader: []
+      ]
     };
   },
-  watch: {
-    goodsData: {
-      handler: function(val) {
-        this.$emit("update:data", val);
-      },
-      deep: true
-    },
-    "order.area"() {
-      this.goodsData.forEach(item => {
-        this.goodsCascaderChange(item);
-      });
-    }
-  },
   methods: {
-    async getData() {
-      this.loadingText = "加载中";
-      this.goodsCascader = [];
-      try {
-        this.goodsCascader = await this.$ajax("/goods/cascader");
-      } catch (error) {}
-      this.loadingText = "";
-    },
-    getGoodsById(_id) {
-      let res = {};
-      this.goodsCascader.forEach(brandItem => {
-        brandItem.children.forEach(goodsItem => {
-          if (goodsItem._id === _id) {
-            res = goodsItem;
-          }
-        });
+    goodsChange(val, index) {
+      let price = {};
+      val.price.forEach(item => {
+        if (
+          this.order.area !== undefined &&
+          (item.area === this.order.area || item.area === this.order.area._id)
+        ) {
+          price = item;
+        }
       });
-      return res;
-    },
-    goodsUnit(row) {
-      let val = row.goods;
-      if (val.length === 2) {
-        return this.getGoodsById(val[1]).unit || "-";
-      }
-    },
-    goodsPrice(row, type) {
-      let val = row.goods;
-      if (val.length === 2 && this.order.area) {
-        let goods = this.getGoodsById(val[1]);
-        let price = "-";
-        goods.price.forEach(item => {
-          if (
-            this.order.area === item.area ||
-            this.order.area._id === item.area
-          ) {
-            price = item[type] || 0;
-          }
-        });
-        return price;
-      }
+      let item = JSON.parse(JSON.stringify(this.goodsData[index]));
+      item.value = val;
+      item.brand = val.brand.name;
+      item.unit = val.unit;
+      item.unitPrice = price.sell || 0;
+      item.factoryPrice = price.factory || 0;
+      item.transportPrice = price.transport || 0;
+      this.goodsData.splice(index, 1, item);
     },
     goodsTotalPrice(row) {
       let total = 0;
@@ -123,16 +101,6 @@ export default {
         total = count * unitPrice;
       }
       return total;
-    },
-    goodsCascaderChange(row) {
-      setTimeout(() => {
-        let goods = this.getGoodsById(row.goods[1]);
-        row.unit = this.goodsUnit(row);
-        row.unitPrice = this.goodsPrice(row, "sell");
-        row.transportPrice = this.goodsPrice(row, "transport");
-        row.factoryPrice = this.goodsPrice(row, "factory");
-        row.value = row.goods[1];
-      }, 200);
     },
     check() {
       let goodsCheck = true;
@@ -180,8 +148,8 @@ export default {
       this.order.goods.forEach(item => {
         this.goodsData.push({
           _id: item._id,
-          value: item.value._id,
-          goods: [item.value.brand._id || item.value.brand, item.value._id],
+          order:this.order._id,
+          value: item.value,
           count: item.count,
           unit: item.value.unit,
           factoryPrice: item.factoryPrice,
@@ -190,7 +158,6 @@ export default {
         });
       });
     }
-    await this.getData();
     this.loadingText = "";
   }
 };

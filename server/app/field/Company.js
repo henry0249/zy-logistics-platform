@@ -6,10 +6,9 @@ module.exports = {
       common: '客户',
       shipper: '发货厂商',
       logistics: '物流公司',
-      // trading: '贸易公司',
-      0:'联营商',
-      1:'中转库',
-      2:'分销点'
+      pool:'联营商',
+      transfer:'中转库',
+      distributor:'分销点'
     },
     require: true
   },

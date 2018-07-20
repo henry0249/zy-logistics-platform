@@ -42,7 +42,7 @@ class OrderService extends Service {
       goodsCheck = '未选择商品';
     }
     goods.forEach(item => {
-      if (!item.value) {
+      if (!(item.value && item.value._id)) {
         goodsCheck = '未选择商品';
         return;
       }
@@ -115,6 +115,7 @@ class OrderService extends Service {
       const goodsItem = body.goods[i];
       let goodsModel = new ctx.model.OrderGoods({
         ...goodsItem,
+        value: goodsItem.value._id,
         order: orderModel._id,
         area: orderModel.area
       });
@@ -160,6 +161,7 @@ class OrderService extends Service {
           ctx.throw(422, "商品编号必填", body);
         }
         delete goodsItem._id;
+        goodsItem.value = goodsItem.value._id; 
         await ctx.model.OrderGoods.update({
           _id: body.goods[i]._id
         }, goodsItem);

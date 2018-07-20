@@ -30,7 +30,7 @@ export default {
       handler: function(val) {
         for (const key in val) {
           this.nav.forEach((item, index) => {
-            if (item.path.indexOf(key) > -1) {
+            if (item.state === key) {
               item.badge = val[key];
             }
             this.$set(this.nav, index, item);
@@ -51,13 +51,15 @@ export default {
         name: "订单计划",
         color: "red",
         icon: "icon-chuangjiandingdan",
-        path: "/order/create"
+        path: "/order/create",
+        state:'create'
       },
       {
         name: "待接单",
         color: "red",
         icon: "icon-jiedanyingli",
         path: "/order/taking",
+        state:'taking',
         badge: this.orderBadge.taking
       },
       {
@@ -65,6 +67,7 @@ export default {
         color: "red",
         icon: "icon-shenhe1",
         path: "/order/dispatchCheck",
+        state:'dispatchCheck',
         badge: this.orderBadge.dispatchCheck
       },
       {
@@ -72,6 +75,7 @@ export default {
         color: "red",
         icon: "icon-tiaoduzhongxin",
         path: "/order/dispatch",
+        state:'dispatch',
         badge: this.orderBadge.dispatch
       },
       {
@@ -79,6 +83,7 @@ export default {
         color: "red",
         icon: "icon-cf-c97",
         path: "/order/distribution",
+        state:'distribution',
         badge: this.orderBadge.distribution
       },
       {
@@ -86,6 +91,7 @@ export default {
         color: "red",
         icon: "icon-shenhe1",
         path: "/order/check",
+        state:'check',
         badge: this.orderBadge.check
       },
       {
@@ -93,6 +99,7 @@ export default {
         color: "red",
         icon: "icon-shenhe1",
         path: "/order/finishCheck",
+        state:'finishCheck',
         badge: this.orderBadge.finishCheck
       },
       {
@@ -100,12 +107,14 @@ export default {
         color: "red",
         icon: "icon-jiesuan",
         path: "/order/finish",
+        state:'finish',
         badge: this.orderBadge.finish
       },
       {
         name: "所有订单",
         color: "red",
         icon: "icon-liebiao",
+        state:'all',
         path: "/order/all"
       }
     ];

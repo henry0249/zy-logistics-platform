@@ -148,7 +148,6 @@ export default {
     },
     cellClick(row, column, cell, event) {
       this.$emit("cellClick", {
-        text: row[column.property],
         row,
         column,
         cell,
@@ -199,7 +198,6 @@ export default {
     },
     rowClick(row, event, column) {
       this.$emit("rowClick", {
-        text: row[column.property],
         row,
         column,
         event

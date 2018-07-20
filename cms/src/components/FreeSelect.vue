@@ -3,7 +3,7 @@
     <div class="tc" style="color:#909399;font-size:12px" v-if="data.length===0">
       暂无推荐数据
     </div>
-    <my-form-item v-if="data.length>0" v-model="search" size="mini"></my-form-item>
+    <my-form-item v-if="data.length>0" v-model="search" size="mini" placeholder="请输入用户名以搜索"></my-form-item>
     <el-tabs v-if="data.length>0" type="border-card" style="box-shadow:none;width:100%;margin-top:15px">
       <el-tab-pane v-for="(item,index) in data" :key="item._id || item.id">
         <span style="font-size:13px" @click="tabClick(item,index)" slot="label">{{item.name}}</span>

@@ -3,12 +3,15 @@
     <div class="g-order-create">
       <div class="g-order">
         <div class="my-title">销售订单</div>
-        <el-alert title="订单信息" type="info" :closable="false" style="margin:15px 0">
-        </el-alert>
-        <Info ref="orderInfo" :data.sync="order"></Info>
-        <el-alert title="订单商品信息" type="info" :closable="false" style="margin:15px 0">
+        <Info ref="orderInfo" selectType :data.sync="order"></Info>
+        <el-alert title="商品信息" type="info" :closable="false" style="margin:15px 0">
         </el-alert>
         <goods-table ref="orderGoods" :order="order" :data.sync="goods" style="margin-top:15px"></goods-table>
+        <el-alert title="贸易链" type="info" :closable="false" style="margin:15px 0">
+        </el-alert>
+        <div v-for="item in goods" :key="'bs'+item.id">
+          <business-trains :order="order" :goods="item"></business-trains>
+        </div>
       </div>
       <div class="flex ac" style="margin-top:30px">
         跳过接单
@@ -25,10 +28,12 @@
 <script>
 import Info from "./Info.vue";
 import GoodsTable from "./GoodsTable.vue";
+import BusinessTrains from "./BusinessTrains";
 export default {
   components: {
     Info,
-    GoodsTable
+    GoodsTable,
+    BusinessTrains
   },
   data() {
     return {
@@ -49,9 +54,9 @@ export default {
       this.loadingText = "创建中...";
       try {
         if (this.skipTaking) {
-          this.order.state = "dispatch";
-        } else {
           this.order.state = "dispatchCheck";
+        } else {
+          this.order.state = "taking";
         }
         await this.$ajax.post("/order/add", {
           order: this.order,
