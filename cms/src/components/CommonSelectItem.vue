@@ -10,18 +10,30 @@
       <span v-else style="color:#ccc;">未选择{{str}}</span>
     </div>
     <div class="f1" style="margin-top:20px;overflow: hidden;">
-      <common-table style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
+      <el-switch @change="switchChange" v-if="switchIO" style="display: block" v-model="value" active-color="#13ce66" inactive-color="#ff4949" :active-text="activeText" :inactive-text="inactiveText">
+      </el-switch>
+      <common-table key="1" v-if="value" style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
         <common-select-area v-if="type === 'area'" slot="header" :areaData.sync="areaData"></common-select-area>
+        <common-select-ship v-else-if="type === 'ship'|| type === 'truck'" slot="header" :type="type" :data.sync="shipData"></common-select-ship>
         <common-select-goods v-else-if="type === 'goods'" slot="header" :data.sync="goodsData"></common-select-goods>
         <my-form-item v-else size="mini" width='200px' :placeholder="placeholder" input v-model="input" slot="header"></my-form-item>
+      </common-table>
+      <common-table key="2" v-if="!value" style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="elsePath" :thead="elseThead">
+        <common-select-ship v-if="type === 'ship'|| type === 'truck'" slot="header" :type="type" :data.sync="shipData"></common-select-ship> -->
+        <my-form-item v-if="type === 'user'|| type === 'company'" size="mini" width='200px' :placeholder="elsePlaceholder" input v-model="input" slot="header"></my-form-item>
       </common-table>
     </div>
   </div>
 </template>
 
 <script>
+  import commonSelect from './CommonSelect.js';
   export default {
     props: {
+      placeholder: {
+        type: String,
+        default: ''
+      },
       option: {
         type: Object,
         default () {
@@ -51,8 +63,9 @@
     },
     data() {
       return {
+        tableIO: true,
+        value: true,
         selection: false,
-        placeholder: '',
         tableHeight: '',
         divHeight: 0,
         tags: [],
@@ -63,22 +76,30 @@
         input: '',
         areaData: {},
         goodsData: {},
+        shipData: {},
+        commonSelect
       }
     },
     watch: {
+      shipData(val) {
+        if (Object.keys(val).length > 0) {
+          console.log(val);
+          for (const key in val) {
+            this.option[key] = val[key];
+          }
+        } else {
+          delete this.option.input;
+          delete this.option.no;
+          delete this.option.company;
+        }
+      },
       goodsData(val) {
         if (Object.keys(val).length > 0) {
+          console.log(val);
           for (const key in val) {
-            if (key === 'input') {
-              this.option['$or'] = [{
-                name: {
-                  $regex: val.input
-                }
-              }]
-            } else {
-              this.option[key] = val[key];
-            }
+            this.option[key] = val[key];
           }
+          console.log(this.option);
         } else {
           delete this.option.input;
           delete this.option.brand;
@@ -151,6 +172,85 @@
       }
     },
     computed: {
+      elsePlaceholder() {
+        if (this.type === 'user') {
+          if (this.value) {
+            return '输入用户名、手机号或邮箱';
+          } else {
+            return '输入公司名称或别称';
+          }
+        } else if (this.type === 'company') {
+          if (this.value) {
+            return '输入公司名称或别称';
+          } else {
+            return '输入用户名、手机号或邮箱';
+          }
+        } else if (this.type === 'truck') {
+          if (this.value) {
+            return '输入车牌号';
+          } else {
+            return '输入船号';
+          }
+        } else if (this.type === 'ship') {
+          if (this.value) {
+            return '输入船号';
+          } else {
+            return '输入车牌号';
+          }
+        }
+      },
+      elseThead() {
+        if (this.type === 'user') {
+          return this.commonSelect.company.thead;
+        } else if (this.type === 'company') {
+          return this.commonSelect.user.thead;
+        } else if (this.type === 'truck') {
+          return this.commonSelect.ship.thead;
+        } else if (this.type === 'ship') {
+          return this.commonSelect.truck.thead;
+        }
+      },
+      elsePath() {
+        if (this.type === 'user') {
+          return '/company/find';
+        } else if (this.type === 'company') {
+          return '/user/find';
+        } else if (this.type === 'truck') {
+          return '/truck/find';
+        } else if (this.type === 'ship') {
+          return '/ship/find';
+        }
+      },
+      switchIO() {
+        let op = this.type === 'user' || this.type === 'company' || this.type === 'truck' || this.type === 'ship'
+        if (op) {
+          return true
+        } else {
+          return false
+        }
+      },
+      inactiveText() {
+        if (this.type === 'user') {
+          return '公司列表'
+        } else if (this.type === 'company') {
+          return '用户列表'
+        } else if (this.type === 'ship') {
+          return '车辆列表'
+        } else if (this.type === 'truck') {
+          return '船只列表'
+        }
+      },
+      activeText() {
+        if (this.type === 'user') {
+          return '用户列表'
+        } else if (this.type === 'company') {
+          return '公司列表'
+        } else if (this.type === 'ship') {
+          return '船只列表'
+        } else if (this.type === 'truck') {
+          return '车辆列表'
+        }
+      },
       str() {
         if (this.type === 'user') {
           return '用户';
@@ -158,10 +258,39 @@
           return '公司';
         } else if (this.type === 'goods') {
           return '商品';
+        } else if (this.type === 'ship') {
+          return '船只';
+        } else if (this.type === 'truck') {
+          return '车辆';
         }
       }
     },
     methods: {
+      switchChange(val) {
+        this.input = '';
+        for (const key in this.commonSelect) {
+          this.commonSelect[key].option.forEach(item => {
+            delete this.option[item];
+          });
+        }
+        if (val) {
+          if (this.type === 'company') {
+            this.$set(this.option, 'populate', 'platform');
+            this.$emit('switchChange', 'company');
+          } else if (this.type === 'user') {
+            this.$set(this.option, 'populate', 'platform');
+            this.$emit('switchChange', 'user');
+          }
+        } else {
+          if (this.type === 'company') {
+            this.$set(this.option, 'populate', 'platform');
+            this.$emit('switchChange', 'user');
+          } else if (this.type === 'user') {
+            this.$set(this.option, 'populate', 'platform');
+            this.$emit('switchChange', 'company');
+          }
+        }
+      },
       selectionChange(val) {
         if (this.selection) {
           val.forEach(item => {
@@ -184,6 +313,10 @@
           return tag.name;
         } else if (this.type === 'area') {
           return tag.name;
+        } else if (this.type === 'ship') {
+          return tag.no;
+        } else if (this.type === 'truck') {
+          return tag.no;
         }
       },
       closeTag(tag) {
@@ -208,78 +341,23 @@
         this.tableHeight = 740 - this.$refs.div.offsetHeight - 372 + 'px';
       })
       this.path = '/' + this.type + '/find';
-      if (this.type === 'user') {
-        this.thead = {
-          name: {
-            readOnly: true,
-            name: '用户名'
-          },
-          mobile: {
-            readOnly: true,
-            name: '手机号'
-          },
-          email: {
-            readOnly: true,
-            name: '邮箱'
+      for (const key in this.commonSelect) {
+        if (key === this.type) {
+          console.log('type', this.type);
+          console.log('key', key);
+          console.log('this.commonSelect[key].option', this.commonSelect[key].option);
+          this.thead = this.commonSelect[key].thead;
+          this.commonSelect[key].option.forEach(item => {
+            delete this.option[item];
+            console.log(this.option);
+          });
+          if (this.commonSelect[key].populate) {
+            this.option.populate = this.commonSelect[key].populate;
           }
-        };
-        delete this.option.$or;
-        this.placeholder = '请输入用户名、手机号、邮箱';
-      } else if (this.type === 'company') {
-        this.thead = {
-          name: {
-            readOnly: true,
-            name: '公司名称'
-          },
-          nick: {
-            readOnly: true,
-            name: '公司别称'
-          }
-        };
-        delete this.option.$or;
-        this.placeholder = '请输入公司名称或公司别称';
-      } else if (this.type === 'goods') {
-        this.thead = {
-          name: {
-            readOnly: true,
-            name: '商品名'
-          },
-          'category.name': {
-            readOnly: true,
-            name: '分类'
-          }
-        };
-        delete this.option.$or;
-        delete this.option.input;
-        delete this.option.brand;
-        delete this.option.mfrs;
-        this.placeholder = '请输入商品名';
-      } else if (this.type === 'area') {
-        this.thead = {
-          'province.name': {
-            readOnly: true,
-            name: '省份'
-          },
-          'city.name': {
-            readOnly: true,
-            name: '市'
-          },
-          'county.name': {
-            readOnly: true,
-            name: '县'
-          },
-          name: {
-            readOnly: true,
-            name: '乡/镇'
-          }
-        };
-        delete this.option.$or;
-        delete this.option.province;
-        delete this.option.city;
-        delete this.option.county;
-        this.placeholder = '请输入地名';
-      }
-    },
+        }
+      };
+      console.log('object', this.option);
+    }
   }
 </script>
 

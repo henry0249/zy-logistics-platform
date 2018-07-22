@@ -1,6 +1,6 @@
 <template>
   <div>
-    <common-select label="选择"  :data.sync="value2"  border width="25%" title="用户选择" type="area"></common-select>
+    <common-select label="选择" disabled  :data.sync="value1" @switchChange="switchChange" border width="25%" title="用户选择" type="user" size="mini"></common-select>
   </div>
 </template>
 
@@ -32,6 +32,11 @@
     watch: {
       value1(val){
         console.log('!!',val);
+      }
+    },
+    methods: {
+      switchChange(val){
+        console.log('!!!',val);
       }
     }
   }

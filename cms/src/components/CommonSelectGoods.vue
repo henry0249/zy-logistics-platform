@@ -28,7 +28,11 @@
     methods: {
       inputChange(val) {
         let obj = JSON.parse(JSON.stringify(this.data));
-        obj.input = val;
+        obj.$or = [{
+          name: {
+            $regex: val
+          }
+        }]
         this.$emit('update:data', obj);
       },
       companyChange(val) {
