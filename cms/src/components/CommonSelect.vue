@@ -130,7 +130,12 @@
           }
         } else {
           this.showDelIcon = true;
-          return 'bg'
+          if (this.data.length > 0 || this.data._id) {
+            return 'bg'
+          } else {
+            this.showDelIcon = false;
+            return ''
+          }
         }
       },
       fontSize() {
@@ -208,8 +213,6 @@
             }
           }
         } else {
-          console.log('wei');
-          // this.showDelIcon = false;
           return '未选择';
         }
       }

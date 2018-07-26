@@ -216,9 +216,9 @@
         } else if (this.type === 'company') {
           return '/user/find';
         } else if (this.type === 'truck') {
-          return '/truck/find';
-        } else if (this.type === 'ship') {
           return '/ship/find';
+        } else if (this.type === 'ship') {
+          return '/truck/find';
         }
       },
       switchIO() {

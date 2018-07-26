@@ -1,6 +1,6 @@
 <template>
   <div>
-    <common-select label="选择" disabled  :data.sync="value1" @switchChange="switchChange" border width="25%" title="用户选择" type="user" size="mini"></common-select>
+    <common-select label="选择" :data.sync="value1" @switchChange="switchChange" border width="25%" title="用户选择" type="truck" size="mini"></common-select>
   </div>
 </template>
 
@@ -17,11 +17,13 @@
           _id: '5b233826ae796f83628d4065'
         },
         value1: [{
+          no:'12233',
           email: "75776584@com",
           name: "用户1",
           mobile: "18877575234",
           _id: '5b233729ae796f83628d405d'
         }, {
+          no:'334585',
           email: "75776584@com",
           name: "用户2",
           mobile: "18877575234",
