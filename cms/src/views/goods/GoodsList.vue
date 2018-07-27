@@ -76,7 +76,6 @@
           let data = {
             model: "goods",
             curdType: "find",
-            populate: this.populate,
             limit: 20,
             skip: 0
           };
