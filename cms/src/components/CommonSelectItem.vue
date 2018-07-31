@@ -10,8 +10,13 @@
       <span v-else style="color:#ccc;">未选择{{str}}</span>
     </div>
     <div class="f1" style="margin-top:20px;overflow: hidden;">
-      <el-switch @change="switchChange" v-if="switchIO" style="display: block" v-model="value" active-color="#13ce66" inactive-color="#ff4949" :active-text="activeText" :inactive-text="inactiveText">
-      </el-switch>
+      <div class="flex jc js" v-if="isSwitch" ref="switchHeight">
+        <p style="margin-right:10px;">选择类型</p>
+        <el-radio-group v-model="radio" @change="switchChange" size="mini">
+          <el-radio-button :label="type">{{activeText}}</el-radio-button>
+          <el-radio-button :label="typeComputed">{{inactiveText}}</el-radio-button>
+        </el-radio-group>
+      </div>
       <common-table key="1" v-if="value" style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
         <common-select-area v-if="type === 'area'" slot="header" :areaData.sync="areaData"></common-select-area>
         <common-select-ship v-else-if="type === 'ship'|| type === 'truck'" slot="header" :type="type" :data.sync="shipData"></common-select-ship>
@@ -30,6 +35,10 @@
   import commonSelect from './CommonSelect.js';
   export default {
     props: {
+      isSwitch: {
+        type: Boolean,
+        default: false
+      },
       placeholder: {
         type: String,
         default: ''
@@ -63,6 +72,7 @@
     },
     data() {
       return {
+        radio: '',
         tableIO: true,
         value: true,
         selection: false,
@@ -210,6 +220,17 @@
           return this.commonSelect.truck.thead;
         }
       },
+      typeComputed() {
+        if (this.type === 'user') {
+          return 'company';
+        } else if (this.type === 'company') {
+          return 'user';
+        } else if (this.type === 'truck') {
+          return 'ship';
+        } else if (this.type === 'ship') {
+          return 'truck';
+        }
+      },
       elsePath() {
         if (this.type === 'user') {
           return '/company/find';
@@ -231,24 +252,24 @@
       },
       inactiveText() {
         if (this.type === 'user') {
-          return '公司列表'
+          return '公司'
         } else if (this.type === 'company') {
-          return '用户列表'
+          return '用户'
         } else if (this.type === 'ship') {
-          return '车辆列表'
+          return '车辆'
         } else if (this.type === 'truck') {
-          return '船只列表'
+          return '船只'
         }
       },
       activeText() {
         if (this.type === 'user') {
-          return '用户列表'
+          return '用户'
         } else if (this.type === 'company') {
-          return '公司列表'
+          return '公司'
         } else if (this.type === 'ship') {
-          return '船只列表'
+          return '船只'
         } else if (this.type === 'truck') {
-          return '车辆列表'
+          return '车辆'
         }
       },
       str() {
@@ -266,30 +287,31 @@
       }
     },
     methods: {
+      radioChange(val) {
+        console.log(val);
+      },
       switchChange(val) {
         this.input = '';
+        console.log(this.commonSelect);
         for (const key in this.commonSelect) {
           this.commonSelect[key].option.forEach(item => {
             delete this.option[item];
           });
         }
-        if (val) {
+        this.value = this.type === val;
+        if (this.type === val) {
           if (this.type === 'company') {
             this.$set(this.option, 'populate', 'platform');
-            this.$emit('switchChange', 'company');
           } else if (this.type === 'user') {
             this.$set(this.option, 'populate', 'platform');
-            this.$emit('switchChange', 'user');
+          } else if (this.type === 'ship') {
+            this.$set(this.option, 'populate', 'owner');
+          } else if (this.type === 'truck') {
+            this.$set(this.option, 'populate', 'owner');
           }
-        } else {
-          if (this.type === 'company') {
-            this.$set(this.option, 'populate', 'platform');
-            this.$emit('switchChange', 'user');
-          } else if (this.type === 'user') {
-            this.$set(this.option, 'populate', 'platform');
-            this.$emit('switchChange', 'company');
-          }
-        }
+        } else {}
+        console.log(this.option);
+        this.$emit('switchChange', val);
       },
       selectionChange(val) {
         if (this.selection) {
@@ -338,7 +360,11 @@
         this.selection = true;
       }
       this.$nextTick(() => {
-        this.tableHeight = 740 - this.$refs.div.offsetHeight - 372 + 'px';
+        if (this.isSwitch) {
+          this.tableHeight = 740 - this.$refs.div.offsetHeight - 372 - this.$refs.switchHeight.offsetHeight + 'px';
+        } else {
+          this.tableHeight = 740 - this.$refs.div.offsetHeight - 372 + 'px';
+        }
       })
       this.path = '/' + this.type + '/find';
       for (const key in this.commonSelect) {
@@ -356,11 +382,19 @@
           }
         }
       };
-      console.log('object', this.option);
+      if (this.type === 'user') {
+        this.radio = 'user';
+      } else if (this.type === 'company') {
+        this.radio = 'company';
+      } else if (this.type === 'ship') {
+        this.radio = 'ship';
+      } else if (this.type === 'truck') {
+        this.radio = 'truck';
+      }
     }
   }
 </script>
 
 <style scoped>
-  .c {}
+
 </style>

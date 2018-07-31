@@ -1,10 +1,10 @@
 <template>
   <div>
-    <common-select label="选择" :data.sync="value1" @switchChange="switchChange" border width="25%" title="用户选择" type="truck" size="mini"></common-select>
+    <common-select isSwitch label="选择" :data.sync="value1" @switchChange="switchChange" border width="25%" title="用户选择" type="truck" size="mini"></common-select>
     <my-table :data.sync="data" :thead="thead">
       <template slot-scope="scope" v-if="scope.column.property === 'value'">
-        <common-select :data.sync="scope.row['value']" @switchChange="switchChange" border width="100%" title="用户选择" type="goods" size="mini"></common-select>
-      </template>
+          <common-select isSwitch :data.sync="scope.row['value']" @switchChange="switchChange" border width="100%" title="用户选择" type="goods" size="mini"></common-select>
+</template>
     </my-table>
   </div>
 </template>
