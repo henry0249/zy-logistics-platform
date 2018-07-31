@@ -9,9 +9,9 @@
           {{selectTxt}}
           <i v-if="showDelIcon" class="el-icon-error pointer del" @click="del"></i>
         </div>
-        <div style="background: #E4E7ED;border-radius: 5px;padding:0 5px;margin-left:5px;" v-if="typeIo && data.length >1">+{{data.length - 1}}</div>
+        <div :style="{background: '#E4E7ED',borderRadius: '5px',padding:'0 5px',marginLeft:'5px',fontSize:fontSize}" v-if="typeIo && data.length >1">+{{data.length - 1}}</div>
       </div>
-      <i v-if="!disabled" class="el-icon-edit pointer" style="color:#409eff;fontSize:12px" @click="dialogVisible = true"></i>
+      <i v-if="!disabled" class="el-icon-edit pointer" :style="{color:'#409eff',fontSize:fontSize}" @click="dialogVisible = true"></i>
     </div>
     <el-dialog :visible.sync="dialogVisible" width="800px">
       <span style="fontSize:16px;" slot="title">{{title}}</span>
