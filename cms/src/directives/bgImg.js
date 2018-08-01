@@ -9,7 +9,7 @@ export default {
   install(Vue) {
     Vue.directive('bgImg', {
       inserted: setBgImg,
-      updated: setBgImg
+      update: setBgImg
     })
   }
 }

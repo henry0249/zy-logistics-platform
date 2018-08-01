@@ -6,11 +6,15 @@ module.exports = {
       common: '客户',
       shipper: '发货厂商',
       logistics: '物流公司',
-      pool:'联营商',
-      transfer:'中转库',
-      distributor:'分销点'
+      pool: '联营商',
+      transfer: '中转库',
+      distributor: '分销点'
     },
     require: true
+  },
+  dispatch: {
+    name: '调度权限',
+    type: 'Boolean'
   },
   name: {
     name: '名称',
@@ -33,14 +37,6 @@ module.exports = {
     name: '固话',
     type: 'String'
   },
-  auth: {
-    name: '资质认证',
-    type: 'Boolean'
-  },
-  qualification: {
-    name: '资质认证材料',
-    type: 'Object'
-  },
   self: {
     name: '自营',
     type: 'Boolean'
@@ -49,14 +45,6 @@ module.exports = {
     name: '所属平台',
     type: 'ObjectId',
     ref: 'Platform'
-  },
-  setting: {
-    name: '设置',
-    type: 'Object'
-  },
-  info: {
-    name: '其他信息',
-    type: 'Object'
   },
   owner: {
     name: '主管理员',
@@ -78,6 +66,21 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'User'
   },
+  dispatchCheck: {
+    name: '调度审核员',
+    type: 'ObjectIdArray',
+    ref: 'User'
+  },
+  dispatcher: {
+    name: '调度专员',
+    type: 'ObjectIdArray',
+    ref: 'User'
+  },
+  finishCheck: {
+    name: '完成审核员',
+    type: 'ObjectIdArray',
+    ref: 'User'
+  },
   financial: {
     name: '财务文员',
     type: 'ObjectIdArray',
@@ -91,5 +94,15 @@ module.exports = {
     name: '区域',
     type: 'ObjectId',
     ref: 'Area'
+  },
+  dispatchCompany: {
+    name: '调度关联公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
+  relationCompany: {
+    name: '关联公司',
+    type: 'ObjectIdArray',
+    ref: 'Company'
   }
 }

@@ -4,12 +4,12 @@
       <strong>{{title}}</strong>
     </div>
     <el-alert v-if="alert" title="订单信息" type="info" :closable="false" style="margin:15px 0">
-      <el-checkbox v-model="isCompany" style="margin-left:50px;color:#909399;font-size:10px">公司订单</el-checkbox>
+      <el-checkbox :value="order.type==='company'" @change="orderTypeChange" style="margin-left:50px;color:#909399;font-size:10px">公司订单</el-checkbox>
     </el-alert>
     <my-form v-show="!hideForm" size="mini" width="24%" :edit="edit">
       <div class="flex ac jb">
         <div style="width:24%">
-          <common-select title="选择一个客户" :label="isCompany?'下单公司':'下单用户'" border :data.sync="customer" :type="order.type" @change="customerChange"></common-select>
+          <common-select title="选择一个客户" label="下单客户" border :data.sync="customer" type="company" @change="customerChange" is-switch @switchChange="customerTypeChange"></common-select>
         </div>
         <my-form-item datetime v-model="order.deliveryTime" label="配送时间">
         </my-form-item>
@@ -21,7 +21,7 @@
       <div class="flex ac jb" style="margin:15px 0">
         <my-form-item select v-model="order.invoiceType" label="发票类型" :options="field.Order.invoiceType.option">
         </my-form-item>
-        <my-form-item @click.native="showCompanyUserCascader" input :popover="isCompany?true:undefined" v-model="order.contactName" label="收货人">
+        <my-form-item @click.native="showCompanyUserCascader" input :popover="order.type==='company'?true:undefined" v-model="order.contactName" label="收货人">
           <div slot="inputPopover">
             <loading-box v-model="companyUserCascaderLoaidng">
               <free-select :data="companyUserCascader" @change="companyUserCascaderChange"></free-select>
@@ -75,8 +75,11 @@ export default {
   },
   data() {
     return {
+      customer:{},
       order: {
-        type:'company',
+        type: "company",
+        user: {},
+        company: {},
         settlementMethod: 1,
         transportModel: 0,
         deliveryTime: "",
@@ -85,13 +88,15 @@ export default {
         contactNumber: "",
         area: {},
         address: "",
-        remark: ""
+        remark: "",
+        goods: {},
+        count: 0,
+        factory: 0,
+        sell: 0,
+        transport: 0
       },
       loadingText: "",
       hideForm: false,
-      customer: {},
-      isCompany: true,
-      areaSelect: {},
       companyUserCascaderLoaidng: "加载中...",
       companyUserCascader: []
     };
@@ -102,25 +107,24 @@ export default {
         this.$emit("update:data", val);
       },
       deep: true
-    },
-    isCompany(val) {
-      delete this.order.user;
-      delete this.order.company;
+    }
+  },
+  methods: {
+    orderTypeChange(val) {
+      this.order.user = {};
+      this.order.company = {};
       if (val) {
         this.order.type = "company";
       } else {
         this.order.type = "user";
       }
-      this.customer = {};
-    }
-  },
-  methods: {
+    },
     async showCompanyUserCascader() {
-      if (this.isCompany && this.customer._id) {
+      if (this.order.type === "company" && this.order.company._id) {
         this.companyUserCascaderLoaidng = "加载中...";
         try {
           this.companyUserCascader = await this.$ajax(
-            "/company/user/cascader?company=" + this.customer._id
+            "/company/user/cascader?company=" + this.order.company._id
           );
         } catch (error) {}
         this.companyUserCascaderLoaidng = "";
@@ -138,10 +142,11 @@ export default {
         }
       }
     },
-    customerChange(val){
-      delete this.order.user;
-      delete this.order.company;
+    customerChange(val) {
       this.order[this.order.type] = val;
+    },
+    customerTypeChange(val){
+      this.order.type = val;
     },
     areaChange(val) {
       this.order.address = this.area2name(val) + " ";
@@ -168,18 +173,18 @@ export default {
         this.$message.error("未选择客户");
         return;
       }
-      if (order.user && order.company) {
-        this.$message.error("客户不能同时选择个人和公司");
-        return;
-      }
       return true;
     }
   },
   async created() {
-    for (const key in this.order) {
-      if (this.val.hasOwnProperty(key)) {
-        this.order[key] = this.val[key];
+    if (this.val._id) {
+      for (const key in this.order) {
+        if (this.val.hasOwnProperty(key)) {
+          this.order[key] = this.val[key];
+        }
       }
+    } else {
+      this.$emit("update:data", JSON.parse(JSON.stringify(this.order)));
     }
     this.loadingText = "加载中";
     setTimeout(() => {

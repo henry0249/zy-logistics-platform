@@ -4,14 +4,8 @@
       <div class="g-order">
         <div class="my-title">销售订单</div>
         <Info ref="orderInfo" selectType :data.sync="order"></Info>
-        <el-alert title="商品信息" type="info" :closable="false" style="margin:15px 0">
-        </el-alert>
-        <goods-table ref="orderGoods" :order="order" :data.sync="goods" style="margin-top:15px"></goods-table>
-        <el-alert title="贸易链" type="info" :closable="false" style="margin:15px 0">
-        </el-alert>
-        <div v-for="item in goods" :key="'bs'+item.id">
-          <business-trains :order="order" :goods="item"></business-trains>
-        </div>
+        <goods-table :order.sync="order"></goods-table>
+        <business-trains :order.sync="order" :data.sync="businessTrainsData"></business-trains>
       </div>
       <div class="flex ac" style="margin-top:30px">
         跳过接单
@@ -39,7 +33,7 @@ export default {
     return {
       loadingText: "",
       order: {},
-      goods: [],
+      businessTrainsData: [],
       skipTaking: true
     };
   },
@@ -58,13 +52,15 @@ export default {
         } else {
           this.order.state = "taking";
         }
-        await this.$ajax.post("/order/add", {
-          order: this.order,
-          goods: this.goods
-        });
+        console.log(this.order);
+        console.log(this.businessTrainsData);
+        // await this.$ajax.post("/order/add", {
+        //   order: this.order,
+        //   businessTrains:this.businessTrainsData
+        // });
         await this.$store.dispatch("orderBadgeNotify");
         this.$message.success("成功创建订单");
-        this.$router.push("/order/dispatch");
+        // this.$router.push("/order/dispatch");
       } catch (error) {}
       this.loadingText = "";
     }

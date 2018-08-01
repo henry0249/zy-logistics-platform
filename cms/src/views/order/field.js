@@ -44,23 +44,29 @@ module.exports = {
     brand: {
       name: "品牌",
       readOnly: true,
+      slot: true,
     },
     unit: {
       name: "单位",
       readOnly: true,
+      slot: true,
     },
     count: {
       name: "数量",
       require: true,
+      slot: true,
     },
     factoryPrice: {
       name: "出厂单价",
+      slot: true,
     },
     unitPrice: {
       name: "销售单价",
+      slot: true,
     },
     transportPrice: {
       name: "运输单价",
+      slot: true,
     },
     totalPrice: {
       name: "合计金额",
@@ -72,22 +78,26 @@ module.exports = {
     purchasePrice: {
       name: '进价',
       type: 'Number',
-      require: true
+      require: true,
+      slot: true
     },
     purchaseCount: {
       name: '进货数量',
       type: 'Number',
-      require: true
+      require: true,
+      slot: true,
     },
     sellPrice: {
       name: '售价',
       type: 'Number',
-      require: true
+      require: true,
+      slot: true,
     },
     sellCount: {
       name: '出货数量',
       type: 'Number',
-      require: true
+      require: true,
+      slot: true,
     },
     remark: {
       name: '备注',

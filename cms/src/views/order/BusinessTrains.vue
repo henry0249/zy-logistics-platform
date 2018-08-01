@@ -1,59 +1,69 @@
 <template>
   <div class="g-business-trains">
-    <div v-if="goods.value" class="flex ac jb" style="color:#909399;padding-left:20px;background:#F2F6FC;font-size:13px">
-      <div class="goods-info-padding">商品名称：{{goods.value.name}}</div>
-      <div class="goods-info-padding">品牌：{{goods.value.brand.name}}</div>
-      <div class="goods-info-padding">规格：{{goods.value.spec}}</div>
-      <div class="goods-info-padding">单位：{{goods.value.unit}}</div>
+    <el-alert title="贸易链" type="info" :closable="false" style="margin:15px 0">
+    </el-alert>
+    <div v-if="order.goods && order.goods._id" class="flex ac jb" style="color:#909399;padding-left:20px;background:#F2F6FC;font-size:13px">
+      <div class="goods-info-padding">商品名称：{{order.goods.name}}</div>
+      <div class="goods-info-padding">品牌：{{order.goods.brand.name}}</div>
+      <div class="goods-info-padding">规格：{{order.goods.spec}}</div>
+      <div class="goods-info-padding">单位：{{order.goods.unit}}</div>
       <div class="f1"></div>
-      <div class="tc bol" style="width:45px;padding:8px 0">
+      <div class="tc bol" style="width:46px;padding:8px 0">
         <i @click="add" style="color:#67C23A" class="el-icon-plus pointer"></i>
       </div>
-      <!-- <div v-if="goods.value.freeDelivery" style="color:#67C23A">包配送</div>
-      <div v-if="!goods.value.freeDelivery" style="color:#F56C6C">不包配送</div> -->
     </div>
-    <div v-if="order.type || order._id">
+    <div ref="main" v-overflow-tool v-if="order.goods && order.goods._id" style="max-height:400px;overflow:auto;transition: all .2s">
       <div v-for="(item,index) in data" :key="index">
-        <div class="flex ac goods-title" v-if="goods.value">
+        <div class="flex ac goods-title">
           <div class="bor tc" style="padding:8px 0;width:50px;color:#409EFF">
             # {{index+1}}
           </div>
-          <div class="tc bor t-bg" style="width:100px;padding:8px 0">
-            {{index === 0 ? '生产厂商' : '联营商'}}
+          <div class="f1 flex ac jb">
+            <div class="f1"></div>
+            <div style="width:44%">
+              <common-select v-if="trainsType(index)===0 || trainsType(index)===1" :data.sync="order.goods.mfrs" type="company" disabled label="生产厂商" size="mini" border ></common-select>
+              <common-select v-if="trainsType(index)===2 || trainsType(index)===3" :data.sync="item.fromCompany" type="company" label="联营商" size="mini" border  @change="fromCompanyChange($event,index)"></common-select>
+            </div>
+            <div class="f1"></div>
+            <div style="width:44%">
+              <common-select v-if="trainsType(index)===0 || trainsType(index)===3" :data.sync="order[order.type]" :type="order.type" disabled label="收货客户" size="mini" border ></common-select>
+              <common-select v-if="trainsType(index)===1 || trainsType(index)===2" :data.sync="item.toCompany" type="company" label="联营商" size="mini" border  @change="toCompanyChange($event,index)"></common-select>
+            </div>
+            <div class="f1"></div>
           </div>
-          <div v-if="index === 0" class="f1" style="padding:8px 10px">
-            {{goods.value.mfrs.name}}
-          </div>
-          <div v-if="index > 0" class="f1" style="padding:0px 10px">
-            <common-select type="company" border @change="associate1change($event,index)" title="选择联营商" :data.sync="item.associate"></common-select>
-          </div>
-          <div class="tc bor bol t-bg" style="width:100px;padding:8px 0">
-            {{index === data.length-1 ? '收货客户' : '联营商'}}
-          </div>
-          <div v-if="index === data.length-1" class="f1" style="padding:5px 10px">
-            <span v-if="order.type==='company'">{{order.company?order.company.name:'未选择下单公司'}}</span>
-            <span v-else-if="order.type==='user'">{{order.user?order.user.name:'未选择下单用户'}}</span>
-            <span v-else>未知类型订单</span>
-          </div>
-          <div v-if="index === 0 && data.length>1" class="f1" style="padding:0px 10px">
-            <common-select type="company" border @change="associate1change($event,index)" title="选择联营商" :data.sync="item.associate"></common-select>
-          </div>
-          <div v-if="index > 0 && index !== data.length-1" class="f1" style="padding:0px 10px">
-            <common-select type="company" border @change="associate2change($event,index)" title="选择联营商" :data.sync="item.associate2"></common-select>
-          </div>
-          <!-- <div class="tc bol" style="width:45px;padding:8px 0">
-            <i @click="add(item,index)" style="color:#67C23A" class="el-icon-plus pointer"></i>
-          </div> -->
-        </div>
-        <my-table opWidth="45" size="mini" border edit op :thead="thead" :data.sync="item.info">
-          <div class="tc" slot="op" slot-scope="scope">
+          <div class="tc bol" style="width:45px;padding:8px 0">
             <i @click="remove(item,index)" style="color:#F56C6C" class="el-icon-delete pointer"></i>
+          </div>
+        </div>
+        <my-table opWidth="45" size="mini" border :thead="thead" :data.sync="temp">
+          <div slot-scope="scope">
+            <div v-if="scope.prop==='purchasePrice'">
+              <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="item.purchasePrice"></my-form-item>
+            </div>
+            <div v-if="scope.prop==='purchaseCount'">
+              <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="item.purchaseCount"></my-form-item>
+            </div>
+            <div v-if="scope.prop==='sellPrice'">
+              <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="item.sellPrice"></my-form-item>
+            </div>
+            <div v-if="scope.prop==='sellCount'">
+              <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="item.sellCount"></my-form-item>
+            </div>
+            <div v-if="scope.prop==='remark'">
+              <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="item.remark"></my-form-item>
+            </div>
           </div>
         </my-table>
       </div>
     </div>
     <div class="tc" style="color:#ccc;padding:10px 0" v-else>
-      订单信息未完善
+      请先选择商品
+    </div>
+    <div @click="spread" class="tc link" style="font-size:12px;padding:5px 0" v-if="overflowToolShow">
+      显示全部<i class="el-icon-arrow-down"></i>
+    </div>
+    <div @click="retract" class="tc link" style="font-size:12px;padding:5px 0" v-if="retractToolShow">
+      收起<i class="el-icon-arrow-up"></i>
     </div>
   </div>
 </template>
@@ -62,12 +72,6 @@
 import { businessTrains } from "./field";
 export default {
   props: {
-    goods: {
-      type: Object,
-      default() {
-        return {};
-      }
-    },
     order: {
       type: Object,
       default() {
@@ -79,15 +83,60 @@ export default {
       default() {
         return [];
       }
+    },
+    thead: {
+      type: Object,
+      default() {
+        return businessTrains;
+      }
     }
   },
   data() {
     return {
-      thead: businessTrains,
-      data: []
+      data: [],
+      temp: [{}],
+      overflowToolShow: false,
+      retractToolShow: false
     };
   },
+  directives: {
+    overflowTool: {
+      inserted(el, binding, vnode) {
+        let _this = vnode.context;
+        setTimeout(() => {
+          _this.overflowToolShow = el.scrollHeight > el.clientHeight;
+        }, 200);
+      },
+      update(el, binding, vnode) {
+        let _this = vnode.context;
+        setTimeout(() => {
+          _this.overflowToolShow = el.scrollHeight > el.clientHeight;
+        }, 200);
+      }
+    }
+  },
   methods: {
+    trainsType(index) {
+      let length = this.data.length;
+      if (length === 1) {
+        return 0;
+      }
+      if (length === 2) {
+        if (index === 0) {
+          return 1;
+        }
+        return 3;
+      }
+      if (length > 2) {
+        if (index === 0) {
+          return 1;
+        }
+        if (index === length - 1) {
+          return 3;
+        }
+        return 2;
+      }
+    },
     add() {
       this.pushItem();
     },
@@ -100,36 +149,31 @@ export default {
     },
     pushItem() {
       this.data.push({
-        goods: this.goods._id,
-        order: this.order._id,
-        info: [
-          {
-            purchasePrice: this.goods.unitPrice,
-            purchaseCount: this.goods.count,
-            sellPrice: 0,
-            sellCount: 0,
-            totalPrice: 0,
-            remark: "",
-            associate: "",
-            associate2: ""
-          }
-        ]
+        fromCompany: {},
+        toCompany: {},
+        purchasePrice: this.order.sell,
+        purchaseCount: this.order.count,
+        sellPrice: 0,
+        sellCount: 0,
+        remark: ""
       });
     },
-    associate1change(val, index) {
-      if (index - 1 > 0) {
-        this.data[index - 1].associate = val;
-        this.data.splice(index, 1, this.data[index - 1]);
-      } else {
-        this.data[index + 1].associate = val;
-        this.data.splice(index, 1, this.data[index + 1]);
-      }
+    fromCompanyChange(val, index) {
+      this.data[index - 1].toCompany = val;
     },
-    associate2change(val, index) {
-      console.log(val, index);
+    toCompanyChange(val, index) {
+      this.data[index + 1].fromCompany = val;
     },
-    save() {
-      console.log(this.data);
+    spread() {
+      this.$refs.main.style = {};
+      this.overflowToolShow = false;
+      this.retractToolShow = true;
+    },
+    retract() {
+      this.$refs.main.style.maxHeight = "400px";
+      this.$refs.main.style.overflow = "auto";
+      this.retractToolShow = false;
+      this.overflowToolShow = true;
     }
   },
   created() {

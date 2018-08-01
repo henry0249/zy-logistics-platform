@@ -26,6 +26,16 @@ module.exports = {
     },
     default: 'taking'
   },
+  mfrs: {
+    name: '生产厂商',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
+  platform: {
+    name: '所属平台',
+    type: 'ObjectId',
+    ref: 'Platform'
+  },
   user: {
     type: 'ObjectId',
     name: '下单客户',
@@ -90,7 +100,6 @@ module.exports = {
     },
     desc: '运费结算:填写运费信息，运费累加到客户订单金额，平台公司结算运费给物流商'
   },
-
   invoiceType: {
     type: 'Number',
     name: '发票类型',
@@ -116,15 +125,15 @@ module.exports = {
     name: '订货数量',
     type: 'Number',
   },
-  factoryPrice: {
+  factory: {
     name: '出厂单价',
     type: 'Number',
   },
-  unitPrice: {
+  sell: {
     name: '销售单价',
     type: 'Number',
   },
-  transportPrice: {
+  transport: {
     name: '运输单单价',
     type: 'Number',
   },

@@ -63,6 +63,7 @@ class CompanyService extends Service {
     let skip = Number(body.skip) || 0;
     delete body.limit;
     delete body.skip;
+    delete body.populate;
     let goods = await ctx.model.Goods.find({
       ...body
     }).populate([{

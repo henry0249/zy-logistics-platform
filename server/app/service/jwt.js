@@ -18,16 +18,6 @@ class jwtService extends Service {
         loginAt: new Date(),
         ...option
       };
-      if (!option.company) {
-        update.$unset = {
-          company: 1
-        }
-      }
-      if (!option.platform) {
-        update.$unset = {
-          platform: 1
-        }
-      }
       await tokenData.update(update);
     } else {
       let newTokenData = new ctx.model.Jwt({
@@ -60,37 +50,35 @@ class jwtService extends Service {
       path: 'user'
     }, {
       path: 'company',
-    }, {
-      path: 'platform',
     }]);
     if (!tokenData) {
       ctx.throw(401, '登录已失效,请尝试重新登录');
     }
-    let dayjs = require('dayjs');
-    let refleshRange = dayjs(tokenData.expAt).diff(dayjs(), 'second');
-    if (refleshRange > 0 && refleshRange <= 60 * 60) {
-      let option = {};
-      if (!ctx.tokenData) {
-        ctx.throw(401, '登录已失效,请尝试重新登录');
-      }
-      if (ctx.tokenData.company) {
-        option.company = ctx.tokenData.company;
-      }
-      if (ctx.tokenData.platform) {
-        option.platform = ctx.tokenData.platform;
-      }
-      option.sys = ctx.tokenData.sys;
-      let newToken = await this.sign(tokenData.user, option);
-      ctx.set({
-        refleshRange,
-        refleshtoken: newToken.value,
-        tokenexp: newToken.expAt
-      });
-      await tokenData.update({
-        value: newToken.value,
-        expAt: newToken.expAt
-      });
-    }
+    // let dayjs = require('dayjs');
+    // let refleshRange = dayjs(tokenData.expAt).diff(dayjs(), 'second');
+    // if (refleshRange > 0 && refleshRange <= 60 * 60) {
+    //   let option = {};
+    //   if (!ctx.tokenData) {
+    //     ctx.throw(401, '登录已失效,请尝试重新登录');
+    //   }
+    //   if (ctx.tokenData.company) {
+    //     option.company = ctx.tokenData.company;
+    //   }
+    //   if (ctx.tokenData.platform) {
+    //     option.platform = ctx.tokenData.platform;
+    //   }
+    //   option.sys = ctx.tokenData.sys;
+    //   let newToken = await this.sign(tokenData.user, option);
+    //   ctx.set({
+    //     refleshRange,
+    //     refleshtoken: newToken.value,
+    //     tokenexp: newToken.expAt
+    //   });
+    //   await tokenData.update({
+    //     value: newToken.value,
+    //     expAt: newToken.expAt
+    //   });
+    // }
     return tokenData;
   }
   async reflesh() {
@@ -108,7 +96,7 @@ class jwtService extends Service {
     }
     let dayjs = require('dayjs');
     let refleshRange = dayjs(tokenData.expAt).diff(dayjs(), 'second');
-    if (refleshRange > 0 && refleshRange <= 600) {
+    if (refleshRange > 0 && refleshRange <= 60 * 60) {
       let user = await ctx.helper.jwtVerify(token);
       return await this.sign(user);
     }

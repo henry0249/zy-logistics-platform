@@ -41,7 +41,6 @@ ajax.interceptors.request.use(async config => {
 // 注册响应拦截器
 ajax.interceptors.response.use(response => {
   if (response.headers.refleshtoken) {
-    alert('有新的token' + response.headers.refleshtoken);
     store.commit('setToken', {
       token: response.headers.refleshtoken,
       exp: response.headers.tokenexp

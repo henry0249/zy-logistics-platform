@@ -5,7 +5,6 @@ const Controller = require('egg').Controller;
 class UserController extends Controller {
   async info() {
     const ctx = this.ctx;
-
     ctx.body = ctx.user;
   }
   async loginInfo() {
@@ -14,32 +13,19 @@ class UserController extends Controller {
   }
   async loginLocal() {
     const ctx = this.ctx;
-
     ctx.body = await ctx.service.user.loginLocal(ctx.request.body)
   }
   async registerMobile() {
     const ctx = this.ctx;
-
     ctx.body = await ctx.service.user.registerMobile(ctx.request.body)
   }
   async logout() {
     const ctx = this.ctx;
-
     ctx.body = await ctx.service.user.logout()
   }
   async refleshToken() {
     const ctx = this.ctx;
-
     ctx.body = await ctx.service.jwt.reflesh()
-  }
-  async power() {
-    const ctx = this.ctx;
-
-    ctx.body = await ctx.service.user.power()
-  }
-  async cascader() {
-    const ctx = this.ctx;
-    ctx.body = await ctx.service.user.cascader()
   }
 }
 

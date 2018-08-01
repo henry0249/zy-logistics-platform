@@ -67,8 +67,54 @@ class OrderService extends Service {
       ctx.throw(422, goodsCheck, body);
     }
   }
+  async getOrderInfo(info) {
+    const ctx = this.ctx;
+    if (!info) {
+      ctx.throw(422, '订单信息未填', body);
+    }
+    if (info.type === 'company' || info.type === 'user') {
+      if (!info[info.type]) {
+        ctx.throw(422, "未指定订单客户", info);
+      }
+      if (info.user && info.company) {
+        ctx.throw(422, "下单客户不能同时为个人和公司", info);
+      }
+    } else {
+      ctx.throw(422, "未指定订单客户", info);
+    }
+    if (!info.contactName) {
+      ctx.throw(422, '未填写收货人', info);
+    }
+    if (!info.contactNumber) {
+      ctx.throw(422, '未填写收货人联系电话', info);
+    }
+    if (!info.area) {
+      ctx.throw(422, '未选择送货地址', info);
+    }
+    if (!info.mfrs) {
+      ctx.throw(422, '未指定生产厂商', info);
+    }
+
+    if (info._id) {
+      let update = JSON.parse(JSON.stringify(info));
+      delete update._id;
+      await ctx.model.Order.update({
+        _id: info._id
+      }, update);
+      return await ctx.model.Order.findById(info._id);
+    } else {
+      let order = new ctx.model.Order(info);
+      await order.save();
+      return order;
+    }
+
+  }
   async set() {
-    return await this.add();
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    let order = body.order;
+    let power = true;
+
   }
   async add() {
     const ctx = this.ctx;
@@ -161,7 +207,7 @@ class OrderService extends Service {
           ctx.throw(422, "商品编号必填", body);
         }
         delete goodsItem._id;
-        goodsItem.value = goodsItem.value._id; 
+        goodsItem.value = goodsItem.value._id;
         await ctx.model.OrderGoods.update({
           _id: body.goods[i]._id
         }, goodsItem);

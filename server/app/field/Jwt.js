@@ -4,16 +4,6 @@ module.exports = {
     type: 'ObjectId',
     ref: 'User'
   },
-  company: {
-    name: '登录公司',
-    type: 'ObjectId',
-    ref: 'Company'
-  },
-  platform: {
-    name: '登录平台',
-    type: 'ObjectId',
-    ref: 'Platform'
-  },
   sys: {
     name: '登录系统标识',
     type: 'String',
@@ -23,6 +13,11 @@ module.exports = {
       wxDriver: '微信司机端',
       cms: '后台管理系统'
     }
+  },
+  company:{
+    name: '登录公司',
+    type: 'ObjectId',
+    ref: 'Company'
   },
   value: {
     name: 'token值',
