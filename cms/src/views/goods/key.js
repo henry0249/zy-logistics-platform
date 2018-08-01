@@ -1,5 +1,5 @@
 let goodsThead = {
-  "name": {
+  name: {
     readOnly: true,
     slot: true,
     name: '名称'

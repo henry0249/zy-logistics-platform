@@ -35,6 +35,10 @@
   import commonSelect from './CommonSelect.js';
   export default {
     props: {
+      changeType: {
+        type: String,
+        default: ''
+      },
       isSwitch: {
         type: Boolean,
         default: false
@@ -72,6 +76,7 @@
     },
     data() {
       return {
+        startType: '',
         radio: '',
         tableIO: true,
         value: true,
@@ -91,9 +96,13 @@
       }
     },
     watch: {
+      startType(val) {
+        if (val !== this.changeType) {
+          this.$emit('update:changeType',val)
+        }
+      },
       shipData(val) {
         if (Object.keys(val).length > 0) {
-          console.log(val);
           for (const key in val) {
             this.option[key] = val[key];
           }
@@ -105,11 +114,9 @@
       },
       goodsData(val) {
         if (Object.keys(val).length > 0) {
-          console.log(val);
           for (const key in val) {
             this.option[key] = val[key];
           }
-          console.log(this.option);
         } else {
           delete this.option.input;
           delete this.option.brand;
@@ -164,12 +171,8 @@
           }
         }
       },
-      divHeight(val) {
-        console.log(val);
-      },
-      tableHeight(val) {
-        console.log(val);
-      },
+      divHeight(val) {},
+      tableHeight(val) {},
       tags(val) {
         for (let index = 0; index < val.length; index++) {
           for (let i = index + 1; i < val.length; i++) {
@@ -287,12 +290,9 @@
       }
     },
     methods: {
-      radioChange(val) {
-        console.log(val);
-      },
+      radioChange(val) {},
       switchChange(val) {
         this.input = '';
-        console.log(this.commonSelect);
         for (const key in this.commonSelect) {
           this.commonSelect[key].option.forEach(item => {
             delete this.option[item];
@@ -310,11 +310,24 @@
             this.$set(this.option, 'populate', 'owner');
           }
         } else {}
-        console.log(this.option);
         this.$emit('switchChange', val);
       },
       selectionChange(val) {
         if (this.selection) {
+          if (this.value) {
+            this.startType = JSON.parse(JSON.stringify(this.type));
+          } else {
+            this.tags = [];
+            if (this.type === 'user') {
+              this.startType = 'comoany';
+            } else if (this.type === 'company') {
+              this.startType = 'user';
+            } else if (this.type === 'ship') {
+              this.startType = 'truck';
+            } else if (this.type === 'truck') {
+              this.startType = 'ship';
+            }
+          }
           val.forEach(item => {
             this.tags.push(item);
           });
@@ -324,6 +337,19 @@
         if (!this.selection) {
           this.tags = [];
           this.tags.push(val);
+          if (this.value) {
+            this.startType = JSON.parse(JSON.stringify(this.type));
+          } else {
+            if (this.type === 'user') {
+              this.startType = 'comoany';
+            } else if (this.type === 'company') {
+              this.startType = 'user';
+            } else if (this.type === 'ship') {
+              this.startType = 'truck';
+            } else if (this.type === 'truck') {
+              this.startType = 'ship';
+            }
+          }
         }
       },
       tagTxt(tag) {
@@ -369,13 +395,9 @@
       this.path = '/' + this.type + '/find';
       for (const key in this.commonSelect) {
         if (key === this.type) {
-          console.log('type', this.type);
-          console.log('key', key);
-          console.log('this.commonSelect[key].option', this.commonSelect[key].option);
           this.thead = this.commonSelect[key].thead;
           this.commonSelect[key].option.forEach(item => {
             delete this.option[item];
-            console.log(this.option);
           });
           if (this.commonSelect[key].populate) {
             this.option.populate = this.commonSelect[key].populate;
@@ -391,6 +413,7 @@
       } else if (this.type === 'truck') {
         this.radio = 'truck';
       }
+      this.startType = JSON.parse(JSON.stringify(this.changeType));
     }
   }
 </script>

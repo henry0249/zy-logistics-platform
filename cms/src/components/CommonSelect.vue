@@ -15,7 +15,7 @@
     </div>
     <el-dialog :visible.sync="dialogVisible" width="800px">
       <span style="fontSize:16px;" slot="title">{{title}}</span>
-      <common-select-item @switchChange="switchChange" :placeholder="newPlaceholder" :isSwitch="isSwitch" :option="option" v-if="dialogVisible" :one="one" :type="type" :data.sync="itemData" :startData="data"></common-select-item>
+      <common-select-item @switchChange="switchChange" :changeType.sync="startType" :placeholder="newPlaceholder" :isSwitch="isSwitch" :option="option" v-if="dialogVisible" :one="one" :type="type" :data.sync="itemData" :startData="data"></common-select-item>
       <div slot="footer" class="dialog-footer jb">
         <el-button size="mini" @click="dialogVisible = false">取 消</el-button>
         <el-button size="mini" type="primary" :disabled="btmDisabled" @click="go">确 定</el-button>
@@ -28,6 +28,10 @@
   import commonSelect from './CommonSelect.js';
   export default {
     props: {
+      changeType: {
+        type: String,
+        default: ''
+      },
       isSwitch: {
         type: Boolean,
         default: false
@@ -91,6 +95,7 @@
     },
     data() {
       return {
+        startType:'',
         typeIo: false,
         one: false,
         newPlaceholder: '',
@@ -102,6 +107,10 @@
       }
     },
     watch: {
+      startType(val){
+        console.log(val);
+        this.$emit('update:changeType',val);
+      },
       data(val) {},
       itemData(val, old) {
         let io = true;
@@ -163,17 +172,6 @@
         } else {
           return {}
         }
-        // let option = {
-        //   large: "15px",
-        //   medium: "14px",
-        //   small: "13px",
-        //   mini: "12px"
-        // };
-        // if (this.labelSize) {
-        //   return this.labelSize;
-        // } else {
-        //   return option[this.size || this.$parent.size] || "15px";
-        // }
       },
       selectStyle() {
         let style = {};
@@ -183,10 +181,7 @@
         return style
       },
       selectTxt() {
-        console.log(this.data);
         if (this.data._id || this.data.length > 0) {
-          // this.showDelIcon = true;
-          console.log('11');
           if (Object.prototype.toString.call(this.data) === '[object Object]') {
             if (this.type === 'user') {
               return this.data.name || this.data.mobile || this.data.email;
@@ -238,7 +233,6 @@
         }
       },
       del() {
-        console.log(Object.prototype.toString.call(this.data) === '[object Object]');
         if (Object.prototype.toString.call(this.data) === '[object Object]') {
           this.$emit('update:data', {});
         } else {
@@ -278,6 +272,7 @@
         this.one = true;
         this.typeIo = false;
       }
+      this.startType = JSON.parse(JSON.stringify(this.type));
     }
   }
 </script>

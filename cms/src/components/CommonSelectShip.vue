@@ -33,8 +33,6 @@
     methods: {
       options() {
         let res = this.field[this.type.substring(0, 1).toUpperCase() + this.type.substring(1)].type.option;
-        console.log(this.field[this.type.substring(0, 1).toUpperCase() + this.type.substring(1)].type.option);
-        console.log(res);
         return res
       },
       inputChange(val) {

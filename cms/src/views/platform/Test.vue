@@ -1,12 +1,19 @@
 <template>
   <div>
-    <common-select isSwitch label="选择" :data.sync="value1" @switchChange="switchChange" border width="25%" title="用户选择" type="user" size="mini"></common-select>
+    <common-select isSwitch label="选择" :data.sync="value1" @switchChange="switchChange" border width="25%" title="用户选择" type="truck" size="mini"></common-select>
     <my-table :data.sync="data" :thead="thead">
       <template slot-scope="scope" v-if="scope.column.property === 'value'">
-          <common-select isSwitch :data.sync="scope.row['value']" @switchChange="switchChange" border width="100%" title="用户选择" type="goods" size="mini"></common-select>
+            <common-select isSwitch :data.sync="scope.row['value']" @switchChange="switchChange" border width="100%" title="用户选择" type="goods" size="mini"></common-select>
 </template>
     </my-table>
   </div>
+      <!-- <my-table index size="mini" edit :thead="tableHeader" :data.sync="tableList">
+<template slot-scope="scope" v-if="scope.column.property === 'tag'||scope.column.property === 'name'">
+  <el-tag v-if="scope.column.property === 'tag'" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['tag']" :key="item.id">
+    {{item}}</el-tag>
+  <i title="点击查看详情" class="pointer name-txt" v-if="scope.column.property === 'name'" @click="op({type:'read',value:scope})">{{scope.row['name']}}</i>
+</template>
+    </my-table> -->
 </template>
 
 <script>

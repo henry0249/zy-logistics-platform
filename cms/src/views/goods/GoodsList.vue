@@ -1,11 +1,16 @@
 <template>
   <loading-box class="goods-box" v-model="loadingText">
-    <my-table index size="mini" edit :thead="tableHeader" :data.sync="tableList">
-      <template slot-scope="scope" v-if="scope.column.property === 'tag'||scope.column.property === 'name'">
-                      <el-tag  v-if="scope.column.property === 'tag'" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['tag']" :key="item.id">{{item}}</el-tag>
-                      <i title="点击查看详情" class="pointer name-txt" v-if="scope.column.property === 'name'" @click="op({type:'read',value:scope})">{{scope.row['name']}}</i>
+    <common-table style="padding:0" path="/goods/find" height="calc(100vh - 51px)" :thead="tableHeader" border index :option="option">
+      <div slot="header" class="jc js">
+        <my-form-item style="margin-right:10px;" size="mini" width='200px' :placeholder="placeholder" input v-model="input"></my-form-item>
+        <my-form-item width='200px' @change="brandChange" style="padding-right:10px;" size="mini" collapse-tags placeholder="选择品牌" v-model="brandData" :options="brandArr" select></my-form-item>
+        <my-form-item @change="categoryChange" style="padding-right:10px;" filterable width="200px" size="mini" placeholder="选择分类" v-model="categoryData" :options="categoryArr" select></my-form-item>
+      </div>
+      <template slot-scope="scope" v-if="scope.prop === 'tag'||scope.prop === 'name'">
+            <el-tag v-if="scope.prop === 'tag'" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+            <i title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="op({type:'read',value:scope})">{{scope.row['name']}}</i>
 </template>
-    </my-table>
+    </common-table>
     <el-dialog :title="title" :visible.sync="show">
       <component :is="componentName" :key-arr="key" :key-data="keyData" :str="str"></component>
     </el-dialog>
@@ -23,6 +28,13 @@
   export default {
     data() {
       return {
+        option: {},
+        brandArr: [],
+        categoryArr: [],
+        brandData: '',
+        categoryData: '',
+        placeholder: '输入商品名称',
+        input: '',
         str: "goods",
         show: false,
         title: "",
@@ -42,6 +54,19 @@
         or
       };
     },
+    watch: {
+      input(val) {
+        if (val) {
+          this.option.$or = [{
+            name: {
+              $regex: this.input
+            }
+          }]
+        } else {
+          delete this.option.$or
+        }
+      }
+    },
     computed: {
       key() {
         let i = null;
@@ -60,6 +85,32 @@
       }
     },
     methods: {
+      brandChange(val) {
+        this.$set(this.option, 'brand', val);
+      },
+      categoryChange(val) {
+        this.$set(this.option, 'category', val);
+      },
+      async getBrand() {
+        try {
+          this.brandArr = await this.$api.curd({
+            model: 'brand',
+            curdType: 'find',
+            limit: 0
+          })
+        } catch (error) {
+        }
+      },
+      async getCategory() {
+        try {
+          this.categoryArr = await this.$api.curd({
+            model: 'category',
+            curdType: 'find',
+            limit: 0
+          })
+        } catch (error) {
+        }
+      },
       async test() {},
       op(val) {
         this.$router.push({
@@ -87,7 +138,9 @@
       }
     },
     async created() {
-      this.getData();
+      await this.getData();
+      await this.getBrand();
+      await this.getCategory();
     }
   };
 </script>
