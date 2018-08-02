@@ -123,7 +123,6 @@
       async getData() {
         let i = 0;
         try {
-          this.loadingText = '加载中'
           let data = {
             model: "goods",
             curdType: "find",
@@ -134,13 +133,14 @@
           console.log(res);
           this.tableList = res;
         } catch (error) {}
-        this.loadingText = ''
       }
     },
     async created() {
+      this.loadingText = '加载中';
       await this.getData();
       await this.getBrand();
       await this.getCategory();
+      this.loadingText = '';
     }
   };
 </script>

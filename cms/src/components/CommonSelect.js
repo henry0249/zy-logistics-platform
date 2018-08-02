@@ -26,6 +26,11 @@ export default {
       nick: {
         readOnly: true,
         name: '公司别称'
+      },
+      type:{
+        readOnly:true,
+        slot:true,
+        name:'公司类型'
       }
     },
     returnName:['name','nick'],
@@ -68,7 +73,7 @@ export default {
       }
     },
     returnName:['name','key'],
-    option: ['$or'],
+    option: ['$or','province','city','county'],
     populate:[{
       path:'province'
     },{

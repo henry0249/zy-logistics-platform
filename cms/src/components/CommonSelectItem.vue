@@ -20,8 +20,12 @@
       <common-table key="1" v-if="value" style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
         <common-select-area v-if="type === 'area'" slot="header" :areaData.sync="areaData"></common-select-area>
         <common-select-ship v-else-if="type === 'ship'|| type === 'truck'" slot="header" :type="type" :data.sync="shipData"></common-select-ship>
+        <common-select-company v-else-if="type === 'company'" slot="header" :type="type" :data.sync="companyData"></common-select-company>
         <common-select-goods v-else-if="type === 'goods'" slot="header" :data.sync="goodsData"></common-select-goods>
         <my-form-item v-else size="mini" width='200px' :placeholder="placeholder" input v-model="input" slot="header"></my-form-item>
+        <template slot-scope="scope" v-if="scope.prop === 'type'&& type === 'company'">
+            <el-tag v-if="scope.prop === 'type' &&field.Company.type.option[item]" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['type']" :key="item.id">{{field.Company.type.option[item]}}</el-tag>
+</template>
       </common-table>
       <common-table key="2" v-if="!value" style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="elsePath" :thead="elseThead">
         <common-select-ship v-if="type === 'ship'|| type === 'truck'" slot="header" :type="type" :data.sync="shipData"></common-select-ship> -->
@@ -92,13 +96,24 @@
         areaData: {},
         goodsData: {},
         shipData: {},
+        companyData: {},
         commonSelect
       }
     },
     watch: {
       startType(val) {
         if (val !== this.changeType) {
-          this.$emit('update:changeType',val)
+          this.$emit('update:changeType', val)
+        }
+      },
+      companyData(val) {
+        if (Object.keys(val).length > 0) {
+          for (const key in val) {
+            this.option[key] = val[key];
+          }
+        } else {
+          delete this.option.input;
+          delete this.option.type;
         }
       },
       shipData(val) {
@@ -403,6 +418,9 @@
             this.option.populate = this.commonSelect[key].populate;
           }
         }
+        // if (this.type === 'area') {
+        //   this.option.type = 'township';
+        // }
       };
       if (this.type === 'user') {
         this.radio = 'user';

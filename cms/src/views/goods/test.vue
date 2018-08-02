@@ -1,6 +1,6 @@
 <template>
   <div>
-    <common-select isSwitch label="选择" :data.sync="value1" @switchChange="switchChange" :changeType.sync="changeType" border width="25%" title="用户选择" type="truck" size="mini"></common-select>
+    <common-select label="选择" :data.sync="value1" @switchChange="switchChange" :changeType.sync="changeType" border width="25%" title="用户选择" type="company" size="mini"></common-select>
   </div>
 </template>
 
