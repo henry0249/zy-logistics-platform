@@ -1,7 +1,7 @@
 <template>
   <div class="fex jc js">
     <my-form-item @change="inputChange" style="padding-right:10px;" width="33%" size="mini" v-model="input" placeholder="输入公司名称或别名搜索"></my-form-item>
-    <my-form-item @change="typeChange" style="padding-right:10px;" multiple width="33%" size="mini" placeholder="选择生产厂商" v-model="typeData" :options="field.Company.type.option" select></my-form-item>
+    <my-form-item @change="typeChange" style="padding-right:10px;" label="公司类型" multiple width="33%" size="mini" placeholder="选择公司类型" v-model="typeData" :options="field.Company.type.option" select></my-form-item>
   </div>
 </template>
 
@@ -37,7 +37,11 @@
       },
       typeChange(val) {
         let obj = JSON.parse(JSON.stringify(this.data));
-        obj.type = val;
+        if (val.length > 0) {
+          obj.type = val;
+        } else {
+          delete obj.type;
+        }
         this.$emit('update:data', obj);
       },
     },

@@ -13,7 +13,7 @@
       </div>
       <i v-if="!disabled" class="el-icon-edit pointer" :style="{color:'#409eff',fontSize:fontSize}" @click="dialogVisible = true"></i>
     </div>
-    <el-dialog :visible.sync="dialogVisible" width="800px">
+    <el-dialog :visible.sync="dialogVisible" width="70%">
       <span style="fontSize:16px;" slot="title">{{title}}</span>
       <common-select-item @switchChange="switchChange" :changeType.sync="startType" :placeholder="newPlaceholder" :isSwitch="isSwitch" :option="option" v-if="dialogVisible" :one="one" :type="type" :data.sync="itemData" :startData="data"></common-select-item>
       <div slot="footer" class="dialog-footer jb">

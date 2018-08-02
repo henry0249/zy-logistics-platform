@@ -1,5 +1,5 @@
 <template>
-  <div class="col-flex" style="width:100%;height:400px">
+  <div class="col-flex" style="width:100%;">
     <div class="js as" ref="div">
       <span style="margin-right:10px;">已选择</span>
       <div class="f1" style="flex-wrap:wrap;max-height:120px;overflow: auto;" ref="div" v-if="tags.length > 0">
@@ -17,7 +17,7 @@
           <el-radio-button :label="typeComputed">{{inactiveText}}</el-radio-button>
         </el-radio-group>
       </div>
-      <common-table key="1" v-if="value" style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
+      <common-table key="1" v-if="value" style="padding:0" height="50vh" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="path" :thead="thead">
         <common-select-area v-if="type === 'area'" slot="header" :areaData.sync="areaData"></common-select-area>
         <common-select-ship v-else-if="type === 'ship'|| type === 'truck'" slot="header" :type="type" :data.sync="shipData"></common-select-ship>
         <common-select-company v-else-if="type === 'company'" slot="header" :type="type" :data.sync="companyData"></common-select-company>
@@ -400,13 +400,13 @@
         }
         this.selection = true;
       }
-      this.$nextTick(() => {
-        if (this.isSwitch) {
-          this.tableHeight = 740 - this.$refs.div.offsetHeight - 372 - this.$refs.switchHeight.offsetHeight + 'px';
-        } else {
-          this.tableHeight = 740 - this.$refs.div.offsetHeight - 372 + 'px';
-        }
-      })
+      // this.$nextTick(() => {
+      //   if (this.isSwitch) {
+      //     this.tableHeight = 740 - this.$refs.div.offsetHeight - 372 - this.$refs.switchHeight.offsetHeight +20 + 'px';
+      //   } else {
+      //     this.tableHeight = 740 - this.$refs.div.offsetHeight - 372 +20 + 'px';
+      //   }
+      // })
       this.path = '/' + this.type + '/find';
       for (const key in this.commonSelect) {
         if (key === this.type) {
@@ -418,8 +418,11 @@
             this.option.populate = this.commonSelect[key].populate;
           }
         }
-        // if (this.type === 'area') {
-        //   this.option.type = 'township';
+        if (this.type === 'area') {
+          this.option.type = 'township';
+        }
+        // if (this.type === 'company' && this.option.type.length === 0) {
+        //   delete this.option.type;
         // }
       };
       if (this.type === 'user') {

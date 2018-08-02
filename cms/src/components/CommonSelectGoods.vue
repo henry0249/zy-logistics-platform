@@ -1,8 +1,8 @@
 <template>
   <div class="fex jc js">
     <my-form-item @change="inputChange" style="padding-right:10px;" width="33%" size="mini" v-model="input" placeholder="输入名称搜索"></my-form-item>
-    <my-form-item @change="companyChange" style="padding-right:10px;" filterable width="33%" size="mini" placeholder="选择生产厂商" v-model="companyData" :options="companyArr" select></my-form-item>
-    <my-form-item @change="brandChange" style="padding-right:10px;" filterable width="33%" size="mini" placeholder="选择品牌" v-model="brand" :options="brandArr" select></my-form-item>
+    <my-form-item @change="companyChange" style="padding-right:10px;" filterable width="33%" size="mini" label="生产厂商" placeholder="选择生产厂商" v-model="companyData" :options="companyArr" select></my-form-item>
+    <my-form-item @change="brandChange" style="padding-right:10px;" filterable width="33%" size="mini" label="品牌" placeholder="选择品牌" v-model="brand" :options="brandArr" select></my-form-item>
   </div>
 </template>
 

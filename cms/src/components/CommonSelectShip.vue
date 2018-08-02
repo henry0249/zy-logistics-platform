@@ -1,8 +1,8 @@
 <template>
   <div class="fex jc js">
     <my-form-item @change="inputChange" style="padding-right:10px;" width="33%" size="mini" v-model="input" :placeholder="`输入${type==='ship'?'船':'车牌'}号搜索`"></my-form-item>
-    <my-form-item @change="typeChange" style="padding-right:10px;" width="33%" size="mini" collapse-tags placeholder="选择类型" v-model="typeData" :options="options()" multiple select></my-form-item>
-    <my-form-item @change="companyChange" style="padding-right:10px;" filterable width="33%" size="mini" placeholder="选择公司" v-model="companyData" :options="companyArr" select></my-form-item>
+    <my-form-item @change="typeChange" style="padding-right:10px;" width="33%" size="mini" label="类型" collapse-tags placeholder="选择类型" v-model="typeData" :options="options()" multiple select></my-form-item>
+    <my-form-item @change="companyChange" style="padding-right:10px;" filterable width="33%" label="公司" size="mini" placeholder="选择公司" v-model="companyData" :options="companyArr" select></my-form-item>
   </div>
 </template>
 
