@@ -1,6 +1,8 @@
 <template>
   <div>
-    <common-select label="选择" :data.sync="value1" @switchChange="switchChange" :changeType.sync="changeType" border width="25%" title="用户选择" type="company" size="mini"></common-select>
+    <common-select label="选择" :data.sync="value1" @switchChange="switchChange" :changeType.sync="changeType" border width="25%" title="用户选择" type="company" size="mini" :option="option"></common-select>
+    <my-form-item size="mini" width="300px" style="margin-top:20px" input v-model="input" filterable label="备注"></my-form-item>
+    <input type="text" width="300" style="margin-top:20px">
   </div>
 </template>
 
@@ -14,7 +16,8 @@
   export default {
     data() {
       return {
-        changeType:'',
+        input: '',
+        changeType: '',
         value2: {},
         value3: [],
         value: {
@@ -38,21 +41,24 @@
         }, ],
         thead: goodsThead,
         option: {
-          $or: [{
-            name: {
-              $regex: this.input
-            }
+          populate: [{
+            path: 'user'
           }]
+          // $or: [{
+          //   name: {
+          //     $regex: this.input
+          //   }
+          // }]
         }
       }
     },
     watch: {
-      changeType(val){
+      changeType(val) {
         console.log(val);
       }
     },
     methods: {
-      switchChange(val){},
+      switchChange(val) {},
     }
   }
 </script>

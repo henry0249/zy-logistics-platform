@@ -400,13 +400,6 @@
         }
         this.selection = true;
       }
-      // this.$nextTick(() => {
-      //   if (this.isSwitch) {
-      //     this.tableHeight = 740 - this.$refs.div.offsetHeight - 372 - this.$refs.switchHeight.offsetHeight +20 + 'px';
-      //   } else {
-      //     this.tableHeight = 740 - this.$refs.div.offsetHeight - 372 +20 + 'px';
-      //   }
-      // })
       this.path = '/' + this.type + '/find';
       for (const key in this.commonSelect) {
         if (key === this.type) {
@@ -421,9 +414,9 @@
         if (this.type === 'area') {
           this.option.type = 'township';
         }
-        // if (this.type === 'company' && this.option.type.length === 0) {
-        //   delete this.option.type;
-        // }
+        if (this.type === 'company') {
+          delete this.option.type;
+        }
       };
       if (this.type === 'user') {
         this.radio = 'user';
