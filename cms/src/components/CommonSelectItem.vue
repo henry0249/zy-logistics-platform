@@ -24,7 +24,7 @@
         <common-select-goods v-else-if="type === 'goods'" slot="header" :data.sync="goodsData"></common-select-goods>
         <my-form-item v-else size="mini" width='200px' :placeholder="placeholder" input v-model="input" slot="header"></my-form-item>
         <template slot-scope="scope" v-if="scope.prop === 'type'&& type === 'company'">
-            <el-tag v-if="scope.prop === 'type' &&field.Company.type.option[item]" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['type']" :key="item.id">{{field.Company.type.option[item]}}</el-tag>
+                <el-tag v-if="scope.prop === 'type' &&field.Company.type.option[item]" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['type']" :key="item.id">{{field.Company.type.option[item]}}</el-tag>
 </template>
       </common-table>
       <common-table key="2" v-if="!value" style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="elsePath" :thead="elseThead">
@@ -109,7 +109,13 @@
       companyData(val) {
         if (Object.keys(val).length > 0) {
           for (const key in val) {
-            this.option[key] = val[key];
+            if (key === 'type') {
+              this.option.type = {
+                $in: val[key]
+              }
+            } else {
+              this.option[key] = val[key];
+            }
           }
         } else {
           delete this.option.input;
