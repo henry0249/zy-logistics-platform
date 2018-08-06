@@ -44,9 +44,6 @@ export default {
         this.$route.path.indexOf("notfound") > -1
       ) {
         flag = false;
-        document.documentElement.clientWidth
-        document.documentElement.clientHeight
-
       }
       return flag;
     }
