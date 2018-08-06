@@ -56,7 +56,7 @@ export default {
       let res = -1;
       this.nav.forEach((item, index) => {
         if (this.$route.matched.length > 0) {
-          if (item.path.indexOf(this.$route.matched[0].path) > -1) {
+          if (item.path && item.path.indexOf(this.$route.matched[0].path) > -1) {
             res = index;
           }
         } else {
