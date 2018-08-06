@@ -5,6 +5,7 @@ import LoginPsw from './LoginPsw.vue';
 import Reg from './Reg.vue';
 import RestPsw from './RestPsw.vue';
 import ChooseCompany from './ChooseCompany.vue';
+import Sys from './SysLogin.vue';
 
 export default [{
   path: '/',
@@ -32,6 +33,12 @@ export default [{
   }, {
     path: 'reg',
     component: Reg,
+    meta: {
+      pass: true //放行
+    }
+  }, {
+    path: 'sys',
+    component: Sys,
     meta: {
       pass: true //放行
     }

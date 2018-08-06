@@ -15,23 +15,33 @@
 </template>
 
 <script>
-import LeftNav from "../common/LeftNav";
-export default {
-  components: {
-    LeftNav
-  },
-  data() {
-    return {
-      nav: [
-        {
+  import LeftNav from "../common/LeftNav";
+  export default {
+    components: {
+      LeftNav
+    },
+    data() {
+      return {
+        nav: [{
           name: "区域管理",
           icon: "icon-quyu",
           path: "/sys/area"
-        }
-      ]
-    };
-  }
-};
+        }, {
+          name: "区域管理",
+          icon: "icon-quyu",
+          path: "/sys/area"
+        }, {
+          name: "区域管理",
+          icon: "icon-quyu",
+          path: "/sys/area"
+        }, {
+          name: "区域管理",
+          icon: "icon-quyu",
+          path: "/sys/area"
+        }]
+      };
+    }
+  };
 </script>
 
 <style scoped>

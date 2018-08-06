@@ -17,6 +17,9 @@ class Api {
   static async login_local(data) {
     return ajax.post('/login/local', data)
   }
+  static async login_sys(data) {
+    return ajax.post('/login/sys', data)
+  }
   static async register_phone(data) {
     return ajax.post('/register/mobile', data)
   }
