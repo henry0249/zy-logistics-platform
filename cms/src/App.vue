@@ -40,6 +40,7 @@ export default {
       if (
         this.$route.path.indexOf("login") > -1 ||
         this.$route.path.indexOf("chooseCompany") > -1 ||
+        this.$route.path.indexOf("sys") > -1 ||
         this.$route.path.indexOf("notfound") > -1
       ) {
         flag = false;
