@@ -54,10 +54,8 @@ export default {
   },
   methods: {
     handelCurrentChange(val) {
-      console.log(val);
     },
     handelSelectionChange(val) {
-      console.log(val);
     },
     toDetail(item, index) {
       if (item._id) {

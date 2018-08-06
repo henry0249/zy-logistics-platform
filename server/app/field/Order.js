@@ -26,6 +26,11 @@ module.exports = {
     },
     default: 'taking'
   },
+  orderCompany: {
+    name: '下单公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
   mfrs: {
     name: '生产厂商',
     type: 'ObjectId',
@@ -137,45 +142,18 @@ module.exports = {
     name: '运输单单价',
     type: 'Number',
   },
-  salesman: {
-    name: '市场专员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
-  dispatchCheck: {
-    name: '调度审核员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
-  dispatcher: {
-    name: '调度员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
-  documentClerk: {
-    name: '单据文员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
-  finishCheck: {
-    name: '完成审核员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
-  financial: {
-    name: '财务专员',
-    type: 'ObjectIdArray',
-    ref: 'User'
+  brokerType: {
+    name: '经纪人类型',
+    type: 'String',
+    option: {
+      normal: '直接经纪人',
+      temporary: '临时经纪人'
+    }
   },
   broker: {
     name: '经纪人',
     type: 'ObjectId',
     ref: 'Broker'
-  },
-  temporaryBroker: {
-    name: '临时经纪人',
-    type: 'ObjectId',
-    ref: 'User'
   },
   brokerBonus: {
     name: '经纪人提成',

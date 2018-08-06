@@ -46,46 +46,6 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Platform'
   },
-  owner: {
-    name: '主管理员',
-    type: 'ObjectId',
-    ref: 'User'
-  },
-  admin: {
-    name: '管理员',
-    type: 'ObjectIdArray',
-    ref: 'User',
-  },
-  salesman: {
-    name: '业务专员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
-  documentClerk: {
-    name: '单据文员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
-  dispatchCheck: {
-    name: '调度审核员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
-  dispatcher: {
-    name: '调度专员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
-  finishCheck: {
-    name: '完成审核员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
-  financial: {
-    name: '财务文员',
-    type: 'ObjectIdArray',
-    ref: 'User'
-  },
   address: {
     name: '地址',
     type: 'String',
@@ -97,11 +57,11 @@ module.exports = {
   },
   dispatchCompany: {
     name: '调度关联公司',
-    type: 'ObjectId',
+    type: 'ObjectIdArray',
     ref: 'Company'
   },
-  relationCompany: {
-    name: '关联公司',
+  businessRelationCompany: {
+    name: '贸易链关联公司',
     type: 'ObjectIdArray',
     ref: 'Company'
   }

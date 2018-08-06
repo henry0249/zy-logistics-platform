@@ -43,18 +43,18 @@ export default {
         this.$route.path.indexOf("notfound") > -1
       ) {
         flag = false;
+        document.documentElement.clientWidth
+        document.documentElement.clientHeight
+
       }
       return flag;
     }
   },
   async created() {
-    if (localStorage.token) {
-      this.$store.commit("getLocalToken");
-      if (this.showHeader) {
-        try {
-          await this.$store.dispatch("getLoginInfo");
-        } catch (error) {}
-      }
+    if (localStorage.token && this.showHeader) {
+      try {
+        await this.$store.dispatch("getLoginInfo");
+      } catch (error) {}
     }
     this.loadingText = "";
   }

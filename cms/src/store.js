@@ -8,11 +8,11 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
+    headerVisible: false,
+    headerNav: [],
     loginInfo: {},
     field: {},
     orderBadge: {},
-    token: '',
-    tokenExp: '',
     baseUrl: window.location.protocol + '//' + window.location.host,
   },
   mutations: {
@@ -33,12 +33,6 @@ const store = new Vuex.Store({
         localStorage.removeItem('token');
         localStorage.removeItem('tokenExp');
       }
-      state.token = data.token;
-      state.tokenExp = data.exp;
-    },
-    getLocalToken(state) {
-      state.token = localStorage.token;
-      state.tokenExp = localStorage.tokenExp;
     },
     logout(state) {
       localStorage.removeItem('token');

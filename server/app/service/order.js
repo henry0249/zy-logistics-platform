@@ -67,20 +67,29 @@ class OrderService extends Service {
       ctx.throw(422, goodsCheck, body);
     }
   }
-  async getOrderInfo(info) {
+  async getOrderInfo(payload) {
     const ctx = this.ctx;
+    let info = JSON.parse(JSON.stringify(payload));
+    for (const key in info) {
+      if (info[key]._id) {
+        info[key] = info[key]._id
+      }
+    }
     if (!info) {
       ctx.throw(422, '订单信息未填', body);
     }
     if (info.type === 'company' || info.type === 'user') {
-      if (!info[info.type]) {
-        ctx.throw(422, "未指定订单客户", info);
+      if (info.type === 'company') {
+        delete info.user;
       }
-      if (info.user && info.company) {
-        ctx.throw(422, "下单客户不能同时为个人和公司", info);
+      if (info.type === 'user') {
+        delete info.company;
+      }
+      if (!info[info.type]) {
+        ctx.throw(422, "未选择订单客户", info);
       }
     } else {
-      ctx.throw(422, "未指定订单客户", info);
+      ctx.throw(422, "未选择订单客户", info);
     }
     if (!info.contactName) {
       ctx.throw(422, '未填写收货人', info);
@@ -94,7 +103,21 @@ class OrderService extends Service {
     if (!info.mfrs) {
       ctx.throw(422, '未指定生产厂商', info);
     }
-
+    if (!info.goods) {
+      ctx.throw(422, '未选择商品', info);
+    }
+    if (Number(info.count) <= 0) {
+      ctx.throw(422, '商品数量必须大于0', info);
+    }
+    if (Number(info.factory) <= 0) {
+      ctx.throw(422, '商品出厂单价必须大于0', info);
+    }
+    if (Number(info.sell) <= 0) {
+      ctx.throw(422, '商品销售单价必须大于0', info);
+    }
+    if (Number(info.transport) <= 0) {
+      ctx.throw(422, '商品运输单价必须大于0', info);
+    }
     if (info._id) {
       let update = JSON.parse(JSON.stringify(info));
       delete update._id;
@@ -107,14 +130,33 @@ class OrderService extends Service {
       await order.save();
       return order;
     }
-
+  }
+  async setBusinessTrainsData(order, arr) {
+    const ctx = this.ctx;
+    if (!(arr !== undefined && arr instanceof Array && arr.length > 0)) {
+      return;
+    }
+    for (let i = 0; i < arr.length; i++) {
+      let item = arr[i];
+      item.order = order._id;
+      if (item._id) {
+        let update = JSON.parse(JSON.stringify(item));
+        delete update._id;
+        await ctx.model.BusinessTrains.update({
+          _id: item._id
+        }, update);
+      } else {
+        let trains = new ctx.model.BusinessTrains(item);
+        await trains.save();
+      }
+    }
   }
   async set() {
     const ctx = this.ctx;
     let body = ctx.request.body;
-    let order = body.order;
-    let power = true;
-
+    let order = await this.getOrderInfo(body.order);
+    await this.setBusinessTrainsData(order, body.businessTrains);
+    return 'ok';
   }
   async add() {
     const ctx = this.ctx;
@@ -411,6 +453,7 @@ class OrderService extends Service {
     let body = ctx.request.body || ctx.request.query;
     let limit = Number(body.limit) || 10;
     let skip = Number(body.skip) || 0;
+    let company = await ctx.model.Company.findById(body.company || ctx.company._id);
     let $or = this.getOrderMan(ctx.user._id);
     let state = params.state;
     if (state === 'all') {
@@ -434,17 +477,7 @@ class OrderService extends Service {
     }]).sort({
       updatedAt: -1
     }).limit(limit).skip(skip);
-    let res = [];
-    for (let i = 0; i < orders.length; i++) {
-      let orderItem = JSON.parse(JSON.stringify(orders[i]));
-      orderItem.goods = await ctx.model.OrderGoods.find({
-        order: orderItem._id
-      }).populate([{
-        path: 'value'
-      }]);
-      res.push(orderItem);
-    }
-    return res;
+    return orders;
   }
   async getOrderById() {
     const ctx = this.ctx;
@@ -462,60 +495,41 @@ class OrderService extends Service {
       ctx.throw(404, "未找到订单", params);
     }
     let res = JSON.parse(JSON.stringify(order));
-    let goodsData = await ctx.model.OrderGoods.find({
-      order: res._id
+    let transportTrainsData = await ctx.model.TransportTrains.find({
+      order: res._id,
+      goods: res.goods
     }).populate([{
-      path: 'value',
+      path: 'origin',
+      populate: areaPopulate
+    }, {
+      path: 'transfer',
       populate: [{
-        path: 'mfrs',
-        populate: [{
-          path: 'area',
-          populate: areaPopulate
-        }]
-      }, {
-        path: 'brand'
+        path: 'area',
+        populate: areaPopulate
       }]
-    }])
-    res.goods = JSON.parse(JSON.stringify(goodsData));
-    for (let i = 0; i < res.goods.length; i++) {
-      let goodsItem = res.goods[i];
-      let transportTrainsData = await ctx.model.TransportTrains.find({
+    }, {
+      path: 'transfer2',
+      populate: areaPopulate,
+      populate: [{
+        path: 'area',
+        populate: areaPopulate
+      }]
+    }, {
+      path: 'destination',
+      populate: areaPopulate
+    }]);
+    let transportTrains = JSON.parse(JSON.stringify(transportTrainsData));
+    for (let j = 0; j < transportTrains.length; j++) {
+      let item = transportTrains[j];
+      item.logistics = await ctx.model.Logistics.find({
+        transportTrains: item._id,
         order: res._id,
         goods: goodsItem.value._id
       }).populate([{
-        path: 'origin',
-        populate: areaPopulate
+        path: 'truck'
       }, {
-        path: 'transfer',
-        populate: [{
-          path: 'area',
-          populate: areaPopulate
-        }]
-      }, {
-        path: 'transfer2',
-        populate: areaPopulate,
-        populate: [{
-          path: 'area',
-          populate: areaPopulate
-        }]
-      }, {
-        path: 'destination',
-        populate: areaPopulate
+        path: 'ship'
       }]);
-      let transportTrains = JSON.parse(JSON.stringify(transportTrainsData));
-      for (let j = 0; j < transportTrains.length; j++) {
-        let item = transportTrains[j];
-        item.logistics = await ctx.model.Logistics.find({
-          transportTrains: item._id,
-          order: res._id,
-          goods: goodsItem.value._id
-        }).populate([{
-          path: 'truck'
-        }, {
-          path: 'ship'
-        }]);
-      }
-      goodsItem.transportTrainsData = transportTrains;
     }
     return res;
   }
