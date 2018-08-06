@@ -1,6 +1,6 @@
 <template>
   <div>
-    <common-select label="选择" :data.sync="value1" @switchChange="switchChange" :changeType.sync="changeType" border width="25%" title="用户选择" type="company" size="mini" :option="option"></common-select>
+    <common-select label="选择" isSwitch :data.sync="value1" @switchChange="switchChange" :changeType.sync="changeType" border width="25%" title="用户选择" type="company" size="mini" :option="option"></common-select>
     <my-form-item size="mini" width="300px" style="margin-top:20px" input v-model="input" filterable label="备注"></my-form-item>
     <input type="text" width="300" style="margin-top:20px">
   </div>
@@ -59,6 +59,38 @@
     },
     methods: {
       switchChange(val) {},
+      async updatePrice() {
+        try {
+          let res = await this.$api.curd({
+            model: 'price',
+            curdType: 'update',
+            find: {
+              _id: '5b6794c78aa5cd2661861f42',
+            },
+            update: {
+              transport:'40',
+              history: true,
+              io: '11111'
+            }
+          })
+        } catch (error) {
+        }
+      },
+      async getPrice() {
+        try {
+          let res = await this.$api.curd({
+            model: 'price',
+            curdType: 'find',
+            goods: '5b1f3ed13857402d29161585',
+            _id:'5b6794c78aa5cd2661861f42'
+            // history:true
+          })
+        } catch (error) {}
+      }
+    },
+    async created() {
+      await this.updatePrice();
+      await this.getPrice();
     }
   }
 </script>

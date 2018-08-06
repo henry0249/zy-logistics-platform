@@ -45,14 +45,15 @@
         <my-table style="margin-top:20px;" border index size="mini" edit :thead="tableTeader" :data.sync="tableList" op>
           <div slot="op" slot-scope="scope">
             <i v-if="tableList.length>1" title="删除该地区" class="pointer" style="margin-right:10px" @click="delAdr(scope['index'])">
-                                                                                  <icon size="16px">icon-ec1</icon>
-                                                                                </i>
+                                                                                    <icon size="16px">icon-ec1</icon>
+                                                                                  </i>
             <i v-if="scope['index'] === tableList.length - 1" title="增加一个地区" class="pointer" @click="addAdr">
-                                                                                  <icon size="16px">icon-54</icon>
-                                                                                </i>
+                                                                                    <icon size="16px">icon-54</icon>
+                                                                                  </i>
           </div>
           <template slot-scope="scope" v-if="scope.column.property === 'address'">
-                      <my-form-item :change-on-select="true" size="mini" style="width:100%" v-model="scope.row[scope.column.property]" area  placeholder="选择数据" @change="areaChange"/>
+      <common-select :data.sync="scope.row[scope.column.property]" border width="100%" title="用户选择" type="area" size="mini"></common-select>
+                        <!-- <my-form-item :change-on-select="true" size="mini" style="width:100%" v-model="scope.row[scope.column.property]" area  placeholder="选择数据" @change="areaChange"/> -->
 </template>
         </my-table>
       </div>
@@ -164,6 +165,7 @@
       },
       addAdr() {
         let obj = JSON.parse(JSON.stringify(this.tableList[this.tableList.length - 1]));
+        obj.new = true;
         this.tableList.push(obj);
       },
       sub() {
@@ -174,8 +176,7 @@
       },
     },
     async created() {
-      this.$emit('input', this.value)
-      console.log(this.tableList)
+      this.$emit('input', this.value);
     }
   }
 </script>

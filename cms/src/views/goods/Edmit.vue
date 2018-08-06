@@ -59,21 +59,22 @@
               factory: val.tableList[index].factory,
               sell: val.tableList[index].sell,
               transport: val.tableList[index].transport,
-              area: val.tableList[index].address[val.tableList[index].address.length - 1],
+              area: val.tableList[index].address._id,
               parent: val.tableList[index]._id,
               goods: this.$route.params._id
             })
-            console.log('newPrice', price);
-            let addOld = await this.$api.curd({
-              model: 'price',
-              curdType: 'update',
-              find: {
-                _id: val.tableList[index]._id
-              },
-              update: {
-                history: true,
-              }
-            })
+            if (price) {
+              let addOld = await this.$api.curd({
+                model: 'price',
+                curdType: 'update',
+                find: {
+                  _id: val.tableList[index]._id
+                },
+                update: {
+                  history: true,
+                }
+              })
+            }
           }
         } catch (error) {
           io = false
@@ -162,7 +163,6 @@
               path: 'platform'
             }]
           })
-          console.log('goods', res);
           for (const key in this.goods) {
             if (this.goods.hasOwnProperty(key)) {
               if (key === 'category') {
@@ -180,7 +180,7 @@
       },
       async getArea() {
         try {
-          this.area = await this.$api.getArea()
+          this.area = await this.$api.getArea();
         } catch (error) {}
       },
       async getPrice() {
@@ -193,7 +193,7 @@
               $exists: false
             }
           })
-          console.log('price', res);
+          let areaArr = [];
           for (let index = 0; index < res.length; index++) {
             let obj = {};
             let area = await this.$api.curd({
@@ -201,27 +201,24 @@
               curdType: 'findOne',
               _id: res[index].area
             })
-            if (area) {
-              obj.address = []
-              if (area.province) {
-                obj.address.push(area.province)
-              }
-              if (area.city) {
-                obj.address.push(area.city)
-              }
-              if (area.county) {
-                obj.address.push(area.county)
-              }
-              if (area.township) {
-                obj.address.push(area.township)
-              }
-            }
-            obj.address.push(area._id)
-            obj._id = res[index]._id;
-            obj.factory = res[index].factory;
-            obj.sell = res[index].sell;
-            obj.transport = res[index].transport;
-            this.tableList.push(obj)
+            areaArr.push(area);
+            // if (area) {
+            //   obj.address = JSON.parse(JSON.stringify(area));
+            // }
+            // obj._id = res[index]._id;
+            // obj.factory = res[index].factory;
+            // obj.sell = res[index].sell;
+            // obj.transport = res[index].transport;
+            // this.tableList.push(obj)
+          }
+          let newAreaArr = new Set(areaArr);
+          console.log('newAreaArr', newAreaArr);
+          for (let index = 0; index < newAreaArr.length; index++) {
+            let price = await this.$api.curd({
+              model: 'price',
+              curdType: 'findOne',
+              area: newAreaArr[index]._id
+            });
           }
           console.log('this.tableList', this.tableList);
         } catch (error) {
@@ -235,7 +232,7 @@
       await this.getCategory();
       await this.getBrand();
       await this.getMfrs();
-      await this.getArea();
+      // await this.getArea();
       await this.getPrice();
       this.loadingText = '';
     }
@@ -248,6 +245,5 @@
     justify-content: flex-end;
     align-items: center;
     margin-top: 20px;
-    
   }
 </style>
