@@ -4,12 +4,12 @@
       <strong>{{title}}</strong>
     </div>
     <el-alert v-if="alert" title="订单信息" type="info" :closable="false" style="margin:15px 0">
-      <el-checkbox :value="order.type==='company'" @change="orderTypeChange" style="margin-left:50px;color:#909399;font-size:10px">公司订单</el-checkbox>
+      <span>&nbsp;&nbsp;({{order.type==='company'?'公司订单':'个人订单'}})</span>
     </el-alert>
     <my-form v-show="!hideForm" size="mini" width="24%" :edit="edit">
       <div class="flex ac jb">
         <div style="width:24%">
-          <common-select title="选择一个客户" label="下单客户" border :data.sync="customer" type="company" @change="customerChange" is-switch @switchChange="customerTypeChange"></common-select>
+          <common-select title="选择一个客户" label="下单客户" border :data.sync="customer" type="company" :changeType.sync="order.type" @change="customerChange" is-switch @switchChange="customerTypeChange"></common-select>
         </div>
         <my-form-item datetime v-model="order.deliveryTime" label="配送时间">
         </my-form-item>
@@ -75,9 +75,10 @@ export default {
   },
   data() {
     return {
-      customer:{},
+      customer: {},
       order: {
         type: "company",
+        mfrs: {},
         user: {},
         company: {},
         settlementMethod: 1,
@@ -144,8 +145,12 @@ export default {
     },
     customerChange(val) {
       this.order[this.order.type] = val;
+      if (this.order.type === "user") {
+        this.order.contactName = val.name || "";
+        this.order.contactNumber = val.mobile || "";
+      }
     },
-    customerTypeChange(val){
+    customerTypeChange(val) {
       this.order.type = val;
     },
     areaChange(val) {
@@ -153,7 +158,7 @@ export default {
     },
     check() {
       let order = this.order;
-      if (!order.company && !order.user) {
+      if (!order[order.type]._id) {
         this.$message.error("未选择客户");
         return;
       }
@@ -165,12 +170,28 @@ export default {
         this.$message.error("未填写收货人联系电话");
         return;
       }
-      if (!order.area) {
+      if (!order.area._id) {
         this.$message.error("未选择送货地址");
         return;
       }
-      if (!order.user && !order.company) {
-        this.$message.error("未选择客户");
+      if (!order.goods._id) {
+        this.$message.error("未选择商品");
+        return;
+      }
+      if (Number(order.count)<=0) {
+        this.$message.error("商品数量必须大于0");
+        return;
+      }
+      if (Number(order.factory)<=0) {
+        this.$message.error("商品出厂单价必须大于0");
+        return;
+      }
+      if (Number(order.sell)<=0) {
+        this.$message.error("商品销售单价必须大于0");
+        return;
+      }
+      if (Number(order.transport)<=0) {
+        this.$message.error("商品运输单价必须大于0");
         return;
       }
       return true;
@@ -184,6 +205,7 @@ export default {
         }
       }
     } else {
+      this.order.orderCompany = this.loginInfo.company._id;
       this.$emit("update:data", JSON.parse(JSON.stringify(this.order)));
     }
     this.loadingText = "加载中";

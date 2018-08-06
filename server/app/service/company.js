@@ -24,14 +24,15 @@ class CompanyService extends Service {
     if (!body.company) {
       ctx.throw(422, '公司_id必填', body);
     }
-    let data = [{
-        name: '主管理员',
-        key: 'owner'
-      },
-      {
-        name: '管理员',
-        key: 'admin',
-      },
+    let data = [
+      // {
+      //   name: '主管理员',
+      //   key: 'owner'
+      // },
+      // {
+      //   name: '管理员',
+      //   key: 'admin',
+      // },
       {
         name: '业务专员',
         key: 'salesman'

@@ -1,8 +1,13 @@
 module.exports = {
-  goods: {
-    type: 'ObjectId',
-    name: '商品信息',
-    ref: 'Goods'
+  type:{
+    type: 'String',
+    name: '类型',
+    option: {
+      0: '生产厂商到客户',
+      1: '生产厂商到中转',
+      2: '中转到中转',
+      3: '中转到客户'
+    }
   },
   order: {
     type: 'ObjectId',

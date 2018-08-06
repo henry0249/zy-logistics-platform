@@ -1,4 +1,13 @@
 module.exports = {
+  customerType: {
+    type: 'String',
+    name: '订单类型',
+    default: 'company',
+    option: {
+      user: '个人订单',
+      company: '公司订单'
+    }
+  },
   type: {
     type: 'String',
     name: '类型',
@@ -13,11 +22,6 @@ module.exports = {
     type: 'Boolean',
     name: '审核标识',
     default: false
-  },
-  goods: {
-    type: 'ObjectId',
-    name: '商品信息',
-    ref: 'Goods'
   },
   order: {
     type: 'ObjectId',
@@ -37,6 +41,16 @@ module.exports = {
   toCompany: {
     name: '收货公司',
     type: 'ObjectId',
+    ref: 'Company'
+  },
+  user: {
+    type: 'ObjectId',
+    name: '下单客户',
+    ref: 'User'
+  },
+  company: {
+    type: 'ObjectId',
+    name: '下单公司',
     ref: 'Company'
   },
   purchasePrice: {
@@ -68,5 +82,9 @@ module.exports = {
     name: '采购结算数量',
     type: 'Number',
     require: true
+  },
+  loss: {
+    name: '损耗数量',
+    type: 'Number',
   }
 }
