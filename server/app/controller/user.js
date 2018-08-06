@@ -15,6 +15,10 @@ class UserController extends Controller {
     const ctx = this.ctx;
     ctx.body = await ctx.service.user.loginLocal(ctx.request.body)
   }
+  async loginSys() {
+    const ctx = this.ctx;
+    ctx.body = await ctx.service.user.loginSys(ctx.request.body)
+  }
   async registerMobile() {
     const ctx = this.ctx;
     ctx.body = await ctx.service.user.registerMobile(ctx.request.body)

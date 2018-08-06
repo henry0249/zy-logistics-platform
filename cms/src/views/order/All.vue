@@ -13,10 +13,10 @@
         {{scope.row | customerName}}
       </div>
       <div v-if="scope.prop==='goodsName'">
-        {{scope.row.goods[0].value.name}}
+        {{scope.row.goods && scope.row.goods.name}}
       </div>
       <div v-if="scope.prop==='goodsCount'">
-        {{scope.row.goods[0].count}}{{scope.row.goods[0].value.unit}}
+        {{scope.row.count}}{{scope.row.goods && scope.row.goods.unit}}
       </div>
       <div v-if="scope.prop==='area'">
         {{area2name(scope.row.area)}}

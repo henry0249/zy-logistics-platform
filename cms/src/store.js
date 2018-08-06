@@ -8,8 +8,6 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    headerVisible: false,
-    headerNav: [],
     loginInfo: {},
     field: {},
     orderBadge: {},

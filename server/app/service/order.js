@@ -126,6 +126,7 @@ class OrderService extends Service {
       }, update);
       return await ctx.model.Order.findById(info._id);
     } else {
+      info.no = ctx.helper.no(info.goods, ctx.user._id, 1);
       let order = new ctx.model.Order(info);
       await order.save();
       return order;
@@ -432,11 +433,9 @@ class OrderService extends Service {
     const ctx = this.ctx;
     let state = orderField.state.option;
     let res = {};
-    let $or = this.getOrderMan(ctx.user._id);
     for (const key in state) {
       res[key] = await ctx.model.Order.count({
-        state: key,
-        $or: $or
+        state: key
       });
     }
     res.distribution = await ctx.model.Logistics.count({
@@ -453,8 +452,6 @@ class OrderService extends Service {
     let body = ctx.request.body || ctx.request.query;
     let limit = Number(body.limit) || 10;
     let skip = Number(body.skip) || 0;
-    let company = await ctx.model.Company.findById(body.company || ctx.company._id);
-    let $or = this.getOrderMan(ctx.user._id);
     let state = params.state;
     if (state === 'all') {
       state = {
@@ -465,12 +462,13 @@ class OrderService extends Service {
     delete body.skip;
     let orders = await ctx.model.Order.find({
       state: state,
-      $or: $or,
       ...body
     }).populate([{
       path: 'user'
     }, {
       path: 'company'
+    }, {
+      path: 'goods'
     }, {
       path: 'area',
       populate: areaPopulate

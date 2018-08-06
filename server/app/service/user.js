@@ -1,7 +1,7 @@
 const Service = require('egg').Service;
 
 class UserService extends Service {
-  async loginLocal() {
+  async getUserInfo() {
     const ctx = this.ctx;
     let body = ctx.request.body;
     if (!body.username) {
@@ -44,53 +44,25 @@ class UserService extends Service {
         username: body.username
       });
     }
-    let option = {};
-    let man = {
-      owner: {},
-      admin: {},
-      salesman: {},
-      documentClerk: {},
-      dispatchCheck: {},
-      dispatcher: {},
-      finishCheck: {},
-      financial: {}
-    }
-    let $or = [];
-    for (const key in man) {
-      $or.push({
-        [key]: {
-          $in: [user._id]
-        }
-      })
-    }
-    let userCompanys = await ctx.model.Company.find({
-      $or: $or
-    });
+    return user;
+  }
+  async loginLocal() {
+    const ctx = this.ctx;
+    let user = await this.getUserInfo();
     let res = {};
-    if (body.sys === 'cms') {
-      option.sys = 'cms';
-      if (userCompanys.length > 1) {
-        if (body.company) {
-          let company = await ctx.model.Company.findById(body.company);
-          if (!company) {
-            ctx.throw(404, '登录公司不存在', body);
-          }
-          res.company = company._id;
-        } else {
-          res.company = userCompanys[0]._id;
-        }
-      } else if (userCompanys.length === 1 && body.sys === 'cms') {
-        res.company = userCompanys[0]._id;
-      } else {
-        ctx.throw(422, '该账号不允许登录后台系统', body);
-      }
-    } else {
-      option.sys = body.sys || 'wxUser';
+    let token = await ctx.service.jwt.sign(user);
+    res.token = token.value;
+    res.exp = token.expAt;
+    return res;
+  }
+  async loginSys() {
+    const ctx = this.ctx;
+    let user = await this.getUserInfo();
+    if (!user.isSys) {
+      ctx.throw(400, '您不是管理员', user);
     }
-    if (res.company) {
-      option.company = res.company;
-    }
-    let token = await ctx.service.jwt.sign(user, option);
+    let res = {};
+    let token = await ctx.service.jwt.sign(user);
     res.token = token.value;
     res.exp = token.expAt;
     return res;

@@ -19,6 +19,7 @@ module.exports = app => {
     .post('/register/mobile', 'user.registerMobile') //手机号注册
     .all('/logout', 'user.logout') //注销
     .post('/login/local', 'user.loginLocal') //密码登录
+    .post('/login/sys', 'user.loginSys') //管理员密码登录
     .get('/loginInfo', checkToken(), 'user.loginInfo') //获取用户信息
     .all('/refleshToken', checkToken(), 'user.refleshToken') //刷新token
     .get('/field', checkToken(), 'field.index') //获取数据库字段信息
