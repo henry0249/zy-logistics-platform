@@ -1,5 +1,9 @@
 import App from './App.vue';
-import Area from './Area.vue';
+import Area from './area/router';
+import Goods from './goods/router';
+import System from './system/router';
+import Company from './company/router';
+import User from './user/router';
 
 export default [{
   path: '/sys',
@@ -8,8 +12,11 @@ export default [{
   meta: {
     keepAlive: true // 需要被缓存
   },
-  children: [{
-    path: 'area',
-    component: Area,
-  }]
+  children: [
+    ...Goods,
+    ...System,
+    ...Company,
+    ...User,
+    ...Area
+  ]
 }]

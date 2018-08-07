@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <!-- <left-nav :nav="nav"></left-nav> -->
+    <left-nav :nav="nav"></left-nav>
     <div class="f1 g-container">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
@@ -15,8 +15,8 @@
 </template>
 
 <script>
-  import LeftNav from "../common/LeftNav";
-  import navObj from './nav.js';
+  import LeftNav from "../../common/LeftNav.vue";
+  import navObj from '../nav.js';
   export default {
     components: {
       LeftNav
@@ -24,28 +24,19 @@
     data() {
       return {
         navObj
-        // nav: [{
-        //   name: "商品管理",
-        //   icon: "icon-quyu",
-        //   path: "/sys/area"
-        // }, {
-        //   name: "区域管理",
-        //   icon: "icon-quyu",
-        //   path: "/sys/area"
-        // }]
-      };
+      }
     },
     computed: {
       nav() {
         for (const key in this.navObj) {
-          let str = '/sys/' + key
-          if (str === this.$route.path) {
+          let str = this.$route.path.split('/')[2];
+          if (str === key) {
             return this.navObj[key];
           }
         }
       }
     }
-  };
+  }
 </script>
 
 <style scoped>

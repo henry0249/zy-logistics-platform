@@ -28,6 +28,10 @@
   import commonSelect from './CommonSelect.js';
   export default {
     props: {
+      noChangeText:{
+        type:String,
+        default:''
+      },
       changeType: {
         type: String,
         default: ''
@@ -212,7 +216,7 @@
             }
           }
         } else {
-          return '未选择';
+          return this.noChangeText ||'未选择';
         }
       }
     },
