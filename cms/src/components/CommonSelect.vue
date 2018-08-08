@@ -6,7 +6,7 @@
     <div :class="border?'border':''" :style="newSelectStyle" class="flex f1 jc jb select-box">
       <div class="f1 jc js flex" style="height:20px;">
         <div class="tf1 jc js io" :class="isBg" :style="{fontSize:fontSize}">
-          {{selectTxt}}
+          <p :style="{fontSize:fontSize}">{{selectTxt}}</p>
           <i v-if="showDelIcon" class="el-icon-error pointer del" @click="del"></i>
         </div>
         <div :style="{background: '#E4E7ED',borderRadius: '5px',padding:'0 5px',marginLeft:'5px',fontSize:fontSize}" v-if="typeIo && data.length >1">+{{data.length - 1}}</div>
@@ -302,6 +302,10 @@
   .io {
     border-radius: 5px;
     padding: 0 5px 0 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
   }
   .bg {
     background: #E4E7ED;
