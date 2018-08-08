@@ -1,19 +1,19 @@
 <template>
   <div class="jc js g-form-item" :style="selectStyle">
-    <div class="tf1" v-if="label" :style="{width:labelWidth || $parent.labelWidth,fontSize:fontSize}">
+    <div class="tf1" v-if="label" :title="label" :style="{width:labelWidth || $parent.labelWidth,fontSize:fontSize}">
       {{label}}
     </div>
     <div :class="border?'border':''" :style="newSelectStyle" class="flex f1 jc jb select-box">
       <div class="f1 jc js flex" style="height:20px;">
         <div class="tf1 jc js io" :class="isBg" :style="{fontSize:fontSize}">
-          <p :style="{fontSize:fontSize}">{{selectTxt}}</p>
+          <span>{{selectTxt}}</span>
           <i v-if="showDelIcon" class="el-icon-error pointer del" @click="del"></i>
         </div>
         <div :style="{background: '#E4E7ED',borderRadius: '5px',padding:'0 5px',marginLeft:'5px',fontSize:fontSize}" v-if="typeIo && data.length >1">+{{data.length - 1}}</div>
       </div>
       <i v-if="!disabled" class="el-icon-edit pointer" :style="{color:'#409eff',fontSize:fontSize}" @click="dialogVisible = true"></i>
     </div>
-    <el-dialog :visible.sync="dialogVisible" width="70%" >
+    <el-dialog :visible.sync="dialogVisible" width="70%" append-to-body>
       <span style="fontSize:16px;" slot="title">{{title}}</span>
       <common-select-item @switchChange="switchChange" :changeType.sync="startType" :placeholder="newPlaceholder" :isSwitch="isSwitch" :option="option" v-if="dialogVisible" :one="one" :type="type" :data.sync="itemData" :startData="data"></common-select-item>
       <div slot="footer" class="dialog-footer jb">

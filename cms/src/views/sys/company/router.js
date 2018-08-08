@@ -1,5 +1,6 @@
 import App from './App.vue';
 import List from './CompanyList.vue';
+import Edmit from './CompanyEdmit.vue';
 
 export default [{
   path: 'company',
@@ -11,5 +12,8 @@ export default [{
   children:[{
     path:'list',
     component:List
+  },{
+    path:'edmit/:_id',
+    component:Edmit
   }]
 }]
