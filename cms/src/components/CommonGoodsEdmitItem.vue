@@ -10,7 +10,7 @@
           <div class="flex form-box">
             <my-form-item class="form-right" input v-model="goods.name" filterable label="商品名">
             </my-form-item>
-            <my-form-item class="form-right" input v-model="goods.unit" filterable label="单位">
+            <my-form-item class="form-right" input v-model.lazy="goods.unit" filterable label="单位">
             </my-form-item>
             <my-form-item class="form-right" input v-model="goods.spec" filterable label="规格">
             </my-form-item>
@@ -20,18 +20,17 @@
           <div class="flex form-box" style="margin-top:20px;">
             <my-form-item class="form-right" select v-model="goods.brand" filterable label="品牌" :options="brandArr">
             </my-form-item>
-            <my-form-item class="form-right" select v-model="goods.mfrs" :disabled="sys" filterable label="生产厂商" :options="mfrsArr">
-            </my-form-item>
             <my-form-item select class="form-right" v-model="goods.saleState" filterable label="售卖状态" :options="field.Goods.saleState.option">
+            </my-form-item>
+            <common-select class="form-right" label="生产厂商" :disabled="!sys" :data.sync="goods.mfrs" border width="25%" title="公司选择" type="company" size="mini"></common-select>
+            <my-form-item width="12.5%" class="form-right" switch v-model="goods.selfDeliverySupport" label="支持自提">
+            </my-form-item>
+            <my-form-item width="12.5%" switch v-model="goods.freeDelivery" label="包配送费">
             </my-form-item>
           </div>
           <div class="flex form-box" style="margin-top:20px;">
-            <my-form-item class="form-right" switch v-model="goods.selfDeliverySupport" label="支持自提" active-text="支持" inactive-text="不支持">
-            </my-form-item>
-            <my-form-item class="form-right" switch v-model="goods.freeDelivery" label="包配送费" active-text="包" inactive-text="不包">
-            </my-form-item>
             <div class="flex edmit-tag">
-              <i style="width:60px">标签</i>
+              <p style="width:60px;font-size: 12px;">标签</p>
               <el-tag size="mini" style="margin-right:10px;" :type="tagType(index,goods.tag)" :key="tag" v-for="(tag,index) in goods.tag" closable :disable-transitions="false" @close="handleClose(goods.tag,tag)">
                 {{tag}}
               </el-tag>
@@ -46,18 +45,25 @@
         <common-alert style="margin:15px 0">
           <div style="width:100%" class="jb">
             <p>商品价格</p>
-            <p>11111111111</p>
+            <div class="jc je">
+              <i class="el-icon-plus jc pointer" style="color:#67C23A;font-size:15px;" title="添加新的价格" @click="addPrice"></i>
+            </div>
           </div>
         </common-alert>
-        <my-table size="mini" edit :thead="thead" :data.sync="tableList" index border>
-          <template slot-scope="scope" v-if="scope.column.property === 'address'">
-            <common-select :data.sync="scope.row[scope.column.property]" border width="100%" title="用户选择" type="area" size="mini"></common-select>
-          </template>
+        <my-table size="mini" edit :thead="thead" :data.sync="tableList" index border op opWidth="50px">
+          <div slot="op" slot-scope="scope" class="tc" style="width:100%;color:#F56C6C">
+            <i v-if="tableList.length>1" title="删除该地区" class="pointer" @click="delAdr(scope['index'])">
+                      <icon size="16px">icon-ec1</icon>
+                    </i>
+          </div>
+          <template slot-scope="scope" v-if="scope.column.property === 'area'">
+                    <common-select :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" border width="100%" title="用户选择" type="area" size="mini"></common-select>
+</template>
         </my-table>
       </div>
       <div class="tr" style="margin-top:30px">
         <el-button size="small" @click="$router.go(-1)">返 回</el-button>
-        <el-button size="small" type="primary" @click="sub">修 改</el-button>
+        <el-button :disabled="disabled" size="small" type="primary" @click="sub">修 改</el-button>
       </div>
     </div>
   </loading-box>
@@ -73,6 +79,7 @@
     },
     data() {
       return {
+        disabled: true,
         tableList: [],
         thead: {
           area: {
@@ -101,24 +108,139 @@
           selfDeliverySupport: false,
           freeDelivery: false,
           tag: [],
-          mfrs: '',
+          mfrs: {},
           detail: ''
         },
         inputVisible: false,
         inputValue: '',
         categoryArr: [],
         brandArr: [],
-        mfrsArr: []
+        mfrsArr: [],
+        priceChange: false,
+        goodsChange: false
+      }
+    },
+    watch: {
+      tableList: {
+        handler: function(val, oldVal) {
+          if (oldVal.length > 0) {
+            console.log(val, oldVal);
+            this.disabled = false;
+            this.priceChange = true;
+          }
+        },
+        deep: true
+      },
+      goods: {
+        handler: function(val, oldVal) {
+          if (oldVal.mfrs) {
+            this.disabled = false;
+            this.goodsChange = true;
+          }
+        },
+        deep: true
       }
     },
     methods: {
-      sub() {},
+      delAdr(i) {
+        if (this.tableList.length > 1) {
+          this.tableList.splice(i, 1);
+        } else {
+          this.$alert(`至少有一个地区`, "提示", {
+            confirmButtonText: "确定",
+            callback: () => {
+              return;
+            }
+          });
+        }
+      },
+      addPrice() {
+        let obj = {};
+        if (this.tableList > 0) {
+          obj = JSON.parse(JSON.stringify(this.tableList[this.tableList.length - 1]));
+          delete obj.area._id
+        } else {
+          obj = {
+            area: {},
+            sell: 0,
+            factory: 0,
+            transport: 0,
+          }
+        }
+        this.tableList.push(obj);
+      },
+      async sub() {
+        try {
+          this.value = '更新中';
+          let io = true;
+          if (this.goodsChange) {
+            let update = {
+              name: this.goods.name,
+              unit: this.goods.unit,
+              spec: this.goods.spec,
+              category: this.goods.category,
+              brand: this.goods.brand,
+              saleState: this.goods.saleState,
+              selfDeliverySupport: this.goods.selfDeliverySupport,
+              freeDelivery: this.goods.freeDelivery,
+              tag: this.goods.tag,
+              mfrs: this.goods.mfrs._id,
+              detail: this.goods.detail
+            };
+            if (this.sys) {
+              delete update.mfrs;
+            }
+            let goods = await this.$api.curd({
+              model: 'goods',
+              curdType: 'update',
+              find: {
+                _id: this.$route.params._id
+              },
+              update,
+            })
+            if (!goods) {
+              io = false;
+            } else {
+              if (this.priceChange) {
+                for (let index = 0; index < this.tableList.length; index++) {
+                  let price = await this.$api.curd({
+                    model: 'price',
+                    curdType: 'add',
+                    goods: this.$route.params._id,
+                    area: this.tableList[index].area._id,
+                    sell: Number(this.tableList[index].sell),
+                    factory: Number(this.tableList[index].factory),
+                    transport: Number(this.tableList[index].transport),
+                  })
+                  if (!price) {
+                    io = false
+                  }
+                }
+              }
+            }
+          }
+          if (io) {
+            this.$alert('更新成功', '提示', {
+              confirmButtonText: '确定',
+              callback: action => {
+                this.$router.go(-1)
+              }
+            });
+          } else {
+            this.$alert('更新失败', '提示', {
+              confirmButtonText: '确定',
+              callback: action => {}
+            });
+          }
+        } catch (error) {}
+        this.value = '';
+      },
       tagType(index, arr) {
         let type = ['success', 'info', 'warning', 'danger'];
-        if (index <= arr.length - 1) {
+        if (index <= type.length - 1) {
           return type[index];
         } else {
-          return type[index - arr.length - 1];
+          return type[index - type.length - 1];
         }
       },
       handleClose(options, tag) {
@@ -170,11 +292,16 @@
           let res = await this.$api.curd({
             model: 'goods',
             curdType: 'findOne',
-            _id: this.$route.params._id
+            _id: this.$route.params._id,
+            populate: [{
+              path: 'mfrs'
+            }]
           })
+          let goods = {};
           for (const key in this.goods) {
-            this.goods[key] = res[key]
+            goods[key] = res[key]
           }
+          this.goods = JSON.parse(JSON.stringify(goods));
         } catch (error) {}
       },
       async getPrice() {
@@ -190,18 +317,22 @@
           });
           let newAreaArr = new Set(areaArr);
           let arr = [...newAreaArr];
+          let tableList = [];
           for (let index = 0; index < arr.length; index++) {
             let price = await this.$api.curd({
               model: 'price',
               curdType: 'findOne',
               area: arr[index],
+              sort: {
+                updatedAt: -1
+              },
               populate: [{
                 path: 'area'
               }]
             })
-            this.tableList.push(price);
+            tableList.push(price);
           }
-          console.log(this.tableList);
+          this.tableList = JSON.parse(JSON.stringify(tableList));
         } catch (error) {}
       }
     },

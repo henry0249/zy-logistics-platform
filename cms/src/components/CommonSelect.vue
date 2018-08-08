@@ -111,6 +111,9 @@
       }
     },
     watch: {
+      option(val){
+        console.log('select',val);
+      },
       startType(val){
         console.log(val);
         this.$emit('update:changeType',val);
@@ -289,7 +292,7 @@
     box-sizing: border-box;
     height: 28px;
     width: 100%;
-    padding: 0 10px;
+    padding: 3px 10px;
     color: #606266;
   }
   .border {

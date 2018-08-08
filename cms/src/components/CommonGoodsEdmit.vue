@@ -1,5 +1,5 @@
 <template>
-  <common-goods-edmit-item>
+  <common-goods-edmit-item :sys="sys">
   </common-goods-edmit-item>
 </template>
 

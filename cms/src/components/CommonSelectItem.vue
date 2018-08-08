@@ -24,7 +24,7 @@
         <common-select-goods v-else-if="type === 'goods'" slot="header" :data.sync="goodsData"></common-select-goods>
         <my-form-item v-else size="mini" width='200px' :placeholder="placeholder" input v-model="input" slot="header"></my-form-item>
         <template slot-scope="scope" v-if="scope.prop === 'type'&& type === 'company'">
-                          <el-tag v-if="scope.prop === 'type' &&field.Company.type.option[item]" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['type']" :key="item.id">{{field.Company.type.option[item]}}</el-tag>
+                              <el-tag v-if="scope.prop === 'type' &&field.Company.type.option[item]" style="margin-right:10px;" size="mini" type="success" v-for="item in scope.row['type']" :key="item.id">{{field.Company.type.option[item]}}</el-tag>
 </template>
       </common-table>
       <common-table key="2" v-if="!value" style="padding:0" :height="tableHeight" :option="option" @selection-change="selectionChange" @current-change="currentChange" :selection="selection" :path="elsePath" :thead="elseThead">
@@ -101,6 +101,9 @@
       }
     },
     watch: {
+      option(val) {
+        console.log('item', val);
+      },
       startType(val) {
         if (val !== this.changeType) {
           this.$emit('update:changeType', val)
@@ -110,11 +113,11 @@
         if (Object.keys(val).length > 0) {
           for (const key in val) {
             if (key === 'type') {
-              this.option.type = {
+              this.$set(this.option, 'type', {
                 $in: val[key]
-              }
+              });
             } else {
-              this.option[key] = val[key];
+              this.$set(this.option, key, val[key]);
             }
           }
         } else {
@@ -125,7 +128,7 @@
       shipData(val) {
         if (Object.keys(val).length > 0) {
           for (const key in val) {
-            this.option[key] = val[key];
+            this.$set(this.option, key, val[key]);
           }
         } else {
           delete this.option.input;
@@ -136,7 +139,7 @@
       goodsData(val) {
         if (Object.keys(val).length > 0) {
           for (const key in val) {
-            this.option[key] = val[key];
+            this.$set(this.option, key, val[key]);
           }
         } else {
           delete this.option.input;
@@ -147,14 +150,14 @@
       areaData(val) {
         if (Object.keys(val).length > 0) {
           for (const key in val) {
-            this.option[key] = val[key];
+            this.$set(this.option, key, val[key]);
           }
         }
       },
       input(val) {
         if (val) {
           if (this.type === 'user') {
-            this.option['$or'] = [{
+            this.$set(this.option, '$or', [{
               name: {
                 $regex: this.input
               }
@@ -166,9 +169,9 @@
               email: {
                 $regex: this.input
               }
-            }]
+            }]);
           } else if (this.type === 'company') {
-            this.option['$or'] = [{
+            this.$set(this.option, '$or', [{
               name: {
                 $regex: this.input
               }
@@ -176,19 +179,19 @@
               nick: {
                 $regex: this.input
               }
-            }]
+            }])
           } else if (this.type === 'goods') {
-            this.option['$or'] = [{
+            this.$set(this.option, '$or', [{
               name: {
                 $regex: this.input
               }
-            }]
+            }])
           } else if (this.type === 'area') {
-            this.option['$or'] = [{
+            this.$set(this.option, '$or', [{
               name: {
                 $regex: this.input
               }
-            }]
+            }])
           }
         }
       },
@@ -413,11 +416,11 @@
             delete this.option[item];
           });
           if (this.commonSelect[key].populate) {
-            this.option.populate = this.commonSelect[key].populate;
+            this.$set(this.option, 'populate', this.commonSelect[key].populate);
           }
         }
         if (this.type === 'area') {
-          this.option.type = 'township';
+            this.$set(this.option, 'type', 'township');
         }
         if (this.type === 'company') {
           delete this.option.type;
