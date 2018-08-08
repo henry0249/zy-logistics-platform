@@ -1,7 +1,7 @@
 <template>
   <loading-box v-model="loadingText" class="g-order-container">
     <div class="g-order-body" v-if="!bodyLoading">
-      <div class="my-title">订单{{order.no}}详情</div>
+      <div class="my-title">订单<span style="color:#409EFF;font-weight:600">{{order.no}}</span>{{title}}</div>
       <Info :val="order"></Info>
       <goods-table :order="order" :edit="false"></goods-table>
       <el-alert title="物流链" type="info" :closable="false" style="margin:15px 0">
@@ -15,7 +15,7 @@
         <business-trains :order="order" :goods="item"></business-trains>
       </div>
     </div>
-    <el-alert style="margin:15px 0" title="订单修改后,请注意流程变化" type="info" center show-icon :closable="false">
+    <el-alert v-if="alert" style="margin:15px 0" :title="alert" type="info" center show-icon :closable="false">
     </el-alert>
     <div class="flex ac">
       <div class="f1"></div>
@@ -29,8 +29,18 @@
 import Info from "./Info.vue";
 import GoodsTable from "./GoodsTable.vue";
 import TransportTrains from "./TransportTrains";
-import BusinessTrains from './BusinessTrains';
+import BusinessTrains from "./BusinessTrains";
 export default {
+  props: {
+    title: {
+      type: String,
+      default: "详情"
+    },
+    alert:{
+      type: String,
+      default: ""
+    }
+  },
   components: {
     Info,
     GoodsTable,
@@ -68,7 +78,7 @@ export default {
       try {
         await this.$ajax.post("/order/update", {
           order: {
-            _id:this.$route.params._id,
+            _id: this.$route.params._id
           },
           state: "finish"
         });

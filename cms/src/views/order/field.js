@@ -75,6 +75,9 @@ module.exports = {
     }
   },
   businessTrains: {
+    stock: {
+      name: "库存"
+    },
     purchasePrice: {
       name: '进价',
       type: 'Number',

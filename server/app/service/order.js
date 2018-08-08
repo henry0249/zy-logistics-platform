@@ -160,63 +160,7 @@ class OrderService extends Service {
     return 'ok';
   }
   async add() {
-    const ctx = this.ctx;
-    let body = ctx.request.body;
-    let order = body.order;
-    this.orderFieldCheck(order);
-    this.orderGoodsCheck(body.goods);
-    let man = {
-      salesman: [],
-      dispatcher: [],
-      documentClerk: [],
-      financial: []
-    };
-    if (ctx.tokenData.sys === 'cms') {
-      function setMan(type) {
-        if (ctx[type]) {
-          for (const key in man) {
-            man[key] = ctx[type][key] || [];
-            if (man[key].length === 0) {
-              let adminSet = new Set(ctx.helper.idArr(ctx[type].admin));
-              if (ctx[type].owner) {
-                adminSet.add(ctx[type].owner.toString());
-              }
-              man[key] = [...adminSet];
-            }
-          }
-        }
-      }
-      setMan('company');
-      setMan('platform');
-      let salesmanSet = new Set(man.salesman);
-      if (!salesmanSet.has(ctx.user._id.toString())) {
-        ctx.throw(403, '您无权限创建订单', body);
-      }
-      for (const key in man) {
-        order[key] = man[key];
-      }
-    }
-    order.creater = ctx.user._id;
-    let orderModel = new ctx.model.Order(order);
-    await orderModel.save();
-    let goods_id;
-    for (let i = 0; i < body.goods.length; i++) {
-      const goodsItem = body.goods[i];
-      let goodsModel = new ctx.model.OrderGoods({
-        ...goodsItem,
-        value: goodsItem.value._id,
-        order: orderModel._id,
-        area: orderModel.area
-      });
-      await goodsModel.save();
-      goods_id = goodsModel._id;
-    }
-    await ctx.model.Order.update({
-      _id: orderModel._id
-    }, {
-      no: ctx.helper.no(goods_id, ctx.user._id)
-    })
-    return 'ok';
+    return await this.set();
   }
 
   async update() {
@@ -468,7 +412,12 @@ class OrderService extends Service {
     }, {
       path: 'company'
     }, {
-      path: 'goods'
+      path: 'goods',
+      populate: [{
+        path: 'brand'
+      }, {
+        path: 'mfrs'
+      }]
     }, {
       path: 'area',
       populate: areaPopulate
@@ -480,11 +429,17 @@ class OrderService extends Service {
   async getOrderById() {
     const ctx = this.ctx;
     let params = ctx.params;
-
     let order = await ctx.model.Order.findById(params._id).populate([{
       path: 'user'
     }, {
       path: 'company'
+    }, {
+      path: 'goods',
+      populate: [{
+        path: 'brand'
+      }, {
+        path: 'mfrs'
+      }]
     }, {
       path: 'area',
       populate: areaPopulate
@@ -493,6 +448,18 @@ class OrderService extends Service {
       ctx.throw(404, "未找到订单", params);
     }
     let res = JSON.parse(JSON.stringify(order));
+    res.businessTrains = await ctx.model.BusinessTrains.find({
+      order: order._id,
+
+    }).populate([{
+      path: 'fromCompany'
+    }, {
+      path: 'toCompany'
+    }, {
+      path: 'user'
+    }, {
+      path: 'company'
+    }]);
     let transportTrainsData = await ctx.model.TransportTrains.find({
       order: res._id,
       goods: res.goods

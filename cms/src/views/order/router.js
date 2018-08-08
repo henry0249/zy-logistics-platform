@@ -12,7 +12,7 @@ import CheckEdit from './CheckEdit.vue';
 import FinishCheck from './FinishCheck.vue';
 import Finish from './Finish.vue';
 import All from './All.vue';
-import Detail from './Detail.vue';
+import Edit from './Edit.vue';
 
 export default [{
   path: '/order',
@@ -61,7 +61,7 @@ export default [{
     path: 'all',
     component: All,
   }, {
-    path: '/edit/detail/:_id',
-    component: Detail,
+    path: '/edit/:_id',
+    component: Edit,
   }]
 }]

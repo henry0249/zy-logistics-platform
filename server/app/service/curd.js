@@ -215,12 +215,17 @@ class CurdService extends Service {
   }
   async findOne(model, param, findType = 'findOne') {
     let populate = param.populate || [],
-      select = param.select || {};
+      select = param.select || {},
+      sort = param.sort || {
+        createdAt: -1
+      };
     delete param.populate;
     delete param.select;
+    delete param.sort;
     return await model[findType](param)
       .populate(populate)
-      .select(select);
+      .select(select)
+      .sort(sort);
   }
   async findById(model, param) {
     if (!param._id) {

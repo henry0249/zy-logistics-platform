@@ -32,6 +32,10 @@ export default {
     state: {
       type: String,
       default: "all"
+    },
+    href: {
+      type: String,
+      default: ""
     }
   },
   data() {
@@ -53,14 +57,14 @@ export default {
     }
   },
   methods: {
-    handelCurrentChange(val) {
-    },
-    handelSelectionChange(val) {
-    },
     toDetail(item, index) {
       if (item._id) {
-        let state = this.state || "detail";
-        this.$router.push(`/edit/${state}/${item._id}`);
+        let href = this.href || this.state;
+        if (href) {
+          this.$router.push(`/edit/${href}/${item._id}`);
+        }else{
+          this.$router.push(`/edit/${item._id}`);
+        }
       }
     }
   }

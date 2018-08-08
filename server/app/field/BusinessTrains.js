@@ -12,10 +12,9 @@ module.exports = {
     type: 'String',
     name: '类型',
     option: {
-      0: '生产厂商到客户',
-      1: '生产厂商到中转',
-      2: '中转到中转',
-      3: '中转到客户'
+      'supplier': '源头供货商',
+      'pool': '联营商',
+      'customer': '客户'
     }
   },
   check: {
@@ -28,63 +27,38 @@ module.exports = {
     name: '所属订单',
     ref: 'Order'
   },
-  mfrs: {
-    name: '生产厂商',
-    type: 'ObjectId',
-    ref: 'Company',
-  },
-  fromCompany: {
-    name: '进货公司',
-    type: 'ObjectId',
-    ref: 'Company'
-  },
-  toCompany: {
-    name: '收货公司',
-    type: 'ObjectId',
-    ref: 'Company'
-  },
   user: {
     type: 'ObjectId',
-    name: '下单客户',
+    name: '用户',
     ref: 'User'
   },
   company: {
     type: 'ObjectId',
-    name: '下单公司',
+    name: '公司',
     ref: 'Company'
   },
-  purchasePrice: {
-    name: '进价',
+  supplyPrice: {
+    name: '供货价格',
     type: 'Number',
-    require: true
   },
-  purchaseCount: {
-    name: '采购数量',
+  supplyCount: {
+    name: '供货数量',
     type: 'Number',
-    require: true
   },
-  purchaseBalancedCount: {
-    name: '采购结算数量',
+  receive: {
+    name: '实收数量',
     type: 'Number',
-    require: true
-  },
-  sellPrice: {
-    name: '售价',
-    type: 'Number',
-    require: true
-  },
-  sellCount: {
-    name: '销售数量',
-    type: 'Number',
-    require: true
-  },
-  sellBalancedCount: {
-    name: '采购结算数量',
-    type: 'Number',
-    require: true
   },
   loss: {
     name: '损耗数量',
+    type: 'Number',
+  },
+  balancePrice:{
+    name: '结算价格',
+    type: 'Number',
+  },
+  balanceCount:{
+    name: '结算数量',
     type: 'Number',
   }
 }

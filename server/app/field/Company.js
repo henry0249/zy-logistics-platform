@@ -41,10 +41,9 @@ module.exports = {
     name: '自营',
     type: 'Boolean'
   },
-  platform: {
-    name: '所属平台',
-    type: 'ObjectId',
-    ref: 'Platform'
+  stock: {
+    name: '库存',
+    type: 'Number'
   },
   address: {
     name: '地址',
@@ -54,11 +53,6 @@ module.exports = {
     name: '区域',
     type: 'ObjectId',
     ref: 'Area'
-  },
-  dispatchCompany: {
-    name: '调度关联公司',
-    type: 'ObjectIdArray',
-    ref: 'Company'
   },
   businessRelationCompany: {
     name: '贸易链关联公司',

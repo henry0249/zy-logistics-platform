@@ -5,10 +5,7 @@
         <div class="my-title">销售订单</div>
         <Info ref="orderInfo" selectType :data.sync="order"></Info>
         <goods-table :order.sync="order"></goods-table>
-        <el-alert title="贸易链(计划步骤可选填)" type="info" :closable="false" style="margin:15px 0">
-          <el-checkbox style="margin-left:20px" v-model="businessVisible">添加贸易链</el-checkbox>
-        </el-alert>
-        <business-trains v-if="businessVisible" :order.sync="order" :data.sync="businessTrainsData" :alert="false"></business-trains>
+        <business-trains :order.sync="order" :data.sync="businessTrainsData" :alert="false"></business-trains>
       </div>
       <div class="flex ac" style="margin-top:30px">
         跳过接单
@@ -36,7 +33,6 @@ export default {
       show: true,
       loadingText: "",
       order: {},
-      businessVisible: false,
       businessTrainsData: [],
       skipTaking: false
     };
@@ -56,9 +52,8 @@ export default {
         let body = {
           order: this.order
         };
-        if (this.businessVisible) {
+        if (this.businessTrainsData.length>0) {
           body.businessTrains = this.businessTrainsData;
-          console.log(body.businessTrains);
         }
         await this.$ajax.post("/order/set", body);
         await this.$store.dispatch("orderBadgeNotify");

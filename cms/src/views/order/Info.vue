@@ -9,7 +9,7 @@
     <my-form v-show="!hideForm" size="mini" width="24%" :edit="edit">
       <div class="flex ac jb">
         <div style="width:24%">
-          <common-select title="选择一个客户" label="下单客户" border :data.sync="customer" type="company" :changeType.sync="order.type" @change="customerChange" is-switch @switchChange="customerTypeChange"></common-select>
+          <common-select :disabled="!edit" title="选择一个客户" label="下单客户" border :data.sync="customer" type="company" :changeType.sync="order.type" @change="customerChange" is-switch @switchChange="customerTypeChange"></common-select>
         </div>
         <my-form-item datetime v-model="order.deliveryTime" label="配送时间">
         </my-form-item>
@@ -198,17 +198,14 @@ export default {
     }
   },
   async created() {
+    this.loadingText = "加载中";
     if (this.val._id) {
-      for (const key in this.order) {
-        if (this.val.hasOwnProperty(key)) {
-          this.order[key] = this.val[key];
-        }
-      }
+      this.customer = this.val[this.val.type];
+      this.order = JSON.parse(JSON.stringify(this.val));
     } else {
       this.order.orderCompany = this.loginInfo.company._id;
       this.$emit("update:data", JSON.parse(JSON.stringify(this.order)));
     }
-    this.loadingText = "加载中";
     setTimeout(() => {
       this.loadingText = "";
     }, 200);

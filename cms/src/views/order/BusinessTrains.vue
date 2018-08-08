@@ -1,144 +1,40 @@
 <template>
   <div class="g-business-trains">
-    <el-alert v-if="alert" title="贸易链" type="info" :closable="false" style="margin:15px 0">
-    </el-alert>
-    <div v-if="order.goods && order.goods._id" class="flex ac jb" style="color:#909399;padding-left:20px;background:#F2F6FC;font-size:13px">
-      <div class="goods-info-padding">商品名称：{{order.goods.name}}</div>
-      <div class="goods-info-padding">品牌：{{order.goods.brand.name}}</div>
-      <div class="goods-info-padding">规格：{{order.goods.spec}}</div>
-      <div class="goods-info-padding">单位：{{order.goods.unit}}</div>
-      <div class="f1"></div>
-      <div class="tc bol" style="width:46px;padding:8px 0">
+    <div class="flex ac jb" style="color:#909399;padding-left:25px;background:#F2F6FC;font-size:13px;margin:15px 0;border-radius:4px">
+      <div class="f1" style="margin-right:20px">贸易链</div>
+      <div v-if="order.goods && order.goods._id" class="flex ac jb">
+        <div style="width:150px">商品名称：{{order.goods.name}}</div>
+        <div class="goods-info-padding">品牌：{{order.goods.brand.name}}</div>
+        <div class="goods-info-padding">规格：{{order.goods.spec}}</div>
+        <div class="goods-info-padding">单位：{{order.goods.unit}}</div>
+      </div>
+      <div class="tc bol" style="width:46px;padding:10px 0">
         <i @click="add" style="color:#67C23A" class="el-icon-plus pointer"></i>
       </div>
     </div>
-    <div ref="main" v-overflow-tool v-if="order.goods && order.goods._id && order.count>0 && order[order.type]._id" style="max-height:400px;overflow:auto;transition: all .2s">
-      <div v-for="(item,index) in data" :key="index">
-        <div class="flex ac goods-title">
-          <div class="bor tc" style="padding:8px 0;width:50px;color:#409EFF">
-            # {{index+1}}
-          </div>
-          <div class="f1 flex ac jb">
-            <div class="f1"></div>
-            <div style="width:44%">
-              <common-select v-if="trainsType(index)===0 || trainsType(index)===1" :data.sync="order.goods.mfrs" type="company" disabled label="生产厂商" size="mini" border></common-select>
-              <common-select v-if="trainsType(index)===2 || trainsType(index)===3" :data.sync="item.fromCompany" type="company" label="联营商" size="mini" border @change="fromCompanyChange($event,index)"></common-select>
+    <div style="height:280px" v-if="data.length>0">
+      <div class="hor-scroll">
+        <div class="hor-scroll-item" style="padding:10px 0" v-for="(item,index) in data" :key="index">
+          <div class="flex ac">
+            <business-trains-card :order="order" :index="index" :last.sync="index>0?data[index-1]:undefined" :next.sync="data[index+1]?data[index+1]:undefined" :title="businessTrainsTitle(index)" :data.sync="item" @remove="remove($event,index)"></business-trains-card>
+            <div v-if="index!==data.length-1" style="padding:0 10px">
+              <i class="el-icon-d-arrow-right success"></i>
             </div>
-            <div class="f1"></div>
-            <div style="width:44%">
-              <common-select v-if="trainsType(index)===0 || trainsType(index)===3" :data.sync="order[order.type]" :type="order.type" disabled label="收货客户" size="mini" border></common-select>
-              <common-select v-if="trainsType(index)===1 || trainsType(index)===2" :data.sync="item.toCompany" type="company" label="联营商" size="mini" border @change="toCompanyChange($event,index)"></common-select>
-            </div>
-            <div class="f1"></div>
-          </div>
-          <div class="tc bol" style="width:45px;padding:8px 0">
-            <i @click="remove(item,index)" style="color:#F56C6C" class="el-icon-delete pointer"></i>
           </div>
         </div>
-        {{item.type}}
-        <my-table opWidth="45" size="mini" border :thead="thead" :data.sync="temp">
-          <div slot-scope="scope">
-            <div v-if="scope.prop==='purchasePrice'">
-              <div v-if="index === 0">
-                {{order.factory}}
-              </div>
-              <my-form-item v-else :disabled="thead[scope.prop].disabled" input popover size="mini" v-model="item.purchasePrice">
-                <div slot="inputPopover">
-                  <div class="trains-tip flex ac" v-if="index === 0">
-                    商品出厂单价：
-                    <div class="tip-text">{{order.factory}}</div>
-                    <div class="link" style="margin-left:10px" @click="item.purchasePrice = order.factory">粘贴</div>
-                  </div>
-                  <div class="trains-tip flex ac" v-if="index > 0">
-                    上一贸易链售价：
-                    <div class="tip-text">{{data[index-1].sellPrice}}</div>
-                    <div class="link" style="margin-left:10px" @click="item.purchasePrice = data[index-1].sellPrice">粘贴</div>
-                  </div>
-                </div>
-              </my-form-item>
-            </div>
-            <div v-if="scope.prop==='purchaseCount'">
-              <div v-if="index === 0">
-                {{order.count}}
-              </div>
-              <my-form-item v-else :disabled="thead[scope.prop].disabled" input popover size="mini" v-model="item.purchaseCount">
-                <div slot="inputPopover">
-                  <div class="trains-tip flex ac" v-if="index === 0">
-                    商品下单数量：
-                    <div class="tip-text">{{order.count}}</div>
-                    <div class="link" style="margin-left:10px" @click="item.purchaseCount = order.count">粘贴</div>
-                  </div>
-                  <div class="trains-tip flex ac" v-if="index > 0">
-                    上一贸易链出货数：
-                    <div class="tip-text">{{data[index-1].sellCount}}</div>
-                    <div class="link" style="margin-left:10px" @click="item.purchaseCount = data[index-1].sellCount">粘贴</div>
-                  </div>
-                </div>
-              </my-form-item>
-            </div>
-            <div v-if="scope.prop==='sellPrice'">
-              <div v-if="index === data.length-1">
-                {{order.sell}}
-              </div>
-              <my-form-item v-else :disabled="thead[scope.prop].disabled" input :popover="index !== data.length-1?true:undefined" size="mini" v-model="item.sellPrice">
-                <div slot="inputPopover">
-                  <div class="trains-tip flex ac" v-if="index !== data.length-1">
-                    当前进价：
-                    <div class="tip-text">{{item.purchasePrice}}</div>
-                    <div class="link" style="margin-left:10px" @click="item.sellPrice = order.purchasePrice">粘贴</div>
-                  </div>
-                  <div class="trains-tip" style="color:#ccc;margin-top:5px">
-                    最大售价：{{order.sell}}
-                  </div>
-                </div>
-              </my-form-item>
-            </div>
-            <div v-if="scope.prop==='sellCount'">
-              <div v-if="index === data.length-1">
-                {{order.count}}
-              </div>
-              <my-form-item v-else :disabled="thead[scope.prop].disabled" input :popover="index !== data.length-1?true:undefined" size="mini" v-model="item.sellCount">
-                <div slot="inputPopover">
-                  <div class="trains-tip flex ac" v-if="index !== data.length-1">
-                    当前进货数：
-                    <div class="tip-text">{{item.purchaseCount}}</div>
-                    <div class="link" style="margin-left:10px" @click="item.sellCount = item.purchaseCount">粘贴</div>
-                  </div>
-                  <div class="trains-tip" style="color:#ccc;margin-top:5px">
-                    最大出货数：{{item.purchaseCount}}
-                  </div>
-                </div>
-              </my-form-item>
-            </div>
-            <div v-if="scope.prop==='remark'">
-              <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="item.remark"></my-form-item>
-            </div>
-          </div>
-        </my-table>
       </div>
     </div>
-    <div class="tc" style="color:#ccc;padding:10px 0" v-else>
-      <div v-if="!order[order.type]._id">请先选择客户</div>
-      <div v-else-if="!(order.goods && order.goods._id)">请先选择商品</div>
-      <div v-else-if="Number(order.count)<=0">商品数量必须大于0</div>
-    </div>
-    <!-- <div @click="spread" class="tc link" style="font-size:12px;padding:5px 0" v-if="overflowToolShow">
-      显示全部<i class="el-icon-arrow-down"></i>
-    </div>
-    <div @click="retract" class="tc link" style="font-size:12px;padding:5px 0" v-if="retractToolShow">
-      收起<i class="el-icon-arrow-up"></i>
-    </div> -->
   </div>
 </template>
 
 <script>
 import { businessTrains } from "./field";
+import BusinessTrainsCard from "./BusinessTrainsCard";
 export default {
+  components: {
+    BusinessTrainsCard
+  },
   props: {
-    alert: {
-      type: Boolean,
-      default: true
-    },
     order: {
       type: Object,
       default() {
@@ -156,17 +52,31 @@ export default {
       default() {
         return businessTrains;
       }
+    },
+    // data: {
+    //   type: Array,
+    //   default() {
+    //     return [];
+    //   }
+    // },
+    removelist: {
+      type: Array,
+      default() {
+        return [];
+      }
     }
   },
   data() {
     return {
       data: [],
       temp: [{}],
-      overflowToolShow: false,
-      retractToolShow: false
+      removeData: []
     };
   },
   watch: {
+    removeData(val) {
+      this.$emit("update:removelist", val);
+    },
     data: {
       handler: function(val) {
         let temp = JSON.parse(JSON.stringify(val));
@@ -204,23 +114,16 @@ export default {
       deep: true
     }
   },
-  directives: {
-    overflowTool: {
-      inserted(el, binding, vnode) {
-        let _this = vnode.context;
-        setTimeout(() => {
-          _this.overflowToolShow = el.scrollHeight > el.clientHeight;
-        }, 200);
-      },
-      update(el, binding, vnode) {
-        let _this = vnode.context;
-        setTimeout(() => {
-          _this.overflowToolShow = el.scrollHeight > el.clientHeight;
-        }, 200);
-      }
-    }
-  },
   methods: {
+    businessTrainsTitle(index) {
+      if (index === 0) {
+        return "供货商";
+      } else if (index === this.data.length - 1) {
+        return "客户";
+      } else {
+        return "联营商" + index;
+      }
+    },
     trainsType(index) {
       let length = this.data.length;
       if (length === 1) {
@@ -243,67 +146,82 @@ export default {
       }
     },
     add() {
+      if (!(this.order[this.order.type] && this.order[this.order.type]._id)) {
+        this.$message.warn(`请先选择客户`);
+        return;
+      }
+      if (!(this.order.goods && this.order.goods._id)) {
+        this.$message.warn(`请先选择商品`);
+        return;
+      }
+      if (Number(this.order.count) <= 0) {
+        this.$message.warn(`商品数量必须大于0`);
+        return;
+      }
       this.pushItem();
     },
     remove(item, index) {
-      if (this.data.length === 1) {
-        this.$message.warn(`至少保留一条贸易链`);
-        return;
+      if (this.data.length > 2) {
+        if (item.type === "customer") {
+          this.$message.warn(`不能删除客户`);
+          return;
+        }
+        if (item.type === "supplier") {
+          this.$message.warn(`不能删除供应商`);
+          return;
+        }
+        this.data.splice(index, 1);
+        if (item._id) {
+          this.removeData.push(item._id);
+        }
+      } else {
+        this.data = [];
       }
-      this.data.splice(index, 1);
     },
     pushItem() {
       let body = {
-        fromCompany: {},
-        toCompany: {},
-        purchasePrice: 0,
-        purchaseCount: 0,
-        sellPrice: 0,
-        sellCount: 0,
+        company: {},
+        supplyPrice: this.order.sell,
+        supplyCount: this.order.count,
+        loss: 0,
+        receive: this.order.count,
         remark: ""
       };
       if (this.data.length === 0) {
-        body.purchasePrice = this.order.factory;
-        body.purchaseCount = this.order.count;
-        body.sellPrice = this.order.sell;
-        body.sellCount = this.order.count;
+        this.data.push({
+          ...body,
+          type: "supplier",
+          company: this.order.goods.mfrs
+        });
+        this.data.push({
+          ...body,
+          type: "pool"
+        });
+        this.data.push({
+          ...body,
+          type: "customer",
+          [this.order.type]: this.order[this.order.type],
+          customerType: this.order.type
+        });
+      } else {
+        this.data.splice(this.data.length - 1, 0, {
+          ...body,
+          type: "pool",
+          supplyCount: this.data[this.data.length - 1 - 1].supplyCount,
+          supplyPrice: this.data[this.data.length - 1 - 1].supplyPrice
+        });
       }
-      if (this.data.length > 0) {
-        let index = this.data.length - 1;
-        body.purchasePrice = this.data[index].sellPrice;
-        body.purchaseCount = this.data[index].sellCount;
-        body.sellPrice = this.data[index].sellPrice;
-        body.sellCount = this.data[index].sellCount;
-        if (this.data.length > 1 && !this.data[index].fromCompany._id) {
-          this.$message.error("联营商不能为空");
-          return;
-        }
-      }
-      this.data.push(body);
     },
     fromCompanyChange(val, index) {
       this.data[index - 1].toCompany = val;
     },
     toCompanyChange(val, index) {
       this.data[index + 1].fromCompany = val;
-    },
-    spread() {
-      this.$refs.main.style = {};
-      this.overflowToolShow = false;
-      this.retractToolShow = true;
-    },
-    retract() {
-      this.$refs.main.style.maxHeight = "400px";
-      this.$refs.main.style.overflow = "auto";
-      this.retractToolShow = false;
-      this.overflowToolShow = true;
     }
   },
   created() {
-    if (this.val.length > 0) {
+    if (this.val && this.val.length > 0) {
       this.data = JSON.parse(JSON.stringify(this.val));
-    } else {
-      this.pushItem();
     }
   }
 };
@@ -327,7 +245,9 @@ export default {
   border-left: 1px solid #eee;
 }
 .goods-info-padding {
-  width: 20%;
+  /* width: 30%; */
+  width: 120px;
+  text-align: center;
 }
 .t-bg {
   background: #f2f6fc;
