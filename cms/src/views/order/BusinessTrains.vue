@@ -1,30 +1,32 @@
 <template>
-  <div class="g-business-trains">
-    <div class="flex ac jb" style="color:#909399;padding-left:25px;background:#F2F6FC;font-size:13px;margin:15px 0;border-radius:4px">
-      <div class="f1" style="margin-right:20px">贸易链</div>
-      <div v-if="order.goods && order.goods._id" class="flex ac jb">
-        <div style="width:150px">商品名称：{{order.goods.name}}</div>
-        <div class="goods-info-padding">品牌：{{order.goods.brand.name}}</div>
-        <div class="goods-info-padding">规格：{{order.goods.spec}}</div>
-        <div class="goods-info-padding">单位：{{order.goods.unit}}</div>
+  <loading-box v-model="loadingText">
+    <div class="g-business-trains">
+      <div class="flex ac jb" style="color:#909399;padding-left:25px;background:#F2F6FC;font-size:13px;margin:15px 0;border-radius:4px">
+        <div class="f1" style="margin-right:20px">贸易链</div>
+        <div v-if="order.goods && order.goods._id" class="flex ac jb">
+          <div style="width:150px">商品名称：{{order.goods.name}}</div>
+          <div class="goods-info-padding">品牌：{{order.goods.brand.name}}</div>
+          <div class="goods-info-padding">规格：{{order.goods.spec}}</div>
+          <div class="goods-info-padding">单位：{{order.goods.unit}}</div>
+        </div>
+        <div class="tc bol" style="width:46px;padding:10px 0">
+          <i @click="add" style="color:#67C23A" class="el-icon-plus pointer"></i>
+        </div>
       </div>
-      <div class="tc bol" style="width:46px;padding:10px 0">
-        <i @click="add" style="color:#67C23A" class="el-icon-plus pointer"></i>
-      </div>
-    </div>
-    <div style="height:280px" v-if="data.length>0">
-      <div class="hor-scroll">
-        <div class="hor-scroll-item" style="padding:10px 0" v-for="(item,index) in data" :key="index">
-          <div class="flex ac">
-            <business-trains-card :order="order" :index="index" :last.sync="index>0?data[index-1]:undefined" :next.sync="data[index+1]?data[index+1]:undefined" :title="businessTrainsTitle(index)" :data.sync="item" @remove="remove($event,index)"></business-trains-card>
-            <div v-if="index!==data.length-1" style="padding:0 10px">
-              <i class="el-icon-d-arrow-right success"></i>
+      <div style="height:280px" v-if="data.length>0">
+        <div class="hor-scroll">
+          <div class="hor-scroll-item" style="padding:10px 0" v-for="(item,index) in data" :key="index">
+            <div class="flex ac">
+              <business-trains-card :order="order" :index="index" :last.sync="index>0?data[index-1]:undefined" :next.sync="data[index+1]?data[index+1]:undefined" :title="businessTrainsTitle(index)" :data.sync="item" @remove="remove($event,index)"></business-trains-card>
+              <div v-if="index!==data.length-1" style="padding:0 10px">
+                <i class="el-icon-d-arrow-right success"></i>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </loading-box>
 </template>
 
 <script>
@@ -68,6 +70,7 @@ export default {
   },
   data() {
     return {
+      loadingText: "",
       data: [],
       temp: [{}],
       removeData: []
@@ -79,37 +82,7 @@ export default {
     },
     data: {
       handler: function(val) {
-        let temp = JSON.parse(JSON.stringify(val));
-        let res = [];
-        temp.forEach((item, index) => {
-          let pushItem = {
-            type: this.trainsType(index),
-            ...item,
-            customerType: this.order.type,
-            mfrs: this.order.mfrs._id
-          };
-          delete pushItem.user;
-          delete pushItem.company;
-          pushItem[this.order.type] = this.order[this.order.type]._id;
-          if (pushItem.type === 0) {
-            delete pushItem.fromCompany;
-            delete pushItem.toCompany;
-          }
-          if (pushItem.type === 1) {
-            delete pushItem.fromCompany;
-            pushItem.toCompany = item.toCompany._id;
-          }
-          if (pushItem.type === 2) {
-            pushItem.fromCompany = item.fromCompany._id;
-            pushItem.toCompany = item.toCompany._id;
-          }
-          if (pushItem.type === 3) {
-            delete pushItem.toCompany;
-            pushItem.fromCompany = item.fromCompany._id;
-          }
-          res.push(pushItem);
-        });
-        this.$emit("update:data", res);
+        this.$emit("update:data", val);
       },
       deep: true
     }
@@ -160,7 +133,7 @@ export default {
       }
       this.pushItem();
     },
-    remove(item, index) {
+    async remove(item, index) {
       if (this.data.length > 2) {
         if (item.type === "customer") {
           this.$message.warn(`不能删除客户`);
@@ -170,9 +143,21 @@ export default {
           this.$message.warn(`不能删除供应商`);
           return;
         }
-        this.data.splice(index, 1);
         if (item._id) {
-          this.removeData.push(item._id);
+          this.$confirm("删除操作无法撤回,是否继续?", "确认删除此贸易链节点", {
+            distinguishCancelAndClose: true,
+            confirmButtonText: "确认删除",
+            cancelButtonText: "取消"
+          }).then(async () => {
+            this.loadingText = "加载中...";
+            try {
+              this.data.splice(index, 1);
+              this.removeData.push(item._id);
+            } catch (error) {}
+            this.loadingText = "";
+          });
+        } else {
+          this.data.splice(index, 1);
         }
       } else {
         this.data = [];
@@ -180,7 +165,6 @@ export default {
     },
     pushItem() {
       let body = {
-        company: {},
         supplyPrice: this.order.sell,
         supplyCount: this.order.count,
         loss: 0,
@@ -195,7 +179,8 @@ export default {
         });
         this.data.push({
           ...body,
-          type: "pool"
+          type: "pool",
+          company: {}
         });
         this.data.push({
           ...body,
@@ -207,6 +192,7 @@ export default {
         this.data.splice(this.data.length - 1, 0, {
           ...body,
           type: "pool",
+          company: {},
           supplyCount: this.data[this.data.length - 1 - 1].supplyCount,
           supplyPrice: this.data[this.data.length - 1 - 1].supplyPrice
         });

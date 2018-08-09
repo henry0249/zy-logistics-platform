@@ -78,7 +78,6 @@ export default {
       customer: {},
       order: {
         type: "company",
-        mfrs: {},
         user: {},
         company: {},
         settlementMethod: 1,
@@ -178,35 +177,34 @@ export default {
         this.$message.error("未选择商品");
         return;
       }
-      if (Number(order.count)<=0) {
+      if (Number(order.count) <= 0) {
         this.$message.error("商品数量必须大于0");
         return;
       }
-      if (Number(order.factory)<=0) {
+      if (Number(order.factory) <= 0) {
         this.$message.error("商品出厂单价必须大于0");
         return;
       }
-      if (Number(order.sell)<=0) {
+      if (Number(order.sell) <= 0) {
         this.$message.error("商品销售单价必须大于0");
         return;
       }
-      if (Number(order.transport)<=0) {
+      if (Number(order.transport) <= 0) {
         this.$message.error("商品运输单价必须大于0");
         return;
       }
       return true;
     }
   },
-  async created() {
+  created() {
     this.loadingText = "加载中";
-    if (this.val._id) {
-      this.customer = this.val[this.val.type];
-      this.order = JSON.parse(JSON.stringify(this.val));
-    } else {
-      this.order.orderCompany = this.loginInfo.company._id;
-      this.$emit("update:data", JSON.parse(JSON.stringify(this.order)));
-    }
     setTimeout(() => {
+      if (this.val._id) {
+        this.customer = this.val[this.val.type];
+        this.order = JSON.parse(JSON.stringify(this.val));
+      } else {
+        this.$emit("update:data", JSON.parse(JSON.stringify(this.order)));
+      }
       this.loadingText = "";
     }, 200);
   }

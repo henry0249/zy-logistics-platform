@@ -12,10 +12,6 @@ module.exports = {
     },
     require: true
   },
-  dispatch: {
-    name: '调度权限',
-    type: 'Boolean'
-  },
   name: {
     name: '名称',
     type: 'String',

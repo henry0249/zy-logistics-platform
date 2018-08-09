@@ -52,12 +52,12 @@ export default {
     return {
       loadingText: "加载中",
       bodyLoading: true,
-      orderAsync:{},
+      orderAsync: {},
       update: {
         businessTrains: [],
         businessTrainsRemove: [],
         transportTrains: [],
-        transportTrainsRemove: [],
+        transportTrainsRemove: []
       },
       order: {},
       goods: [],
@@ -81,6 +81,18 @@ export default {
         this.bodyLoading = false;
       }, 200);
     },
+    getSubmitData() {
+      let data = {
+        state: this.newState,
+        order: this.orderAsync
+      };
+      for (const key in this.update) {
+        if (this.update[key].length > 0) {
+          data[key] = this.update[key];
+        }
+      }
+      return data;
+    },
     async submit() {
       if (!this.newState) {
         this.$message.error(`非法的订单状态`);
@@ -88,16 +100,7 @@ export default {
       }
       this.loadingText = "正在提交";
       try {
-        this.update.state = this.newState;
-        let update = {
-          state:this.newState,
-          order:this.orderAsync
-        };
-        for (const key in this.update) {
-          if (this.update[key].length>0) {
-            update[key] = this.update[key];
-          }
-        }
+        let update = this.getSubmitData();
         console.log(update);
         // await this.$ajax.post("/order/update", update);
         // this.back();

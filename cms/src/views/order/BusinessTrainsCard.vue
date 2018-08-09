@@ -12,7 +12,7 @@
       <div class="marginBottom">
         <common-select v-if="data.type === 'supplier'" size="mini" title="选择一个公司" placeholder="公司名称" border type="company" :data.sync="data.company" disabled></common-select>
         <common-select v-if="data.type === 'pool'" size="mini" title="选择一个公司" placeholder="公司名称" border type="company" :data.sync="data.company"></common-select>
-        <common-select v-if="data.type === 'customer'" size="mini" title="选择一个公司" placeholder="公司名称" border :type="data.customerType" :data.sync="data[data.customerType]" disabled></common-select>
+        <common-select v-if="data.type === 'customer'" size="mini" border :type="data.customerType" :data.sync="data[data.customerType]" disabled></common-select>
       </div>
       <div v-if="data.type === 'supplier'">
         <my-form-item class="marginBottom" value="0" text label="库存数量" size="mini">

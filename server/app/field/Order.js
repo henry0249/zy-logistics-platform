@@ -26,13 +26,8 @@ module.exports = {
     },
     default: 'taking'
   },
-  orderCompany: {
-    name: '下单公司',
-    type: 'ObjectId',
-    ref: 'Company'
-  },
-  mfrs: {
-    name: '生产厂商',
+  handle: {
+    name: '处理公司',
     type: 'ObjectId',
     ref: 'Company'
   },

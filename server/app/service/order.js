@@ -71,7 +71,7 @@ class OrderService extends Service {
     const ctx = this.ctx;
     let info = JSON.parse(JSON.stringify(payload));
     for (const key in info) {
-      if (info[key]._id) {
+      if (info[key] && info[key]._id) {
         info[key] = info[key]._id
       }
     }
@@ -139,6 +139,11 @@ class OrderService extends Service {
     }
     for (let i = 0; i < arr.length; i++) {
       let item = arr[i];
+      for (const key in item) {
+        if (item[key] && item[key]._id) {
+          item[key] = item[key]._id
+        }
+      }
       item.order = order._id;
       if (item._id) {
         let update = JSON.parse(JSON.stringify(item));
@@ -161,6 +166,18 @@ class OrderService extends Service {
   }
   async add() {
     return await this.set();
+  }
+
+  async transfer() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    let order = await ctx.model.Order.findById(body.order);
+    await order.update({
+      handle: body.transferCompany
+    });
+    body.businessTrains[0].company = body.transferCompany;
+    await this.setBusinessTrainsData(order, body.businessTrains);
+    return 'ok';
   }
 
   async update() {
@@ -449,13 +466,8 @@ class OrderService extends Service {
     }
     let res = JSON.parse(JSON.stringify(order));
     res.businessTrains = await ctx.model.BusinessTrains.find({
-      order: order._id,
-
+      order: order._id
     }).populate([{
-      path: 'fromCompany'
-    }, {
-      path: 'toCompany'
-    }, {
       path: 'user'
     }, {
       path: 'company'
