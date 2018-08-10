@@ -14,8 +14,8 @@ export default {
         name: '邮箱'
       }
     },
-    returnName:['name','mobile','email'],
-    option: ['$or']    
+    returnName: ['name', 'mobile', 'email'],
+    option: ['$or']
   },
   company: {
     thead: {
@@ -27,14 +27,28 @@ export default {
         readOnly: true,
         name: '公司别称'
       },
-      type:{
-        readOnly:true,
-        slot:true,
-        name:'公司类型'
+      type: {
+        readOnly: true,
+        slot: true,
+        name: '公司类型'
       }
     },
-    returnName:['name','nick'],
-    option: ['$or']   
+    returnName: ['name', 'nick'],
+    option: ['$or'],
+    populate: [{
+      path: 'area',
+      populate: [{
+        path: 'province'
+      }, {
+        path: 'city'
+      }, {
+        path: 'county'
+      }, {
+        path: 'township'
+      }, {
+        path: 'street'
+      }]
+    }]
   },
   goods: {
     thead: {
@@ -47,11 +61,11 @@ export default {
         name: '分类'
       }
     },
-    returnName:['name'],
-    option: ['$or','mfrs','brand'],
-    populate:[{
-      path:'category'
-    }]  
+    returnName: ['name'],
+    option: ['$or', 'mfrs', 'brand'],
+    populate: [{
+      path: 'category'
+    }]
   },
   area: {
     thead: {
@@ -72,15 +86,15 @@ export default {
         name: '乡/镇'
       }
     },
-    returnName:['name','key'],
-    option: ['$or','province','city','county'],
-    populate:[{
-      path:'province'
-    },{
-      path:'city'
-    },{
-      path:'county'
-    }]   
+    returnName: ['name', 'key'],
+    option: ['$or', 'province', 'city', 'county'],
+    populate: [{
+      path: 'province'
+    }, {
+      path: 'city'
+    }, {
+      path: 'county'
+    }]
   },
   truck: {
     thead: {
@@ -93,11 +107,11 @@ export default {
         name: '司机'
       }
     },
-    returnName:['no'],
-    option: ['$or','no','company','type'],
-    populate:[{
-      path:'owner'
-    }]   
+    returnName: ['no'],
+    option: ['$or', 'no', 'company', 'type'],
+    populate: [{
+      path: 'owner'
+    }]
   },
   ship: {
     thead: {
@@ -110,10 +124,10 @@ export default {
         name: '司机'
       }
     },
-    returnName:['no'],
-    option: ['$or','no','company','type'],
-    populate:[{
-      path:'owner'
-    }]   
+    returnName: ['no'],
+    option: ['$or', 'no', 'company', 'type'],
+    populate: [{
+      path: 'owner'
+    }]
   }
 }

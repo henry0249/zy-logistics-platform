@@ -15,7 +15,7 @@
     </div>
     <el-dialog :visible.sync="dialogVisible" width="70%" append-to-body>
       <span style="fontSize:16px;" slot="title">{{title}}</span>
-      <common-select-item @switchChange="switchChange" :changeType.sync="startType" :placeholder="newPlaceholder" :isSwitch="isSwitch" :option="option" v-if="dialogVisible" :one="one" :type="type" :data.sync="itemData" :startData="data"></common-select-item>
+      <common-select-item :typeTwo="typeTwo" @switchChange="switchChange" :changeType.sync="startType" :placeholder="newPlaceholder" :isSwitch="isSwitch" :option="option" v-if="dialogVisible" :one="one" :type="type" :data.sync="itemData" :startData="data"></common-select-item>
       <div slot="footer" class="dialog-footer jb">
         <el-button size="mini" @click="dialogVisible = false">取 消</el-button>
         <el-button size="mini" type="primary" :disabled="btmDisabled" @click="go">确 定</el-button>
@@ -28,6 +28,10 @@
   import commonSelect from './CommonSelect.js';
   export default {
     props: {
+      typeTwo:{
+        type:Boolean,
+        default:false
+      },
       noChangeText:{
         type:String,
         default:''
@@ -112,10 +116,8 @@
     },
     watch: {
       option(val){
-        console.log('select',val);
       },
       startType(val){
-        console.log(val);
         this.$emit('update:changeType',val);
       },
       data(val) {},
