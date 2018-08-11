@@ -109,14 +109,13 @@ export default {
           let roleOp = {};
           for (const key in this.removeData) {
             if (this.removeData[key].length > 0) {
-              for (
-                let index = 0;
-                index < this.removeData[key].length;
-                index++
-              ) {
+              for (let index = 0;index < this.removeData[key].length;index++) {
                 let delRole = await this.$ajax.post(
                   "/role/delete?_id=" + this.removeData[key][index]
                 );
+                if (!delRole) {
+                  io = false;
+                }
               }
             }
           }
@@ -136,69 +135,105 @@ export default {
           }
         }
         if (this.shipIo) {
-          console.log("1111");
           for (const key in this.shipObj) {
-            console.log("2", key);
-            console.log(this.data);
-            for (let n = 0; n < this.data[key].length; n++) {
-              console.log("3", n);
-              for (let index = 0; index < this.shipObj[key].length; index++) {
-                console.log("4", index);
-                if (
-                  this.shipObj[key][index]._id === this.data[key][n]._id
-                ) {
-                  console.log("5");
-                  this.shipObj[key].splice(index, 1);
-                  this.data[key].splice(n, 1);
+            let updateArr = [];
+            let data = JSON.parse(JSON.stringify(this.data[key]));
+            if (this.data[key].length > 0) {
+              for (let n = 0; n < this.data[key].length; n++) {
+                for (let index = 0; index < this.shipObj[key].length; index++) {
+                  if (this.shipObj[key][index]._id === this.data[key][n]._id) {
+                    updateArr.push(this.data[key][n]);
+                  }
                 }
               }
-              if (this.data[key].length > 0) {
-                for (
-                  let index = 0;
-                  index < this.data[key].length;
-                  index++
-                ) {
+              if (updateArr.length > 0) {
+                for (let index = 0; index < updateArr.length; index++) {
+                  for (let i = 0; i < this.shipObj[key].length; i++) {
+                    if (this.shipObj[key][i]._id === updateArr[index]._id) {
+                      let res = await this.$api.curd({
+                        model: key,
+                        curdType: "update",
+                        find: {
+                          _id: this.shipObj[key][i]._id
+                        },
+                        update: {
+                          name: this.shipObj[key][i].name,
+                          no: this.shipObj[key][i].no,
+                          owner: this.shipObj[key][i].owner,
+                          type: this.shipObj[key][i].type
+                        }
+                      });
+                      if (!res) {
+                        io = false;
+                      }
+                    }
+                  }
+                }
+                let delArr = [];
+                let copyData = JSON.parse(JSON.stringify(this.data[key]));
+                copyData.forEach((dataItem, index) => {
+                  let delIo = false;
+                  updateArr.forEach((upItem, i) => {
+                    if (upItem._id === dataItem._id) {
+                      delIo = true;
+                      return;
+                    }
+                  });
+                  if (delIo) {
+                    copyData.splice(index, 1);
+                  }
+                });
+                if (copyData.length > 0) {
+                  for (let i = 0; i < copyData.length; i++) {
+                    let delShip = await this.$ajax.post(
+                      "/" + key + "/delete?_id=" + copyData[i]._id
+                    );
+                    if (!delShip) {
+                      io = false;
+                    }
+                  }
+                }
+              } else {
+                if (this.data[key].length > 0) {
+                  for (let index = 0; index < this.data[key].length; index++) {
+                    let res = await this.$ajax.post(
+                      "/" + key + "/delete?_id=" + this.data[key][index]._id
+                    );
+                    if (!res) {
+                      io = false;
+                    }
+                  }
+                }
+              }
+              for (let index = 0; index < this.shipObj[key].length; index++) {
+                if (!this.shipObj[key][index]._id) {
                   let addShip = await this.$api.curd({
                     model: key,
                     curdType: "set",
-                    name: this.data[key][index].name,
-                    no: this.data[key][index].no,
-                    owner: this.data[key][index].owner,
-                    type: this.data[key][index].type,
+                    name: this.shipObj[key][index].name,
+                    no: this.shipObj[key][index].no,
+                    owner: this.shipObj[key][index].owner,
+                    type: this.shipObj[key][index].type,
                     company: this.$route.params._id
                   });
+                  if (!addShip) {
+                    io = false
+                  }
                 }
               }
+            } else {
               if (this.shipObj[key].length > 0) {
                 for (let index = 0; index < this.shipObj[key].length; index++) {
                   let res = await this.$api.curd({
                     model: key,
-                    curdType: "update",
-                    find: {
-                      _id: this.shipObj[key][index]._id
-                    },
-                    update: {
-                      name: this.shipObj[key][index].name,
-                      no: this.shipObj[key][index].no,
-                      owner: this.shipObj[key][index].owner,
-                      type: this.shipObj[key][index].type
-                    }
+                    curdType: "set",
+                    name: this.shipObj[key][index].name,
+                    no: this.shipObj[key][index].no,
+                    owner: this.shipObj[key][index].owner,
+                    type: this.shipObj[key][index].type,
+                    company: this.$route.params._id
                   });
                   if (!res) {
-                    io = false;
-                  }
-                }
-              }
-              if (this.shipRemoveObj[key].length > 0) {
-                for (
-                  let index = 0;
-                  index < this.shipRemoveObj[key].length;
-                  index++
-                ) {
-                  let del = await this.$ajax.post(
-                    "/" + key + "/delete?_id=" + this.shipRemoveObj[key][index]
-                  );
-                  if (!del) {
                     io = false;
                   }
                 }

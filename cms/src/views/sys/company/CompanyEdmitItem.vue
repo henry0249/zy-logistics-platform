@@ -22,81 +22,92 @@
 </template>
 
 <script>
-export default {
-  props: {
-    show: {
-      type: Boolean,
-      default: true
-    },
-    value: {
-      type: String,
-      default: ""
-    },
-    data: {
-      type: Object,
-      default() {
-        return {};
-      }
-    },
-    startData: {
-      type: Object,
-      default() {
-        return {};
-      }
-    },
-  },
-  data() {
-    return {
-      roleDate: {},
-      companyData: {
-        name: "",
-        nick: "",
-        code: "",
-        mobile: "",
-        type: [],
-        tel: "",
-        self: false,
-        address: "",
-        area: {},
-        businessRelationCompany: []
-      }
-    };
-  },
-  watch: {
-    companyData: {
-      handler: function(val, oldVal) {
-        if (oldVal._id) {
-          this.$emit("update:data", val);
+  export default {
+    props: {
+      type: {
+        type: String,
+        default: "edmit"
+      },
+      show: {
+        type: Boolean,
+        default: true
+      },
+      value: {
+        type: String,
+        default: ""
+      },
+      data: {
+        type: Object,
+        default () {
+          return {};
         }
       },
-      deep: true
-    }
-  },
-  methods: {},
-  created() {
-    let companyData = {};
-    let roleDate = {};
-    for (const key in this.companyData) {
-      this.$set(companyData, key, this.startData[key]);
-    }
-    this.$set(companyData, "_id", this.startData._id);
-    for (const key in this.roleStartDate) {
-      if (this.roleStartDate[key].length > 0) {
-        this.roleStartDate[key].forEach(item => {
-          let obj = {};
-          obj = item.user;
-          obj.roleId = item._id;
-          roleDate[key].push(obj);
-        });
-      } else {
-        roleDate[key] = [];
+      startData: {
+        type: Object,
+        default () {
+          return {};
+        }
+      }
+    },
+    data() {
+      return {
+        roleDate: {},
+        companyData: {
+          name: "",
+          nick: "",
+          code: "",
+          mobile: "",
+          type: [],
+          tel: "",
+          self: false,
+          address: "",
+          area: {},
+          businessRelationCompany: []
+        }
+      };
+    },
+    watch: {
+      companyData: {
+        handler: function(val, oldVal) {
+          if (this.type === "edmit") {
+            if (oldVal._id) {
+              this.$emit("update:data", val);
+            }
+          } else if (this.type === "add") {
+            this.$emit("update:data", val);
+          }
+        },
+        deep: true
+      }
+    },
+    methods: {},
+    created() {
+      let companyData = {};
+      let roleDate = {};
+      for (const key in this.companyData) {
+        this.$set(companyData, key, this.startData[key]);
+      }
+      this.$set(companyData, "_id", this.startData._id);
+      for (const key in this.roleStartDate) {
+        if (this.roleStartDate[key].length > 0) {
+          this.roleStartDate[key].forEach(item => {
+            let obj = {};
+            obj = item.user;
+            obj.roleId = item._id;
+            roleDate[key].push(obj);
+          });
+        } else {
+          roleDate[key] = [];
+        }
+      }
+      if (this.type === 'edmit') {
+        this.roleDate = JSON.parse(JSON.stringify(roleDate));
+        this.companyData = JSON.parse(JSON.stringify(companyData));
       }
     }
-    this.roleDate = JSON.parse(JSON.stringify(roleDate));
-    this.companyData = JSON.parse(JSON.stringify(companyData));
-  }
-};
+  };
 </script>
 
 <style scoped>
+
 </style>
