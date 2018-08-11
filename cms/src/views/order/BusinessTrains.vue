@@ -1,7 +1,7 @@
 <template>
   <loading-box v-model="loadingText">
     <div class="g-business-trains">
-      <div class="flex ac jb" style="color:#909399;padding-left:25px;background:#F2F6FC;font-size:13px;margin:15px 0;border-radius:4px">
+      <div class="flex ac jb" style="color:#909399;padding-left:25px;background:#f4f4f5;font-size:13px;margin:15px 0;border-radius:4px">
         <div class="f1" style="margin-right:20px">贸易链</div>
         <div v-if="order.goods && order.goods._id" class="flex ac jb">
           <div style="width:150px">商品名称：{{order.goods.name}}</div>
@@ -9,12 +9,12 @@
           <div class="goods-info-padding">规格：{{order.goods.spec}}</div>
           <div class="goods-info-padding">单位：{{order.goods.unit}}</div>
         </div>
-        <div class="tc bol" style="width:46px;padding:10px 0">
-          <i @click="add" style="color:#67C23A" class="el-icon-plus pointer"></i>
+        <div @click="add" class="success pointer" style="padding:10px">
+          贸易节点<i class="el-icon-plus"></i>
         </div>
       </div>
-      <div style="height:280px" v-if="data.length>0">
-        <div class="hor-scroll">
+      <div  v-if="data.length>0">
+        <div class="hor-scroll" style="margin-bottom:10px">
           <div class="hor-scroll-item" style="padding:10px 0" v-for="(item,index) in data" :key="index">
             <div class="flex ac">
               <business-trains-card :order="order" :index="index" :last.sync="index>0?data[index-1]:undefined" :next.sync="data[index+1]?data[index+1]:undefined" :title="businessTrainsTitle(index)" :data.sync="item" @remove="remove($event,index)"></business-trains-card>

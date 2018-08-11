@@ -111,45 +111,54 @@ module.exports = {
   },
   logistics: {
     no: {
-      name: '运单号',
+      name: '物流单号',
       slot: true,
       readOnly: true,
       width: "100",
     },
-    ts: {
-      name: '车/船',
+    transportation: {
+      name: '运输工具(车/船)',
       slot: true,
-      width: "120",
-      readOnly: true
+      readOnly: true,
+      width: '200'
     },
     loading: {
       name: '装货量',
       type: 'Number',
-      width: "70",
+      slot: true,
     },
     landed: {
       name: '卸货量',
       type: 'Number',
-      width: "70",
+      slot: true,
     },
-    transportPrice: {
+    price: {
       name: '运费单价',
       type: 'Number',
-      width: "80",
+      slot: true,
       require: true
     },
-    startAt: {
-      name: '出发时间',
-      type: 'Date',
+    total: {
+      name: '运费合计',
+      type: 'Number',
+      require: true,
       slot: true,
       readOnly: true
     },
-    finishAt: {
-      name: '送达时间',
-      type: 'Date',
-      slot: true,
-      readOnly: true
-    },
+    // startAt: {
+    //   name: '出发时间',
+    //   type: 'Date',
+    //   slot: true,
+    //   readOnly: true,
+    //   width:'150'
+    // },
+    // finishAt: {
+    //   name: '送达时间',
+    //   type: 'Date',
+    //   slot: true,
+    //   readOnly: true,
+    //   width:'150'
+    // },
     state: {
       type: 'String',
       name: '状态',

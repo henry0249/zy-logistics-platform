@@ -451,6 +451,12 @@ class OrderService extends Service {
     }, {
       path: 'company'
     }, {
+      path: 'handle',
+      populate: [{
+        path: 'area',
+        populate: areaPopulate
+      }]
+    }, {
       path: 'goods',
       populate: [{
         path: 'brand'

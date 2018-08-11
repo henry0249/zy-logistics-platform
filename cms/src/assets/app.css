@@ -106,7 +106,18 @@ p {
   line-height: 1.6;
   font-size: 14px;
 }
-
+.brtl{
+  border-top-left-radius: 4px; 
+}
+.brtr{
+  border-top-right-radius: 4px; 
+}
+.brbl{
+  border-bottom-left-radius: 4px; 
+}
+.brbr{
+  border-bottom-right-radius: 4px; 
+}
 .tc {
   text-align: center
 }

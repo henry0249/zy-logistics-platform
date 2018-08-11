@@ -5,7 +5,7 @@
       <Info :val="order" :data.sync="orderAsync"></Info>
       <goods-table :order="orderAsync"></goods-table>
       <business-trains :val="order.businessTrains" :order="orderAsync" :data.sync="update.businessTrains" :removelist.sync="update.businessTrainsRemove"></business-trains>
-      <!-- <transport-trains disabled ref="trains" :order="order" :val="item.transportTrainsData" :data.sync="update.transportTrains" :removeTrains.sync="removeTrains" :removeLogistics.sync="removeLogistics"></transport-trains> -->
+      <transport-trains-new v-if="orderAsync.area && orderAsync.area._id" :order="orderAsync" :data.sync="update.transportTrains" :removeTrains.sync="update.transportTrainsRemove" :removeLogistics.sync="update.logisticsRemove"></transport-trains-new>
     </div>
     <el-alert v-if="alert" style="margin-top:15px" :title="alert" type="info" center show-icon :closable="false">
     </el-alert>
@@ -25,8 +25,8 @@
 <script>
 import Info from "./Info.vue";
 import GoodsTable from "./GoodsTable.vue";
-import TransportTrains from "./TransportTrains";
 import BusinessTrains from "./BusinessTrains";
+import TransportTrainsNew from "./TransportTrainsNew";
 export default {
   props: {
     title: {
@@ -40,13 +40,17 @@ export default {
     newState: {
       type: String,
       default: ""
+    },
+    transport: {
+      type: Boolean,
+      default: false
     }
   },
   components: {
     Info,
     GoodsTable,
-    TransportTrains,
-    BusinessTrains
+    BusinessTrains,
+    TransportTrainsNew
   },
   data() {
     return {
@@ -57,7 +61,8 @@ export default {
         businessTrains: [],
         businessTrainsRemove: [],
         transportTrains: [],
-        transportTrainsRemove: []
+        transportTrainsRemove: [],
+        logisticsRemove: []
       },
       order: {},
       goods: [],

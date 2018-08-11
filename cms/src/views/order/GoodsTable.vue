@@ -91,7 +91,7 @@ export default {
         this.order.sell = price.sell || 0;
         this.order.factory = price.factory || 0;
         this.order.transport = price.transport || 0;
-        this.order.handle = val.mfrs._id;
+        this.order.handle = val.mfrs;
         this.$emit("update:data", this.order);
       }
     }

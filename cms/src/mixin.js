@@ -30,6 +30,9 @@ Vue.mixin({
       this.$router.go(-1);
     },
     area2arr(data) {
+      if (!data) {
+        return '';
+      }
       let res = [];
       let areaSelectType = ["province", "city", "county", "township"];
       areaSelectType.forEach(item => {
@@ -37,10 +40,15 @@ Vue.mixin({
           res.push(data[item]._id || data[item]);
         }
       });
-      res.push(data._id);
+      if (data._id) {
+        res.push(data._id);
+      }
       return res;
     },
-    area2name(data) {
+    area2name(data, joinText = '/') {
+      if (!(data && data._id)) {
+        return '请选择地址';
+      }
       let res = [];
       let areaSelectType = ["province", "city", "county", "township"];
       areaSelectType.forEach(item => {
@@ -48,8 +56,13 @@ Vue.mixin({
           res.push(data[item].name);
         }
       });
-      res.push(data.name);
-      return res.join('/');
+      if (data.name) {
+        res.push(data.name);
+      }
+      if (res.length === 0) {
+        return '';
+      }
+      return res.join(joinText);
     }
   }
 })
