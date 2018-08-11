@@ -7,7 +7,11 @@ export default {
   company:[{
     name: '公司列表',
     icon: 'icon-icon-test',
-    path: ''
+    path: '/sys/company/list'
+  },{
+    name: '添加公司',
+    icon: 'icon-icon-test',
+    path: '/sys/company/add'
   }],
   goods:[{
     name: '商品列表',

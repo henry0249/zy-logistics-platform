@@ -1,7 +1,7 @@
 <template>
   <div>
-    <!-- <common-select label="选择" isSwitch :data.sync="value1" @switchChange="switchChange" :changeType.sync="changeType" border width="8%" title="用户选择" type="company" size="mini" :option="option"></common-select> -->
-    <common-select class="form-right" label="生产厂商" :data.sync="mfrs" border width="25%" title="公司选择" type="company" size="mini"></common-select>
+    <common-select label="选择" isSwitch :data.sync="value1" @switchChange="switchChange" :changeType.sync="changeType" border width="25%" title="用户选择" type="truck" size="mini" :option="option"></common-select>
+    <!-- <common-select class="form-right" label="生产厂商" :data.sync="mfrs" border width="25%" title="公司选择" type="company" size="mini"></common-select> -->
     <my-form-item size="mini" width="300px" style="margin-top:20px" input v-model="input" filterable label="备注"></my-form-item>
     <input type="text" width="300" style="margin-top:20px">
   </div>

@@ -1,6 +1,6 @@
 <template>
   <div style="width:100%">
-    <my-table :data.sync="data" height="300px" border index size="mini" :thead="thead" op>
+    <my-table :data.sync="data" max-height="300" border index size="mini" :thead="thead" op>
       <div slot-scope="scope" slot="op" class="jc" style="color:#F56C6C">
         <div style="width:20px;height:20px;" class="jc" @click="del(scope)">
           <icon class="pointer" size="16px" title="移除该用户">icon-ec1</icon>
