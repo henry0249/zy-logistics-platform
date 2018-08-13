@@ -4,8 +4,8 @@
       <div class="my-title">订单<span style="color:#409EFF;font-weight:600">{{order.no}}</span>{{title}}</div>
       <Info :val="order" :data.sync="orderAsync"></Info>
       <goods-table :order="orderAsync"></goods-table>
-      <business-trains :val="order.businessTrains" :order="orderAsync" :data.sync="update.businessTrains" :removelist.sync="update.businessTrainsRemove"></business-trains>
-      <transport-trains-new v-if="orderAsync.area && orderAsync.area._id" :order="orderAsync" :data.sync="update.transportTrains" :removeTrains.sync="update.transportTrainsRemove" :removeLogistics.sync="update.logisticsRemove"></transport-trains-new>
+      <business-trains :val="order.businessTrains" :order="orderAsync" :data.sync="update.businessTrains"></business-trains>
+      <transport-trains-new v-if="orderAsync.area && orderAsync.area._id" :order="orderAsync" :data.sync="update.transportTrains"></transport-trains-new>
     </div>
     <el-alert v-if="alert" style="margin-top:15px" :title="alert" type="info" center show-icon :closable="false">
     </el-alert>
@@ -59,10 +59,7 @@ export default {
       orderAsync: {},
       update: {
         businessTrains: [],
-        businessTrainsRemove: [],
         transportTrains: [],
-        transportTrainsRemove: [],
-        logisticsRemove: []
       },
       order: {},
       goods: [],

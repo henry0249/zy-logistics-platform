@@ -29,6 +29,7 @@ module.exports = app => {
     //商品接口
     //订单接口
     .get('/order/badge', checkToken(), 'order.badge') //订单标记
+    .post('/order/company/badge', checkToken(), 'order.companyBadge') //公司订单标记
     .get('/order/info/:_id', checkToken(), 'order.getOrderById') //根据id获取订单信息
     .post('/order/transfer', checkToken(), 'order.transfer') //转单
     .post('/order/dispatch', checkToken(), 'order.dispatch') //订单确认调度

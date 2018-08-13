@@ -1,5 +1,5 @@
 <template>
-  <common-table :path="'/order/pending/'+state" :thead="thead" :option="option">
+  <common-table :path="'/order/pending/'+state" :thead="thead" :option="option" showCompany>
     <my-form width="24%" class="flex ac" slot="header">
       <my-form-item size="mini" v-model="no" label="单号"></my-form-item>
     </my-form>
@@ -26,57 +26,59 @@
 </template>
 
 <script>
-import { table } from "./field";
-export default {
-  props: {
-    state: {
-      type: String,
-      default: "all"
-    },
-    href: {
-      type: String,
-      default: ""
-    }
-  },
-  data() {
-    return {
-      thead: table,
-      no: ""
-    };
-  },
-  computed: {
-    option() {
-      let res = {};
-      res.no = {
-        $regex: this.no
-      };
-      if (!this.no) {
-        delete res.no;
+  import {
+    table
+  } from "./field";
+  export default {
+    props: {
+      state: {
+        type: String,
+        default: "all"
+      },
+      href: {
+        type: String,
+        default: ""
       }
-      return res;
-    }
-  },
-  methods: {
-    toDetail(item, index) {
-      if (item._id) {
-        let href = this.href || this.state;
-        if (href) {
-          this.$router.push(`/edit/${href}/${item._id}`);
-        }else{
-          this.$router.push(`/edit/${item._id}`);
+    },
+    data() {
+      return {
+        thead: table,
+        no: ""
+      };
+    },
+    computed: {
+      option() {
+        let res = {};
+        res.no = {
+          $regex: this.no
+        };
+        if (!this.no) {
+          delete res.no;
+        }
+        return res;
+      }
+    },
+    methods: {
+      toDetail(item, index) {
+        if (item._id) {
+          let href = this.href || this.state;
+          if (href) {
+            this.$router.push(`/edit/${href}/${item._id}`);
+          } else {
+            this.$router.push(`/edit/${item._id}`);
+          }
         }
       }
     }
-  }
-};
+  };
 </script>
 
 <style scoped>
-.link {
-  color: #409eff;
-  cursor: pointer;
-}
-.link:hover {
-  text-decoration: underline;
-}
+  .link {
+    color: #409eff;
+    cursor: pointer;
+  }
+  .link:hover {
+    text-decoration: underline;
+  }
 </style>

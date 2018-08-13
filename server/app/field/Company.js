@@ -42,13 +42,19 @@ module.exports = {
     type: 'Number'
   },
   address: {
-    name: '地址',
-    type: 'String',
+    name: '默认地址',
+    type: 'ObjectId',
+    ref: 'Address'
   },
   area: {
     name: '区域',
     type: 'ObjectId',
     ref: 'Area'
+  },
+  areaInfo: {
+    name: '详细地址',
+    type: 'ObjectId',
+    ref: 'String'
   },
   businessRelationCompany: {
     name: '贸易链关联公司',

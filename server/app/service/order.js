@@ -175,8 +175,10 @@ class OrderService extends Service {
     await order.update({
       handle: body.transferCompany
     });
-    body.businessTrains[0].company = body.transferCompany;
-    await this.setBusinessTrainsData(order, body.businessTrains);
+    if (ctx.helper.is('array', body.businessTrains) && body.businessTrains.length > 0) {
+      body.businessTrains[0].company = body.transferCompany;
+      await this.setBusinessTrainsData(order, body.businessTrains);
+    }
     return 'ok';
   }
 
@@ -404,6 +406,28 @@ class OrderService extends Service {
         $nin: [5]
       }
     });
+    return res;
+  }
+  async companyBadge() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    let res = [];
+    let company = await ctx.model.Company.find();
+    for (let i = 0; i < company.length; i++) {
+      let item = JSON.parse(JSON.stringify(company[i]));
+      item.badge = await ctx.model.Order.count({
+        state: body.state,
+        handle: item._id
+      });
+      // if (item.badge>0) {
+      res.push(item);
+      // }
+    }
+
+    function sortId(a, b) {
+      return b.badge - a.badge;
+    }
+    res.sort(sortId);
     return res;
   }
 

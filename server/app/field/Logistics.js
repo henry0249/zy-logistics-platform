@@ -30,7 +30,7 @@ module.exports = {
     name: '所属物流链',
     ref: 'TransportTrains'
   },
-  transportation:{
+  transportation: {
     type: 'String',
     name: '交通工具',
     option: {

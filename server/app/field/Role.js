@@ -34,5 +34,15 @@ module.exports = {
     name: '所属订单',
     type: 'ObjectId',
     ref: 'Order'
+  },
+  truck:{
+    name: '所属车辆',
+    type: 'ObjectId',
+    ref: 'Truck'
+  },
+  ship:{
+    name: '所属船只',
+    type: 'ObjectId',
+    ref: 'Ship'
   }
 }

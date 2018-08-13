@@ -1,5 +1,5 @@
 module.exports = {
-  type:{
+  type: {
     type: 'String',
     name: '类型',
     option: {
@@ -8,15 +8,16 @@ module.exports = {
       2: '目的地',
     }
   },
-  areaType:{
+  areaType: {
     type: 'String',
     name: '地址类型',
     option: {
       0: '普通地址',
       1: '公司地址',
+      2: '贸易节点'
     }
   },
-  area:{
+  area: {
     type: 'ObjectId',
     name: '地址',
     ref: 'Area'
@@ -26,12 +27,12 @@ module.exports = {
     name: '所属订单',
     ref: 'Order'
   },
-  company:{
+  company: {
     type: 'ObjectId',
     name: '经过公司',
     ref: 'Company'
   },
-  user:{
+  user: {
     type: 'ObjectId',
     name: '收货客户',
     ref: 'User'

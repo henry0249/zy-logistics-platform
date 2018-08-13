@@ -10,7 +10,7 @@
       <div class="hor-scroll" style="margin-bottom:10px">
         <div class="hor-scroll-item" v-for="(item,index) in trains" :key="index">
           <div class="flex ac">
-            <transport-trains-card :data.sync="item" :index="index"></transport-trains-card>
+            <transport-trains-card :data.sync="item" :index="index" @remove="remove($event,index)"></transport-trains-card>
             <div v-if="index!==trains.length-1" style="padding:0 10px">
               <i class="el-icon-d-arrow-right success"></i>
             </div>
@@ -35,7 +35,8 @@
           </div>
           <my-table max-height="300" opWidth="45" size="mini" index border :thead="thead" op :data.sync="item.logistics">
             <div class="tc" slot="op" slot-scope="scope">
-              <i @click="removeLogistics(item.logistics,scope.index)" class="el-icon-delete pointer danger"></i>
+              <remove-check @remove="removeLogistics(item.logistics,scope.index)"></remove-check>
+              <!-- <i @click="removeLogistics(item.logistics,scope.index)" class="el-icon-delete pointer danger"></i> -->
             </div>
             <div slot-scope="scope">
               <div v-if="scope.prop==='no'">
@@ -53,13 +54,13 @@
                 </el-dropdown>
                 <common-select style="margin-left:10px" size="mini" border :type="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]"></common-select>
               </div>
-              <my-form-item v-if="scope.prop==='loading'" number  v-model="scope.row.loading" size="mini" :min="0" :max="order.count">
+              <my-form-item v-if="scope.prop==='loading'" number v-model="scope.row.loading" size="mini" :min="0" :max="order.count">
               </my-form-item>
-              <my-form-item v-if="scope.prop==='landed'" number  v-model="scope.row.landed" size="mini" :max="scope.row.loading" :min="0">
+              <my-form-item v-if="scope.prop==='landed'" number v-model="scope.row.landed" size="mini" :max="scope.row.loading" :min="0">
               </my-form-item>
-              <my-form-item v-if="scope.prop==='price'" number  v-model="scope.row.price" size="mini" :min="0">
+              <my-form-item v-if="scope.prop==='price'" number v-model="scope.row.price" size="mini" :min="0">
               </my-form-item>
-              <div v-if="scope.prop==='total'" >
+              <div v-if="scope.prop==='total'">
                 {{Number(scope.row.price) * Number(scope.row.landed)}}
               </div>
               <my-form-item v-if="scope.prop==='state'" select size="mini" v-model="scope.row.state" :options="field.Logistics.state.option">
@@ -75,13 +76,13 @@
               总装货量：<span style="color:#67C23A">{{statistics.loading}}</span>
             </div>
             <div class="tc" style="width:120px">
-              总卸货量：<span style="color:#E6A23C">{{statistics.landed}}</span>
+              总卸货量：<span style="color:#F56C6C">{{statistics.landed}}</span>
             </div>
             <div class="tc" style="width:120px">
               平均运费：<span style="color:#E6A23C">{{statistics.average}}</span>
             </div>
             <div class="tc" style="width:120px">
-              总运费：<span style="color:#F56C6C">{{statistics.totalPrice}}</span>
+              总运费：<span style="color:#E6A23C">{{statistics.totalPrice}}</span>
               <!-- <span style="color:#aaa">（卸货量*单价）</span> -->
             </div>
           </div>
@@ -114,6 +115,12 @@ export default {
     alert: {
       type: String,
       default: "物流链"
+    },
+    data: {
+      type: Array,
+      default() {
+        return [];
+      }
     }
   },
   computed: {
@@ -123,7 +130,7 @@ export default {
         landed: 0,
         totalPrice: 0,
         count: 0,
-        average:0
+        average: 0
       };
       this.trains.forEach(item => {
         if (item.logistics) {
@@ -135,13 +142,21 @@ export default {
           });
         }
       });
-      if (res.count>0) {
+      if (res.count > 0) {
         res.average = (res.totalPrice / res.count).toFixed(1);
       }
       return res;
     },
     totalLoading() {
       return 0;
+    }
+  },
+  watch: {
+    trains: {
+      handler: function(val) {
+        this.$emit("update:data", val);
+      },
+      deep: true
     }
   },
   data() {
@@ -170,6 +185,17 @@ export default {
         company: {},
         logistics: []
       });
+    },
+    async remove(item, index) {
+      if (item._id) {
+        this.loadingText = "加载中...";
+        try {
+          this.trains.splice(index, 1);
+        } catch (error) {}
+        this.loadingText = "";
+      } else {
+        this.trains.splice(index, 1);
+      }
     },
     addLogistics(logistics, index) {
       if (!this.trains[index].area._id) {

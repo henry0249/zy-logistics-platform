@@ -27,29 +27,6 @@ module.exports = {
     name: '账户余额',
     type: 'Number'
   },
-  platform: {
-    name: '所属平台',
-    type: 'ObjectIdArray',
-    ref: 'Platform'
-  },
-  company: {
-    name: '所属公司',
-    type: 'ObjectIdArray',
-    ref: 'Company'
-  },
-  role: {
-    name: '角色',
-    type: 'Array',
-    option: {
-      common: '普通用户',
-      admin: '系统管理员',
-      platformAdmin: '平台管理员',
-      companyAdmin: '公司管理员',
-      truck: '货车司机',
-      ship: '货船船员'
-    },
-    default: ['common']
-  },
   recommendedByUser: {
     name: '推荐人',
     type: 'ObjectId',
@@ -69,14 +46,9 @@ module.exports = {
     name: '系统管理员标识',
     type: 'Boolean'
   },
-  defaultAddress: {
+  address: {
     name: '默认地址',
     type: 'ObjectId',
-    ref: 'Address'
-  },
-  address: {
-    name: '收货地址',
-    type: 'ObjectIdArray',
     ref: 'Address'
   },
   area: {

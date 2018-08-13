@@ -7,7 +7,8 @@
         <div v-if="data.type==='pool'" class="link" style="margin:0 5px">关联物流</div>
         <i v-if="data.type==='pool'" class="el-icon-question info"></i>
         <div class="f1"></div>
-        <i @click="remove" class="el-icon-delete pointer" style="color:#F56C6C"></i>
+        <remove-check @remove="remove"></remove-check>
+        <!-- <i @click="remove" class="el-icon-delete pointer" style="color:#F56C6C"></i> -->
       </div>
       <div class="marginBottom">
         <common-select v-if="data.type === 'supplier'" size="mini" title="选择一个公司" placeholder="公司名称" border type="company" :data.sync="data.company" disabled></common-select>

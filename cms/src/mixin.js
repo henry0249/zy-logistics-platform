@@ -12,9 +12,6 @@ Vue.mixin({
     company() {
       return this.$store.state.loginInfo.company || {};
     },
-    platform() {
-      return this.$store.state.loginInfo.platform || {};
-    },
     isSys() {
       return this.$store.state.loginInfo.user.isSys || false;
     },
@@ -63,6 +60,15 @@ Vue.mixin({
         return '';
       }
       return res.join(joinText);
+    },
+    getElementByAttr(tag, attr, value) {
+      var aElements = document.getElementsByTagName(tag);
+      var aEle = [];
+      for (var i = 0; i < aElements.length; i++) {
+        if (aElements[i].getAttribute(attr) == value)
+          aEle.push(aElements[i]);
+      }
+      return aEle;
     }
   }
 })

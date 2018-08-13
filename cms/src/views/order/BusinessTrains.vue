@@ -13,7 +13,7 @@
           贸易节点<i class="el-icon-plus"></i>
         </div>
       </div>
-      <div  v-if="data.length>0">
+      <div  v-if="data.length>0" style="height:280px">
         <div class="hor-scroll" style="margin-bottom:10px">
           <div class="hor-scroll-item" style="padding:10px 0" v-for="(item,index) in data" :key="index">
             <div class="flex ac">
@@ -54,32 +54,16 @@ export default {
       default() {
         return businessTrains;
       }
-    },
-    // data: {
-    //   type: Array,
-    //   default() {
-    //     return [];
-    //   }
-    // },
-    removelist: {
-      type: Array,
-      default() {
-        return [];
-      }
     }
   },
   data() {
     return {
       loadingText: "",
       data: [],
-      temp: [{}],
-      removeData: []
+      temp: [{}]
     };
   },
   watch: {
-    removeData(val) {
-      this.$emit("update:removelist", val);
-    },
     data: {
       handler: function(val) {
         this.$emit("update:data", val);
@@ -144,18 +128,11 @@ export default {
           return;
         }
         if (item._id) {
-          this.$confirm("删除操作无法撤回,是否继续?", "确认删除此贸易链节点", {
-            distinguishCancelAndClose: true,
-            confirmButtonText: "确认删除",
-            cancelButtonText: "取消"
-          }).then(async () => {
-            this.loadingText = "加载中...";
-            try {
-              this.data.splice(index, 1);
-              this.removeData.push(item._id);
-            } catch (error) {}
-            this.loadingText = "";
-          });
+          this.loadingText = "加载中...";
+          try {
+            this.data.splice(index, 1);
+          } catch (error) {}
+          this.loadingText = "";
         } else {
           this.data.splice(index, 1);
         }
@@ -197,12 +174,6 @@ export default {
           supplyPrice: this.data[this.data.length - 1 - 1].supplyPrice
         });
       }
-    },
-    fromCompanyChange(val, index) {
-      this.data[index - 1].toCompany = val;
-    },
-    toCompanyChange(val, index) {
-      this.data[index + 1].fromCompany = val;
     }
   },
   created() {

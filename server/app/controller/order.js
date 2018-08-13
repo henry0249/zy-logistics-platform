@@ -9,6 +9,9 @@ class OrderController extends Controller {
   async badge(){
     this.ctx.body = await this.ctx.service.order.badge();
   }
+  async companyBadge(){
+    this.ctx.body = await this.ctx.service.order.companyBadge();
+  }
   async transfer(){
     this.ctx.body = await this.ctx.service.order.transfer();
   }

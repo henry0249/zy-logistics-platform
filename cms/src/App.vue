@@ -82,4 +82,7 @@ body {
   font-size: 20px;
   text-align: center;
 }
+.el-tabs__header{
+  margin-bottom: 0px
+}
 </style>
