@@ -15,11 +15,6 @@ module.exports = {
       5: '完成'
     }
   },
-  goods: {
-    type: 'ObjectId',
-    name: '商品信息',
-    ref: 'Goods'
-  },
   order: {
     type: 'ObjectId',
     name: '所属订单',
@@ -48,11 +43,6 @@ module.exports = {
     name: '船',
     ref: 'Ship'
   },
-  carrier: {
-    type: 'ObjectId',
-    name: '承运商',
-    ref: 'Company'
-  },
   loading: {
     name: '装货数量',
     type: 'Number',
@@ -61,11 +51,7 @@ module.exports = {
     name: '卸货数量',
     type: 'Number',
   },
-  settlementCount: {
-    name: '结算数量',
-    type: 'Number',
-  },
-  transportPrice: {
+  price: {
     name: '运费单价',
     type: 'Number',
     require: true
@@ -93,7 +79,7 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Area'
   },
-  address: {
+  areaInfo: {
     name: '详细地址',
     type: 'String',
   },
@@ -104,21 +90,5 @@ module.exports = {
   finishAt: {
     name: '送达时间',
     type: 'Date'
-  },
-  balanced: {
-    name: '已结算',
-    type: 'Boolean'
-  },
-  balancedNumber: {
-    name: '已结算金额',
-    type: 'Number'
-  },
-  invoiced: {
-    name: '已开发票',
-    type: 'Boolean'
-  },
-  invoicedNumber: {
-    name: '已开票金额',
-    type: 'Number'
   }
 }

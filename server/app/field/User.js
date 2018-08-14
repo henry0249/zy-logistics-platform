@@ -55,5 +55,10 @@ module.exports = {
     name: '区域',
     type: 'ObjectIdArray',
     ref: 'Area'
+  },
+  company: {
+    name: '关联主公司',
+    type: 'ObjectId',
+    ref: 'Company'
   }
 }

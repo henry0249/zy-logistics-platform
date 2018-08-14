@@ -31,18 +31,18 @@ module.exports = {
     name: '所属物流单',
     ref: 'Logistics'
   },
-  transfer: {
+  area: {
     type: 'ObjectId',
-    name: '中转地',
-    ref: 'Transfer'
+    name: '地址',
+    ref: 'Area'
+  },
+  areaInfo: {
+    type: 'String',
+    name: '地址详情'
   },
   title: {
     type: 'String',
     name: '标题'
-  },
-  address: {
-    type: 'String',
-    name: '地址详情'
   },
   addressComponent: {
     type: 'Object',

@@ -56,8 +56,13 @@
       activeNavIndex() {
         let res = -1;
         this.nav.forEach((item, index) => {
+          let path = item.path;
           if (this.$route.matched.length > 0) {
-            if (item.path && item.path.indexOf(this.$route.matched[0].path) > -1) {
+            let matchedPath = this.$route.matched[0].path;
+            if (this.$route.path.indexOf("sys")>-1) {
+              matchedPath = this.$route.matched[1].path;
+            }
+            if (item.path && item.path.indexOf(matchedPath) > -1) {
               res = index;
             }
           } else {

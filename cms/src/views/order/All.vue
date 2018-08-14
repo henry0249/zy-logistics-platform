@@ -26,59 +26,57 @@
 </template>
 
 <script>
-  import {
-    table
-  } from "./field";
-  export default {
-    props: {
-      state: {
-        type: String,
-        default: "all"
-      },
-      href: {
-        type: String,
-        default: ""
-      }
+import { table } from "./field";
+export default {
+  props: {
+    state: {
+      type: String,
+      default: "all"
     },
-    data() {
-      return {
-        thead: table,
-        no: ""
+    href: {
+      type: String,
+      default: ""
+    }
+  },
+  data() {
+    return {
+      thead: table,
+      no: ""
+    };
+  },
+  computed: {
+    option() {
+      let res = {};
+      res.no = {
+        $regex: this.no
       };
-    },
-    computed: {
-      option() {
-        let res = {};
-        res.no = {
-          $regex: this.no
-        };
-        if (!this.no) {
-          delete res.no;
-        }
-        return res;
+      if (!this.no) {
+        delete res.no;
       }
-    },
-    methods: {
-      toDetail(item, index) {
-        if (item._id) {
-          let href = this.href || this.state;
-          if (href) {
-            this.$router.push(`/edit/${href}/${item._id}`);
-          } else {
-            this.$router.push(`/edit/${item._id}`);
-          }
+      return res;
+    }
+  },
+  methods: {
+    toDetail(item, index) {
+      if (item._id) {
+        let href = this.href || this.state;
+        if (href) {
+          this.$router.push(`/edit/${href}/${item._id}`);
+        } else {
+          this.$router.push(`/edit/${item._id}`);
         }
       }
     }
-  };
+  }
+};
 </script>
 
 <style scoped>
-  .link {
-    color: #409eff;
-    cursor: pointer;
-  }
-  .link:hover {
-    text-decoration: underline;
-  }
+.link {
+  color: #409eff;
+  cursor: pointer;
+}
+.link:hover {
+  text-decoration: underline;
+}
 </style>

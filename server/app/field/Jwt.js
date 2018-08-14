@@ -11,13 +11,9 @@ module.exports = {
       wxUser: '微信公众号用户端',
       wxCompany: '微信公众号公司端',
       wxDriver: '微信司机端',
-      cms: '后台管理系统'
+      cms: '后台管理系统',
+      sysCms: '系统管理员后台'
     }
-  },
-  company:{
-    name: '登录公司',
-    type: 'ObjectId',
-    ref: 'Company'
   },
   value: {
     name: 'token值',

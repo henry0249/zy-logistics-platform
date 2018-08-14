@@ -44,11 +44,25 @@ class UserService extends Service {
         username: body.username
       });
     }
+    
     return user;
   }
   async loginLocal() {
     const ctx = this.ctx;
     let user = await this.getUserInfo();
+    // if (!user.company) {
+    //   let roleCompany = await ctx.model.Role.findOne({
+    //     user: user._id,
+    //     createdAt: 1
+    //   });
+    //   if (!roleCompany) {
+    //     ctx.throw(404, '未关联公司,请联系公司管理员', user);
+    //   }
+    //   await user.update({
+    //     company: roleCompany._id
+    //   });
+    //   user = await ctx.model.User.findById(user._id);
+    // }
     let res = {};
     let token = await ctx.service.jwt.sign(user);
     res.token = token.value;
@@ -62,7 +76,9 @@ class UserService extends Service {
       ctx.throw(400, '您不是管理员', user);
     }
     let res = {};
-    let token = await ctx.service.jwt.sign(user);
+    let token = await ctx.service.jwt.sign(user, {
+      sys: 'sysCms'
+    });
     res.token = token.value;
     res.exp = token.expAt;
     return res;
@@ -110,7 +126,7 @@ class UserService extends Service {
   async power() {
     const ctx = this.ctx;
     let models = require('../field')('ALL');
-    return models
+    return models;
   }
 }
 module.exports = UserService;

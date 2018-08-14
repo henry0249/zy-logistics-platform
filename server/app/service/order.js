@@ -502,41 +502,30 @@ class OrderService extends Service {
     }, {
       path: 'company'
     }]);
-    let transportTrainsData = await ctx.model.TransportTrains.find({
+    let transportTrains = await ctx.model.TransportTrains.find({
       order: res._id,
       goods: res.goods
     }).populate([{
-      path: 'origin',
+      path: 'area',
       populate: areaPopulate
     }, {
-      path: 'transfer',
-      populate: [{
-        path: 'area',
-        populate: areaPopulate
-      }]
+      path: 'company'
     }, {
-      path: 'transfer2',
-      populate: areaPopulate,
-      populate: [{
-        path: 'area',
-        populate: areaPopulate
-      }]
-    }, {
-      path: 'destination',
-      populate: areaPopulate
+      path: 'user'
     }]);
-    let transportTrains = JSON.parse(JSON.stringify(transportTrainsData));
+    res.transportTrains = [];
+    // let transportTrains = JSON.parse(JSON.stringify(transportTrainsData));
     for (let j = 0; j < transportTrains.length; j++) {
-      let item = transportTrains[j];
+      let item = JSON.parse(JSON.stringify(transportTrains[j]));
       item.logistics = await ctx.model.Logistics.find({
         transportTrains: item._id,
-        order: res._id,
-        goods: goodsItem.value._id
+        order: res._id
       }).populate([{
         path: 'truck'
       }, {
         path: 'ship'
       }]);
+      res.transportTrains.push(item);
     }
     return res;
   }

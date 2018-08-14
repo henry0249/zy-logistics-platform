@@ -5,7 +5,7 @@
       <Info :val="order" :data.sync="orderAsync"></Info>
       <goods-table :order="orderAsync"></goods-table>
       <business-trains :val="order.businessTrains" :order="orderAsync" :data.sync="update.businessTrains"></business-trains>
-      <transport-trains-new v-if="orderAsync.area && orderAsync.area._id" :order="orderAsync" :data.sync="update.transportTrains"></transport-trains-new>
+      <transport-trains v-if="orderAsync.area && orderAsync.area._id" :order="orderAsync" :data.sync="update.transportTrains"></transport-trains>
     </div>
     <el-alert v-if="alert" style="margin-top:15px" :title="alert" type="info" center show-icon :closable="false">
     </el-alert>
@@ -26,7 +26,7 @@
 import Info from "./Info.vue";
 import GoodsTable from "./GoodsTable.vue";
 import BusinessTrains from "./BusinessTrains";
-import TransportTrainsNew from "./TransportTrainsNew";
+import TransportTrains from "./TransportTrains";
 export default {
   props: {
     title: {
@@ -50,7 +50,7 @@ export default {
     Info,
     GoodsTable,
     BusinessTrains,
-    TransportTrainsNew
+    TransportTrains
   },
   data() {
     return {
