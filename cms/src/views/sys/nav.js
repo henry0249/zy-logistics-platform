@@ -10,22 +10,22 @@ export default {
     path: '/sys/user/list'
   }],
   company:[{
-    name: '公司列表',
-    icon: 'icon-icon-test',
-    path: '/sys/company/list'
-  },{
     name: '添加公司',
     icon: 'icon-icon-test',
     path: '/sys/company/add'
+  },{
+    name: '公司列表',
+    icon: 'icon-icon-test',
+    path: '/sys/company/list'
   }],
   goods:[{
-    name: '商品列表',
-    icon: 'icon-icon-test',
-    path: '/sys/goods/list'
-  },{
     name: '商品添加',
     icon: 'icon-icon-test',
     path: '/sys/goods/add'
+  },{
+    name: '商品列表',
+    icon: 'icon-icon-test',
+    path: '/sys/goods/list'
   },
   {
     name: "分类管理",

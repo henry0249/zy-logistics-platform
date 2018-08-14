@@ -52,8 +52,7 @@ export default {
   },
   watch: {
     roleObj: {
-      handler(val) {
-      },
+      handler(val) {},
       deep: true
     },
     companyArr: {
@@ -70,10 +69,9 @@ export default {
   },
   methods: {
     async sub() {
-      let isSuccess = true;
+      this.loadingText = "添加中";
       if (this.confirmation()) {
         try {
-          this.loadingText = "添加中";
           let companyOp = {
             model: "company",
             curdType: "set",
@@ -96,64 +94,42 @@ export default {
             delete companyOp.businessRelationCompany;
           }
           let res = await this.$api.curd(companyOp);
-          if (res) {
-            for (const key in this.roleObj) {
-              for (let index = 0; index < this.roleObj[key].length; index++) {
-                let addrole = await this.$api.curd({
-                  model: "role",
+          for (const key in this.roleObj) {
+            for (let index = 0; index < this.roleObj[key].length; index++) {
+              let addrole = await this.$api.curd({
+                model: "role",
+                curdType: "set",
+                user: this.roleObj[key][index]._id,
+                company: res._id,
+                type: key
+              });
+              if (!addrole) {
+                isSuccess = false;
+              }
+            }
+          }
+          for (const key in this.shipObj) {
+            if (this.shipObj[key].length > 0) {
+              for (let index = 0; index < this.shipObj[key].length; index++) {
+                let shipAdd = await this.$api.curd({
+                  model: key,
                   curdType: "set",
-                  user: this.roleObj[key][index]._id,
-                  company: res._id,
-                  type: key
+                  no: this.shipObj[key][index].no,
+                  owner: this.shipObj[key][index].owner,
+                  type: this.shipObj[key][index].type,
+                  company: res._id
                 });
-                if (!addrole) {
+                if (!shipAdd) {
                   isSuccess = false;
                 }
               }
             }
-            for (const key in this.shipObj) {
-              if (this.shipObj[key].length > 0) {
-                for (let index = 0; index < this.shipObj[key].length; index++) {
-                  let shipAdd = await this.$api.curd({
-                    model: key,
-                    curdType: "set",
-                    no: this.shipObj[key][index].no,
-                    owner: this.shipObj[key][index].owner,
-                    type: this.shipObj[key][index].type,
-                    company: res._id
-                  });
-                  if (!shipAdd) {
-                    isSuccess = false;
-                  }
-                }
-              }
-            }
-          } else {
-            isSuccess = false;
           }
+          this.$message.success("添加成功！");
+          this.$router.go(-1);
         } catch (error) {}
-        this.loadingText = "";
-        if (isSuccess) {
-          this.$alert("添加成功！", "提示", {
-            confirmButtonText: "确定",
-            callback: action => {
-              this.$router.go(-1);
-            }
-          });
-        } else {
-          this.$confirm("添加失败", "提示", {
-            confirmButtonText: "继续添加",
-            cancelButtonText: "返回列表",
-            type: "warning"
-          })
-            .then(() => {
-              this.$router.go(0);
-            })
-            .catch(() => {
-              this.$router.go(-1);
-            });
-        }
       }
+      this.loadingText = "";
     },
     myAlert(str) {
       this.$alert(str, "提示", {

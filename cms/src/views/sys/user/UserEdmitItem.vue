@@ -103,7 +103,7 @@ export default {
             model: "user",
             curdType: "update"
           };
-          let res;
+          // let res;
           if (this.type === "add") {
             Object.assign(op, {
               name: this.userData.name,
@@ -127,8 +127,43 @@ export default {
               }
             }
             this.$set(op, "curdType", "set");
-            res = await this.$api.curd(op);
           } else if (this.type === "edmit") {
+            Object.assign(op, {
+              find: {
+                _id: this.$route.params._id
+              },
+              update: {
+                name: this.userData.name,
+                mobile: this.userData.mobile,
+                type: this.userData.type,
+                email: this.userData.email,
+                tag: this.userData.tag,
+                recommendedByUser: this.userData.recommendedByUser._id,
+                superior: this.userData.superior._id,
+                parent: this.userData.parent._id
+              }
+            });
+          }
+          let res = await this.$api.curd(op);
+          if (!res) {
+            this.$confirm(`${this.type === 'add'?'添加失败':'更新失败'}`, "提示", {
+              confirmButtonText:  `${this.type === 'add'?'继续添加':'继续修改'}`,
+              cancelButtonText: "返回",
+              type: "warning"
+            })
+              .then(() => {
+                // this.$router.go(0);
+              })
+              .catch(() => {
+                this.$router.go(-1);
+              });
+          } else {
+            this.$alert(`${this.type === 'add'?'添加成功':'修改成功'}`, "提示", {
+              confirmButtonText: "确定",
+              callback: action => {
+                this.$router.go(-1);
+              }
+            });
           }
         } catch (error) {}
         this.$emit("input", "");
