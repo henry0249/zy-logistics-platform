@@ -68,7 +68,7 @@
       </div>
       <div class="tr" style="margin-top:30px">
         <el-button size="small" @click="$router.go(-1)">返 回</el-button>
-        <el-button :disabled="disabled" size="small" type="primary" @click="checkMethods">修 改</el-button>
+        <el-button :disabled="disabled" size="small" type="primary" @click="checkMethods">添 加</el-button>
       </div>
     </div>
   </loading-box>

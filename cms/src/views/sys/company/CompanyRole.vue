@@ -18,6 +18,7 @@
       </el-tab-pane>
     </el-tabs>
     <div class="jc" v-if="show()" style="position:absolute;top:0;right:0;height:40px;" title="添加用户">
+      <el-button type="primary" @click="fastAdd" size="mini">快速初始化</el-button>
       <el-button type="success" @click="add" size="mini">添加{{userText()}}</el-button>
     </div>
     <el-dialog :title="`选择${userText()}`" width="50%" :visible.sync="dialogTableVisible">
@@ -35,207 +36,244 @@
 </template>
 
 <script>
-  import CompanyRoleItem from "./CompanyRoleItem.vue";
-  export default {
-    components: {
-      CompanyRoleItem
+import CompanyRoleItem from "./CompanyRoleItem.vue";
+export default {
+  components: {
+    CompanyRoleItem
+  },
+  props: {
+    type: {
+      type: String,
+      default: "edmit"
     },
-    props: {
-      type: {
-        type: String,
-        default: "edmit"
-      },
-      startRoleObj: {
-        type: Object,
-        default () {
-          return {};
-        }
-      },
-      removeData: {
-        type: Object,
-        default () {
-          return {
-            admin: [],
-            salesman: [],
-            finishCheck: [],
-            financial: [],
-            documentClerk: []
-          };
-        }
-      },
-      data: {
-        type: Object,
-        default () {
-          return {};
-        }
-      },
-      showData: {
-        type: Boolean,
-        default: true
+    startRoleObj: {
+      type: Object,
+      default() {
+        return {};
       }
     },
-    data() {
-      return {
-        startShowData: true,
-        startRemoveData: {
+    removeData: {
+      type: Object,
+      default() {
+        return {
           admin: [],
           salesman: [],
           finishCheck: [],
           financial: [],
           documentClerk: []
+        };
+      }
+    },
+    data: {
+      type: Object,
+      default() {
+        return {};
+      }
+    },
+    showData: {
+      type: Boolean,
+      default: true
+    }
+  },
+  data() {
+    return {
+      fastAddIo: false,
+      fastAddShow: false,
+      startShowData: true,
+      startRemoveData: {
+        admin: [],
+        salesman: [],
+        finishCheck: [],
+        financial: [],
+        documentClerk: []
+      },
+      btmIo: false,
+      btmDisabled: true,
+      selectionArr: [],
+      option: {},
+      tableHeight: "",
+      input: "",
+      activeName: "admin",
+      loadingText: "",
+      dialogTableVisible: false,
+      roleArr: {
+        admin: [],
+        salesman: [],
+        finishCheck: [],
+        financial: [],
+        documentClerk: []
+      },
+      thead: {
+        name: {
+          name: "用户名",
+          readOnly: true
         },
-        btmIo: false,
-        btmDisabled: true,
-        selectionArr: [],
-        option: {},
-        tableHeight: "",
-        input: "",
-        activeName: "",
-        loadingText: "",
-        dialogTableVisible: false,
-        roleArr: {
-          admin: [],
-          salesman: [],
-          finishCheck: [],
-          financial: [],
-          documentClerk: []
-        },
-        thead: {
-          name: {
-            name: "用户名",
-            readOnly: true
-          },
-          mobile: {
-            name: "手机号",
-            readOnly: true
+        mobile: {
+          name: "手机号",
+          readOnly: true
+        }
+      }
+    };
+  },
+  watch: {
+    startShowData(val) {
+      this.$emit("update:showData", val);
+    },
+    startRemoveData: {
+      handler(val) {
+        this.$emit("update:removeData", val);
+      },
+      deep: true
+    },
+    roleArr: {
+      handler(val, oldVal) {
+        for (const key in val) {
+          for (let index = 0; index < val[key].length; index++) {
+            for (let i = index + 1; i < val[key].length; i++) {
+              if (val[key][i]._id === val[key][index]._id) {
+                val[key].splice(i, 1);
+              }
+            }
           }
         }
-      };
-    },
-    watch: {
-      startShowData(val) {
-        this.$emit("update:showData", val);
-      },
-      startRemoveData: {
-        handler(val) {
-          this.$emit("update:removeData", val);
-        },
-        deep: true
-      },
-      roleArr: {
-        handler(val, oldVal) {
-          if (this.type === 'edmit') {
-            let op = oldVal.admin.length === 0 && oldVal.salesman.length === 0 && ldVal.finishCheck.length === 0 && oldVal.financial.length === 0 && oldVal.documentClerk.length === 0;
-            if (!op) {
-              this.$emit("update:data", val);
-            }
-          } else if (this.type === 'add') {
+        if (this.type === "edmit") {
+          let op =
+            oldVal.admin.length === 0 &&
+            oldVal.salesman.length === 0 &&
+            oldVal.finishCheck.length === 0 &&
+            oldVal.financial.length === 0 &&
+            oldVal.documentClerk.length === 0;
+          if (!op) {
             this.$emit("update:data", val);
           }
-        },
-        deep: true
-      },
-      activeName(val, oldVal) {},
-      selectionArr(val) {
-        if (val.length > 0) {
-          this.btmDisabled = false;
-        } else {
-          this.btmDisabled = true;
-        }
-      },
-      dialogTableVisible(val) {
-        if (!val) {
-          this.selectionArr = [];
-        }
-      }
-    },
-    methods: {
-      res() {
-        this.dialogTableVisible = false;
-      },
-      go() {
-        this.selectionArr.forEach(item => {
-          this.roleArr[this.activeName].push(item);
-        });
-        for (
-          let index = 0; index < this.roleArr[this.activeName].length; index++
-        ) {
-          for (let i = index + 1; i < this.roleArr[this.activeName].length; i++) {
-            if (
-              this.roleArr[this.activeName][index]._id ===
-              this.roleArr[this.activeName][i]._id
-            ) {
-              this.roleArr[this.activeName].splice(i, 1);
-            }
+        } else if (this.type === "add") {
+          this.$emit("update:data", val);
+          if (val.admin.length > 0) {
+            this.fastAddShow = true;
+          } else {
+            this.fastAddShow = false;
           }
         }
-        this.dialogTableVisible = false;
-        this.$emit("update:showData", false);
       },
-      selectionChange(val) {
-        this.selectionArr = val;
-      },
-      inputChange(val) {
-        if (val) {
-          this.$set(this.option, "$or", [{
-              name: {
-                $regex: val
-              }
-            },
-            {
-              mobile: {
-                $regex: val
-              }
-            }
-          ]);
-        } else {
-          delete this.option.$or;
-        }
-      },
-      userText() {
-        if (this.activeName === "admin") {
-          return "管理员";
-        } else if (this.activeName === "salesman") {
-          return "业务专员";
-        } else if (this.activeName === "finishCheck") {
-          return "完成审核员";
-        } else if (this.activeName === "financial") {
-          return "财务文员";
-        } else if (this.activeName === "documentClerk") {
-          return "单据文员";
-        } else {
-          return "";
-        }
-      },
-      show() {
-        if (
-          this.activeName === "admin" ||
-          this.activeName === "salesman" ||
-          this.activeName === "finishCheck" ||
-          this.activeName === "financial" ||
-          this.activeName === "documentClerk"
-        ) {
-          return true;
-        }
-      },
-      add() {
-        if (this.show()) {
-          this.dialogTableVisible = true;
-        }
+      deep: true
+    },
+    activeName(val, oldVal) {},
+    selectionArr(val) {
+      if (val.length > 0) {
+        this.btmDisabled = false;
+      } else {
+        this.btmDisabled = true;
       }
     },
-    mounted() {
-      this.tableHeight =
-        document.documentElement.clientHeight * 0.7 - 114 - 58 + "px";
-    },
-    async created() {
-      // this.roleArr = JSON.parse(JSON.stringify(this.startRoleObj));
+    dialogTableVisible(val) {
+      if (!val) {
+        this.selectionArr = [];
+      }
     }
-  };
+  },
+  methods: {
+    fastAdd() {
+      this.fastAddIo = true;
+      this.add();
+    },
+    res() {
+      this.dialogTableVisible = false;
+    },
+    go() {
+      this.selectionArr.forEach(item => {
+        this.roleArr[this.activeName].push(item);
+      });
+      for (
+        let index = 0;
+        index < this.roleArr[this.activeName].length;
+        index++
+      ) {
+        for (let i = index + 1; i < this.roleArr[this.activeName].length; i++) {
+          if (
+            this.roleArr[this.activeName][index]._id ===
+            this.roleArr[this.activeName][i]._id
+          ) {
+            this.roleArr[this.activeName].splice(i, 1);
+          }
+        }
+      }
+      if (this.fastAddIo) {
+        for (const key in this.roleArr) {
+          this.selectionArr.forEach(item => {
+            this.roleArr[key].push(item);
+          });
+        }
+      }
+      this.dialogTableVisible = false;
+      this.$emit("update:showData", false);
+    },
+    selectionChange(val) {
+      this.selectionArr = val;
+    },
+    inputChange(val) {
+      if (val) {
+        this.$set(this.option, "$or", [
+          {
+            name: {
+              $regex: val
+            }
+          },
+          {
+            mobile: {
+              $regex: val
+            }
+          }
+        ]);
+      } else {
+        delete this.option.$or;
+      }
+    },
+    userText() {
+      if (this.activeName === "admin") {
+        return "管理员";
+      } else if (this.activeName === "salesman") {
+        return "业务专员";
+      } else if (this.activeName === "finishCheck") {
+        return "完成审核员";
+      } else if (this.activeName === "financial") {
+        return "财务文员";
+      } else if (this.activeName === "documentClerk") {
+        return "单据文员";
+      } else {
+        return "";
+      }
+    },
+    show() {
+      if (
+        this.activeName === "admin" ||
+        this.activeName === "salesman" ||
+        this.activeName === "finishCheck" ||
+        this.activeName === "financial" ||
+        this.activeName === "documentClerk"
+      ) {
+        return true;
+      }
+    },
+    add() {
+      if (this.show()) {
+        this.dialogTableVisible = true;
+      }
+    }
+  },
+  mounted() {
+    this.tableHeight =
+      document.documentElement.clientHeight * 0.7 - 114 - 58 + "px";
+  },
+  async created() {
+    if (this.type === "edmit") {
+      this.roleArr = JSON.parse(JSON.stringify(this.startRoleObj));
+    }
+  }
+};
 </script>
 
 <style scoped>
-  .role-box {
-    position: relative;
-  }
+.role-box {
+  position: relative;
+}
 </style>

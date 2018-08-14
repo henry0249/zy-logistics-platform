@@ -52,7 +52,7 @@
       return {
         truckRemoveArr: [],
         shipRemoveArr: [],
-        activeName: "",
+        activeName: "truck",
         truckData: [],
         shipData: [],
         truckThead: {

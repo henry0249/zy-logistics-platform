@@ -1,5 +1,6 @@
 import App from './App.vue';
 import List from './UserList.vue';
+import UserAdd from './UserAdd.vue';
 
 export default [{
   path: 'user',
@@ -11,5 +12,8 @@ export default [{
   children:[{
     path:'list',
     component:List
+  },{
+    path:'add',
+    component:UserAdd
   }]
 }]

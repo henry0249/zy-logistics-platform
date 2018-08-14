@@ -9,8 +9,8 @@
         <company-edmit-item v-if="!loadingText" v-model="loadingText" :data.sync="companyArr" :startData="startCompanyArr"></company-edmit-item>
         <common-alert style="margin:15px 0">公司角色</common-alert>
         <company-role v-if="!loadingText" :removeData.sync="removeData" :data.sync="roleObj" :startRoleObj="startRoleObj" :showData.sync="show"></company-role>
-        <common-alert style="margin:15px 0">车船信息</common-alert>
-        <company-ship v-if="!loadingText" :startData="startShipObj" :removeObj.sync="shipRemoveObj" :isLogistics="isLogistics" :data.sync="shipObj"></company-ship>
+        <common-alert style="margin:15px 0">{{isLogistics?'车船信息':'车船信息 (该公司不是物流公司，无车船信息)'}}</common-alert>
+        <company-ship v-if="!loadingText&&isLogistics" :startData="startShipObj" :removeObj.sync="shipRemoveObj" :isLogistics="isLogistics" :data.sync="shipObj"></company-ship>
       </div>
       <div class="tr" style="margin-top:30px">
         <el-button size="small" @click="$router.go(-1)">返 回</el-button>
@@ -304,6 +304,7 @@ export default {
             }
           }
         });
+        console.log(this.startRoleObj);
       } catch (error) {}
     },
     async getTruc() {
@@ -312,6 +313,7 @@ export default {
           model: "truck",
           curdType: "find",
           limit: 0,
+          company:this.$route.params._id,
           populate: [
             {
               path: "owner"
@@ -335,6 +337,7 @@ export default {
           model: "ship",
           curdType: "find",
           limit: 0,
+          company:this.$route.params._id,
           populate: [
             {
               path: "owner"

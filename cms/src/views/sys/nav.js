@@ -1,8 +1,13 @@
 export default {
-  user:[{
+  user:[
+    {
+      name: '添加用户',
+      icon: 'icon-icon-test',
+      path: '/sys/user/add'
+    },{
     name: '用户列表',
     icon: 'icon-icon-test',
-    path: ''
+    path: '/sys/user/list'
   }],
   company:[{
     name: '公司列表',
@@ -21,6 +26,19 @@ export default {
     name: '商品添加',
     icon: 'icon-icon-test',
     path: '/sys/goods/add'
+  },
+  {
+    name: "分类管理",
+    color: "orange",
+    icon: "icon-fenlei",
+    path:"/sys/goods/category"
+  },
+  {
+    name: "品牌管理",
+    color: "orange",
+    icon: "icon-shangbiao",
+    iconSize: '15',
+    path: "/sys/goods/brand"
   }],
   area:[{
     name: '地区列表',

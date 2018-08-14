@@ -2,6 +2,8 @@ import App from './App.vue';
 import List from './GoodsList.vue';
 import Add from './GoodsAdd.vue';
 import Edmit from './GoodsEdmit.vue';
+import GoodsBrand from './GoodsBrand.vue';
+import GoodsCategory from './GoodsCategory.vue';
 
 export default [{
   path: 'goods',
@@ -16,6 +18,12 @@ export default [{
   },{
     path:'add',
     component:Add
+  },{
+    path:'category',
+    component:GoodsCategory
+  },{
+    path:'brand',
+    component:GoodsBrand
   },{
     path:'edmit/:_id',
     component:Edmit
