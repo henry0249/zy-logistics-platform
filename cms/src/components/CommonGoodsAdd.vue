@@ -23,15 +23,15 @@
             <common-select class="form-right" v-if="sys" label="生产厂商" :data.sync="goods.mfrs" border width="25%" title="公司选择" type="company" size="mini"></common-select>
             <my-form-item select class="form-right" v-model="goods.saleState" filterable label="售卖状态" :options="field.Goods.saleState.option">
             </my-form-item>
-            <my-form-item class="form-right" v-if="!sys" switch v-model="goods.selfDeliverySupport" label="支持自提" active-text="支持" inactive-text="不支持">
+            <my-form-item class="form-right" v-if="!sys" switch v-model="goods.selfDeliverySupport" label="支持自提">
             </my-form-item>
-            <my-form-item class="form-right" v-if="!sys" switch v-model="goods.freeDelivery" label="包配送费" active-text="包" inactive-text="不包">
+            <my-form-item class="form-right" v-if="!sys" switch v-model="goods.freeDelivery" label="包配送费">
             </my-form-item>
           </div>
           <div class="flex form-box" style="margin-top:20px;">
-            <my-form-item class="form-right" v-if="sys" switch v-model="goods.selfDeliverySupport" label="支持自提" active-text="支持" inactive-text="不支持">
+            <my-form-item class="form-right" v-if="sys" switch v-model="goods.selfDeliverySupport" label="支持自提">
             </my-form-item>
-            <my-form-item class="form-right" v-if="sys" switch v-model="goods.freeDelivery" label="包配送费" active-text="包" inactive-text="不包">
+            <my-form-item class="form-right" v-if="sys" switch v-model="goods.freeDelivery" label="包配送费">
             </my-form-item>
             <div class="flex edmit-tag">
               <i style="width:60px;font-size: 12px;">标签</i>
@@ -58,12 +58,13 @@
         <my-table v-else size="mini" edit :thead="thead" :data.sync="tableList" index border op opWidth="50px">
           <div slot="op" slot-scope="scope" class="tc" style="width:100%;color:#F56C6C">
             <i v-if="tableList.length>0" title="删除该地区" class="pointer" @click="delAdr(scope['index'])">
-              <icon size="16px">icon-ec1</icon>
-            </i>
+                          <icon size="16px">icon-ec1</icon>
+                        </i>
           </div>
-          <template slot-scope="scope" v-if="scope.column.property === 'area'">
-            <common-select :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" border width="100%" title="用户选择" type="area" size="mini"></common-select>
-          </template>
+          <template slot-scope="scope">
+                        <common-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" border width="100%" title="用户选择" type="area" size="mini"></common-select>
+                        <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
+</template>
         </my-table>
       </div>
       <div class="tr" style="margin-top:30px">
@@ -75,254 +76,235 @@
 </template>
 
 <script>
-  export default {
-    props: {
-      sys: {
-        type: Boolean,
-        default: false
-      },
-    },
-    data() {
-      return {
-        disabled: true,
-        value: '',
-        tableList: [],
-        thead: {
-          area: {
-            name: '地区',
-            slot: true,
-            readOnly: true,
-          },
-          factory: {
-            name: '出厂价',
-          },
-          sell: {
-            name: '销售价',
-          },
-          transport: {
-            name: '运输价',
-          }
+export default {
+  props: {
+    sys: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      disabled: true,
+      value: "",
+      tableList: [],
+      thead: {
+        area: {
+          name: "地区",
+          slot: true,
+          readOnly: true
         },
-        goods: {
-          name: '',
-          unit: '',
-          spec: '',
-          category: '',
-          brand: '',
-          saleState: '',
-          selfDeliverySupport: false,
-          freeDelivery: false,
-          tag: [],
-          mfrs: {},
-          detail: ''
+        factory: {
+          name: "出厂价",
+          slot: true,
+          readOnly: true
         },
-        inputVisible: false,
-        inputValue: '',
-        categoryArr: [],
-        brandArr: [],
-        mfrsArr: [],
-      }
-    },
-    watch: {
-      tableList: {
-        handler: function(val, oldVal) {
-          if (oldVal.length > 0) {
-            this.disabled = false;
-            this.priceChange = true;
-          }
+        sell: {
+          name: "销售价",
+          slot: true,
+          readOnly: true
         },
-        deep: true
+        transport: {
+          name: "运输价",
+          slot: true,
+          readOnly: true
+        }
       },
       goods: {
-        handler: function(val, oldVal) {
+        name: "",
+        unit: "",
+        spec: "",
+        category: "",
+        brand: "",
+        saleState: 1,
+        selfDeliverySupport: false,
+        freeDelivery: false,
+        tag: [],
+        mfrs: {},
+        detail: ""
+      },
+      inputVisible: false,
+      inputValue: "",
+      categoryArr: [],
+      brandArr: [],
+      mfrsArr: []
+    };
+  },
+  watch: {
+    tableList: {
+      handler: function(val, oldVal) {
+        if (oldVal.length > 0) {
           this.disabled = false;
-          this.goodsChange = true;
-        },
-        deep: true
+          this.priceChange = true;
+        }
+      },
+      deep: true
+    },
+    goods: {
+      handler: function(val, oldVal) {
+        this.disabled = false;
+        this.goodsChange = true;
+      },
+      deep: true
+    }
+  },
+  methods: {
+    delAdr(i) {
+      this.tableList.splice(i, 1);
+    },
+    addPrice() {
+      let obj = {
+        area: {},
+        sell: 0,
+        transport: 0,
+        factory: 0
+      };
+      this.tableList.push(obj);
+    },
+    tagType(index, arr) {
+      let type = ["success", "info", "warning", "danger"];
+      if (index <= arr.length - 1) {
+        return type[index];
+      } else {
+        return type[index - arr.length - 1];
       }
     },
-    methods: {
-      delAdr(i) {
-        if (this.tableList.length > 1) {
-          this.tableList.splice(i, 1);
-        } else {
-          this.$alert(`至少有一个地区`, "提示", {
-            confirmButtonText: "确定",
-            callback: () => {
-              return;
-            }
-          });
-        }
-      },
-      addPrice() {
-        let obj = {
-          area: {},
-          sell: 0,
-          transport: 0,
-          factory: 0
-        }
-        this.tableList.push(obj);
-      },
-      tagType(index, arr) {
-        let type = ['success', 'info', 'warning', 'danger'];
-        if (index <= arr.length - 1) {
-          return type[index];
-        } else {
-          return type[index - arr.length - 1];
-        }
-      },
-      handleClose(options, tag) {
-        options.splice(options.indexOf(tag), 1);
-      },
-      showInput() {
-        this.inputVisible = true;
-        this.$nextTick(_ => {
-          this.$refs.saveTagInput.$refs.input.focus();
+    handleClose(options, tag) {
+      options.splice(options.indexOf(tag), 1);
+    },
+    showInput() {
+      this.inputVisible = true;
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus();
+      });
+    },
+    handleInputConfirm(options) {
+      let inputValue = this.inputValue;
+      if (inputValue) {
+        options.push(inputValue);
+      }
+      this.inputVisible = false;
+      this.inputValue = "";
+    },
+    async checkMethods() {
+      if (!this.goods.name) {
+        this.$alert("名字是必填的", "提示", {
+          confirmButtonText: "确定",
+          callback: action => {}
         });
-      },
-      handleInputConfirm(options) {
-        let inputValue = this.inputValue;
-        if (inputValue) {
-          options.push(inputValue);
-        }
-        this.inputVisible = false;
-        this.inputValue = "";
-      },
-      async checkMethods() {
-        if (!this.goods.name) {
-          this.$alert('名字是必填的', '提示', {
-            confirmButtonText: '确定',
-            callback: action => {}
-          });
-          return
-        }
-        if (this.sys && !Object.keys(this.goods.mfrs).length === 0) {
-          this.$alert('生产厂商是必填的', '提示', {
-            confirmButtonText: '确定',
-            callback: action => {}
-          });
-          return
-        }
-        if (this.tableList.length > 0) {
-          this.tableList.forEach(tableListItem => {
-            if (Object.keys(tableListItem.area).length === 0) {
-              this.$alert('地区是必填的', '提示', {
-                confirmButtonText: '确定',
-                callback: action => {}
-              });
-              return
-            }
-            if (!(/(^[1-9]\d*$)/.test(tableListItem.sell)) || !(/(^[1-9]\d*$)/.test(tableListItem.factory)) || !(/(^[1-9]\d*$)/.test(tableListItem.transport))) {
-              this.$alert('价格必须是数字并且大于0', '提示', {
-                confirmButtonText: '确定',
-                callback: action => {}
-              });
-              return
-            }
-          });
-        }
-        await this.sub();
-      },
-      async sub() {
-        try {
-          this.value = '更新中';
-          let io = true;
-          let goodsOp = {
-            model: 'goods',
-            curdType: 'add'
-          }
-          for (const key in this.goods) {
-            goodsOp[key] = this.goods[key]
-          }
-          if (this.sys) {
-            goodsOp.mfrs = this.goods.mfrs._id;
-          } else {
-            goodsOp.mfrs = this.loginInfo.company._id;
-          }
-          let goods = await this.$api.curd(goodsOp);
-          if (!goods) {
-            io = false;
-          } else {
-            for (let index = 0; index < this.tableList.length; index++) {
-              let price = await this.$api.curd({
-                model: 'price',
-                curdType: 'add',
-                sell: this.tableList[index].sell,
-                factory: this.tableList[index].factory,
-                transport: this.tableList[index].transport,
-                goods: goods._id,
-                area: this.tableList[index].area._id
-              })
-              if (!price) {
-                io = false
-              }
-            }
-          }
-          this.value = '';
-          if (io) {
-            this.$alert('添加成功', '提示', {
-              confirmButtonText: '确定',
-              callback: action => {
-                this.$router.go(0)
-              }
-            });
-          } else {
-            this.$alert('添加失败', '提示', {
-              confirmButtonText: '确定',
+        return;
+      }
+      if (this.sys && !Object.keys(this.goods.mfrs).length === 0) {
+        this.$alert("生产厂商是必填的", "提示", {
+          confirmButtonText: "确定",
+          callback: action => {}
+        });
+        return;
+      }
+      if (this.tableList.length > 0) {
+        this.tableList.forEach(tableListItem => {
+          if (Object.keys(tableListItem.area).length === 0) {
+            this.$alert("地区是必填的", "提示", {
+              confirmButtonText: "确定",
               callback: action => {}
             });
+            return;
           }
-        } catch (error) {}
-      },
-      async getBrand() {
-        try {
-          this.brandArr = await this.$api.curd({
-            model: 'brand',
-            curdType: 'find'
-          })
-        } catch (error) {
-        }
-      },
-      async getCategory() {
-        try {
-          this.categoryArr = await this.$api.curd({
-            model: 'category',
-            curdType: 'find'
-          })
-        } catch (error) {
-        }
-      },
+          if (
+            !/(^[1-9]\d*$)/.test(tableListItem.sell) ||
+            !/(^[1-9]\d*$)/.test(tableListItem.factory) ||
+            !/(^[1-9]\d*$)/.test(tableListItem.transport)
+          ) {
+            this.$alert("价格必须是数字并且大于0", "提示", {
+              confirmButtonText: "确定",
+              callback: action => {}
+            });
+            return;
+          }
+        });
+      }
+      await this.sub();
     },
-    async created() {
-      this.value = '加载中';
-      await this.getBrand();
-      await this.getCategory();
-      this.value = '';
+    async sub() {
+      try {
+        this.value = "更新中";
+        let io = true;
+        let goodsOp = {
+          model: "goods",
+          curdType: "add"
+        };
+        for (const key in this.goods) {
+          goodsOp[key] = this.goods[key];
+        }
+        if (this.sys) {
+          goodsOp.mfrs = this.goods.mfrs._id;
+        } else {
+          goodsOp.mfrs = this.loginInfo.company._id;
+        }
+        let goods = await this.$api.curd(goodsOp);
+        for (let index = 0; index < this.tableList.length; index++) {
+          let price = await this.$api.curd({
+            model: "price",
+            curdType: "add",
+            sell: this.tableList[index].sell,
+            factory: this.tableList[index].factory,
+            transport: this.tableList[index].transport,
+            goods: goods._id,
+            area: this.tableList[index].area._id
+          });
+        }
+        this.$message.success("添加成功！");
+        this.$router.go(-1);
+      } catch (error) {}
+      this.value = "";
+    },
+    async getBrand() {
+      try {
+        this.brandArr = await this.$api.curd({
+          model: "brand",
+          curdType: "find"
+        });
+      } catch (error) {}
+    },
+    async getCategory() {
+      try {
+        this.categoryArr = await this.$api.curd({
+          model: "category",
+          curdType: "find"
+        });
+      } catch (error) {}
     }
+  },
+  async created() {
+    this.value = "加载中";
+    await this.getBrand();
+    await this.getCategory();
+    this.value = "";
   }
+};
 </script>
 
 <style scoped>
-  .g-order-create {
-    padding: 3% 5%;
-  }
-  .g-order {
-    margin: 0 auto;
-    padding: 30px;
-    border: 1px solid #eee;
-    border-radius: 4px;
-  }
-  .edmit-tag {
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center
-  }
-  .form-box {
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center
-  }
-  .form-right {
-    padding-right: 20px
-  }
+.g-order-create {
+  padding: 3% 5%;
+}
+.g-order {
+  margin: 0 auto;
+  padding: 30px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+.edmit-tag {
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+.form-box {
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+.form-right {
+  padding-right: 20px;
+}
 </style>

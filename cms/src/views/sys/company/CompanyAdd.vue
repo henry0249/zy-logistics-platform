@@ -51,6 +51,15 @@ export default {
     };
   },
   watch: {
+    "companyArr.type"(val) {
+      let io = false;
+      val.forEach(item => {
+        if (item === "logistics") {
+          io = true;
+        }
+      });
+      this.isLogistics = io;
+    },
     roleObj: {
       handler(val) {},
       deep: true
@@ -58,11 +67,6 @@ export default {
     companyArr: {
       handler(val) {
         this.disabled = false;
-        val.type.forEach(item => {
-          if (item === "logistics") {
-            this.isLogistics = true;
-          }
-        });
       },
       deep: true
     }
