@@ -67,23 +67,24 @@
     watch: {
       companyData: {
         handler: function(val, oldVal) {
-          if (this.type === "edmit") {
-            if (oldVal._id) {
-              this.$emit("update:data", val);
-            }
-          } else if (this.type === "add") {
-            if (val.area._id) {
-              this.$set(
-                this.companyData,
-                "areaInfo",
-                val.area.province.name +
-                val.area.city.name +
-                val.area.county.name +
-                val.area.name
-              );
-            }
+          // if (this.type === "edmit") {
+          //   if (oldVal._id) {
+          //     this.$emit("update:data", val);
+          //   }
+          // } else if (this.type === "add") {
+          //   if (val.area._id) {
+          //     this.$set(
+          //       this.companyData,
+          //       "areaInfo",
+          //       val.area.province.name +
+          //       val.area.city.name +
+          //       val.area.county.name +
+          //       val.area.name
+          //     );
+          //   }
+            console.log(val);
             this.$emit("update:data", val);
-          }
+          // }
         },
         deep: true
       }

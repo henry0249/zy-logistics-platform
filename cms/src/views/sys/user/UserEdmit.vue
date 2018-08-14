@@ -1,0 +1,52 @@
+<template>
+  <user-edmit-item v-if="!loadingText" type="edmit" :startData="startData" v-model="loadingText">
+  </user-edmit-item>
+</template>
+
+<script>
+import UserEdmitItem from './UserEdmitItem';
+export default {
+  components: {
+    UserEdmitItem
+  },
+  data() {
+    return {
+      loadingText:'',
+      startData: {}
+    };
+  },
+  methods: {
+    async getData() {
+      try {
+        this.startData = await this.$api.curd({
+          model: "user",
+          curdType: "findOne",
+          populate: [
+            {
+              path: "area"
+            },
+            {
+              path: "recommendedByUser"
+            },
+            {
+              path: "superior"
+            },
+            {
+              path: "parent"
+            }
+          ],
+          _id: this.$route.params._id
+        });
+      } catch (error) {}
+    }
+  },
+  async created() {
+    this.loadingText = '更新中';
+    await this.getData();
+    this.loadingText = '';
+  }
+};
+</script>
+
+<style scoped>
+</style>

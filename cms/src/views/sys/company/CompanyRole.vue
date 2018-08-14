@@ -1,27 +1,27 @@
 <template>
   <loading-box v-model="loadingText" class="role-box" style="position: relative;">
-    <el-tabs v-model="activeName" type="card" style="box-shadow:none;">
+    <el-tabs v-model="activeName" style="box-shadow:none;">
       <el-tab-pane label="管理员" name="admin">
-        <company-role-item :removeData.sync="startRemoveData.admin" :show.sync="startShowData" :data.sync="roleArr.admin" key="admin"></company-role-item>
+        <company-role-item style="margin-top:15px;" :removeData.sync="startRemoveData.admin" :show.sync="startShowData" :data.sync="roleArr.admin" key="admin"></company-role-item>
       </el-tab-pane>
       <el-tab-pane label="业务专员" name="salesman">
-        <company-role-item :removeData.sync="startRemoveData.salesman" :show.sync="startShowData" :data.sync="roleArr.salesman" key="salesman"></company-role-item>
+        <company-role-item style="margin-top:15px;" :removeData.sync="startRemoveData.salesman" :show.sync="startShowData" :data.sync="roleArr.salesman" key="salesman"></company-role-item>
       </el-tab-pane>
       <el-tab-pane label="完成审核员" name="finishCheck">
-        <company-role-item :removeData.sync="startRemoveData.finishCheck" :show.sync="startShowData" :data.sync="roleArr.finishCheck" key="finishCheck"></company-role-item>
+        <company-role-item style="margin-top:15px;" :removeData.sync="startRemoveData.finishCheck" :show.sync="startShowData" :data.sync="roleArr.finishCheck" key="finishCheck"></company-role-item>
       </el-tab-pane>
       <el-tab-pane label="财务文员" name="financial">
-        <company-role-item :removeData.sync="startRemoveData.financial" :show.sync="startShowData" :data.sync="roleArr.financial" key="financial"></company-role-item>
+        <company-role-item style="margin-top:15px;" :removeData.sync="startRemoveData.financial" :show.sync="startShowData" :data.sync="roleArr.financial" key="financial"></company-role-item>
       </el-tab-pane>
       <el-tab-pane label="单据文员" name="documentClerk">
-        <company-role-item :removeData.sync="startRemoveData.documentClerk" :show.sync="startShowData" :data.sync="roleArr.documentClerk" key="documentClerk"></company-role-item>
+        <company-role-item style="margin-top:15px;" :removeData.sync="startRemoveData.documentClerk" :show.sync="startShowData" :data.sync="roleArr.documentClerk" key="documentClerk"></company-role-item>
       </el-tab-pane>
     </el-tabs>
-    <div class="jc" v-if="show()" style="position:absolute;top:0;right:0;height:40px;" title="添加用户">
+    <div class="jc" v-if="show()" style="position:absolute;top:0;right:0;height:40px;">
       <el-button type="primary" @click="fastAdd" size="mini">快速初始化</el-button>
-      <el-button type="success" @click="add" size="mini">添加{{userText()}}</el-button>
+      <el-button type="success" @click="add" :title="`添加${userText()}`" size="mini">{{userText()}}<i class="el-icon-plus el-icon--right"></i></el-button>
     </div>
-    <el-dialog :title="`选择${userText()}`" width="50%" :visible.sync="dialogTableVisible">
+    <el-dialog :title="`选择${userText()}`" width="70%" :visible.sync="dialogTableVisible">
       <common-table v-if="dialogTableVisible" path="/user/find" @selection-change="selectionChange" :height="tableHeight" :thead="thead" selection :option="option">
         <div slot="header">
           <my-form-item input v-model="input" @change="inputChange" width="300px" size="mini" filterable placeholder="搜索用户名或者手机号码"></my-form-item>

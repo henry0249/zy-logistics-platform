@@ -1,6 +1,7 @@
 import App from './App.vue';
 import List from './UserList.vue';
 import UserAdd from './UserAdd.vue';
+import UserEdmit from './UserEdmit.vue';
 
 export default [{
   path: 'user',
@@ -15,5 +16,8 @@ export default [{
   },{
     path:'add',
     component:UserAdd
+  },{
+    path:'edmit/:_id',
+    component:UserEdmit
   }]
 }]

@@ -9,12 +9,12 @@
         <company-edmit-item v-if="!loadingText" type="add" v-model="loadingText" :data.sync="companyArr"></company-edmit-item>
         <common-alert style="margin:15px 0">公司角色</common-alert>
         <company-role v-if="!loadingText" type="add" :data.sync="roleObj" :showData.sync="show"></company-role>
-        <common-alert style="margin:15px 0">车船信息</common-alert>
-        <company-ship v-if="!loadingText" type="add" :isLogistics="isLogistics" :data.sync="shipObj"></company-ship>
+        <common-alert style="margin:15px 0">{{isLogistics?'车船信息':'车船信息 (该公司不是物流公司，无车船信息)'}}</common-alert>
+        <company-ship v-if="!loadingText&&isLogistics" type="add" :isLogistics="isLogistics" :data.sync="shipObj"></company-ship>
       </div>
       <div class="tr" style="margin-top:30px">
         <el-button size="small" @click="$router.go(-1)">返 回</el-button>
-        <el-button :disabled="disabled" size="small" type="primary" @click="sub">添 加</el-button>
+        <el-button size="small" type="primary" @click="sub">添 加</el-button>
       </div>
     </div>
   </loading-box>
@@ -188,15 +188,6 @@ export default {
         this.myAlert(`最少选择一名${str.substr(0, str.length - 1)}`);
         returnIo = false;
       }
-      // else if (this.isLogistics) {
-      //   if (this.shipObj.ship.length === 0) {
-      //     this.myAlert("最少有一条船");
-      //     returnIo = false;
-      //   } else if (this.shipObj.ship.length === 0) {
-      //     this.myAlert("最少有一辆车");
-      //     returnIo = false;
-      //   }
-      // }
       return returnIo;
     }
   }

@@ -1,15 +1,15 @@
 <template>
   <div class="role-box">
-    <el-tabs v-model="activeName" type="card" style="box-shadow:none;">
+    <el-tabs v-model="activeName" style="box-shadow:none;">
       <el-tab-pane label="车辆信息" name="truck">
-        <company-ship-item str="Truck" :removeArr="truckRemoveArr" :activeName="activeName" :thead="truckThead" :data.sync="truckData" key="truck"></company-ship-item>
+        <company-ship-item style="margin-top:15px;" str="Truck" :removeArr="truckRemoveArr" :activeName="activeName" :thead="truckThead" :data.sync="truckData" key="truck"></company-ship-item>
       </el-tab-pane>
       <el-tab-pane label="船只信息" name="ship">
-        <company-ship-item str="Ship" :removeArr="shipRemoveArr" :activeName="activeName" :thead="shipThead" :data.sync="shipData" key="ship"></company-ship-item>
+        <company-ship-item style="margin-top:15px;" str="Ship" :removeArr="shipRemoveArr" :activeName="activeName" :thead="shipThead" :data.sync="shipData" key="ship"></company-ship-item>
       </el-tab-pane>
     </el-tabs>
     <div class="jc" v-if="show()" style="position:absolute;top:0;right:0;height:40px;" :title="`添加${typeText()}`">
-      <el-button type="success" @click="add" size="mini">添加{{typeText()}}</el-button>
+      <el-button type="success" @click="add" size="mini">{{typeText()}}<i class="el-icon-plus el-icon--right"></i></el-button>
     </div>
   </div>
 </template>

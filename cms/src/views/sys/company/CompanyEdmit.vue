@@ -14,7 +14,7 @@
       </div>
       <div class="tr" style="margin-top:30px">
         <el-button size="small" @click="$router.go(-1)">返 回</el-button>
-        <el-button :disabled="disabled" size="small" type="primary" @click="sub">修 改</el-button>
+        <el-button size="small" type="primary" @click="sub">修 改</el-button>
       </div>
     </div>
   </loading-box>
@@ -60,6 +60,10 @@ export default {
   watch: {
     companyArr: {
       handler(val, oldVal) {
+        console.log(val);
+        if (val.type.length > 0) {
+          console.log("111");
+        }
         this.companyIo = true;
         this.disabled = false;
       },
@@ -86,183 +90,238 @@ export default {
     }
   },
   methods: {
+    myAlert(str) {
+      this.$alert(str, "提示", {
+        confirmButtonText: "确定"
+      });
+    },
+    confirmation() {
+      let returnIo = true;
+      let roleKey = {
+        admin: "管理员",
+        salesman: "业务专员",
+        finishCheck: "完成审核员",
+        financial: "财务文员",
+        documentClerk: "单据文员"
+      };
+      let str = "";
+      for (const key in roleKey) {
+        if (this.roleObj[key].length === 0) {
+          str += roleKey[key] + "、";
+        }
+      }
+      if (!this.companyArr.name) {
+        this.myAlert("公司名称不能为空");
+        returnIo = false;
+      } else if (!this.companyArr.nick) {
+        this.myAlert("公司别称不能为空");
+        returnIo = false;
+      } else if (!this.companyArr.area._id) {
+        this.myAlert("公司地区不能为空");
+        returnIo = false;
+      } else if (str) {
+        this.myAlert(`最少选择一名${str.substr(0, str.length - 1)}`);
+        returnIo = false;
+      }
+      return returnIo;
+    },
     async sub() {
-      try {
-        this.loadingText = "更新中";
-        let io = true;
-        if (this.companyIo) {
-          let companyOp = JSON.parse(JSON.stringify(this.companyArr));
-          delete companyOp._id;
-          let company = await this.$api.curd({
-            model: "company",
-            curdType: "update",
-            find: {
-              _id: this.$route.params._id
-            },
-            update: companyOp
-          });
-          if (!company) {
-            io = false;
+      if (this.confirmation()) {
+        try {
+          this.loadingText = "更新中";
+          let io = true;
+          if (this.companyIo) {
+            let companyOp = JSON.parse(JSON.stringify(this.companyArr));
+            delete companyOp._id;
+            let company = await this.$api.curd({
+              model: "company",
+              curdType: "update",
+              find: {
+                _id: this.$route.params._id
+              },
+              update: companyOp
+            });
+            if (!company) {
+              io = false;
+            }
           }
-        }
-        if (this.roleIo) {
-          let roleOp = {};
-          for (const key in this.removeData) {
-            if (this.removeData[key].length > 0) {
-              for (let index = 0;index < this.removeData[key].length;index++) {
-                let delRole = await this.$ajax.post(
-                  "/role/delete?_id=" + this.removeData[key][index]
-                );
-                if (!delRole) {
-                  io = false;
+          if (this.roleIo) {
+            let roleOp = {};
+            for (const key in this.removeData) {
+              if (this.removeData[key].length > 0) {
+                for (
+                  let index = 0;
+                  index < this.removeData[key].length;
+                  index++
+                ) {
+                  let delRole = await this.$ajax.post(
+                    "/role/delete?_id=" + this.removeData[key][index]
+                  );
+                  if (!delRole) {
+                    io = false;
+                  }
                 }
               }
             }
-          }
-          for (const key in this.roleObj) {
-            for (let index = 0; index < this.roleObj[key].length; index++) {
-              if (!this.roleObj[key][index].roleId) {
-                let addRole = await this.$ajax.post("/role/add", {
-                  company: this.$route.params._id,
-                  user: this.roleObj[key][index]._id,
-                  type: key
-                });
-                if (!addRole) {
-                  io = false;
-                }
-              }
-            }
-          }
-        }
-        if (this.shipIo) {
-          for (const key in this.shipObj) {
-            let updateArr = [];
-            let data = JSON.parse(JSON.stringify(this.data[key]));
-            if (this.data[key].length > 0) {
-              for (let n = 0; n < this.data[key].length; n++) {
-                for (let index = 0; index < this.shipObj[key].length; index++) {
-                  if (this.shipObj[key][index]._id === this.data[key][n]._id) {
-                    updateArr.push(this.data[key][n]);
-                  }
-                }
-              }
-              if (updateArr.length > 0) {
-                for (let index = 0; index < updateArr.length; index++) {
-                  for (let i = 0; i < this.shipObj[key].length; i++) {
-                    if (this.shipObj[key][i]._id === updateArr[index]._id) {
-                      let res = await this.$api.curd({
-                        model: key,
-                        curdType: "update",
-                        find: {
-                          _id: this.shipObj[key][i]._id
-                        },
-                        update: {
-                          name: this.shipObj[key][i].name,
-                          no: this.shipObj[key][i].no,
-                          owner: this.shipObj[key][i].owner,
-                          type: this.shipObj[key][i].type
-                        }
-                      });
-                      if (!res) {
-                        io = false;
-                      }
-                    }
-                  }
-                }
-                let delArr = [];
-                let copyData = JSON.parse(JSON.stringify(this.data[key]));
-                copyData.forEach((dataItem, index) => {
-                  let delIo = false;
-                  updateArr.forEach((upItem, i) => {
-                    if (upItem._id === dataItem._id) {
-                      delIo = true;
-                      return;
-                    }
+            for (const key in this.roleObj) {
+              for (let index = 0; index < this.roleObj[key].length; index++) {
+                if (!this.roleObj[key][index].roleId) {
+                  let addRole = await this.$ajax.post("/role/add", {
+                    company: this.$route.params._id,
+                    user: this.roleObj[key][index]._id,
+                    type: key
                   });
-                  if (delIo) {
-                    copyData.splice(index, 1);
-                  }
-                });
-                if (copyData.length > 0) {
-                  for (let i = 0; i < copyData.length; i++) {
-                    let delShip = await this.$ajax.post(
-                      "/" + key + "/delete?_id=" + copyData[i]._id
-                    );
-                    if (!delShip) {
-                      io = false;
-                    }
-                  }
-                }
-              } else {
-                if (this.data[key].length > 0) {
-                  for (let index = 0; index < this.data[key].length; index++) {
-                    let res = await this.$ajax.post(
-                      "/" + key + "/delete?_id=" + this.data[key][index]._id
-                    );
-                    if (!res) {
-                      io = false;
-                    }
-                  }
-                }
-              }
-              for (let index = 0; index < this.shipObj[key].length; index++) {
-                if (!this.shipObj[key][index]._id) {
-                  let addShip = await this.$api.curd({
-                    model: key,
-                    curdType: "set",
-                    name: this.shipObj[key][index].name,
-                    no: this.shipObj[key][index].no,
-                    owner: this.shipObj[key][index].owner,
-                    type: this.shipObj[key][index].type,
-                    company: this.$route.params._id
-                  });
-                  if (!addShip) {
-                    io = false
-                  }
-                }
-              }
-            } else {
-              if (this.shipObj[key].length > 0) {
-                for (let index = 0; index < this.shipObj[key].length; index++) {
-                  let res = await this.$api.curd({
-                    model: key,
-                    curdType: "set",
-                    name: this.shipObj[key][index].name,
-                    no: this.shipObj[key][index].no,
-                    owner: this.shipObj[key][index].owner,
-                    type: this.shipObj[key][index].type,
-                    company: this.$route.params._id
-                  });
-                  if (!res) {
+                  if (!addRole) {
                     io = false;
                   }
                 }
               }
             }
           }
-        }
-        if (!io) {
-          this.$confirm("更新失败", "提示", {
-            confirmButtonText: "继续更新",
-            cancelButtonText: "返回",
-            type: "warning"
-          })
-            .then(() => {
-              this.$router.go(0);
-            })
-            .catch(() => {
-              this.$router.go(-1);
-            });
-        } else {
-          this.$alert("更新成功！", "提示", {
-            confirmButtonText: "确定",
-            callback: action => {
-              this.$router.go(-1);
+          if (this.shipIo) {
+            for (const key in this.shipObj) {
+              let updateArr = [];
+              let data = JSON.parse(JSON.stringify(this.data[key]));
+              if (this.data[key].length > 0) {
+                for (let n = 0; n < this.data[key].length; n++) {
+                  for (
+                    let index = 0;
+                    index < this.shipObj[key].length;
+                    index++
+                  ) {
+                    if (
+                      this.shipObj[key][index]._id === this.data[key][n]._id
+                    ) {
+                      updateArr.push(this.data[key][n]);
+                    }
+                  }
+                }
+                if (updateArr.length > 0) {
+                  for (let index = 0; index < updateArr.length; index++) {
+                    for (let i = 0; i < this.shipObj[key].length; i++) {
+                      if (this.shipObj[key][i]._id === updateArr[index]._id) {
+                        let res = await this.$api.curd({
+                          model: key,
+                          curdType: "update",
+                          find: {
+                            _id: this.shipObj[key][i]._id
+                          },
+                          update: {
+                            name: this.shipObj[key][i].name,
+                            no: this.shipObj[key][i].no,
+                            owner: this.shipObj[key][i].owner,
+                            type: this.shipObj[key][i].type
+                          }
+                        });
+                        if (!res) {
+                          io = false;
+                        }
+                      }
+                    }
+                  }
+                  let delArr = [];
+                  let copyData = JSON.parse(JSON.stringify(this.data[key]));
+                  copyData.forEach((dataItem, index) => {
+                    let delIo = false;
+                    updateArr.forEach((upItem, i) => {
+                      if (upItem._id === dataItem._id) {
+                        delIo = true;
+                        return;
+                      }
+                    });
+                    if (delIo) {
+                      copyData.splice(index, 1);
+                    }
+                  });
+                  if (copyData.length > 0) {
+                    for (let i = 0; i < copyData.length; i++) {
+                      let delShip = await this.$ajax.post(
+                        "/" + key + "/delete?_id=" + copyData[i]._id
+                      );
+                      if (!delShip) {
+                        io = false;
+                      }
+                    }
+                  }
+                } else {
+                  if (this.data[key].length > 0) {
+                    for (
+                      let index = 0;
+                      index < this.data[key].length;
+                      index++
+                    ) {
+                      let res = await this.$ajax.post(
+                        "/" + key + "/delete?_id=" + this.data[key][index]._id
+                      );
+                      if (!res) {
+                        io = false;
+                      }
+                    }
+                  }
+                }
+                for (let index = 0; index < this.shipObj[key].length; index++) {
+                  if (!this.shipObj[key][index]._id) {
+                    let addShip = await this.$api.curd({
+                      model: key,
+                      curdType: "set",
+                      name: this.shipObj[key][index].name,
+                      no: this.shipObj[key][index].no,
+                      owner: this.shipObj[key][index].owner,
+                      type: this.shipObj[key][index].type,
+                      company: this.$route.params._id
+                    });
+                    if (!addShip) {
+                      io = false;
+                    }
+                  }
+                }
+              } else {
+                if (this.shipObj[key].length > 0) {
+                  for (
+                    let index = 0;
+                    index < this.shipObj[key].length;
+                    index++
+                  ) {
+                    let res = await this.$api.curd({
+                      model: key,
+                      curdType: "set",
+                      name: this.shipObj[key][index].name,
+                      no: this.shipObj[key][index].no,
+                      owner: this.shipObj[key][index].owner,
+                      type: this.shipObj[key][index].type,
+                      company: this.$route.params._id
+                    });
+                    if (!res) {
+                      io = false;
+                    }
+                  }
+                }
+              }
             }
-          });
-        }
-      } catch (error) {}
-      this.loadingText = "";
+          }
+          if (!io) {
+            this.$confirm("更新失败", "提示", {
+              confirmButtonText: "继续更新",
+              cancelButtonText: "返回",
+              type: "warning"
+            })
+              .then(() => {
+                this.$router.go(0);
+              })
+              .catch(() => {
+                this.$router.go(-1);
+              });
+          } else {
+            this.$alert("更新成功！", "提示", {
+              confirmButtonText: "确定",
+              callback: action => {
+                this.$router.go(-1);
+              }
+            });
+          }
+        } catch (error) {}
+        this.loadingText = "";
+      }
     },
     async getCompany() {
       try {
@@ -313,7 +372,7 @@ export default {
           model: "truck",
           curdType: "find",
           limit: 0,
-          company:this.$route.params._id,
+          company: this.$route.params._id,
           populate: [
             {
               path: "owner"
@@ -337,7 +396,7 @@ export default {
           model: "ship",
           curdType: "find",
           limit: 0,
-          company:this.$route.params._id,
+          company: this.$route.params._id,
           populate: [
             {
               path: "owner"
@@ -354,6 +413,9 @@ export default {
           this.$set(this.startShipObj, "ship", []);
         }
       } catch (error) {}
+    },
+    test() {
+      console.log(this.companyArr);
     }
   },
   async created() {

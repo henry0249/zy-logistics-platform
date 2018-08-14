@@ -1,12 +1,12 @@
 <template>
-  <loading-box v-model="loadingText">
+  <loading-box v-model="value">
     <div class="g-order-create">
       <div class="g-order">
         <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
           <strong>{{type === 'add'?'用户添加':'用户详情'}}</strong>
         </div>
         <common-alert style="margin:15px 0">用户信息</common-alert>
-        <user-edmit-item-form v-if="!loadingText" :data.sync="userData" :startData="startUserData" :type="type"></user-edmit-item-form>
+        <user-edmit-item-form v-if="!value" :data.sync="userData" :startData="startUserData" :type="type"></user-edmit-item-form>
       </div>
       <div class="tr" style="margin-top:30px">
         <el-button size="small" @click="$router.go(-1)">返 回</el-button>
@@ -23,6 +23,10 @@ export default {
     UserEdmitItemForm
   },
   props: {
+    value: {
+      type: String,
+      default: ""
+    },
     type: {
       type: String,
       default: "add"
@@ -42,7 +46,7 @@ export default {
   },
   data() {
     return {
-      loadingText: "",
+      // value: "",
       disabled: true,
       userData: {},
       startUserData: {
@@ -89,12 +93,11 @@ export default {
     },
     async sub() {
       if (this.checkMethods()) {
-        console.log(this.userData);
         try {
           if (this.type === "add") {
-            this.loadingText = "添加中";
+            this.$emit("input", "添加中");
           } else if (this.type === "edmit") {
-            this.loadingText = "更新中";
+            this.$emit("input", "更新中");
           }
           let op = {
             model: "user",
@@ -125,11 +128,10 @@ export default {
             }
             this.$set(op, "curdType", "set");
             res = await this.$api.curd(op);
-          }else if (this.type === 'edmit') {
-            
+          } else if (this.type === "edmit") {
           }
         } catch (error) {}
-        this.loadingText = "";
+        this.$emit("input", "");
       }
     }
   },
@@ -140,6 +142,8 @@ export default {
         this.$set(this.startUserData, key, this.startData[key]);
       }
       this.$set(this.startUserData, "_id", this.startData._id);
+      console.log(this.startUserData);
+      console.log(this.startData);
     }
   }
 };
