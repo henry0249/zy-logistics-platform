@@ -53,8 +53,7 @@ module.exports = {
   },
   areaInfo: {
     name: '详细地址',
-    type: 'ObjectId',
-    ref: 'String'
+    type: 'String'
   },
   businessRelationCompany: {
     name: '贸易链关联公司',

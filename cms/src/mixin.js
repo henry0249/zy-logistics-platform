@@ -10,7 +10,10 @@ Vue.mixin({
       return this.$store.state.loginInfo.user || {};
     },
     company() {
-      return this.$store.state.loginInfo.company || {};
+      return this.$store.state.company || {};
+    },
+    roleCompany() {
+      return this.$store.state.roleCompany || {};
     },
     isSys() {
       return this.$store.state.loginInfo.user.isSys || false;

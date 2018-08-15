@@ -26,6 +26,11 @@ export default {
     }
   },
   watch: {
+    async $route(val) {
+      if (localStorage.token) {
+        await this.$store.dispatch("orderBadgeNotify");
+      }
+    },
     orderBadge: {
       handler: function(val) {
         for (const key in val) {
@@ -46,6 +51,7 @@ export default {
     };
   },
   mounted() {
+
     this.nav = [
       {
         name: "订单计划",
@@ -118,6 +124,9 @@ export default {
         path: "/order/all"
       }
     ];
+    if (localStorage.token) {
+      this.$store.dispatch("orderBadgeNotify");
+    }
   }
 };
 </script>

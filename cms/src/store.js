@@ -8,6 +8,8 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
+    roleCompany: [],
+    company:{},
     loginInfo: {},
     field: {},
     orderBadge: {},
@@ -19,6 +21,12 @@ const store = new Vuex.Store({
     },
     setField(state, data) {
       state.field = data || {};
+    },
+    setCompany(state, data) {
+      state.company = data || {};
+    },
+    setRoleCompany(state, data) {
+      state.roleCompany = data || [];
     },
     setOrderBadge(state, data) {
       state.orderBadge = data || {};
@@ -40,12 +48,21 @@ const store = new Vuex.Store({
   },
   actions: {
     async getLoginInfo(context, payload) {
-      let res = await ajax('/loginInfo');
-      context.commit('setLoginInfo', res);
-      let fieldRes = await ajax('/field');
-      context.commit('setField', fieldRes);
-      let orderBadgeRes = await ajax('/order/badge');
-      context.commit('setOrderBadge', orderBadgeRes);
+      try {
+        let res = await ajax('/loginInfo');
+        context.commit('setLoginInfo', res);
+        let fieldRes = await ajax('/field');
+        context.commit('setField', fieldRes);
+        let roleCompanyRes = await ajax('/roleCompany');
+        context.commit('setRoleCompany', roleCompanyRes);
+        if (roleCompanyRes.length>0) {
+          context.commit('setCompany', roleCompanyRes[0]);
+        }
+        let orderBadgeRes = await ajax('/order/badge');
+        context.commit('setOrderBadge', orderBadgeRes);
+      } catch (error) {
+        router.replace('/');
+      }
     },
     async getField(context, payload) {
       let res = await ajax.get('/field');

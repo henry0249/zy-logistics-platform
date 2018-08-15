@@ -52,7 +52,7 @@ export default {
         let body = {
           order: this.order
         };
-        if (this.businessTrainsData.length>0) {
+        if (this.businessTrainsData.length > 0) {
           body.businessTrains = this.businessTrainsData;
         }
         await this.$ajax.post("/order/set", body);

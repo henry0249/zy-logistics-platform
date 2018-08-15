@@ -23,6 +23,7 @@ module.exports = app => {
     .get('/loginInfo', checkToken(), 'user.loginInfo') //获取用户信息
     .all('/refleshToken', checkToken(), 'user.refleshToken') //刷新token
     .get('/field', checkToken(), 'field.index') //获取数据库字段信息
+    .get('/roleCompany', checkToken(), 'user.roleCompany') //获取用户关联的所有公司
     //公司接口
     .all('/company/user/cascader', checkToken(), 'company.userCascader') //公司用户级联数据
     //区域接口

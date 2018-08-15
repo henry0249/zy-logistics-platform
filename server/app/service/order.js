@@ -100,7 +100,7 @@ class OrderService extends Service {
     if (!info.area) {
       ctx.throw(422, '未选择送货地址', info);
     }
-    if (!info.mfrs) {
+    if (!info.handle) {
       ctx.throw(422, '未指定生产厂商', info);
     }
     if (!info.goods) {

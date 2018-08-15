@@ -13,23 +13,27 @@ class UserController extends Controller {
   }
   async loginLocal() {
     const ctx = this.ctx;
-    ctx.body = await ctx.service.user.loginLocal(ctx.request.body)
+    ctx.body = await ctx.service.user.loginLocal(ctx.request.body);
   }
   async loginSys() {
     const ctx = this.ctx;
-    ctx.body = await ctx.service.user.loginSys(ctx.request.body)
+    ctx.body = await ctx.service.user.loginSys(ctx.request.body);
   }
   async registerMobile() {
     const ctx = this.ctx;
-    ctx.body = await ctx.service.user.registerMobile(ctx.request.body)
+    ctx.body = await ctx.service.user.registerMobile(ctx.request.body);
   }
   async logout() {
     const ctx = this.ctx;
-    ctx.body = await ctx.service.user.logout()
+    ctx.body = await ctx.service.user.logout();
   }
   async refleshToken() {
     const ctx = this.ctx;
-    ctx.body = await ctx.service.jwt.reflesh()
+    ctx.body = await ctx.service.jwt.reflesh();
+  }
+  async roleCompany() {
+    const ctx = this.ctx;
+    ctx.body = await ctx.service.user.roleCompany();
   }
 }
 

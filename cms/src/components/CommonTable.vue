@@ -2,7 +2,7 @@
   <loading-box class="g-common-table" v-model="loadingText">
     <my-table highlight-current-row :selection="selection" index border size="mini" :height="height" :loadmore="loadmore" :thead="thead" :data.sync="data" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
       <div slot="header">
-        <div name="company" v-if="showCompany">
+        <div name="company" v-if="showCompany" style="height:40px">
           <el-tabs v-model="activeCompany">
             <el-tab-pane :label="item.name || item.nick" :name="item._id" v-for="(item) in companylist" :key="item._id"></el-tab-pane>
           </el-tabs>
@@ -170,7 +170,9 @@ export default {
       this.loadingText = "";
     }
     await this.getData();
-    this.setTabBadge();
+    this.$nextTick(()=>{
+      this.setTabBadge();
+    });
   }
 };
 </script>

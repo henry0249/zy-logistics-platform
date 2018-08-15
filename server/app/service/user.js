@@ -44,25 +44,26 @@ class UserService extends Service {
         username: body.username
       });
     }
-    
+
     return user;
   }
   async loginLocal() {
     const ctx = this.ctx;
     let user = await this.getUserInfo();
-    // if (!user.company) {
-    //   let roleCompany = await ctx.model.Role.findOne({
-    //     user: user._id,
-    //     createdAt: 1
-    //   });
-    //   if (!roleCompany) {
-    //     ctx.throw(404, '未关联公司,请联系公司管理员', user);
-    //   }
-    //   await user.update({
-    //     company: roleCompany._id
-    //   });
-    //   user = await ctx.model.User.findById(user._id);
-    // }
+    if (!user.company) {
+      let roleCompany = await ctx.model.Role.findOne({
+        user: user._id
+      }).sort({
+        createdAt: 1
+      });
+      if (!roleCompany) {
+        ctx.throw(404, '未关联公司,请联系公司管理员', user);
+      }
+      await user.update({
+        company: roleCompany._id
+      });
+      user = await ctx.model.User.findById(user._id);
+    }
     let res = {};
     let token = await ctx.service.jwt.sign(user);
     res.token = token.value;
@@ -127,6 +128,32 @@ class UserService extends Service {
     const ctx = this.ctx;
     let models = require('../field')('ALL');
     return models;
+  }
+  async roleCompany() {
+    const ctx = this.ctx;
+    let findOption = {
+      user: ctx.user._id,
+    }
+    let res = [];
+    let mySet = new Set();
+    let roleCompany = await ctx.model.Role.find(findOption).populate([{
+      path: 'company'
+    }]).sort({
+      createdAt: 1
+    });
+    let firstCompany = '';
+    roleCompany.forEach(item => {
+      if (ctx.user.company && item.company._id.toString() === ctx.user.company.toString()) {
+        firstCompany = item.company;
+      } else {
+        mySet.add(item.company);
+      }
+    });
+    res = [...mySet];
+    if (firstCompany) {
+      res.unshift(firstCompany);
+    }
+    return res;
   }
 }
 module.exports = UserService;

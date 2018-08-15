@@ -20,5 +20,10 @@ module.exports = {
   cover: {
     type: 'String',
     name: '封面',
+  },
+  company: {
+    type: 'ObjectId',
+    name: '所属公司',
+    ref: 'Company'
   }
 }
