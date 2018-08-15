@@ -74,7 +74,6 @@
     computed: {},
     methods: {
       see(obj) {
-        console.log(this.path + obj.value.row._id);
         this.$router.push({
           path: this.path + '/' + obj.value.row._id,
         })

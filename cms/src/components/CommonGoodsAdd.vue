@@ -35,7 +35,7 @@
             </my-form-item>
             <div class="flex edmit-tag">
               <i style="width:60px;font-size: 12px;">标签</i>
-              <el-tag size="mini" style="margin-right:10px;" :type="tagType(index,goods.tag)" :key="tag" v-for="(tag,index) in goods.tag" closable :disable-transitions="false" @close="handleClose(goods.tag,tag)">
+              <el-tag size="mini" style="margin-right:10px;" :type="tagType(index,goods.tag)" :key="index" v-for="(tag,index) in goods.tag" closable :disable-transitions="false" @close="handleClose(goods.tag,tag)">
                 {{tag}}
               </el-tag>
               <el-input style="width:60px" size="mini" class="input-new-tag" v-if="inputVisible" v-model="inputValue" ref="saveTagInput" @keyup.enter.native="handleInputConfirm(goods.tag)" @blur="handleInputConfirm(goods.tag)">
@@ -48,7 +48,7 @@
         </my-form>
         <common-alert style="margin:15px 0">
           <div style="width:100%" class="jb">
-            <p>商品价格</p>
+            <div>商品价格</div>
             <div class="jc je">
               <i class="el-icon-plus jc pointer" style="color:#67C23A;font-size:15px;" title="添加新的价格" @click="addPrice"></i>
             </div>
@@ -254,7 +254,8 @@ export default {
           });
         }
         this.$message.success("添加成功！");
-        this.$router.go(-1);
+        // this.$router.go(-1);
+        this.$router.push({path:'/sys/goods'})
       } catch (error) {}
       this.value = "";
     },

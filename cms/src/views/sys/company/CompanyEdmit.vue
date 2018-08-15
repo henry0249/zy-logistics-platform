@@ -332,6 +332,8 @@ export default {
           populate: [
             {
               path: "area"
+            },{
+              path:'businessRelationCompany'
             }
           ]
         });

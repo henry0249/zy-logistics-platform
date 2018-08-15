@@ -19,22 +19,30 @@ export default {
     path: '/sys/company/list'
   }],
   goods:[{
-    name: '商品添加',
+    name: '添加商品',
     icon: 'icon-icon-test',
     path: '/sys/goods/add'
+  },{
+    name: '添加品牌',
+    icon: 'icon-icon-test',
+    path: '/sys/goods/brand_add'
+  },{
+    name: '添加分类',
+    icon: 'icon-icon-test',
+    path: '/sys/goods/category_add'
   },{
     name: '商品列表',
     icon: 'icon-icon-test',
     path: '/sys/goods/list'
   },
   {
-    name: "分类管理",
+    name: "分类列表",
     color: "orange",
     icon: "icon-fenlei",
     path:"/sys/goods/category"
   },
   {
-    name: "品牌管理",
+    name: "品牌列表",
     color: "orange",
     icon: "icon-shangbiao",
     iconSize: '15',

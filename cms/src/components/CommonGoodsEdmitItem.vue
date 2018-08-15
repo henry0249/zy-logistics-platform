@@ -30,7 +30,7 @@
           </div>
           <div class="flex form-box" style="margin-top:20px;">
             <div class="flex edmit-tag">
-              <p style="width:60px;font-size: 12px;">标签</p>
+              <span style="width:60px;font-size: 12px;">标签</span>
               <el-tag size="mini" style="margin-right:10px;" :type="tagType(index,goods.tag)" :key="tag" v-for="(tag,index) in goods.tag" closable :disable-transitions="false" @close="handleClose(goods.tag,tag)">
                 {{tag}}
               </el-tag>
