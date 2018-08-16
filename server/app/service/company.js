@@ -2,17 +2,44 @@ const Service = require('egg').Service;
 const companyField = require('../field/Company');
 
 class CompanyService extends Service {
-  // async add(param) {
-  //   const ctx = this.ctx;
-  //   return {
-  //     ...param,
-  //     creater: ctx.user._id,
-  //     owner: ctx.user._id,
-  //   };
-  // }
-  // async set(param) {
-  //   return await this.add(param);
-  // }
+  async find() {
+    const ctx = this.ctx;
+    let body = ctx.request.body || ctx.request.query;
+    let limit = Number(body.limit) || 10;
+    let skip = Number(body.skip) || 0;
+    delete body.limit;
+    delete body.skip;
+    delete body.populate;
+    let populate = [{
+      path: 'area',
+      populate: [{
+        path: 'province'
+      }, {
+        path: 'city'
+      }, {
+        path: 'county'
+      }, {
+        path: 'township'
+      }, {
+        path: 'street'
+      }]
+    }];
+    let res = [];
+    if (body.limit === 0) {
+      res = await ctx.model.Company.find({
+        ...body
+      }).populate(populate).sort({
+        updatedAt: -1
+      })
+    } else {
+      res = await ctx.model.Company.find({
+        ...body
+      }).populate(populate).sort({
+        updatedAt: -1
+      }).limit(limit).skip(skip);
+    }
+    return res;
+  }
   async userCascader() {
     const ctx = this.ctx;
     let body = {};
@@ -36,16 +63,16 @@ class CompanyService extends Service {
     }
     for (const key in user) {
       let item = {
-        name:user[key],
-        _id:key
+        name: user[key],
+        _id: key
       }
       let role = await ctx.model.Role.find({
         company: body.company,
         type: key
       }).populate([{
-        path:'user'
+        path: 'user'
       }]);
-      if (role.length>0) {
+      if (role.length > 0) {
         item.children = [];
         role.forEach(roleItem => {
           item.children.push(roleItem.user);

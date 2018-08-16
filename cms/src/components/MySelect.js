@@ -73,6 +73,9 @@ export default {
       },
       'owner.name': {
         name: '司机'
+      },
+      'company.name': {
+        name: '所属公司'
       }
     },
     ship: {
@@ -80,81 +83,10 @@ export default {
         name: '船号'
       },
       'owner.name': {
-        name: '司机'
-      }
-    }
-  },
-  company: {
-    thead: {
-      name: {
-        name: '公司名称'
+        name: '船长'
       },
-      nick: {
-        name: '公司别称'
-      },
-      type: {
-        slot: true,
-        name: '公司类型'
-      }
-    },
-    populate: [{
-      path: 'area',
-      populate: [{
-        path: 'province'
-      }, {
-        path: 'city'
-      }, {
-        path: 'county'
-      }, {
-        path: 'township'
-      }, {
-        path: 'street'
-      }]
-    }]
-  },
-  goods: {
-    thead: {
-      name: {
-        name: '商品名'
-      },
-      'category.name': {
-        name: '分类'
-      }
-    }
-  },
-  area: {
-    thead: {
-      'province.name': {
-        name: '省份'
-      },
-      'city.name': {
-        name: '市'
-      },
-      'county.name': {
-        name: '县'
-      },
-      name: {
-        name: '乡/镇'
-      }
-    }
-  },
-  truck: {
-    thead: {
-      no: {
-        name: '车牌号'
-      },
-      'owner.name': {
-        name: '司机'
-      }
-    }
-  },
-  ship: {
-    thead: {
-      no: {
-        name: '船号'
-      },
-      'owner.name': {
-        name: '司机'
+      'company.name': {
+        name: '所属公司'
       }
     }
   }

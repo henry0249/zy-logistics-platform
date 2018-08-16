@@ -16,7 +16,7 @@ Vue.mixin({
       return this.$store.state.roleCompany || {};
     },
     isSys() {
-      return this.$store.state.loginInfo.user.isSys || false;
+      return (this.user && this.user.isSys) || false;
     },
     field() {
       return this.$store.state.field || {};

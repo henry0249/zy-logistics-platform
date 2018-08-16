@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="loadingText">
-    <Edit title="接单确认" newState="dispatchCheck" ref="edit">
+    <Edit title="接单确认" newState="dispatchCheck" ref="edit" transport>
       <el-button size="small" type="warning" slot="toolLeft" @click="dialogVisible = true">转单</el-button>
     </Edit>
     <el-dialog title="选择订单转入公司" :visible.sync="dialogVisible" width="40%">

@@ -43,8 +43,9 @@
                 <div v-if="scope.row.no">{{scope.row.no}}</div>
                 <div v-else style="color:#ccc">未生成</div>
               </div>
-              <div v-if="scope.prop==='transportation'" class="flex ac">
-                <el-dropdown @command="handleCommand($event,scope.row)" trigger="click">
+              <div v-if="scope.prop==='transportation'">
+                <my-select truck :type.sync="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]" placeholder="运输工具"></my-select>
+                <!-- <el-dropdown @command="handleCommand($event,scope.row)" trigger="click">
                   <div :class="{success:scope.row.transportation==='truck',warning:scope.row.transportation==='ship'}" style="font-size:13px">
                     {{scope.row.transportation==='truck'?'车':'船'}}<i class="el-icon-caret-bottom"></i>
                   </div>
@@ -52,7 +53,7 @@
                     <el-dropdown-item v-for="dropdownItem in json2arr(field.Logistics.transportation.option)" :key="dropdownItem._id||dropdownItem.value || dropdownItem.id" :command="dropdownItem.value">{{dropdownItem.name || dropdownItem.label}}</el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
-                <common-select style="margin-left:10px" size="mini" border :type="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]"></common-select>
+                <common-select style="margin-left:10px" size="mini" border :type="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]"></common-select> -->
               </div>
               <my-form-item v-if="scope.prop==='loading'" number v-model="scope.row.loading" size="mini" :min="0" :max="order.count">
               </my-form-item>

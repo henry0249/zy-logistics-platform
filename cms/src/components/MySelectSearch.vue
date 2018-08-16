@@ -20,11 +20,12 @@
       <my-form-item label="名称" v-model="option.goods.name.$regex"></my-form-item>
       <my-form-item style="margin-left:15px" label="品牌" v-model="option.goods.brand" select :options="brandArr" filterable :disabled="brandArr.length===0"></my-form-item>
       <my-form-item style="margin-left:15px" label="分类" v-model="option.goods.category" select :options="categoryArr" filterable :disabled="categoryArr.length===0"></my-form-item>
-      <!-- <my-form-item style="margin-left:15px" label="公司" v-model="option.goods.company"></my-form-item> -->
     </template>
     <template v-if="type === 'truck'">
-      <my-form-item label="车牌号" v-model="option.truck.no"></my-form-item>
-      
+      <my-form-item label="车牌号" v-model="option.truck.no.$regex"></my-form-item>
+    </template>
+    <template v-if="type === 'ship'">
+      <my-form-item label="船号" v-model="option.ship.no.$regex"></my-form-item>
     </template>
   </my-form>
 </loading-box>
@@ -80,8 +81,13 @@ export default {
           brand: "",
           category: ""
         },
-        truck:{
-          no:{
+        truck: {
+          no: {
+            $regex: ""
+          }
+        },
+        ship: {
+          no: {
             $regex: ""
           }
         }

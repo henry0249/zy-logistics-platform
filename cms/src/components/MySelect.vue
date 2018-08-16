@@ -8,8 +8,8 @@
         <div class="disabled-hide" v-if="disabled">
         </div>
         <el-input style="width:100%" :value="text" v-bind="$attrs" :size="size||$parent.size" class="input-with-select">
-          <text-dropdown v-if="userCompanyTypeChoose" slot="prepend" v-model="innerType" :options="field.Order.type.option"></text-dropdown>
-          <text-dropdown v-if="truckShipTypeChoose" slot="prepend" v-model="innerType" :options="field.Logistics.transportation.option"></text-dropdown>
+          <text-dropdown v-if="userCompanyTypeChoose" slot="prepend" v-model="innerType" :options="field.Order.type.option" :color="['#909399','#409EFF']"></text-dropdown>
+          <text-dropdown v-if="truckShipTypeChoose" slot="prepend" v-model="innerType" :options="field.Logistics.transportation.option" :color="['#67C23A','#E6A23C']"></text-dropdown>
         </el-input>
         <div class="choose-icon ac pointer" @click="dialogVisible = true">
           <i class="el-icon-edit blue" :class="{disabled:disabled}"></i>
@@ -187,9 +187,9 @@ export default {
 .choose-icon {
   font-size: 10px;
   position: absolute;
-  top: 5%;
+  top: 25%;
   right: 2px;
-  height: 90%;
+  height: 50%;
   background: #fff;
   padding: 0 10px;
 }
