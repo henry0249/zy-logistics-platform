@@ -71,7 +71,7 @@ class CompanyService extends Service {
     }, {
       path: 'category'
     }, {
-      path: 'mfrs',
+      path: 'company',
     }]).sort({
       updatedAt: -1
     }).limit(limit).skip(skip);

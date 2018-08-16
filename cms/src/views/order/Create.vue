@@ -5,7 +5,7 @@
         <div class="my-title">销售订单</div>
         <Info ref="orderInfo" selectType :data.sync="order"></Info>
         <goods-table :order.sync="order"></goods-table>
-        <business-trains :order.sync="order" :data.sync="businessTrainsData" :alert="false"></business-trains>
+        <business-trains titleTip="(计划时贸易链可选填)" :order.sync="order" :data.sync="businessTrainsData"></business-trains>
       </div>
       <div class="flex ac" style="margin-top:30px">
         跳过接单

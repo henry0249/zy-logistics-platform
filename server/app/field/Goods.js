@@ -33,10 +33,10 @@ module.exports = {
     type: 'Number',
     default: 0,
     option: {
-      0: '未发布',
-      1: '已发布',
-      2: '已下架',
-      3: '缺货中',
+      0: '编辑',
+      1: '上架',
+      2: '下架',
+      3: '缺货',
     }
   },
   selfDeliverySupport: {
@@ -47,20 +47,10 @@ module.exports = {
     name: '是否包邮',
     type: 'Boolean'
   },
-  mfrs: {
-    name: '生产厂商',
-    type: 'ObjectId',
-    ref: 'Company',
-  },
   company: {
-    name: '发布公司',
+    name: '所属公司',
     type: 'ObjectId',
     ref: 'Company',
-  },
-  platform: {
-    name: '发布平台',
-    type: 'ObjectId',
-    ref: 'Platform',
   },
   cover: {
     name: '封面',

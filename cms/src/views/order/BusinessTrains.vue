@@ -2,7 +2,12 @@
   <loading-box v-model="loadingText">
     <div class="g-business-trains">
       <div class="flex ac jb" style="color:#909399;padding-left:25px;background:#f4f4f5;font-size:13px;margin:15px 0;border-radius:4px">
-        <div class="f1" style="margin-right:20px">贸易链</div>
+        <div style="margin-right:20px">贸易链</div>
+        <div v-if="data.length > 0 " style="margin-right:15px">
+          <remove-check label="清空" @remove="removeAll"></remove-check>
+        </div>
+        <div>{{titleTip}}</div>
+        <div class="f1"></div>
         <div v-if="order.goods && order.goods._id" class="flex ac jb">
           <div style="width:150px">商品名称：{{order.goods.name}}</div>
           <div class="goods-info-padding">品牌：{{order.goods.brand.name}}</div>
@@ -13,7 +18,7 @@
           贸易节点<i class="el-icon-plus"></i>
         </div>
       </div>
-      <div  v-if="data.length>0" style="height:280px">
+      <div v-if="data.length>0" style="height:280px">
         <div class="hor-scroll" style="margin-bottom:10px">
           <div class="hor-scroll-item" style="padding:10px 0" v-for="(item,index) in data" :key="index">
             <div class="flex ac">
@@ -54,6 +59,10 @@ export default {
       default() {
         return businessTrains;
       }
+    },
+    titleTip: {
+      type: String,
+      default: ""
     }
   },
   data() {
@@ -136,6 +145,9 @@ export default {
         } else {
           this.data.splice(index, 1);
         }
+        if (this.data.length === 2) {
+          this.data = [];
+        }
       } else {
         this.data = [];
       }
@@ -152,7 +164,7 @@ export default {
         this.data.push({
           ...body,
           type: "supplier",
-          company: this.order.goods.mfrs
+          company: this.order.goods.company
         });
         this.data.push({
           ...body,
@@ -174,6 +186,9 @@ export default {
           supplyPrice: this.data[this.data.length - 1 - 1].supplyPrice
         });
       }
+    },
+    removeAll() {
+      this.data = [];
     }
   },
   created() {

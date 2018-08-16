@@ -9,7 +9,7 @@
     <my-form v-show="!hideForm" size="mini" width="24%" :edit="edit">
       <div class="flex ac jb">
         <div style="width:24%">
-          <common-select :disabled="!edit" title="选择一个客户" label="下单客户" border :data.sync="customer" type="company" :changeType.sync="order.type" @change="customerChange" is-switch @switchChange="customerTypeChange"></common-select>
+          <my-select :type.sync="order.type" :data.sync="customer" label="下单客户" placeholder="请选择客户" @change="customerChange"></my-select>
         </div>
         <my-form-item datetime v-model="order.deliveryTime" label="配送时间">
         </my-form-item>
@@ -30,7 +30,8 @@
         </my-form-item>
         <my-form-item input v-model="order.contactNumber" label="联系电话">
         </my-form-item>
-        <common-select style="width:24%" title="选择送货地址" label="送货地址" border :data.sync="order.area" type="area" @change="areaChange"></common-select>
+        <my-select area :data.sync="order.area" label="送货地址" @change="areaChange"></my-select>
+        <!-- <common-select style="width:24%" title="选择送货地址" label="送货地址" border :data.sync="order.area" type="area" @change="areaChange"></common-select> -->
       </div>
       <my-form-item width="100%" style="margin:15px 0" input v-model="order.address" label="详细地址">
       </my-form-item>

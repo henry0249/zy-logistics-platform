@@ -9,30 +9,42 @@
       <el-button size="mini" type="text" @click="cancel">取消</el-button>
       <el-button type="danger" size="mini" @click="remove">确定删除</el-button>
     </div>
-    <i slot="reference" class="el-icon-delete pointer" style="color:#F56C6C"></i>
+    <span class="pointer" slot="reference" :style="{color:color}">
+      {{label}}
+      <i class="el-icon-delete"></i>
+    </span>
   </el-popover>
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        visible: false
-      }
+export default {
+  props: {
+    label: {
+      type: String,
+      default: ""
     },
-    methods: {
-      remove() {
-        this.visible = false;
-        this.$emit('remove');
-      },
-      cancel(){
-        this.visible = false;
-        this.$emit('cancel');
-      }
+    color: {
+      type: String,
+      default: "#F56C6C"
+    }
+  },
+  data() {
+    return {
+      visible: false
+    };
+  },
+  methods: {
+    remove() {
+      this.visible = false;
+      this.$emit("remove");
     },
-  };
+    cancel() {
+      this.visible = false;
+      this.$emit("cancel");
+    }
+  }
+};
 </script>
 
 <style scoped>
-
 </style>

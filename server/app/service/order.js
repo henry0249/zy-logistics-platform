@@ -485,7 +485,7 @@ class OrderService extends Service {
       populate: [{
         path: 'brand'
       }, {
-        path: 'mfrs'
+        path: 'company'
       }]
     }, {
       path: 'area',

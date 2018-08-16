@@ -38,7 +38,7 @@ export default {
   methods: {
     label(value) {
       let res = {
-        text: "未选择",
+        text: "未选",
         color: "#606266"
       };
       let arr = this.json2arr(this.options);

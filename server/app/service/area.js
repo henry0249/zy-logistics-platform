@@ -2,12 +2,46 @@ const Service = require('egg').Service;
 const areaField = require('../field/Area');
 
 class CompanyService extends Service {
-
+  async find() {
+    const ctx = this.ctx;
+    let body = ctx.request.body || ctx.request.query;
+    let limit = Number(body.limit) || 10;
+    let skip = Number(body.skip) || 0;
+    delete body.limit;
+    delete body.skip;
+    delete body.populate;
+    let populate = [{
+      path: 'province'
+    }, {
+      path: 'city'
+    }, {
+      path: 'county'
+    }, {
+      path: 'township'
+    }, {
+      path: 'street'
+    }];
+    let res = [];
+    if (body.limit === 0) {
+      res = await ctx.model.Area.find({
+        ...body
+      }).populate(populate).sort({
+        updatedAt: -1
+      })
+    } else {
+      res = await ctx.model.Area.find({
+        ...body
+      }).populate(populate).sort({
+        updatedAt: -1
+      }).limit(limit).skip(skip);
+    }
+    return res;
+  }
   async preAdd(data) {
     const ctx = this.ctx;
     let hasData = await ctx.model.Area.findOne({
-      key:data.key,
-      name:data.name
+      key: data.key,
+      name: data.name
     });
     if (hasData) {
       return hasData._id;

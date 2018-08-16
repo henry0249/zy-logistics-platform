@@ -4,8 +4,8 @@ module.exports = {
     name: '订单类型',
     default: 'company',
     option: {
-      user: '个人订单',
-      company: '公司订单'
+      user: '个人',
+      company: '公司'
     }
   },
   no: {

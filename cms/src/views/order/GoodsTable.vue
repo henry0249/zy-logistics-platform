@@ -4,7 +4,8 @@
     </el-alert>
     <my-table v-if="order.area && order.area._id" size="small" border :thead="thead" :data.sync="goodsData">
       <div slot-scope="scope">
-        <common-select :disabled="thead[scope.prop].disabled" :data.sync="order.goods" border v-if="scope.prop === 'value'" type="goods" @change="goodsChange" size="mini"></common-select>
+        <my-select v-if="scope.prop === 'value'" goods :data.sync="order.goods" size="mini" @change="goodsChange"></my-select>
+        <!-- <common-select :disabled="thead[scope.prop].disabled" :data.sync="order.goods" border v-if="scope.prop === 'value'" type="goods" @change="goodsChange" size="mini"></common-select> -->
         <div v-if="scope.prop === 'brand'">
           {{order.goods.brand ? order.goods.brand.name : '-'}}
         </div>
@@ -78,6 +79,7 @@ export default {
   },
   methods: {
     goodsChange(val) {
+      console.log(val.company);
       let price = {};
       if (val.price && val.price instanceof Array) {
         val.price.forEach(item => {
@@ -91,7 +93,7 @@ export default {
         this.order.sell = price.sell || 0;
         this.order.factory = price.factory || 0;
         this.order.transport = price.transport || 0;
-        this.order.handle = val.mfrs;
+        this.order.handle = val.company;
         this.$emit("update:data", this.order);
       }
     }

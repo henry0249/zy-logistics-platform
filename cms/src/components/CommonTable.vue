@@ -79,6 +79,9 @@ export default {
     }
   },
   methods: {
+    refresh() {
+      this.getData();
+    },
     async getData() {
       let option = this.$attrs.option || {};
       this.loadingText = "加载中";
@@ -170,7 +173,7 @@ export default {
       this.loadingText = "";
     }
     await this.getData();
-    this.$nextTick(()=>{
+    this.$nextTick(() => {
       this.setTabBadge();
     });
   }

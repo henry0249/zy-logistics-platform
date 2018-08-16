@@ -7,13 +7,12 @@
         <div v-if="data.type==='pool'" class="link" style="margin:0 5px">关联物流</div>
         <i v-if="data.type==='pool'" class="el-icon-question info"></i>
         <div class="f1"></div>
-        <remove-check @remove="remove"></remove-check>
-        <!-- <i @click="remove" class="el-icon-delete pointer" style="color:#F56C6C"></i> -->
+        <remove-check @remove="remove" v-if="data.type === 'pool'"></remove-check>
       </div>
       <div class="marginBottom">
-        <common-select v-if="data.type === 'supplier'" size="mini" title="选择一个公司" placeholder="公司名称" border type="company" :data.sync="data.company" disabled></common-select>
-        <common-select v-if="data.type === 'pool'" size="mini" title="选择一个公司" placeholder="公司名称" border type="company" :data.sync="data.company"></common-select>
-        <common-select v-if="data.type === 'customer'" size="mini" border :type="data.customerType" :data.sync="data[data.customerType]" disabled></common-select>
+        <my-select v-if="data.type === 'supplier'" :data.sync="data.company" disabled></my-select>
+        <my-select v-if="data.type === 'pool'" :data.sync="data.company" placeholder="联营商公司"></my-select>
+        <my-select v-if="data.type === 'customer'" :data.sync="data[data.customerType]" disabled></my-select>
       </div>
       <div v-if="data.type === 'supplier'">
         <my-form-item class="marginBottom" value="0" text label="库存数量" size="mini">

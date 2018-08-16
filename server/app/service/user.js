@@ -143,10 +143,12 @@ class UserService extends Service {
     });
     let firstCompany = '';
     roleCompany.forEach(item => {
-      if (ctx.user.company && item.company._id.toString() === ctx.user.company.toString()) {
+      if (ctx.user.company && item.company && item.company._id.toString() === ctx.user.company.toString()) {
         firstCompany = item.company;
       } else {
-        mySet.add(item.company);
+        if (item.company) {
+          mySet.add(item.company);
+        }
       }
     });
     res = [...mySet];
