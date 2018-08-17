@@ -60,6 +60,12 @@ export default {
       default() {
         return [];
       }
+    },
+    val: {
+      type: [Array],
+      default() {
+        return [];
+      }
     }
   },
   data() {
@@ -150,7 +156,6 @@ export default {
     selectChange(val) {
       let currentRoleArr = this.roleTypeArr(this.activeType);
       if (currentRoleArr.length > 1) {
-
         let lastRole = currentRoleArr[currentRoleArr.length - 1 - 1];
         if (
           lastRole.user._id === val._id &&
