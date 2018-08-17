@@ -13,58 +13,29 @@ const areaPopulate = [{
 }];
 
 class OrderService extends Service {
-  orderFieldCheck(order) {
+  async statePowerCheck(msg) {
     const ctx = this.ctx;
     let body = ctx.request.body;
-    if (!order) {
-      ctx.throw(422, '订单信息未填', body);
-    }
-    if (!order.company && !order.user) {
-      ctx.throw(422, '未选择客户', body);
-    }
-    if (order.user && order.company) {
-      ctx.throw(422, "下单客户不能同时为个人和公司", body);
-    }
-    if (!order.contactName) {
-      ctx.throw(422, '未填写收货人', body);
-    }
-    if (!order.contactNumber) {
-      ctx.throw(422, '未填写收货人联系电话', body);
-    }
-    if (!order.area) {
-      ctx.throw(422, '未选择送货地址', body);
-    }
+    let statePower = {
+      taking: ['salesman', 'sysSalesman', 'dispatchCheck'],
+      beforeDispatchCheck: ['salesman', 'sysSalesman'],
+      dispatch: ['dispatchCheck'],
+      beforeSettleCheck: ['dispatcher', 'sysDispatcher'],
+      settle: ['financial', 'documentClerk', 'finishCheck'],
+      finish: ['finishCheck']
+    };
+    return await ctx.service.check.role(statePower[body.state], body.roleCompany);
   }
-  orderGoodsCheck(goods) {
+  async opUser() {
     const ctx = this.ctx;
-    let goodsCheck = true;
-    if (goods instanceof Array && goods.length > 0) {} else {
-      goodsCheck = '未选择商品';
-    }
-    goods.forEach(item => {
-      if (!(item.value && item.value._id)) {
-        goodsCheck = '未选择商品';
-        return;
-      }
-      if (!ctx.helper.is('number', Number(item.count)) || Number(item.count) <= 0) {
-        goodsCheck = '商品数量不正确';
-        return;
-      }
-      if (!ctx.helper.is('number', Number(item.factoryPrice)) || Number(item.factoryPrice) <= 0) {
-        goodsCheck = '出厂价格不正确';
-        return;
-      }
-      if (!ctx.helper.is('number', Number(item.unitPrice)) || Number(item.unitPrice) <= 0) {
-        goodsCheck = '销售单价不正确';
-        return;
-      }
-      if (!ctx.helper.is('number', Number(item.transportPrice)) || Number(item.transportPrice) <= 0) {
-        goodsCheck = '运输单价不正确';
-        return;
-      }
-    });
-    if (goodsCheck !== true) {
-      ctx.throw(422, goodsCheck, body);
+    let body = ctx.request.body;
+    let user = {
+      taking: ['salesman', 'sysSalesman'],
+      beforeDispatchCheck: ['dispatchCheck'],
+      dispatch: ['dispatcher', 'sysDispatcher'],
+      beforeSettleCheck: ['financial', 'documentClerk'],
+      settle: ['finishCheck'],
+      finish: ['financial', 'documentClerk']
     }
   }
   async getOrderInfo(payload) {
@@ -77,6 +48,12 @@ class OrderService extends Service {
     }
     if (!info) {
       ctx.throw(422, '订单信息未填', body);
+    }
+    if (!info.state) {
+      ctx.throw(422, '未选择订单状态', info);
+    }
+    if (!orderField.state.option[info.state]) {
+      ctx.throw(422, '非法的订单状态', info);
     }
     if (info.type === 'company' || info.type === 'user') {
       if (info.type === 'company') {
@@ -119,6 +96,7 @@ class OrderService extends Service {
       ctx.throw(422, '商品运输单价必须大于0', info);
     }
     if (info._id) {
+      if (info.state) {}
       let update = JSON.parse(JSON.stringify(info));
       delete update._id;
       await ctx.model.Order.update({
@@ -126,6 +104,7 @@ class OrderService extends Service {
       }, update);
       return await ctx.model.Order.findById(info._id);
     } else {
+      info.state = 'taking';
       info.no = ctx.helper.no(info.goods, ctx.user._id, 1);
       let order = new ctx.model.Order(info);
       await order.save();
@@ -182,45 +161,6 @@ class OrderService extends Service {
     return 'ok';
   }
 
-  async update() {
-    const ctx = this.ctx;
-    let body = ctx.request.body;
-    let _id = body.order._id;
-    delete body.order._id;
-    if (!ctx.helper.is('empty', body.order)) {
-      this.orderFieldCheck(body.order);
-    }
-    if (body.goods instanceof Array && body.goods.length > 0) {
-      this.orderGoodsCheck(body.goods);
-    }
-    if (!_id) {
-      ctx.throw(422, "订单编号必填", body);
-    }
-    let order = await ctx.model.Order.findById(_id);
-    if (!order) {
-      ctx.throw(404, "未找到订单", body);
-    }
-    if (body.state !== undefined) {
-      await this.updateState(order);
-    }
-    if (!ctx.helper.is('empty', body.order)) {
-      await order.update(body.order);
-    }
-    if (body.goods instanceof Array && body.goods.length > 0) {
-      for (let i = 0; i < body.goods.length; i++) {
-        let goodsItem = JSON.parse(JSON.stringify(body.goods[i]));
-        if (!goodsItem._id) {
-          ctx.throw(422, "商品编号必填", body);
-        }
-        delete goodsItem._id;
-        goodsItem.value = goodsItem.value._id;
-        await ctx.model.OrderGoods.update({
-          _id: body.goods[i]._id
-        }, goodsItem);
-      }
-    }
-    return 'ok';
-  }
   async dispatch() {
     const ctx = this.ctx;
     let body = ctx.request.body;

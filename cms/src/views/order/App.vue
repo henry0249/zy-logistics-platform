@@ -93,7 +93,7 @@ export default {
         badge: this.orderBadge.distribution
       },
       {
-        name: "待审核",
+        name: "配送完成审核",
         color: "red",
         icon: "icon-shenhe1",
         path: "/order/check",

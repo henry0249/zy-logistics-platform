@@ -17,10 +17,11 @@ module.exports = {
     name: '状态',
     option: {
       taking: '待接单',
-      dispatchCheck: '调度审核',
+      beforeDispatchCheck: '调度前审核',
       dispatch: '待调度',
-      check: '待审核',
-      finishCheck: '完成审核',
+      distributionFinishCheck: '配送完成审核',
+      beforeSettleCheck: '结算前审核',
+      settle: '待结算',
       finish: '订单完成',
       delete: '已删除'
     },

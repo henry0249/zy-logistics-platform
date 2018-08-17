@@ -1,4 +1,6 @@
 const Service = require('egg').Service;
+const roleField = require('../field/Role');
+
 
 class CheckService extends Service {
   async sys(param, msg = '需要系统管理员权限') {
@@ -8,29 +10,39 @@ class CheckService extends Service {
     }
     return true;
   }
-  async platformAdmin(param, msg = '需要平台管理员或系统管理员权限') {
+  async role(type, company, msg = '无权限操作') {
     const ctx = this.ctx;
-    if (!ctx.user.isSys) {
-      let isPlatformAdmin = ctx.service.curd.findOne(ctx.model.Platform, {
-        admin: { in: [ctx.user._id]
+    if (type instanceof Array) {
+      if (type.length === 0) {
+        ctx.throw(401, msg);
+      }
+      type.forEach((item) => {
+        if (!roleField.type.option[item]) {
+          ctx.throw(401, msg);
         }
       });
-      if (!isPlatformAdmin) {
-        ctx.throw(404, msg, param);
+    } else {
+      if (!roleField.type.option[type]) {
+        ctx.throw(401, msg);
       }
     }
-    return true;
-  }
-  async companyAdmin(param, msg = '需要公司管理员或系统管理员权限') {
-    const ctx = this.ctx;
-    if (!ctx.user.isSys) {
-      let isCompanyAdmin = ctx.service.curd.findOne(ctx.model.Company, {
-        admin: { in: [ctx.user._id]
-        }
-      });
-      if (!isCompanyAdmin) {
-        ctx.throw(404, msg, param);
-      }
+    if (!company) {
+      ctx.throw(401, '无权限操作,未指定当前操作公司');
+    }
+    let findOption = {
+      company: company,
+      user: ctx.user._id
+    }
+    if (type instanceof Array) {
+      findOption.type = {
+        $in: type
+      };
+    } else {
+      findOption.type = type;
+    }
+    let role = await ctx.model.Role.findOne(findOption);
+    if (!role) {
+      ctx.throw(401, `您无权限操作,需要${roleField.type.option[type]}权限`);
     }
     return true;
   }

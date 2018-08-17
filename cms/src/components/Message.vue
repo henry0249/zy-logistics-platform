@@ -72,6 +72,14 @@ export default {
         time: 2000
       });
     },
+    warning(text) {
+      this.show({
+        text: text || "警告消息",
+        icon: "icon-e3",
+        color: "#FFC107",
+        time: 2000
+      });
+    },
     info(text) {
       this.show({
         text: text || "一般消息",

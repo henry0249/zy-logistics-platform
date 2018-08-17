@@ -7,7 +7,7 @@
       <div style="position:relative">
         <div class="disabled-hide" v-if="disabled">
         </div>
-        <el-input style="width:100%" :value="text" v-bind="$attrs" :size="size||$parent.size" class="input-with-select">
+        <el-input style="width:100%" :value="text" v-bind="$attrs" :placeholder="$attrs.placeholder || autoPlaceholder" :size="size||$parent.size" class="input-with-select">
           <text-dropdown v-if="userCompanyTypeChoose" slot="prepend" v-model="innerType" :options="field.Order.type.option" :color="['#909399','#409EFF']"></text-dropdown>
           <text-dropdown v-if="truckShipTypeChoose" slot="prepend" v-model="innerType" :options="field.Logistics.transportation.option" :color="['#67C23A','#E6A23C']"></text-dropdown>
         </el-input>
@@ -17,7 +17,7 @@
       </div>
     </my-form-item>
     <el-dialog append-to-body :title="title||autoTitle" :visible.sync="dialogVisible" width="70%" top="10vh">
-      <div >
+      <div style="height:55vh;overflow:hidden">
         <common-table v-if="dialogVisible" :option="searchOption" :path="path" :thead="thead" height="55vh" style="padding:0" @current-change="selectChange">
           <my-select-search slot="header" :data.sync="searchOption" :type="selectType"></my-select-search>
           <div slot-scope="scope" v-if="selectType === 'company'">
@@ -137,6 +137,9 @@ export default {
     autoTitle() {
       return "选择" + this.options.type[this.selectType];
     },
+    autoPlaceholder() {
+      return "请选择" + this.options.type[this.selectType];
+    },
     path() {
       return this.options.path[this.selectType];
     },
@@ -145,8 +148,7 @@ export default {
     },
     userCompanyTypeChoose() {
       return (
-        this.type &&
-        (this.selectType === "user" || this.selectType === "company")
+        this.type && (this.selectType === "user" || this.selectType === "company")
       );
     },
     truckShipTypeChoose() {
