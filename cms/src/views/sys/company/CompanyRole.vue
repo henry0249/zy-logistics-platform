@@ -1,10 +1,10 @@
 <template>
   <loading-box v-model="loadingText" class="role-box" style="position: relative;">
     <el-tabs v-model="activeName" style="box-shadow:none;">
-      <el-tab-pane label="管理员" name="admin">
-        <company-role-item style="margin-top:15px;" :removeData.sync="startRemoveData.admin" :show.sync="startShowData" :data.sync="roleArr.admin" key="admin"></company-role-item>
+      <el-tab-pane :label="value" :name="k" v-for="(value,k,index) in key" :key="index">
+        <company-role-item style="margin-top:15px;" :removeData.sync="startRemoveData[k]" :show.sync="startShowData" :data.sync="roleArr.admin" :key="k"></company-role-item>
       </el-tab-pane>
-      <el-tab-pane label="业务专员" name="salesman">
+      <!-- <el-tab-pane label="业务专员" name="salesman"> 
         <company-role-item style="margin-top:15px;" :removeData.sync="startRemoveData.salesman" :show.sync="startShowData" :data.sync="roleArr.salesman" key="salesman"></company-role-item>
       </el-tab-pane>
       <el-tab-pane label="完成审核员" name="finishCheck">
@@ -15,7 +15,7 @@
       </el-tab-pane>
       <el-tab-pane label="单据文员" name="documentClerk">
         <company-role-item style="margin-top:15px;" :removeData.sync="startRemoveData.documentClerk" :show.sync="startShowData" :data.sync="roleArr.documentClerk" key="documentClerk"></company-role-item>
-      </el-tab-pane>
+      </el-tab-pane> -->
     </el-tabs>
     <div class="jc" v-if="show()" style="position:absolute;top:0;right:0;height:40px;">
       <el-button type="primary" @click="fastAdd" size="mini">快速初始化</el-button>
@@ -77,13 +77,24 @@ export default {
   },
   data() {
     return {
+      key: {
+        admin: "管理员",
+        salesman: "业务专员",
+        beforeDispatchCheck: "调度前审核员",
+        dispatcher: "调度专员",
+        beforeSettleCheck: "结算前审核员",
+        financial: "财务文员",
+        documentClerk: "单据文员"
+      },
       fastAddIo: false,
       fastAddShow: false,
       startShowData: true,
       startRemoveData: {
         admin: [],
         salesman: [],
-        finishCheck: [],
+        beforeDispatchCheck: [],
+        dispatcher: [],
+        beforeSettleCheck: [],
         financial: [],
         documentClerk: []
       },
@@ -99,7 +110,9 @@ export default {
       roleArr: {
         admin: [],
         salesman: [],
-        finishCheck: [],
+        beforeDispatchCheck: [],
+        dispatcher: [],
+        beforeSettleCheck: [],
         financial: [],
         documentClerk: []
       },
@@ -116,6 +129,9 @@ export default {
     };
   },
   watch: {
+    activeName(val){
+      console.log(val);
+    },
     startShowData(val) {
       this.$emit("update:showData", val);
     },
@@ -140,7 +156,9 @@ export default {
           let op =
             oldVal.admin.length === 0 &&
             oldVal.salesman.length === 0 &&
-            oldVal.finishCheck.length === 0 &&
+            oldVal.beforeDispatchCheck.length === 0 &&
+            oldVal.dispatcher.length === 0 &&
+            oldVal.beforeSettleCheck.length === 0 &&
             oldVal.financial.length === 0 &&
             oldVal.documentClerk.length === 0;
           if (!op) {
@@ -233,8 +251,12 @@ export default {
         return "管理员";
       } else if (this.activeName === "salesman") {
         return "业务专员";
-      } else if (this.activeName === "finishCheck") {
-        return "完成审核员";
+      } else if (this.activeName === "beforeDispatchCheck") {
+        return "调度前审核员";
+      }  else if (this.activeName === "dispatcher") {
+        return "审核专员";
+      }  else if (this.activeName === "beforeSettleCheck") {
+        return "结算前审核员";
       } else if (this.activeName === "financial") {
         return "财务文员";
       } else if (this.activeName === "documentClerk") {
@@ -247,7 +269,9 @@ export default {
       if (
         this.activeName === "admin" ||
         this.activeName === "salesman" ||
-        this.activeName === "finishCheck" ||
+        this.activeName === "beforeDispatchCheck" ||
+        this.activeName === "dispatcher" ||
+        this.activeName === "beforeSettleCheck" ||
         this.activeName === "financial" ||
         this.activeName === "documentClerk"
       ) {

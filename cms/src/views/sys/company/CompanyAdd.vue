@@ -38,9 +38,11 @@ export default {
       isLogistics: false,
       companyArr: {},
       roleObj: {
-        admin: [],
+       admin: [],
         salesman: [],
-        finishCheck: [],
+        beforeDispatchCheck: [],
+        dispatcher: [],
+        beforeSettleCheck: [],
         financial: [],
         documentClerk: []
       },

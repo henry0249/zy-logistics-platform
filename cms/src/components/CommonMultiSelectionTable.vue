@@ -16,6 +16,10 @@
 <script>
 export default {
   props: {
+    selectIo:{
+      type:Boolean,
+      default:false
+    },
     keyData: {
       type: Object,
       default() {
@@ -36,11 +40,11 @@ export default {
     };
   },
   watch: {
-    dynamicTags:{
-      handler(val){
-        this.$emit('update:data',val)
+    dynamicTags: {
+      handler(val) {
+        this.$emit("update:data", val);
       },
-      deep:true
+      deep: true
     }
   },
   computed: {
@@ -53,6 +57,7 @@ export default {
   },
   methods: {
     selectionChange(val) {
+      this.$emit("update:selectIo", true);
       let data = JSON.parse(JSON.stringify(this.dynamicTags));
       val.forEach(item => {
         data.push(item);
@@ -60,7 +65,7 @@ export default {
       for (let index = 0; index < data.length; index++) {
         for (let i = index + 1; i < data.length; i++) {
           if (data[index]._id === data[i]._id) {
-            data.splice(i,1);
+            data.splice(i, 1);
           }
         }
       }
@@ -85,11 +90,7 @@ export default {
       }
     }
   },
-  mounted() {
-  },
-  created() {
-    console.log(this.keyData);
-  }
+  mounted() {}
 };
 </script>
 
