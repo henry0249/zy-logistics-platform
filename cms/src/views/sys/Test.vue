@@ -19,17 +19,6 @@ export default {
       },
       deep:true
     }
-  },
-  computed: {
-    // data() {
-    //   let data = [];
-    //   for (let index = 0; index < 20; index++) {
-    //     let obj = {};
-    //     obj.name = "用户" + index;
-    //     data.push(obj);
-    //   }
-    //   return data;
-    // }
   }
 };
 </script>
