@@ -1,9 +1,12 @@
 <template>
-  <common-goods-edmit-item sys></common-goods-edmit-item>
+  <div>
+
+  </div>
 </template>
 
 <script>
   export default {
+    
   }
 </script>
 

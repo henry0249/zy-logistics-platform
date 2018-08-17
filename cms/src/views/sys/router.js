@@ -4,6 +4,7 @@ import Goods from './goods/router';
 import System from './system/router';
 import Company from './company/router';
 import User from './user/router';
+import Test from './Test.vue';
 
 export default [{
   path: '/sys',
@@ -17,6 +18,10 @@ export default [{
     ...System,
     ...Company,
     ...User,
-    ...Area
+    ...Area,
+    {
+      path: 'test',
+      component:Test
+    }
   ]
 }]

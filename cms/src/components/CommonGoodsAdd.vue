@@ -20,7 +20,7 @@
           <div class="flex form-box" style="margin-top:20px;">
             <my-form-item class="form-right" select v-model="goods.brand" filterable label="品牌" :options="brandArr">
             </my-form-item>
-            <common-select class="form-right" v-if="sys" label="生产厂商" :data.sync="goods.mfrs" border width="25%" title="公司选择" type="company" size="mini"></common-select>
+            <common-select class="form-right" v-if="sys" label="生产厂商" :data.sync="goods.company" border width="25%" title="公司选择" type="company" size="mini"></common-select>
             <my-form-item select class="form-right" v-model="goods.saleState" filterable label="售卖状态" :options="field.Goods.saleState.option">
             </my-form-item>
             <my-form-item class="form-right" v-if="!sys" switch v-model="goods.selfDeliverySupport" label="支持自提">
@@ -120,14 +120,14 @@ export default {
         selfDeliverySupport: false,
         freeDelivery: false,
         tag: [],
-        mfrs: {},
+        company: {},
         detail: ""
       },
       inputVisible: false,
       inputValue: "",
       categoryArr: [],
       brandArr: [],
-      mfrsArr: []
+      companyArr: []
     };
   },
   watch: {
@@ -194,7 +194,7 @@ export default {
         });
         return;
       }
-      if (this.sys && !Object.keys(this.goods.mfrs).length === 0) {
+      if (this.sys && !Object.keys(this.goods.company).length === 0) {
         this.$alert("生产厂商是必填的", "提示", {
           confirmButtonText: "确定",
           callback: action => {}
@@ -237,9 +237,9 @@ export default {
           goodsOp[key] = this.goods[key];
         }
         if (this.sys) {
-          goodsOp.mfrs = this.goods.mfrs._id;
+          goodsOp.company = this.goods.company._id;
         } else {
-          goodsOp.mfrs = this.loginInfo.company._id;
+          goodsOp.company = this.loginInfo.company._id;
         }
         let goods = await this.$api.curd(goodsOp);
         for (let index = 0; index < this.tableList.length; index++) {

@@ -18,7 +18,7 @@
       </el-tab-pane>
     </el-tabs>
     <div class="jc" v-if="show()" style="position:absolute;top:0;right:0;height:40px;">
-      <el-button type="primary" v-if="startRemoveData.admin.length > 0 && startRemoveData.salesman.length > 0 && startRemoveData.finishCheck.length > 0 && startRemoveData.financial.length > 0 && startRemoveData.documentClerk.length > 0 " @click="fastAdd" size="mini">快速初始化</el-button>
+      <el-button type="primary" @click="fastAdd" size="mini">快速初始化</el-button>
       <el-button type="success" @click="add" :title="`添加${userText()}`" size="mini">{{userText()}}<i class="el-icon-plus el-icon--right"></i></el-button>
     </div>
     <el-dialog :title="`选择${userText()}`" width="70%" :visible.sync="dialogTableVisible">

@@ -49,9 +49,13 @@ export default {
     path: "/sys/goods/brand"
   }],
   area:[{
+    name: '添加地区',
+    icon: 'icon-icon-test',
+    path: '/sys/area/add'
+  },{
     name: '地区列表',
     icon: 'icon-icon-test',
-    path: ''
+    path: '/sys/area/list'
   }],
   system:[{
     name: '系统管理',
