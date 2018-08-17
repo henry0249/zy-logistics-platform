@@ -7,9 +7,6 @@
         <goods-table :order.sync="order"></goods-table>
         <business-trains titleTip="(计划时贸易链可选填)" :order.sync="order" :data.sync="businessTrainsData"></business-trains>
       </div>
-      <div>
-        <company-role-user></company-role-user>
-      </div>
       <div class="flex ac" style="margin-top:30px">
         <div class="f1"></div>
         <el-button size="small" type="primary" @click="createOrder">创建订单</el-button>
@@ -19,7 +16,6 @@
 </template>
 
 <script>
-import CompanyRoleUser from '../common/CompanyRoleUser';
 import Info from "./Info.vue";
 import GoodsTable from "./GoodsTable.vue";
 import BusinessTrains from "./BusinessTrains";
@@ -28,7 +24,6 @@ export default {
     Info,
     GoodsTable,
     BusinessTrains,
-    CompanyRoleUser
   },
   data() {
     return {

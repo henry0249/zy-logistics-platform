@@ -79,7 +79,6 @@ export default {
   },
   methods: {
     goodsChange(val) {
-      console.log(val.company);
       let price = {};
       if (val.price && val.price instanceof Array) {
         val.price.forEach(item => {
