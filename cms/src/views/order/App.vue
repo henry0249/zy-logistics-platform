@@ -72,9 +72,9 @@ export default {
         name: "调度前审核",
         color: "red",
         icon: "icon-shenhe1",
-        path: "/order/dispatchCheck",
-        state:'dispatchCheck',
-        badge: this.orderBadge.dispatchCheck
+        path: "/order/beforeDispatchCheck",
+        state:'beforeDispatchCheck',
+        badge: this.orderBadge.beforeDispatchCheck
       },
       {
         name: "待调度",

@@ -53,6 +53,10 @@ export default {
     showCompany: {
       type: Boolean,
       default: false
+    },
+    handle: {
+      type: String,
+      default: ""
     }
   },
   data() {
@@ -162,7 +166,7 @@ export default {
     }
   },
   async mounted() {
-    this.activeCompany = this.company._id;
+    this.activeCompany = this.handle || this.company._id;
     if (this.showCompany) {
       this.loadingText = "加载中";
       try {

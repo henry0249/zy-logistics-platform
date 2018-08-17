@@ -7,18 +7,19 @@
         <goods-table :order.sync="order"></goods-table>
         <business-trains titleTip="(计划时贸易链可选填)" :order.sync="order" :data.sync="businessTrainsData"></business-trains>
       </div>
+      <div>
+        <company-role-user></company-role-user>
+      </div>
       <div class="flex ac" style="margin-top:30px">
-        跳过接单
-        <el-switch v-model="skipTaking" active-color="#13ce66" inactive-color="#ff4949">
-        </el-switch>
         <div class="f1"></div>
-        <el-button size="small" type="primary" @click="createOrder">立即创建</el-button>
+        <el-button size="small" type="primary" @click="createOrder">创建订单</el-button>
       </div>
     </div>
   </loading-box>
 </template>
 
 <script>
+import CompanyRoleUser from '../common/CompanyRoleUser';
 import Info from "./Info.vue";
 import GoodsTable from "./GoodsTable.vue";
 import BusinessTrains from "./BusinessTrains";
@@ -26,7 +27,8 @@ export default {
   components: {
     Info,
     GoodsTable,
-    BusinessTrains
+    BusinessTrains,
+    CompanyRoleUser
   },
   data() {
     return {

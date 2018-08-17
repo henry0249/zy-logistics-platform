@@ -10,7 +10,11 @@ class CheckService extends Service {
     }
     return true;
   }
-  async role(type, company, msg = '无权限操作') {
+  async role(
+    type,
+    company,
+    msg = '无权限操作',
+  ) {
     const ctx = this.ctx;
     if (type instanceof Array) {
       if (type.length === 0) {

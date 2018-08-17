@@ -16,7 +16,7 @@
         <el-button size="small" @click="back()">返回</el-button>
       </slot>
       <slot name="toolRight">
-        <el-button size="small" type="primary" @click="submit">确定</el-button>
+        <el-button size="small" type="primary" @click="submit">{{submitText}}</el-button>
       </slot>
     </div>
   </loading-box>
@@ -44,6 +44,10 @@ export default {
     transport: {
       type: Boolean,
       default: false
+    },
+    submitText: {
+      type: String,
+      default: "提交"
     }
   },
   components: {
@@ -59,7 +63,7 @@ export default {
       orderAsync: {},
       update: {
         businessTrains: [],
-        transportTrains: [],
+        transportTrains: []
       },
       order: {},
       goods: [],
@@ -103,9 +107,9 @@ export default {
       this.loadingText = "正在提交";
       try {
         let update = this.getSubmitData();
-        console.log(update);
-        // await this.$ajax.post("/order/update", update);
-        // this.back();
+        update.state = this.newState;
+        await this.$ajax.post("/order/set", update);
+        this.back();
       } catch (error) {}
       this.loadingText = "";
     }

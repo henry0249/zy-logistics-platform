@@ -13,30 +13,31 @@ const areaPopulate = [{
 }];
 
 class OrderService extends Service {
-  async statePowerCheck(msg) {
+  async stateChangeCheck(order,msg) {
     const ctx = this.ctx;
-    let body = ctx.request.body;
     let statePower = {
-      taking: ['salesman', 'sysSalesman', 'dispatchCheck'],
+      taking: ['salesman', 'sysSalesman', 'beforeDispatchCheck'],
       beforeDispatchCheck: ['salesman', 'sysSalesman'],
-      dispatch: ['dispatchCheck'],
-      beforeSettleCheck: ['dispatcher', 'sysDispatcher'],
-      settle: ['financial', 'documentClerk', 'finishCheck'],
-      finish: ['finishCheck']
-    };
-    return await ctx.service.check.role(statePower[body.state], body.roleCompany);
-  }
-  async opUser() {
-    const ctx = this.ctx;
-    let body = ctx.request.body;
-    let user = {
-      taking: ['salesman', 'sysSalesman'],
-      beforeDispatchCheck: ['dispatchCheck'],
-      dispatch: ['dispatcher', 'sysDispatcher'],
+      dispatch: ['beforeDispatchCheck'],
+      distributionFinishCheck: ['dispatcher', 'sysDispatcher'],
       beforeSettleCheck: ['financial', 'documentClerk'],
-      settle: ['finishCheck'],
+      settle: ['beforeSettleCheck'],
       finish: ['financial', 'documentClerk']
+    };
+    return await ctx.service.check.role(statePower[order.state], order.handle._id || order.handle);
+  }
+  pendingRoleUserType(state) {
+    let userType = {
+      all: ['salesman', 'sysSalesman', 'beforeDispatchCheck', 'dispatcher', 'sysDispatcher', 'financial', 'documentClerk', 'beforeSettleCheck'],
+      taking: ['salesman', 'sysSalesman'],
+      beforeDispatchCheck: ['beforeDispatchCheck'],
+      dispatch: ['dispatcher', 'sysDispatcher'],
+      distribution: ['dispatcher', 'sysDispatcher'],
+      distributionFinishCheck: ['financial', 'documentClerk'],
+      beforeSettleCheck: ['beforeSettleCheck'],
+      settle: ['financial', 'documentClerk']
     }
+    return userType[state];
   }
   async getOrderInfo(payload) {
     const ctx = this.ctx;
@@ -78,7 +79,7 @@ class OrderService extends Service {
       ctx.throw(422, '未选择送货地址', info);
     }
     if (!info.handle) {
-      ctx.throw(422, '未指定生产厂商', info);
+      ctx.throw(422, '未指定供应商', info);
     }
     if (!info.goods) {
       ctx.throw(422, '未选择商品', info);
@@ -96,9 +97,12 @@ class OrderService extends Service {
       ctx.throw(422, '商品运输单价必须大于0', info);
     }
     if (info._id) {
-      if (info.state) {}
       let update = JSON.parse(JSON.stringify(info));
+      await this.stateChangeCheck(update);
+      console.log(update.state);
       delete update._id;
+      delete update.createdAt;
+      delete update.updatedAt;
       await ctx.model.Order.update({
         _id: info._id
       }, update);
@@ -112,10 +116,10 @@ class OrderService extends Service {
     }
   }
   async setBusinessTrainsData(order, arr) {
-    const ctx = this.ctx;
     if (!(arr !== undefined && arr instanceof Array && arr.length > 0)) {
       return;
     }
+    const ctx = this.ctx;
     for (let i = 0; i < arr.length; i++) {
       let item = arr[i];
       for (const key in item) {
@@ -127,6 +131,8 @@ class OrderService extends Service {
       if (item._id) {
         let update = JSON.parse(JSON.stringify(item));
         delete update._id;
+        delete update.createdAt;
+        delete update.updatedAt;
         await ctx.model.BusinessTrains.update({
           _id: item._id
         }, update);
@@ -136,11 +142,21 @@ class OrderService extends Service {
       }
     }
   }
+  async setTransportTrainsData(order, arr) {
+    if (!(arr !== undefined && arr instanceof Array && arr.length > 0)) {
+      return;
+    }
+    const ctx = this.ctx;
+  }
   async set() {
     const ctx = this.ctx;
     let body = ctx.request.body;
+    if (body.state) {
+      body.order.state = body.state;
+    }
     let order = await this.getOrderInfo(body.order);
     await this.setBusinessTrainsData(order, body.businessTrains);
+    await this.setTransportTrainsData(order, body.transportTrains);
     return 'ok';
   }
   async add() {
@@ -161,177 +177,6 @@ class OrderService extends Service {
     return 'ok';
   }
 
-  async dispatch() {
-    const ctx = this.ctx;
-    let body = ctx.request.body;
-    if (!body.order) {
-      ctx.throw(422, "订单编号必填", body);
-    }
-    let transportTrains = body.transportTrains;
-    if (!(transportTrains && transportTrains.length > 0)) {
-      ctx.throw(422, "物流链信息必填", body);
-    }
-    let order = await ctx.model.Order.findById(body.order);
-    if (!order) {
-      ctx.throw(404, "订单不存在", body);
-    }
-    if (order.state !== 'dispatch') {
-      ctx.throw(403, "此订单已经完成调度", body);
-    }
-    if (body.removeTrains instanceof Array && body.removeTrains.length > 0) {
-      for (let i = 0; i < body.removeTrains.length; i++) {
-        if (body.removeTrains[i]._id) {
-          await ctx.model.TransportTrains.remove({
-            _id: body.removeTrains[i]._id
-          })
-        }
-      }
-    }
-    if (body.removeLogistics instanceof Array && body.removeLogistics.length > 0) {
-      for (let i = 0; i < body.removeLogistics.length; i++) {
-        if (body.removeLogistics[i]._id) {
-          await ctx.model.Logistics.remove({
-            _id: body.removeLogistics[i]._id
-          })
-        }
-      }
-    }
-    for (let i = 0; i < transportTrains.length; i++) {
-      let item = transportTrains[i];
-      if (!(item.logistics instanceof Array && item.logistics.length > 0)) {
-        ctx.throw(422, "运单数量不能为0", body);
-      }
-      let transportTrains_id;
-      let $unset = {};
-      if (!item.origin) {
-        $unset.origin = 1;
-      }
-      if (!item.transfer) {
-        $unset.transfer = 1;
-      }
-      if (!item.transfer2) {
-        $unset.transfer2 = 1;
-      }
-      if (!item.destination) {
-        $unset.destination = 1;
-      }
-      if (item._id) {
-        transportTrains_id = item._id;
-        delete item._id;
-        await ctx.model.TransportTrains.update({
-          _id: transportTrains_id
-        }, { ...item,
-          $unset: $unset
-        });
-      } else {
-        let transportTrainsModel = new ctx.model.TransportTrains(item);
-        await transportTrainsModel.save();
-        transportTrains_id = transportTrainsModel._id;
-      }
-      for (let j = 0; j < item.logistics.length; j++) {
-        let lg = item.logistics[j];
-        if (lg.state > 0 && !(lg.truck || lg.ship)) {
-          ctx.throw(422, "接单后必须填写车船信息", body);
-        }
-        lg.transportTrains = transportTrains_id;
-        delete lg.ts;
-        if (lg._id) {
-          let logistics_id = lg._id;
-          delete lg._id;
-          await ctx.model.Logistics.update({
-            _id: logistics_id
-          }, {
-            ...lg,
-            $unset: $unset
-          });
-        } else {
-          lg.no = ctx.helper.no(lg.goods, ctx.user._id, '6');
-          let logisticsModel = new ctx.model.Logistics(lg);
-          await logisticsModel.save();
-        }
-      }
-    }
-    return 'ok';
-  }
-  async updateState(order) {
-    const ctx = this.ctx;
-    let body = ctx.request.body;
-    let newState = body.state;
-    let newStateStr = orderField.state.option[newState];
-
-    if (!newStateStr) {
-      ctx.throw(422, "无效的订单状态", body);
-    }
-    if (newState === order.state) {
-      ctx.throw(405, `订单已经是【${newStateStr}】，请勿重复修改`, body);
-    }
-    if (newState === 'dispatchCheck') {
-      if (!ctx.helper.inArr(order.salesman, ctx.user._id)) {
-        ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
-      }
-    }
-    if (newState === 'dispatch') {
-      if (!ctx.helper.inArr(order.dispatchCheck, ctx.user._id)) {
-        ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
-      }
-    }
-    if (newState === 'check') {
-      if (!ctx.helper.inArr(order.dispatcher, ctx.user._id)) {
-        ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
-      }
-    }
-    if (newState === 'finish') {
-      if (!ctx.helper.inArr(order.financial, ctx.user._id)) {
-        ctx.throw(403, `您无权限修改订单状态为【${newStateStr}】`, body);
-      }
-    }
-    if (newState === 'check') {
-      let hasLogistics = await ctx.model.Logistics.findOne();
-      if (!hasLogistics) {
-        ctx.throw(404, `该订单尚未添加任何物流运输单`, body);
-      }
-      let logistics = await ctx.model.Logistics.findOne({
-        order: order._id,
-        state: {
-          $in: [0, 1, 2, 3, 4]
-        }
-      });
-      if (logistics) {
-        ctx.throw(403, `该订单存在尚未完成的物流运输单`, body);
-      }
-    }
-    await ctx.model.Order.update({
-      _id: order._id
-    }, {
-      state: newState
-    });
-  }
-
-  getOrderMan(user_id) {
-    let inMan = {
-      salesman: {
-
-      },
-      dispatcher: {
-
-      },
-      documentClerk: {
-
-      },
-      financial: {
-
-      }
-    };
-    let $or = [];
-    for (const key in inMan) {
-      $or.push({
-        [key]: {
-          $in: [user_id]
-        }
-      })
-    }
-    return $or;
-  }
   async badge() {
     const ctx = this.ctx;
     let state = orderField.state.option;
@@ -352,16 +197,23 @@ class OrderService extends Service {
     const ctx = this.ctx;
     let body = ctx.request.body;
     let res = [];
-    let company = await ctx.model.Company.find();
+    let role = await ctx.model.Role.find({
+      user: ctx.user._id,
+    }).populate([{
+      path: 'company'
+    }]);
+    let companySet = new Set();
+    role.forEach(item => {
+      companySet.add(item.company);
+    });
+    let company = [...companySet];
     for (let i = 0; i < company.length; i++) {
       let item = JSON.parse(JSON.stringify(company[i]));
       item.badge = await ctx.model.Order.count({
         state: body.state,
         handle: item._id
       });
-      // if (item.badge>0) {
       res.push(item);
-      // }
     }
 
     function sortId(a, b) {
@@ -383,6 +235,17 @@ class OrderService extends Service {
         $exists: true
       }
     }
+    let roleType = this.pendingRoleUserType(state);
+    let role = await ctx.model.Role.find({
+      type: {
+        $in: roleType
+      },
+      user: ctx.user._id,
+      company: body.handle
+    });
+    if (role.length === 0) {
+      return [];
+    }
     delete body.limit;
     delete body.skip;
     let orders = await ctx.model.Order.find({
@@ -397,7 +260,7 @@ class OrderService extends Service {
       populate: [{
         path: 'brand'
       }, {
-        path: 'mfrs'
+        path: 'company'
       }]
     }, {
       path: 'area',

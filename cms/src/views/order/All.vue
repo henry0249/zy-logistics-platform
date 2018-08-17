@@ -1,5 +1,5 @@
 <template>
-  <common-table :path="'/order/pending/'+state" :thead="thead" :option="option" showCompany>
+  <common-table :path="'/order/pending/'+state" :thead="thead" :option="option" showCompany :state="state">
     <my-form width="24%" class="flex ac" slot="header">
       <my-form-item size="mini" v-model="no" label="单号"></my-form-item>
     </my-form>
@@ -33,9 +33,9 @@ export default {
       type: String,
       default: "all"
     },
-    href: {
-      type: String,
-      default: ""
+    autoHref: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -59,11 +59,10 @@ export default {
   methods: {
     toDetail(item, index) {
       if (item._id) {
-        let href = this.href || this.state;
-        if (href) {
-          this.$router.push(`/edit/${href}/${item._id}`);
-        } else {
+        if (this.autoHref) {
           this.$router.push(`/edit/${item._id}`);
+        } else {
+          this.$router.push(`/edit/${this.state}/${item._id}`);
         }
       }
     }
