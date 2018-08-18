@@ -1,15 +1,25 @@
 <template>
-  <div style="padding-left:30px;">
-    <common-multi-selection user :data.sync="data" :label="label" width="50%" size="mini" border></common-multi-selection>
+  <div>
+    <!-- <common-multi-selection user :data.sync="data" :label="label" width="50%" size="mini" border></common-multi-selection>
+    <my-select :data.sync="value" label="国会山" user width="35%"></my-select> -->
+    <Test :data.sync="data"></Test>
+    <company-role-user></company-role-user>
   </div>
 </template>
 
 <script>
+import Test from '../common/CommonCompanyRole.vue';
+import CompanyRoleUser from '../common/CompanyRoleUser.vue';
 export default {
+  components: {
+    Test,
+    CompanyRoleUser
+  },
   data() {
     return {
       label:'用户',
-      data:[]
+      data:[],
+      value:''
     };
   },
   watch: {

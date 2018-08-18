@@ -8,7 +8,7 @@
         <common-alert style="margin:15px 0">公司信息</common-alert>
         <company-edmit-item v-if="!loadingText" v-model="loadingText" :data.sync="companyArr" :startData="startCompanyArr"></company-edmit-item>
         <common-alert style="margin:15px 0">公司角色</common-alert>
-        <company-role v-if="!loadingText" :removeData.sync="removeData" :data.sync="roleObj" :startRoleObj="startRoleObj" :showData.sync="show"></company-role>
+        <common-company-role v-if="!loadingText" :startData="roleStartData" :data.sync="roleArr" :removeList="removeList"></common-company-role>
         <common-alert style="margin:15px 0">{{isLogistics?'车船信息':'车船信息 (该公司不是物流公司，无车船信息)'}}</common-alert>
         <company-ship v-if="!loadingText&&isLogistics" :startData="startShipObj" :removeObj.sync="shipRemoveObj" :isLogistics="isLogistics" :data.sync="shipObj"></company-ship>
       </div>
@@ -21,116 +21,97 @@
 </template>
 
 <script>
-import CompanyEdmitItem from "./CompanyEdmitItem.vue";
-import CompanyRole from "./CompanyRole.vue";
-import CompanyShip from "./CompanyShip.vue";
-export default {
-  components: {
-    CompanyEdmitItem,
-    CompanyRole,
-    CompanyShip
-  },
-  data() {
-    return {
-      loadingText: "",
-      disabled: true,
-      show: true,
-      roleIo: false,
-      shipIo: false,
-      companyIo: false,
-      isLogistics: false,
-      companyArr: {},
-      startCompanyArr: {},
-      roleStartDate: {},
-      startRoleObj: {
-        admin: [],
-        salesman: [],
-        finishCheck: [],
-        financial: [],
-        documentClerk: []
-      },
-      haveRole: [],
-      roleObj: {},
-      shipObj: {},
-      startShipObj: {},
-      removeData: {},
-      shipRemoveObj: {}
-    };
-  },
-  watch: {
-    companyArr: {
-      handler(val, oldVal) {
-        console.log(val);
-        if (val.type.length > 0) {
-          console.log("111");
-        }
-        this.companyIo = true;
-        this.disabled = false;
-      },
-      deep: true
+  import CompanyEdmitItem from "./CompanyEdmitItem.vue";
+  import CommonCompanyRole from "../../common/CommonCompanyRole.vue";
+  import CompanyShip from "./CompanyShip.vue";
+  export default {
+    components: {
+      CompanyEdmitItem,
+      CompanyShip,
+      CommonCompanyRole
     },
-    roleObj: {
-      handler(val, oldVal) {
-        this.disabled = false;
-        console.log("roleObj", val);
-        this.roleIo = true;
-      },
-      deep: true
-    },
-    shipObj: {
-      handler(val) {
-        console.log("shipObj", val);
-        this.disabled = false;
-        this.shipIo = true;
-      },
-      deep: true
-    },
-    show(val) {
-      this.disabled = val;
-    }
-  },
-  methods: {
-    myAlert(str) {
-      this.$alert(str, "提示", {
-        confirmButtonText: "确定"
-      });
-    },
-    confirmation() {
-      let returnIo = true;
-      let roleKey = {
-        admin: "管理员",
-        salesman: "业务专员",
-        finishCheck: "完成审核员",
-        financial: "财务文员",
-        documentClerk: "单据文员"
+    data() {
+      return {
+        loadingText: "",
+        disabled: true,
+        show: true,
+        roleIo: false,
+        shipIo: false,
+        isLogistics: false,
+        companyArr: {},
+        roleStartData: [],
+        roleArr: [],
+        removeList: [],
+        startCompanyArr: {},
+        roleStartDate: {},
+        startRoleObj: {
+          admin: [],
+          salesman: [],
+          beforeDispatchCheck: [],
+          dispatcher: [],
+          beforeSettleCheck: [],
+          financial: [],
+          documentClerk: []
+        },
+        haveRole: [],
+        roleObj: {},
+        shipObj: {},
+        startShipObj: {},
+        removeData: {},
+        shipRemoveObj: {}
       };
-      let str = "";
-      for (const key in roleKey) {
-        if (this.roleObj[key].length === 0) {
-          str += roleKey[key] + "、";
-        }
-      }
-      if (!this.companyArr.name) {
-        this.myAlert("公司名称不能为空");
-        returnIo = false;
-      } else if (!this.companyArr.nick) {
-        this.myAlert("公司别称不能为空");
-        returnIo = false;
-      } else if (!this.companyArr.area._id) {
-        this.myAlert("公司地区不能为空");
-        returnIo = false;
-      } else if (str) {
-        this.myAlert(`最少选择一名${str.substr(0, str.length - 1)}`);
-        returnIo = false;
-      }
-      return returnIo;
     },
-    async sub() {
-      if (this.confirmation()) {
-        try {
-          this.loadingText = "更新中";
-          let io = true;
-          if (this.companyIo) {
+    watch: {
+      companyArr: {
+        handler(val, oldVal) {
+          if (val.type.length > 0) {}
+          this.disabled = false;
+        },
+        deep: true
+      },
+      shipObj: {
+        handler(val) {
+          console.log("shipObj", val);
+          this.disabled = false;
+          this.shipIo = true;
+        },
+        deep: true
+      },
+      show(val) {
+        this.disabled = val;
+      }
+    },
+    methods: {
+      myAlert(str) {
+        this.$message.warn(str);
+        // this.$alert(str, "提示", {
+        //   confirmButtonText: "确定"
+        // });
+      },
+      confirmation() {
+        let returnIo = true;
+        if (!this.companyArr.name) {
+          this.myAlert("公司名称不能为空");
+          returnIo = false;
+        } else if (!this.companyArr.nick) {
+          this.myAlert("公司别称不能为空");
+          returnIo = false;
+        } else if (!this.companyArr.area._id) {
+          this.myAlert("公司地区不能为空");
+          returnIo = false;
+        }else if (!(/^1[34578]\d{9}$/.test(this.companyArr.mobile))) {
+          this.myAlert("手机号码格式不正确！");
+          returnIo = false;
+        }else if (!/^(\(\d{3,4}\)|\d{3,4}-|\s)?\d{7,14}$/.test(this.companyArr.tel)) {
+          this.myAlert("公司固话格式不正确！");
+          returnIo = false;
+        }
+        return returnIo;
+      },
+      async sub() {
+        if (this.confirmation()) {
+          try {
+            this.loadingText = "更新中";
             let companyOp = JSON.parse(JSON.stringify(this.companyArr));
             delete companyOp._id;
             let company = await this.$api.curd({
@@ -141,57 +122,35 @@ export default {
               },
               update: companyOp
             });
-            if (!company) {
-              io = false;
+            console.log('111');
+            for (let index = 0; index < this.removeList.length; index++) {
+              let delRole = await this.$api.curd({
+                model: 'role',
+                curdType: 'delete',
+                _id: this.removeList[index]
+              })
             }
-          }
-          if (this.roleIo) {
-            let roleOp = {};
-            for (const key in this.removeData) {
-              if (this.removeData[key].length > 0) {
-                for (
-                  let index = 0;
-                  index < this.removeData[key].length;
-                  index++
-                ) {
-                  let delRole = await this.$ajax.post(
-                    "/role/delete?_id=" + this.removeData[key][index]
-                  );
-                  if (!delRole) {
-                    io = false;
-                  }
-                }
+            console.log('2222');
+            for (let index = 0; index < this.roleArr.length; index++) {
+              if (!this.roleArr[index]._id) {
+                console.log(index);
+                console.log(this.roleArr[index].type);
+                let setRole = await this.$api.curd({
+                  model: 'role',
+                  curdType: 'set',
+                  company: this.$route.params._id,
+                  type: this.roleArr[index].type,
+                  user: this.roleArr[index].user._id
+                })
               }
             }
-            for (const key in this.roleObj) {
-              for (let index = 0; index < this.roleObj[key].length; index++) {
-                if (!this.roleObj[key][index].roleId) {
-                  let addRole = await this.$ajax.post("/role/add", {
-                    company: this.$route.params._id,
-                    user: this.roleObj[key][index]._id,
-                    type: key
-                  });
-                  if (!addRole) {
-                    io = false;
-                  }
-                }
-              }
-            }
-          }
-          if (this.shipIo) {
             for (const key in this.shipObj) {
               let updateArr = [];
               let data = JSON.parse(JSON.stringify(this.data[key]));
               if (this.data[key].length > 0) {
                 for (let n = 0; n < this.data[key].length; n++) {
-                  for (
-                    let index = 0;
-                    index < this.shipObj[key].length;
-                    index++
-                  ) {
-                    if (
-                      this.shipObj[key][index]._id === this.data[key][n]._id
-                    ) {
+                  for (let index = 0; index < this.shipObj[key].length; index++) {
+                    if (this.shipObj[key][index]._id === this.data[key][n]._id) {
                       updateArr.push(this.data[key][n]);
                     }
                   }
@@ -213,9 +172,6 @@ export default {
                             type: this.shipObj[key][i].type
                           }
                         });
-                        if (!res) {
-                          io = false;
-                        }
                       }
                     }
                   }
@@ -238,24 +194,14 @@ export default {
                       let delShip = await this.$ajax.post(
                         "/" + key + "/delete?_id=" + copyData[i]._id
                       );
-                      if (!delShip) {
-                        io = false;
-                      }
                     }
                   }
                 } else {
                   if (this.data[key].length > 0) {
-                    for (
-                      let index = 0;
-                      index < this.data[key].length;
-                      index++
-                    ) {
+                    for (let index = 0; index < this.data[key].length; index++) {
                       let res = await this.$ajax.post(
                         "/" + key + "/delete?_id=" + this.data[key][index]._id
                       );
-                      if (!res) {
-                        io = false;
-                      }
                     }
                   }
                 }
@@ -270,18 +216,11 @@ export default {
                       type: this.shipObj[key][index].type,
                       company: this.$route.params._id
                     });
-                    if (!addShip) {
-                      io = false;
-                    }
                   }
                 }
               } else {
                 if (this.shipObj[key].length > 0) {
-                  for (
-                    let index = 0;
-                    index < this.shipObj[key].length;
-                    index++
-                  ) {
+                  for (let index = 0; index < this.shipObj[key].length; index++) {
                     let res = await this.$api.curd({
                       model: key,
                       curdType: "set",
@@ -291,155 +230,130 @@ export default {
                       type: this.shipObj[key][index].type,
                       company: this.$route.params._id
                     });
-                    if (!res) {
-                      io = false;
-                    }
                   }
                 }
               }
             }
-          }
-          if (!io) {
-            this.$confirm("更新失败", "提示", {
-              confirmButtonText: "继续更新",
-              cancelButtonText: "返回",
-              type: "warning"
-            })
-              .then(() => {
-                this.$router.go(0);
-              })
-              .catch(() => {
-                this.$router.go(-1);
-              });
-          } else {
-            this.$alert("更新成功！", "提示", {
-              confirmButtonText: "确定",
-              callback: action => {
-                this.$router.go(-1);
-              }
+            this.$message.success("更新成功！");
+            this.$router.push({
+              path: "/sys/company"
             });
+          } catch (error) {
+            console.log(error);
+          }
+          this.loadingText = "";
+        }
+      },
+      async getCompany() {
+        try {
+          this.startCompanyArr = await this.$api.curd({
+            model: "company",
+            curdType: "findOne",
+            _id: this.$route.params._id,
+            populate: [{
+                path: "area",
+                populate: [{
+                  path: 'province'
+                },
+                {
+                  path: 'county'
+                },{
+                  path: 'city'
+                }]
+              },
+              {
+                path: "businessRelationCompany"
+              }
+            ]
+          });
+          this.startCompanyArr.type.forEach(item => {
+            if (item === "logistics") {
+              this.isLogistics = true;
+            }
+          });
+        } catch (error) {}
+      },
+      async getRole() {
+        try {
+          this.roleStartData = await this.$api.curd({
+            model: "role",
+            curdType: "find",
+            limit: 0,
+            company: this.$route.params._id,
+            populate: [{
+              path: "user"
+            }]
+          });
+        } catch (error) {}
+      },
+      async getTruc() {
+        try {
+          let truckData = await this.$api.curd({
+            model: "truck",
+            curdType: "find",
+            limit: 0,
+            company: this.$route.params._id,
+            populate: [{
+              path: "owner"
+            }]
+          });
+          if (truckData.length > 0) {
+            let data = [];
+            truckData.forEach(item => {
+              data.push(item._id);
+            });
+            this.$set(this.startShipObj, "truck", truckData);
+          } else {
+            this.$set(this.startShipObj, "truck", []);
           }
         } catch (error) {}
-        this.loadingText = "";
+      },
+      async getShip() {
+        try {
+          let shipData = await this.$api.curd({
+            model: "ship",
+            curdType: "find",
+            limit: 0,
+            company: this.$route.params._id,
+            populate: [{
+              path: "owner"
+            }]
+          });
+          if (shipData.length > 0) {
+            let data = [];
+            shipData.forEach(item => {
+              data.push(item._id);
+            });
+            this.$set(this.startShipObj, "ship", shipData);
+          } else {
+            this.$set(this.startShipObj, "ship", []);
+          }
+        } catch (error) {}
+      },
+      test() {
+        console.log(this.companyArr);
       }
     },
-    async getCompany() {
-      try {
-        this.startCompanyArr = await this.$api.curd({
-          model: "company",
-          curdType: "findOne",
-          _id: this.$route.params._id,
-          populate: [
-            {
-              path: "area"
-            },{
-              path:'businessRelationCompany'
-            }
-          ]
-        });
-        this.startCompanyArr.type.forEach(item => {
-          if (item === "logistics") {
-            this.isLogistics = true;
-          }
-        });
-      } catch (error) {}
-    },
-    async getRole() {
-      try {
-        let role = await this.$api.curd({
-          model: "role",
-          curdType: "find",
-          company: this.$route.params._id,
-          populate: [
-            {
-              path: "user"
-            }
-          ]
-        });
-        role.forEach(roleItem => {
-          for (const key in this.startRoleObj) {
-            if (key === roleItem.type) {
-              let obj = JSON.parse(JSON.stringify(roleItem.user));
-              this.$set(obj, "roleId", roleItem._id);
-              this.startRoleObj[key].push(obj);
-            }
-          }
-        });
-        console.log(this.startRoleObj);
-      } catch (error) {}
-    },
-    async getTruc() {
-      try {
-        let truckData = await this.$api.curd({
-          model: "truck",
-          curdType: "find",
-          limit: 0,
-          company: this.$route.params._id,
-          populate: [
-            {
-              path: "owner"
-            }
-          ]
-        });
-        if (truckData.length > 0) {
-          let data = [];
-          truckData.forEach(item => {
-            data.push(item._id);
-          });
-          this.$set(this.startShipObj, "truck", truckData);
-        } else {
-          this.$set(this.startShipObj, "truck", []);
-        }
-      } catch (error) {}
-    },
-    async getShip() {
-      try {
-        let shipData = await this.$api.curd({
-          model: "ship",
-          curdType: "find",
-          limit: 0,
-          company: this.$route.params._id,
-          populate: [
-            {
-              path: "owner"
-            }
-          ]
-        });
-        if (shipData.length > 0) {
-          let data = [];
-          shipData.forEach(item => {
-            data.push(item._id);
-          });
-          this.$set(this.startShipObj, "ship", shipData);
-        } else {
-          this.$set(this.startShipObj, "ship", []);
-        }
-      } catch (error) {}
-    },
-    test() {
-      console.log(this.companyArr);
+    async created() {
+      this.loadingText = "加载中";
+      await this.getCompany();
+      await this.getRole();
+      await this.getTruc();
+      await this.getShip();
+      this.data = JSON.parse(JSON.stringify(this.startShipObj));
+      this.loadingText = "";
     }
-  },
-  async created() {
-    this.loadingText = "加载中";
-    await this.getCompany();
-    await this.getRole();
-    await this.getTruc();
-    await this.getShip();
-    this.data = JSON.parse(JSON.stringify(this.startShipObj));
-    this.loadingText = "";
-  }
-};
+  };
 </script>
 
 <style scoped>
-.g-order-create {
-  padding: 3% 5%;
-}
-.g-order {
-  margin: 0 auto;
-  padding: 30px;
-  border: 1px solid #eee;
-  border-radius: 4px;
-}
+  .g-order-create {
+    padding: 3% 5%;
+  }
+  .g-order {
+    margin: 0 auto;
+    padding: 30px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+  }
 </style>

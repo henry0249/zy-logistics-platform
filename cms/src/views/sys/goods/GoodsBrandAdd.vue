@@ -10,6 +10,12 @@
     components: {
       GoodsBrandEdmitItem
     },
+    props: {
+      sys: {
+        type: Boolean,
+        default: false
+      }
+    },
     data() {
       return {
         loadingText: "",
@@ -58,8 +64,9 @@
             }
             let res = await this.$api.curd(data);
             this.$message.success("添加成功");
+            let path = !this.sys ? '/sys/goods/brand' : '/goods/brand'
             this.$router.push({
-              path: "/sys/goods/brand"
+              path
             });
           } catch (error) {}
           this.loadingText = "";

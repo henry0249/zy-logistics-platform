@@ -11,7 +11,7 @@
           <my-form-item input v-model="categoryData.desc" filterable label="描述"></my-form-item>
           <my-form-item input v-model="categoryData.remark" filterable label="备注"></my-form-item>
           <my-form-item collapse-tags v-if="haveParent" select v-model="categoryData.parent" label="父级分类" :options="parentCategoryArr"></my-form-item>
-          <!-- <div style="width:24%" v-else></div> -->
+          <div style="width:24%" v-if="!haveParent"></div>
         </div>
       </my-form>
     </div>

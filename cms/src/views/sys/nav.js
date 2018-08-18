@@ -32,7 +32,7 @@ export default {
     path: '/sys/goods/category_add'
   },{
     name: '商品列表',
-    icon: 'icon-icon-test',
+    icon: 'icon-liebiao',
     path: '/sys/goods/list'
   },
   {

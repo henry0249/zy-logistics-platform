@@ -2,8 +2,8 @@
   <my-form size="mini" width="24%" style="margin:15px 0" v-if="!value">
     <div class="flex jb">
       <my-form-item multiple collapse-tags select v-model="companyData.type" label="公司类型" :options="field.Company.type.option"></my-form-item>
-      <my-form-item input v-model="companyData.name" filterable label="公司全称"></my-form-item>
-      <my-form-item input v-model="companyData.nick" filterable label="公司别称"></my-form-item>
+      <my-form-item input v-model="companyData.name" filterable label="公司名称"></my-form-item>
+      <my-form-item input v-model="companyData.nick" filterable label="公司简称"></my-form-item>
       <my-form-item input v-model="companyData.mobile" filterable label="手机号码"></my-form-item>
     </div>
     <div class="flex jb" style="margin-top:20px;">
@@ -65,26 +65,14 @@
       };
     },
     watch: {
+      'companyData.area' (val) {
+        console.log(val);
+        let areaInfo = val.province.name + val.city.name + val.county.name + val.name
+        this.$set(this.companyData, 'areaInfo', areaInfo)
+      },
       companyData: {
         handler: function(val, oldVal) {
-          // if (this.type === "edmit") {
-          //   if (oldVal._id) {
-          //     this.$emit("update:data", val);
-          //   }
-          // } else if (this.type === "add") {
-          //   if (val.area._id) {
-          //     this.$set(
-          //       this.companyData,
-          //       "areaInfo",
-          //       val.area.province.name +
-          //       val.area.city.name +
-          //       val.area.county.name +
-          //       val.area.name
-          //     );
-          //   }
-            console.log(val);
-            this.$emit("update:data", val);
-          // }
+          this.$emit("update:data", val);
         },
         deep: true
       }

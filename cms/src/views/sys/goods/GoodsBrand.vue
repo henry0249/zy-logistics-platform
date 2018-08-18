@@ -2,8 +2,7 @@
   <div>
     <common-table path="/brand/find" :thead="thead" :option="op">
       <div slot="header" class="jc js">
-        <my-form-item size="mini" style="padding-right:10px;" @change="inputChange" input label="商品名" placeholder="请输入商品名" width="25%" v-model="input"></my-form-item>
-        <!-- <my-form-item @change="categoryChange" label="选择类别" style="padding-right:10px;" filterable width="25%" size="mini" placeholder="选择分类" v-model="categoryData" :options="categoryArr" select></my-form-item> -->
+        <my-form-item size="mini" style="padding-right:10px;" @change="inputChange" input label="商品名" placeholder="请输入品牌名" width="25%" v-model="input"></my-form-item>
       </div>
       <template slot-scope="scope">
         <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
@@ -16,16 +15,24 @@
 
 <script>
   export default {
+    props: {
+      option: {
+        type: Object,
+        default () {
+          return {}
+        }
+      },
+    },
     data() {
       return {
         input: "",
         op: {
           populate: [{
-            path: "category"
-          },
-          {
-            path: "company"
-          }
+              path: "category"
+            },
+            {
+              path: "company"
+            }
           ]
         },
         categoryArr: [],
@@ -43,7 +50,7 @@
           },
           category: {
             name: "所属分类",
-            slot:true
+            slot: true
           },
           "company.name": {
             name: "所属公司"
@@ -66,9 +73,21 @@
         });
       },
       categoryChange(val) {},
-      inputChange(val) {}
+      inputChange(val) {
+        this.$set(this.op, '$or', [{
+          name: {
+            $regex: val
+          }
+        }])
+      }
     },
-    created() {}
+    created() {
+      if (Object.keys(this.option).length > 0) {
+        for (const key in this.option) {
+          this.$set(this.op,key,this.option[key]);
+        }
+      }
+    }
   };
 </script>
 

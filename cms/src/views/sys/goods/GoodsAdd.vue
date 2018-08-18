@@ -1,9 +1,13 @@
 <template>
-  <common-goods-add sys></common-goods-add>
+  <goods-add sys></goods-add>
 </template>
 
 <script>
+import GoodsAdd from './CommonGoodsAdd.vue';
   export default {
+    components: {
+      GoodsAdd
+    }
   }
 </script>
 

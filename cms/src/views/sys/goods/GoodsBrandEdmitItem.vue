@@ -2,7 +2,7 @@
   <div class="g-order-create">
     <div class="g-order">
       <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
-        <strong>{{type === 'add'?'添加分类':'分类详情'}}</strong>
+        <strong>{{type === 'add'?'添加品牌':'分类详情'}}</strong>
       </div>
       <common-alert style="margin:15px 0">分类信息</common-alert>
       <my-form size="mini" width="24%" style="margin:15px 0">
@@ -10,7 +10,9 @@
           <my-form-item input v-model="brandData.name" filterable label="品牌名"></my-form-item>
           <my-form-item input v-model="brandData.type" filterable label="类型"></my-form-item>
           <my-form-item multiple collapse-tags select v-model="brandData.category" label="所属分类" :options="categoryArr"></my-form-item>
-          <common-select label="所属公司" :data.sync="brandData.company" border width="24%" type="company" size="mini"></common-select>
+          <div style="width:24%">
+            <my-select label="所属公司" :data.sync="brandData.company" company></my-select>
+          </div>
         </div>
         <div class="flex form-box" style="margin-top:20px;">
           <div class="flex jc js">
