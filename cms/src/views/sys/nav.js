@@ -58,8 +58,12 @@ export default {
     path: '/sys/area/list'
   }],
   system:[{
-    name: '系统管理',
+    name: '系统业务员',
     icon: 'icon-icon-test',
-    path: ''
+    path: '/sys/system/sys_saleman'
+  },{
+    name: '系统调度员',
+    icon: 'icon-icon-test',
+    path: '/sys/system/sys_dispatcher'
   }]
 }

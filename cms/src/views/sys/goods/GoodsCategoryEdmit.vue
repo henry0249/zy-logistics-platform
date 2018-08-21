@@ -43,8 +43,12 @@ export default {
         }
         let res = await this.$api.curd(data)
         this.$message.success("修改成功！");
+        let path = '/sys/goods/category';
+        if (!this.sys) {
+          path = '/goods/category';
+        }
         this.$router.push({
-          path: "/sys/goods/category"
+          path: path
         });
       } catch (error) {}
     },

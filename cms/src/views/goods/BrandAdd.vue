@@ -1,5 +1,5 @@
 <template>
-  <goods-brand-add sys></goods-brand-add>
+  <goods-brand-add :sys="false"></goods-brand-add>
 </template>
 
 <script>

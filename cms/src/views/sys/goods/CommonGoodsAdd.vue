@@ -18,24 +18,21 @@
             </my-form-item>
           </div>
           <div class="jb" style="margin-top:20px;">
+            <div style="width:24%">
+              <my-select :disabled="!sys" label="所属公司" :data.sync="goods.company" company></my-select>
+            </div>
             <my-form-item select v-model="goods.brand" filterable label="品牌" :options="brandArr">
             </my-form-item>
-            <div style="width:24%">
-              <my-select label="所属公司" :data.sync="goods.company" company></my-select>
-            </div>
             <my-form-item select v-model="goods.saleState" filterable label="售卖状态" :options="field.Goods.saleState.option">
             </my-form-item>
-            <my-form-item placeholder="请输入商品名" input v-model="goods.name" filterable label="商品名"></my-form-item>
-            <my-form-item v-if="!sys" switch v-model="goods.selfDeliverySupport" label="支持自提">
-            </my-form-item>
-            <my-form-item v-if="!sys" switch v-model="goods.freeDelivery" label="包配送费">
-            </my-form-item>
+            <div style="width:24%" class="jb">
+              <my-form-item width="50%" switch v-model="goods.selfDeliverySupport" label="支持自提">
+              </my-form-item>
+              <my-form-item width="50%" switch v-model="goods.freeDelivery" label="包配送费">
+              </my-form-item>
+            </div>
           </div>
           <div class="jb" style="margin-top:20px;">
-            <my-form-item width="24%" v-if="sys" switch v-model="goods.selfDeliverySupport" label="支持自提">
-            </my-form-item>
-            <my-form-item width="24%" v-if="sys" switch v-model="goods.freeDelivery" label="包配送费">
-            </my-form-item>
             <div class="flex edmit-tag" style="width:24%">
               <i style="width:60px;font-size: 12px;">标签</i>
               <el-tag size="mini" style="margin-right:10px;" :type="tagType(index,goods.tag)" :key="index" v-for="(tag,index) in goods.tag" closable :disable-transitions="false" @close="handleClose(goods.tag,tag)">
@@ -45,7 +42,7 @@
               </el-input>
               <el-button size="mini" v-else class="button-new-tag" @click="showInput">添加标签</el-button>
             </div>
-            <div style="width:24%" v-if="sys"></div>
+            <div style="width:24%" v-if="!sys"></div>
           </div>
           <my-form-item style="margin-top:20px;" size="mini" placeholder="请输入商品详情" v-model="goods.detail" width="100%" input type="textarea" autosize label="商品详情">
           </my-form-item>
@@ -62,12 +59,12 @@
         <my-table v-else size="mini" edit :thead="thead" :data.sync="tableList" index border op opWidth="50px">
           <div slot="op" slot-scope="scope" class="tc" style="width:100%;color:#F56C6C">
             <i v-if="tableList.length>0" title="删除该地区" class="pointer" @click="delAdr(scope['index'])">
-                              <icon size="16px">icon-ec1</icon>
-                            </i>
+                                            <icon size="16px">icon-ec1</icon>
+                                          </i>
           </div>
           <template slot-scope="scope">
-                <my-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" area></my-select>
-                            <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
+                              <my-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" area></my-select>
+                                          <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
 </template>
         </my-table>
       </div>
@@ -84,7 +81,7 @@
     props: {
       sys: {
         type: Boolean,
-        default: false
+        default: true
       }
     },
     data() {
@@ -135,6 +132,17 @@
       };
     },
     watch: {
+      async 'goods.company' (val) {
+        await this.getBrand();
+      },
+      company: {
+        handler(val) {
+          if (!this.sys) {
+            this.$set(this.goods, 'company', val);
+          }
+        },
+        deep: true
+      },
       tableList: {
         handler: function(val, oldVal) {
           if (oldVal.length > 0) {
@@ -239,11 +247,6 @@
           for (const key in this.goods) {
             goodsOp[key] = this.goods[key];
           }
-          if (this.sys) {
-            goodsOp.company = this.goods.company._id;
-          } else {
-            goodsOp.company = this.loginInfo.company._id;
-          }
           let goods = await this.$api.curd(goodsOp);
           for (let index = 0; index < this.tableList.length; index++) {
             let price = await this.$api.curd({
@@ -261,7 +264,7 @@
             this.$router.push({
               path: "/sys/goods"
             });
-          }else{
+          } else {
             this.$router.push({
               path: "/goods/list"
             });
@@ -271,17 +274,23 @@
       },
       async getBrand() {
         try {
-          this.brandArr = await this.$api.curd({
+          let data = {
             model: "brand",
-            curdType: "find"
-          });
+            curdType: "find",
+            limit: 0
+          }
+          if (!this.sys) {
+            this.$set(data, 'company', this.company._id);
+          }
+          this.brandArr = await this.$api.curd(data);
         } catch (error) {}
       },
       async getCategory() {
         try {
           this.categoryArr = await this.$api.curd({
             model: "category",
-            curdType: "find"
+            curdType: "find",
+            limit:0
           });
         } catch (error) {}
       }
@@ -290,6 +299,10 @@
       this.value = "加载中";
       await this.getBrand();
       await this.getCategory();
+      if (!this.sys) {
+        this.$set(this.goods, 'company', this.company);
+        console.log(this.goods);
+      }
       this.value = "";
     }
   };

@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="loadingText">
-    <goods-brand-edmit-item v-if="!loadingText" @sub="sub" type="edmit" :startData="startData" :categoryArr="categoryArr"></goods-brand-edmit-item>
+    <goods-brand-edmit-item :sys="sys" v-if="!loadingText" @sub="sub" type="edmit" :startData="startData" :categoryArr="categoryArr"></goods-brand-edmit-item>
   </loading-box>
 </template>
 
@@ -9,6 +9,12 @@ import GoodsBrandEdmitItem from "./GoodsBrandEdmitItem.vue";
 export default {
   components: {
     GoodsBrandEdmitItem
+  },
+  props: {
+    sys: {
+      type: Boolean,
+      default: true
+    },
   },
   data() {
     return {
@@ -70,6 +76,7 @@ export default {
           }
         ]
       });
+      console.log(this.startData);
     },
     async getCategory() {
       this.categoryArr = await this.$api.curd({

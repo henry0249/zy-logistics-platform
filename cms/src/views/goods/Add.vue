@@ -1,12 +1,12 @@
 <template>
-  <goods-add></goods-add>
+  <goods-add :sys="false"></goods-add>
 </template>
 
 <script>
 import GoodsAdd from '../sys/goods/CommonGoodsAdd.vue';
   export default {
     components: {
-      GoodsAdd
+      GoodsAdd,
     }
   }
 </script>

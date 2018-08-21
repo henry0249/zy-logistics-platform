@@ -9,90 +9,121 @@
         <div v-if="dynamicTags.length <= 0">未选择</div>
       </div>
     </div>
-    <common-table size="mini" height="50vh - 50px" selection @selection-change="selectionChange" style="margin-top:10px;padding:0px;width:100%;" :path="path" :thead="thead"></common-table>
+    <common-table size="mini" height="50vh - 50px" selection @selection-change="selectionChange" style="margin-top:10px;padding:0px;width:100%;" :path="path" :thead="thead" :option="op">
+      <common-multi-selection-table-search slot="header" :data.sync="inputData" :type="typeChange"></common-multi-selection-table-search>
+    </common-table>
   </div>
 </template>
 
 <script>
-export default {
-  props: {
-    selectIo:{
-      type:Boolean,
-      default:false
-    },
-    keyData: {
-      type: Object,
-      default() {
-        return {};
-      }
-    },
-    data: {
-      type: Array,
-      default() {
-        return [];
-      }
-    }
-  },
-  data() {
-    return {
-      maxHeight: "",
-      dynamicTags: []
-    };
-  },
-  watch: {
-    dynamicTags: {
-      handler(val) {
-        this.$emit("update:data", val);
+  export default {
+    props: {
+      type: {
+        type: String,
+        default: ''
       },
-      deep: true
-    }
-  },
-  computed: {
-    path() {
-      return "/" + this.keyData.key + "/find";
-    },
-    thead() {
-      return this.keyData.obj.thead;
-    }
-  },
-  methods: {
-    selectionChange(val) {
-      this.$emit("update:selectIo", true);
-      let data = JSON.parse(JSON.stringify(this.dynamicTags));
-      val.forEach(item => {
-        data.push(item);
-      });
-      for (let index = 0; index < data.length; index++) {
-        for (let i = index + 1; i < data.length; i++) {
-          if (data[index]._id === data[i]._id) {
-            data.splice(i, 1);
-          }
+      option: {
+        type: Object,
+        default () {
+          return {}
+        }
+      },
+      selectIo: {
+        type: Boolean,
+        default: false
+      },
+      keyData: {
+        type: Object,
+        default () {
+          return {};
+        }
+      },
+      data: {
+        type: Array,
+        default () {
+          return [];
         }
       }
-      this.dynamicTags = data;
     },
-    handleClose(tag, index) {
-      this.dynamicTags.splice(index, 1);
+    data() {
+      return {
+        inputData:{},
+        maxHeight: "",
+        dynamicTags: [],
+        op:{},
+      };
     },
-    recursion(index, arr) {
-      if (index <= arr.length - 1) {
-        return index;
-      } else {
-        this.recursion(index - arr.length, arr);
+    watch: {
+      inputData:{
+        handler(val){
+          console.log(val);
+          for (const key in val) {
+            this.$set(this.op,key,val[key]);
+          }
+        },
+        deep:true
+      },
+      dynamicTags: {
+        handler(val) {
+          this.$emit("update:data", val);
+        },
+        deep: true
       }
     },
-    tagType(index, arr) {
-      let type = ["success", "info", "warning", "danger"];
-      if (index <= type.length - 1) {
-        return type[index];
-      } else {
-        return type[this.recursion(index, type)];
+    computed: {
+      typeChange(){
+        return this.type;
+      },
+      path() {
+        return "/" + this.keyData.key + "/find";
+      },
+      thead() {
+        return this.keyData.obj.thead;
+      }
+    },
+    methods: {
+      selectionChange(val) {
+        this.$emit("update:selectIo", true);
+        let data = JSON.parse(JSON.stringify(this.dynamicTags));
+        val.forEach(item => {
+          data.push(item);
+        });
+        for (let index = 0; index < data.length; index++) {
+          for (let i = index + 1; i < data.length; i++) {
+            if (data[index]._id === data[i]._id) {
+              data.splice(i, 1);
+            }
+          }
+        }
+        this.dynamicTags = data;
+      },
+      handleClose(tag, index) {
+        this.dynamicTags.splice(index, 1);
+      },
+      recursion(index, arr) {
+        if (index <= arr.length - 1) {
+          return index;
+        } else {
+          this.recursion(index - arr.length, arr);
+        }
+      },
+      tagType(index, arr) {
+        let type = ["success", "info", "warning", "danger"];
+        if (index <= type.length - 1) {
+          return type[index];
+        } else {
+          return type[this.recursion(index, type)];
+        }
+      }
+    },
+    created () {
+      if (Object.keys(this.option).length > 0) {
+        this.op = JSON.parse(JSON.stringify(this.option));
       }
     }
-  },
-  mounted() {}
-};
+  };
 </script>
 
 <style scoped>
+
 </style>

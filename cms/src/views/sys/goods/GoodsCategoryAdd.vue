@@ -11,6 +11,12 @@ export default {
   components: {
     GoodsCategoryEdmitItem
   },
+  props: {
+    sys: {
+      type: Boolean,
+      default:true
+    },
+  },
   data() {
     return {
       loadingText: "",
@@ -37,8 +43,12 @@ export default {
         }
         let res = await this.$api.curd(op);
         this.$message.success("添加成功！");
+        let path = "/sys/goods/category";
+        if (this.sys) {
+          path = '/goods/category'
+        }
         this.$router.push({
-          path: "/sys/goods/category"
+          path
         });
       } catch (error) {}
       this.loadingText = "";

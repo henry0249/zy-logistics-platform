@@ -1,15 +1,19 @@
 import App from './App.vue';
-import List from './SystemList.vue';
+import SystemSysSalesman from './SystemSysSalesman.vue';
+import SysDispatcher from './SysDispatcher.vue';
 
 export default [{
   path: 'system',
   component: App,
-  redirect: 'system/list',
+  redirect: 'system/sys_saleman',
   meta: {
     keepAlive: true // 需要被缓存
   },
   children:[{
-    path:'list',
-    component:List
+    path:'sys_saleman',
+    component:SystemSysSalesman
+  },{
+    path:'sys_dispatcher',
+    component:SysDispatcher
   }]
 }]

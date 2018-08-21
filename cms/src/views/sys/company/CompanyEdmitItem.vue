@@ -9,12 +9,14 @@
     <div class="flex jb" style="margin-top:20px;">
       <my-form-item input v-model="companyData.tel" filterable label="公司固话"></my-form-item>
       <my-form-item input v-model="companyData.code" filterable label="公司编号"></my-form-item>
-      <common-select label="贸易链关联公司" :data.sync="companyData.businessRelationCompany" border width="24%" title="贸易链关联公司选择" type="company" size="mini"></common-select>
       <my-form-item switch v-model="companyData.self" label="自营"></my-form-item>
+      <common-select label="公司地区" width="24%" :data.sync="companyData.area" border title="所在区域" type="area" size="mini"></common-select>
     </div>
     <div class="flex jb" style="margin-top:20px;">
-      <common-select label="公司地区" width="24%" :data.sync="companyData.area" border title="所在区域" type="area" size="mini"></common-select>
-      <my-form-item input width="74.5%" v-model="companyData.areaInfo" ref="addressInput" filterable label="详细地址"></my-form-item>
+      <my-form-item input width="100%" v-model="companyData.areaInfo" ref="addressInput" filterable label="详细地址"></my-form-item>
+    </div>
+    <div class="flex jb" style="margin-top:20px;">
+      <common-multi-selection label="贸易链关联公司" :data.sync="companyData.businessRelationCompany" border title="贸易链关联公司选择" company size="mini"></common-multi-selection>
     </div>
   </my-form>
 </template>

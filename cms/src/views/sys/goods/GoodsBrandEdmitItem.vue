@@ -11,7 +11,7 @@
           <my-form-item input v-model="brandData.type" filterable label="类型"></my-form-item>
           <my-form-item multiple collapse-tags select v-model="brandData.category" label="所属分类" :options="categoryArr"></my-form-item>
           <div style="width:24%">
-            <my-select label="所属公司" :data.sync="brandData.company" company></my-select>
+            <my-select :disabled="disabled" label="所属公司" :data.sync="brandData.company" company></my-select>
           </div>
         </div>
         <div class="flex form-box" style="margin-top:20px;">
@@ -37,6 +37,10 @@
 <script>
   export default {
     props: {
+      sys: {
+        type: Boolean,
+        default: true
+      },
       type: {
         type: String,
         default: "add"
@@ -68,6 +72,7 @@
     },
     data() {
       return {
+        disabled: false,
         inputValue: '',
         inputVisible: false,
         brandData: {
@@ -78,6 +83,19 @@
           company: {}
         }
       };
+    },
+    watch: {
+      company: {
+        handler(val) {
+          if (!this.sys) {
+            this.$set(this.brandData, 'company', val);
+            if (this.type === 'edmit') {
+              this.$router.push({path:'/goods/brand'})
+            }
+          }
+        },
+        deep: true
+      }
     },
     methods: {
       handleClose(tag) {
@@ -104,6 +122,10 @@
     created() {
       if (this.type === 'edmit') {
         this.brandData = JSON.parse(JSON.stringify(this.startData));
+      }
+      if (!this.sys) {
+        this.$set(this.brandData, 'company', this.company);
+        this.disabled = true;
       }
     }
   };

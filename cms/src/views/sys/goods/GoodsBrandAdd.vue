@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="loadingText">
-    <goods-brand-edmit-item v-if="!loadingText" @sub="sub" :categoryArr="categoryArr"></goods-brand-edmit-item>
+    <goods-brand-edmit-item v-if="!loadingText" :sys="sys" @sub="sub" :categoryArr="categoryArr"></goods-brand-edmit-item>
   </loading-box>
 </template>
 
@@ -13,7 +13,7 @@
     props: {
       sys: {
         type: Boolean,
-        default: false
+        default: true
       }
     },
     data() {
@@ -64,7 +64,7 @@
             }
             let res = await this.$api.curd(data);
             this.$message.success("添加成功");
-            let path = !this.sys ? '/sys/goods/brand' : '/goods/brand'
+            let path = this.sys ? '/sys/goods/brand' : '/goods/brand'
             this.$router.push({
               path
             });
