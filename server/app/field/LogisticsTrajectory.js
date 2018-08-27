@@ -32,9 +32,8 @@ module.exports = {
     ref: 'Logistics'
   },
   area: {
-    type: 'ObjectId',
-    name: '地址',
-    ref: 'Area'
+    name: '收货地址',
+    type: 'Object',
   },
   areaInfo: {
     type: 'String',

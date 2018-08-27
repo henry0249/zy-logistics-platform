@@ -3,9 +3,9 @@
     <div class="g-business-trains">
       <div class="flex ac jb" style="color:#909399;padding-left:25px;background:#f4f4f5;font-size:13px;margin:15px 0;border-radius:4px">
         <div style="margin-right:20px">贸易链</div>
-        <div v-if="data.length > 0 " style="margin-right:15px">
+        <!-- <div v-if="data.length > 0 " style="margin-right:15px">
           <remove-check label="清空" @remove="removeAll"></remove-check>
-        </div>
+        </div> -->
         <div>{{titleTip}}</div>
         <div class="f1"></div>
         <div v-if="order.goods && order.goods._id" class="flex ac jb">
@@ -146,7 +146,7 @@ export default {
           this.data.splice(index, 1);
         }
         if (this.data.length === 2) {
-          this.data = [];
+          // this.data = [];
         }
       } else {
         this.data = [];
@@ -166,11 +166,11 @@ export default {
           type: "supplier",
           company: this.order.goods.company
         });
-        this.data.push({
-          ...body,
-          type: "pool",
-          company: {}
-        });
+        // this.data.push({
+        //   ...body,
+        //   type: "pool",
+        //   company: {}
+        // });
         this.data.push({
           ...body,
           type: "customer",
@@ -178,6 +178,10 @@ export default {
           customerType: this.order.type
         });
       } else {
+        if (!(this.data[this.data.length - 1 - 1].company._id)) {
+          this.$message.warn(`请先选择联营商公司`);
+          return;
+        }
         this.data.splice(this.data.length - 1, 0, {
           ...body,
           type: "pool",

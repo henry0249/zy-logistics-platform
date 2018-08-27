@@ -22,6 +22,14 @@ module.exports = {
     name: '地址',
     ref: 'Area'
   },
+  area: {
+    name: '收货地址',
+    type: 'Object',
+  },
+  areaInfo: {
+    type: 'String',
+    name: '地址详情'
+  },
   order: {
     type: 'ObjectId',
     name: '所属订单',

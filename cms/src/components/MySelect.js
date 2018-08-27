@@ -5,7 +5,8 @@ export default {
     goods: '商品',
     area: '地址',
     truck: '车辆',
-    ship: '船只'
+    ship: '船只',
+    areaInfo: '地址详情',
   },
   path: {
     user: '/user/find',

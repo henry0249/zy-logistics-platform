@@ -30,7 +30,9 @@
         </my-form-item>
         <my-form-item input v-model="order.contactNumber" label="联系电话">
         </my-form-item>
-        <my-select area :data.sync="order.area" label="送货地址" @change="areaChange"></my-select>
+        <div style="width:24%">
+          <my-select area :data.sync="order.area" label="送货地址" @change="areaChange"></my-select>
+        </div>
         <!-- <common-select style="width:24%" title="选择送货地址" label="送货地址" border :data.sync="order.area" type="area" @change="areaChange"></common-select> -->
       </div>
       <my-form-item width="100%" style="margin:15px 0" input v-model="order.address" label="详细地址">

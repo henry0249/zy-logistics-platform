@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="loadingText">
-    <Edit title="接单确认" newState="beforeDispatchCheck" ref="edit" alert="提交后将进入调度前审核流程">
+    <Edit transport title="接单确认" newState="beforeDispatchCheck" ref="edit" alert="提交后将进入调度前审核流程">
       <el-button size="small" type="warning" slot="toolLeft" @click="dialogVisible = true">转单</el-button>
     </Edit>
     <el-dialog title="选择订单转入公司" :visible.sync="dialogVisible" width="40%">

@@ -54,7 +54,7 @@ module.exports = {
   price: {
     name: '运费单价',
     type: 'Number',
-    require: true
+    require: true,
   },
   user: {
     type: 'ObjectId',
@@ -76,8 +76,7 @@ module.exports = {
   },
   area: {
     name: '收货地址',
-    type: 'ObjectId',
-    ref: 'Area'
+    type: 'Object',
   },
   areaInfo: {
     name: '详细地址',

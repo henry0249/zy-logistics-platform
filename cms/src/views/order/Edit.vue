@@ -5,7 +5,7 @@
       <Info :val="order" :data.sync="orderAsync"></Info>
       <goods-table :order="orderAsync"></goods-table>
       <business-trains :val="order.businessTrains" :order="orderAsync" :data.sync="update.businessTrains"></business-trains>
-      <transport-trains v-if="orderAsync.area && orderAsync.area._id && transport" :order="orderAsync" :data.sync="update.transportTrains"></transport-trains>
+      <transport-trains v-if="orderAsync.area && orderAsync.area._id && transport" :val="order.transportTrains" :order="orderAsync" :data.sync="update.transportTrains"></transport-trains>
     </div>
     <el-alert v-if="alert" style="margin-top:15px" :title="alert" type="info" center show-icon :closable="false">
     </el-alert>

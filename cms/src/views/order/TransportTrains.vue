@@ -25,9 +25,9 @@
       <div v-for="(item,index) in trains" :key="'table'+index">
         <div v-if="showIndex === index">
           <div class="flex ac jb brtl brtr" style="color:#909399;padding-left:25px;background:#f4f4f5;font-size:13px">
-            <div>{{area2name(trains[index - 1].area)}}</div>
+            <div>{{areaInfo(trains[index - 1].area)}}</div>
             <i style="margin:0 15px" class="el-icon-d-arrow-right success"></i>
-            <div>{{area2name(item.area)}}</div>
+            <div>{{areaInfo(item.area)}}</div>
             <div class="f1"></div>
             <div class="success pointer" style="padding:10px" @click="addLogistics(item.logistics,index)">
               物流单<i class="el-icon-plus"></i>
@@ -137,9 +137,9 @@ export default {
         if (item.logistics) {
           item.logistics.forEach(logisticsItem => {
             res.count++;
-            res.loading += logisticsItem.loading;
-            res.landed += logisticsItem.landed;
-            res.totalPrice += logisticsItem.price;
+            res.loading += logisticsItem.loading || 0;
+            res.landed += logisticsItem.landed || 0;
+            res.totalPrice += logisticsItem.price || 0;
           });
         }
       });
@@ -169,6 +169,12 @@ export default {
     };
   },
   methods: {
+    areaInfo(val) {
+      if (val && val.info) {
+        return val.info;
+      }
+      return "请选择地址";
+    },
     changeShowIndex(index) {
       if (index !== 0) {
         this.showIndex = index;
@@ -241,6 +247,7 @@ export default {
         [this.order.type]: this.order[this.order.type]
       });
     } else {
+      this.trains = JSON.parse(JSON.stringify(this.val));
     }
   }
 };

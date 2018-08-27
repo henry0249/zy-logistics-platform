@@ -18,12 +18,14 @@
     </my-form-item>
     <el-dialog append-to-body :title="title||autoTitle" :visible.sync="dialogVisible" width="70%" top="10vh">
       <div style="height:55vh;overflow:hidden">
-        <common-table v-if="dialogVisible" :option="searchOption" :path="path" :thead="thead" height="55vh" style="padding:0" @current-change="selectChange">
-          <my-select-search slot="header" :data.sync="searchOption" :type="selectType"></my-select-search>
-          <div slot-scope="scope" v-if="selectType === 'company'">
-            <div v-if="scope.prop==='type'">{{companyType2Text(scope.row.type)}}</div>
-          </div>
-        </common-table>
+        <div v-if="dialogVisible">
+          <common-table :option="searchOption" :path="path" :thead="thead" height="55vh" style="padding:0" @current-change="selectChange">
+            <my-select-search slot="header" :data.sync="searchOption" :type="selectType"></my-select-search>
+            <div slot-scope="scope" v-if="selectType === 'company'">
+              <div v-if="scope.prop==='type'">{{companyType2Text(scope.row.type)}}</div>
+            </div>
+          </common-table>
+        </div>
       </div>
       <div slot="footer" class="flex ac">
         <div class="info">
@@ -63,7 +65,7 @@ export default {
       default: ""
     },
     data: {
-      type: [Object, Number, String],
+      type: [Object, Number, String, Array],
       default() {
         return {};
       }
@@ -88,7 +90,8 @@ export default {
       options: options,
       innerType: "",
       dialogVisible: false,
-      searchOption: {}
+      searchOption: {},
+      areaInfo: []
     };
   },
   watch: {
@@ -101,7 +104,7 @@ export default {
       },
       deep: true
     },
-    dialogVisible(val){
+    dialogVisible(val) {
       if (val === false) {
         this.searchOption = {};
       }
@@ -148,7 +151,8 @@ export default {
     },
     userCompanyTypeChoose() {
       return (
-        this.type && (this.selectType === "user" || this.selectType === "company")
+        this.type &&
+        (this.selectType === "user" || this.selectType === "company")
       );
     },
     truckShipTypeChoose() {

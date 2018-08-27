@@ -39,7 +39,7 @@
         </my-form-item>
         <my-form-item class="marginBottom" v-model="order.count" label="订单数量" size="mini" text>
         </my-form-item>
-        <my-form-item class="marginBottom" v-model="data.receive" label="实收数量" size="mini" number :max="last.receive">
+        <my-form-item class="marginBottom" v-model="data.receive" label="实收数量" size="mini" number :max="Number(last.receive) || Number(last.supplyCount)">
         </my-form-item>
         <my-form-item value="0" text label="运输数量" size="mini">
         </my-form-item>
