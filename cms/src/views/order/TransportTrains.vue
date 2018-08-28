@@ -25,9 +25,9 @@
       <div v-for="(item,index) in trains" :key="'table'+index">
         <div v-if="showIndex === index">
           <div class="flex ac jb brtl brtr" style="color:#909399;padding-left:25px;background:#f4f4f5;font-size:13px">
-            <div>{{areaInfo(trains[index - 1].area)}}</div>
+            <div>{{areaInfo(trains[index - 1])}}</div>
             <i style="margin:0 15px" class="el-icon-d-arrow-right success"></i>
-            <div>{{areaInfo(item.area)}}</div>
+            <div>{{areaInfo(item)}}</div>
             <div class="f1"></div>
             <div class="success pointer" style="padding:10px" @click="addLogistics(item.logistics,index)">
               物流单<i class="el-icon-plus"></i>
@@ -36,7 +36,6 @@
           <my-table max-height="300" opWidth="45" size="mini" index border :thead="thead" op :data.sync="item.logistics">
             <div class="tc" slot="op" slot-scope="scope">
               <remove-check @remove="removeLogistics(item.logistics,scope.index)"></remove-check>
-              <!-- <i @click="removeLogistics(item.logistics,scope.index)" class="el-icon-delete pointer danger"></i> -->
             </div>
             <div slot-scope="scope">
               <div v-if="scope.prop==='no'">
@@ -45,15 +44,6 @@
               </div>
               <div v-if="scope.prop==='transportation'">
                 <my-select truck :type.sync="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]" placeholder="运输工具"></my-select>
-                <!-- <el-dropdown @command="handleCommand($event,scope.row)" trigger="click">
-                  <div :class="{success:scope.row.transportation==='truck',warning:scope.row.transportation==='ship'}" style="font-size:13px">
-                    {{scope.row.transportation==='truck'?'车':'船'}}<i class="el-icon-caret-bottom"></i>
-                  </div>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item v-for="dropdownItem in json2arr(field.Logistics.transportation.option)" :key="dropdownItem._id||dropdownItem.value || dropdownItem.id" :command="dropdownItem.value">{{dropdownItem.name || dropdownItem.label}}</el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-                <common-select style="margin-left:10px" size="mini" border :type="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]"></common-select> -->
               </div>
               <my-form-item v-if="scope.prop==='loading'" number v-model="scope.row.loading" size="mini" :min="0" :max="order.count">
               </my-form-item>
@@ -169,11 +159,24 @@ export default {
     };
   },
   methods: {
-    areaInfo(val) {
-      if (val && val.info) {
-        return val.info;
+    areaInfo(item) {
+      let res = "请选择地址";
+      if (Number(item.type) === 1) {
+        if (item.areaType === 0) {
+          if (item.areaArr instanceof Array && item.areaArr.length > 0) {
+            let temp = [];
+            item.areaArr.forEach(item => {
+              temp.push(item.name);
+            });
+            res = temp.join("/");
+          }
+        } else {
+          res = this.area2name(item.area);
+        }
+      } else {
+        res = this.area2name(item.area);
       }
-      return "请选择地址";
+      return res;
     },
     changeShowIndex(index) {
       if (index !== 0) {
@@ -190,7 +193,8 @@ export default {
         type: 1,
         area: {},
         company: {},
-        logistics: []
+        logistics: [],
+        areaArr: []
       });
     },
     async remove(item, index) {

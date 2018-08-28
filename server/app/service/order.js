@@ -403,6 +403,9 @@ class OrderService extends Service {
       }]
     }, {
       path: 'user'
+    }, {
+      path: 'area',
+      populate: areaPopulate
     }]).sort({
       updatedAt: 1
     });

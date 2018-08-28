@@ -3,13 +3,13 @@ module.exports = {
     name: '库存变化类型',
     type: 'String',
     option: {
-      0: '入库',
-      1: '出库',
-      2: '盘点'
+      in: '入库',
+      out: '出库',
+      check: '盘点'
     }
   },
   name: {
-    name: '出库单名称',
+    name: '库存单名称',
     type: 'String',
   },
   num: {

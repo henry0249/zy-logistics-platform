@@ -22,9 +22,9 @@ module.exports = {
     name: '地址',
     ref: 'Area'
   },
-  area: {
-    name: '收货地址',
-    type: 'Object',
+  areaArr: {
+    name: '任选地址数组',
+    type: 'Array',
   },
   areaInfo: {
     type: 'String',

@@ -8,7 +8,7 @@
         <div class="disabled-hide" v-if="disabled">
         </div>
         <el-input style="width:100%" :value="text" v-bind="$attrs" :placeholder="$attrs.placeholder || autoPlaceholder" :size="size||$parent.size" class="input-with-select">
-          <text-dropdown v-if="userCompanyTypeChoose" slot="prepend" v-model="innerType" :options="field.Order.type.option" :color="['#909399','#409EFF']"></text-dropdown>
+          <text-dropdown v-if="userCompanyTypeChoose" slot="prepend" v-model="innerType" :options="field.Order.type.option" :color="['#E6A23C','#409EFF']"></text-dropdown>
           <text-dropdown v-if="truckShipTypeChoose" slot="prepend" v-model="innerType" :options="field.Logistics.transportation.option" :color="['#67C23A','#E6A23C']"></text-dropdown>
         </el-input>
         <div class="choose-icon ac pointer" @click="dialogVisible = true">

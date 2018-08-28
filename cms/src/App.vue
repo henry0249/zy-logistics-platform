@@ -85,4 +85,7 @@ body {
 .el-tabs__header{
   margin-bottom: 0px
 }
+.ivu-input-small{
+  height: 28px
+}
 </style>
