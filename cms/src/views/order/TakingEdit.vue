@@ -3,9 +3,9 @@
     <Edit transport title="接单确认" newState="beforeDispatchCheck" ref="edit" alert="提交后将进入调度前审核流程">
       <el-button size="small" type="warning" slot="toolLeft" @click="dialogVisible = true">转单</el-button>
     </Edit>
-    <el-dialog title="选择订单转入公司" :visible.sync="dialogVisible" width="40%">
+    <el-dialog title="选择订单转入公司" :visible.sync="dialogVisible" width="30%">
       <div>
-        <common-select title="选择转入公司" labelWidth="80px" label="转入公司" border type="company" :data.sync="transferCompany" size="small"></common-select>
+        <my-select title="选择转入公司" label="转入公司" company :data.sync="transferCompany"></my-select>
         <el-alert title="转单成功后,本公司将无法处理此订单,交由转入公司处理!" type="warning" center show-icon :closable="false" style="margin-top:15px">
         </el-alert>
       </div>

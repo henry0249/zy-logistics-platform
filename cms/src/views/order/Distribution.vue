@@ -19,22 +19,18 @@
           <span @click="$router.push('/edit/distribution/'+scope.row._id)" class="link" v-if="scope.prop==='no'">
             {{scope.row.no}}
           </span>
-          <span v-if="scope.prop==='ts'">
-            <el-tag v-if="scope.row.truck" size="mini" type="success">车</el-tag>
-            <el-tag v-else-if="scope.row.ship" size="mini" type="danger">船</el-tag>
-            <span v-else>-</span>
-            <span v-if="scope.row.truck">{{scope.row.truck.no}}</span>
-            <span v-else-if="scope.row.ship">{{scope.row.ship.no}}</span>
-          </span>
-          <span v-if="scope.prop==='startAt'">
-            {{scope.row.startAt | formatTime}}
-          </span>
-          <span v-if="scope.prop==='finishAt'">
-            {{scope.row.finishAt | formatTime}}
-          </span>
-          <span v-if="scope.prop==='state'">
+          <div v-if="scope.prop==='transportation'">
+            <my-select truck :type.sync="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]" placeholder="运输工具" disabled></my-select>
+          </div>
+          <div v-if="scope.prop==='loading'">
+            {{scope.row.loading}}
+          </div>
+          <div v-if="scope.prop==='landed'">
+            {{scope.row.landed}}
+          </div>
+          <div v-if="scope.prop==='state'" >
             {{field.Logistics.state.option[scope.row.state]}}
-          </span>
+          </div>
         </template>
       </my-table>
     </div>
@@ -42,12 +38,12 @@
 </template>
 
 <script>
-import { logistics } from "./field";
+import { logisticsTable } from "./field";
 export default {
   data() {
     return {
       loadingText: "",
-      thead: logistics,
+      thead: logisticsTable,
       limit: 10,
       data: []
     };

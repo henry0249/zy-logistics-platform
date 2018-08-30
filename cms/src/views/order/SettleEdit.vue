@@ -1,5 +1,5 @@
 <template>
-  <Edit ref="edit" title="调度完成审核" newState="beforeSettleCheck" submitText="推送结算审核">
+  <Edit ref="edit" title="结算" newState="beforeSettleCheck" submitText="完成结算">
     <el-button size="small" type="danger" slot="toolLeft">打回配送</el-button>
   </Edit>
 </template>

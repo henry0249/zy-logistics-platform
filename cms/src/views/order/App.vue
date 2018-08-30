@@ -51,7 +51,6 @@ export default {
     };
   },
   mounted() {
-
     this.nav = [
       {
         name: "订单计划",
@@ -96,7 +95,7 @@ export default {
         name: "配送完成审核",
         color: "red",
         icon: "icon-shenhe1",
-        path: "/order/check",
+        path: "/order/distributionFinishCheck",
         state:'check',
         badge: this.orderBadge.check
       },
@@ -104,17 +103,17 @@ export default {
         name: "结算前审核",
         color: "red",
         icon: "icon-shenhe1",
-        path: "/order/finishCheck",
-        state:'finishCheck',
-        badge: this.orderBadge.finishCheck
+        path: "/order/beforeSettleCheck",
+        state:'beforeSettleCheck',
+        badge: this.orderBadge.beforeSettleCheck
       },
       {
         name: "待结算",
         color: "red",
         icon: "icon-jiesuan",
-        path: "/order/finish",
-        state:'finish',
-        badge: this.orderBadge.finish
+        path: "/order/settle",
+        state:'settle',
+        badge: this.orderBadge.settle
       },
       {
         name: "所有订单",

@@ -14,15 +14,19 @@
         <el-tooltip effect="dark" :content="areaInfo(data)" placement="top">
           <div class="marginBottom">
             <my-select area :data.sync="data.area" disabled></my-select>
-            <!-- <al-cascader v-model="areaArr" data-type="name" disabled /> -->
           </div>
         </el-tooltip>
         <my-form-item label="起运时间" size="mini" datetime></my-form-item>
       </div>
       <div v-if="Number(data.type)===1">
-        <my-select v-if="data.areaType === 1"  class="marginBottom" :data.sync="data.company" company @change="companyChange"></my-select>
+        <!-- <my-select  :data.sync="data.company" company @change="companyChange"></my-select> -->
+        <div class="marginBottom">
+          <my-form-item v-if="Number(data.areaType) === 0" size="mini" text value="根据实际地址自行选择"></my-form-item>
+          <my-form-item v-if="Number(data.areaType) === 1" select v-model="data.company" :options="order.handle.businessRelationCompany" size="mini" @change="companyChange" label="公司" placeholder="请选择关联公司"></my-form-item>
+          <my-form-item v-if="Number(data.areaType) === 2" select v-model="data.company" :options="getBusinessTrainsArea()" size="mini" @change="companyChange" label="贸易节点" placeholder="请选择贸易节点"></my-form-item>
+        </div>
         <!-- <common-select :data.sync="data.company" class="marginBottom" v-if="data.areaType === 1" size="mini" border type="company" label="公司" @change="companyChange"></common-select> -->
-        <my-form-item class="marginBottom" v-else disabled value="无需选择公司" label="公司" size="mini"></my-form-item>
+        <!-- <my-form-item class="marginBottom" v-else disabled value="无需选择公司" label="公司" size="mini"></my-form-item> -->
         <el-tooltip key="0" v-if="data.areaType === 0" effect="dark" :content="areaInfo(data)" placement="top">
           <al-cascader v-model="data.areaArr" data-type="all" size="small" />
         </el-tooltip>
@@ -72,6 +76,12 @@ export default {
       return res[this.data.type] || "地点";
     }
   },
+  watch:{
+    "data.areaType"(){
+      this.data.company = "";
+      this.data.area = {};
+    }
+  },
   methods: {
     areaInfo(item) {
       let res = "请选择地址";
@@ -96,10 +106,37 @@ export default {
       this.data.areaType = val;
     },
     companyChange(val) {
-      this.data.area = val.area;
+      let res = {};
+      if (this.data.areaType === 1) {
+        this.order.handle.businessRelationCompany.forEach(item => {
+          if (item._id === val) {
+            res = item;
+          }
+        });
+      }
+      if (this.data.areaType === 2) {
+        this.order.businessTrains.forEach(item => {
+          if (item.type === "pool") {
+            if (item.company._id === val) {
+              res = item.company;
+            }
+          }
+        });
+      }
+
+      this.data.area = res.area;
     },
     remove() {
       this.$emit("remove", this.data);
+    },
+    getBusinessTrainsArea() {
+      let res = [];
+      this.order.businessTrains.forEach(item => {
+        if (item.type === "pool") {
+          res.push(item.company);
+        }
+      });
+      return res;
     }
   }
 };

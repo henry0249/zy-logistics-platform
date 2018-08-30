@@ -10,7 +10,7 @@
       <div class="hor-scroll" style="margin-bottom:10px">
         <div class="hor-scroll-item" v-for="(item,index) in trains" :key="index">
           <div class="flex ac">
-            <transport-trains-card :data.sync="item" :index="index" @remove="remove($event,index)"></transport-trains-card>
+            <transport-trains-card :order="order" :data.sync="item" :index="index" @remove="remove($event,index)"></transport-trains-card>
             <div v-if="index!==trains.length-1" style="padding:0 10px">
               <i class="el-icon-d-arrow-right success"></i>
             </div>
@@ -184,9 +184,21 @@ export default {
       }
     },
     add() {
-      if (!this.trains[this.trains.length - 1 - 1].area._id) {
-        this.$message.error(`请先选择中转地${this.trains.length - 1 - 1}地址`);
-        return;
+      let lastItem = this.trains[this.trains.length - 1 - 1];
+      if (Number(lastItem.areaType) === 0) {
+        if (lastItem.areaArr.length === 0) {
+          this.$message.error(
+            `请先选择中转地${this.trains.length - 1 - 1}地址`
+          );
+          return;
+        }
+      } else {
+        if (!lastItem.area._id) {
+          this.$message.error(
+            `请先选择中转地${this.trains.length - 1 - 1}地址`
+          );
+          return;
+        }
       }
       this.trains.splice(this.trains.length - 1, 0, {
         areaType: 0,

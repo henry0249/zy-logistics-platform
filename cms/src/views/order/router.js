@@ -10,11 +10,17 @@ import BeforeDispatchCheckEdit from './BeforeDispatchCheckEdit';
 import Dispatch from './Dispatch';
 import DispatchEdit from './DispatchEdit';
 
+import Distribution from './Distribution.vue';
+import DistributionEdit from './DistributionEdit.vue';
+
 import DistributionFinishCheck from './DistributionFinishCheck';
 import DistributionFinishCheckEdit from './DistributionFinishCheckEdit';
 
-import Distribution from './Distribution.vue';
-import DistributionEdit from './DistributionEdit.vue';
+import BeforeSettleCheck from './BeforeSettleCheck';
+import BeforeSettleCheckEdit from './BeforeSettleCheckEdit';
+
+import Settle from './Settle';
+import SettleEdit from './SettleEdit';
 
 import All from './All.vue';
 import Edit from './Edit.vue';
@@ -59,6 +65,18 @@ export default [{
   }, {
     path: '/edit/distributionFinishCheck/:_id',
     component: DistributionFinishCheckEdit,
+  }, {
+    path: 'beforeSettleCheck',
+    component: BeforeSettleCheck,
+  }, {
+    path: '/edit/beforeSettleCheck/:_id',
+    component: BeforeSettleCheckEdit,
+  }, {
+    path: 'settle',
+    component: Settle,
+  }, {
+    path: '/edit/settle/:_id',
+    component: SettleEdit,
   }, {
     path: 'all',
     component: All,

@@ -4,7 +4,7 @@
       <div class="flex ac jb" v-if="title" slot="header" style="font-size:12px">
         {{title}}
         <div v-if="data.type==='pool'">{{index}}</div>
-        <div v-if="data.type==='pool'" class="link" style="margin:0 5px">关联物流</div>
+        <div v-if="data.type==='pool'" class="link" style="margin:0 5px" @click="dialogVisible = true">关联物流</div>
         <i v-if="data.type==='pool'" class="el-icon-question info"></i>
         <div class="f1"></div>
         <remove-check @remove="remove" v-if="data.type === 'pool'"></remove-check>
@@ -45,6 +45,15 @@
         </my-form-item>
       </div>
     </el-card>
+    <el-dialog title="选择关联物流单" :visible.sync="dialogVisible" width="70%">
+      <div>
+        
+      </div>
+      <div slot="footer">
+        <el-button @click="dialogVisible = false" size="mini">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false" size="mini">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -98,6 +107,7 @@ export default {
   },
   data() {
     return {
+      dialogVisible: false
       // company: {}
     };
   },

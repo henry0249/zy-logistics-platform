@@ -174,8 +174,14 @@ class OrderService extends Service {
           delete item[key];
         }
       }
-      if (!item.areaInfo && !item.area) {
-        ctx.throw(422, '物流节点中有地址未填写', item);
+      if (item.areaType === 0) {
+        if (item.areaArr.length === 0) {
+          ctx.throw(422, '物流节点中有地址未填写', item);
+        }
+      } else {
+        if (!item.area) {
+          ctx.throw(422, '物流节点中有地址未填写', item);
+        }
       }
       let trains = {};
       if (item._id) {
@@ -366,6 +372,12 @@ class OrderService extends Service {
       populate: [{
         path: 'area',
         populate: areaPopulate
+      }, {
+        path: 'businessRelationCompany',
+        populate: [{
+          path: 'area',
+          populate: areaPopulate
+        }]
       }]
     }, {
       path: 'goods',
