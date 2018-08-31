@@ -1,12 +1,13 @@
 <template>
-  <goods-brand :sys="false"></goods-brand>
+  <edmit-item type="read">
+  </edmit-item>
 </template>
 
 <script>
-import GoodsBrand from '../sys/goods/GoodsBrand.vue';
+  import EdmitItem from './EdmitItem.vue';
   export default {
     components: {
-      GoodsBrand
+      EdmitItem
     }
   }
 </script>

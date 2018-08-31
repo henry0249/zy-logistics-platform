@@ -59,12 +59,12 @@
         <my-table v-else size="mini" edit :thead="thead" :data.sync="tableList" index border op opWidth="50px">
           <div slot="op" slot-scope="scope" class="tc" style="width:100%;color:#F56C6C">
             <i v-if="tableList.length>0" title="删除该地区" class="pointer" @click="delAdr(scope['index'])">
-                                            <icon size="16px">icon-ec1</icon>
-                                          </i>
+                                                <icon size="16px">icon-ec1</icon>
+                                              </i>
           </div>
           <template slot-scope="scope">
-                              <my-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" area></my-select>
-                                          <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
+                                  <my-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" area></my-select>
+                                              <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
 </template>
         </my-table>
       </div>
@@ -200,36 +200,24 @@
       },
       async checkMethods() {
         if (!this.goods.name) {
-          this.$alert("名字是必填的", "提示", {
-            confirmButtonText: "确定",
-            callback: action => {}
-          });
+          this.$message.warn('名字是必填的');
           return;
         }
         if (this.sys && !Object.keys(this.goods.company).length === 0) {
-          this.$alert("生产厂商是必填的", "提示", {
-            confirmButtonText: "确定",
-            callback: action => {}
-          });
+          this.$message.warn('生产厂商是必填的');
           return;
         }
         if (this.tableList.length > 0) {
           this.tableList.forEach(tableListItem => {
             if (Object.keys(tableListItem.area).length === 0) {
-              this.$alert("地区是必填的", "提示", {
-                confirmButtonText: "确定",
-                callback: action => {}
-              });
+              this.$message.warn('地区是必填的');
               return;
             }
             if (!/(^[1-9]\d*$)/.test(tableListItem.sell) ||
               !/(^[1-9]\d*$)/.test(tableListItem.factory) ||
               !/(^[1-9]\d*$)/.test(tableListItem.transport)
             ) {
-              this.$alert("价格必须是数字并且大于0", "提示", {
-                confirmButtonText: "确定",
-                callback: action => {}
-              });
+              this.$message.warn('价格必须是数字并且大于0');
               return;
             }
           });
@@ -290,7 +278,7 @@
           this.categoryArr = await this.$api.curd({
             model: "category",
             curdType: "find",
-            limit:0
+            limit: 0
           });
         } catch (error) {}
       }

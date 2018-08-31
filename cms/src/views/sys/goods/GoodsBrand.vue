@@ -2,13 +2,16 @@
   <div>
     <common-table v-if="show" path="/brand/find" :thead="thead" :option="op">
       <div slot="header" class="jc js">
-        <my-form-item size="mini" style="padding-right:10px;" @change="inputChange" input label="商品名" placeholder="请输入品牌名" width="25%" v-model="input"></my-form-item>
+        <my-form-item size="mini" style="padding-right:10px;" @change="inputChange" input label="品牌名" placeholder="请输入品牌名" width="25%" v-model="input"></my-form-item>
+        <div style="width:25%">
+          <my-select :disabled="disabled" label="选择公司" :data.sync="companyData" placeholder="选择公司" company></my-select>
+        </div>
       </div>
       <template slot-scope="scope">
-            <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
-            <el-tag v-if="scope.prop === 'category'" :type="tagType(index,scope.row['category'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['category']" :key="item.id">{{item.name}}</el-tag>
-            <i title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{scope.row['name']}}</i>
-</template>
+        <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+        <el-tag v-if="scope.prop === 'category'" :type="tagType(index,scope.row['category'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['category']" :key="item.id">{{item.name}}</el-tag>
+        <i title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{scope.row['name']}}</i>
+      </template>
    </common-table>
   </div>
 </template>
@@ -16,6 +19,10 @@
 <script>
   export default {
     props: {
+      sys: {
+        type: Boolean,
+        default: true
+      },
       option: {
         type: Object,
         default () {
@@ -25,7 +32,9 @@
     },
     data() {
       return {
-        show:true,
+        disabled: false,
+        companyData: {},
+        show: true,
         input: "",
         op: {
           populate: [{
@@ -60,13 +69,22 @@
       };
     },
     watch: {
+      companyData: {
+        handler(val) {
+          this.$set(this.op, 'company', val._id);
+        },
+        deep: true
+      },
       company: {
         handler(val) {
-          this.show = false;
-          this.$set(this.op, 'company', val._id);
-          setTimeout(() => {
-            this.show = true;
-          }, 200);
+          if (!this.sys) {
+            this.show = false;
+            this.companyData = val;
+            this.$set(this.op, 'company', val._id);
+            setTimeout(() => {
+              this.show = true;
+            }, 200);
+          }
         },
         deep: true
       }
@@ -106,7 +124,9 @@
         }
       }
       if (!this.sys) {
+        this.companyData = this.company;
         this.$set(this.op, 'company', this.company._id);
+        this.disabled = true;
       }
     }
   };

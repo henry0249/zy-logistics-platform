@@ -9,7 +9,7 @@
         <div v-if="scope.prop === 'type'">
         <my-form-item size="mini" multiple collapse-tags select v-model="scope.row[scope.prop]" :options="field[str].type.option"></my-form-item>
         </div>
-        <common-select v-if="scope.prop === 'owner'" :data.sync="scope.row[scope.prop]" border width="100%" title="司机选择" type="user" size="mini"></common-select>
+        <my-select v-if="scope.prop === 'owner'" :data.sync="scope.row[scope.prop]" user></my-select>
 </template>
   </my-table>
 </template>

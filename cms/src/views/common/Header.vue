@@ -125,7 +125,7 @@ export default {
           },
           {
             name: "库存管理",
-            path: "",
+            path: "/stock",
             icon: "icon-leixing"
           },
           {

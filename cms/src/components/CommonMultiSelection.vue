@@ -1,6 +1,6 @@
 <template>
   <div :style="{color:'#606266',width:$attrs.width || '100%',}">
-    <div class="jc jb" style="width:100%;padding:5px 0;color:#606266">
+    <div class="jc jb" style="width:100%;color:#606266;margin-bottom:5px;">
       <div class="f1 jc js" :style="{fontSize:fontSize}">
         <div v-if="$attrs.label" :title="$attrs.label" class="tf1" :style="{fontSize:fontSize,width:labelWidth}">{{$attrs.label}}</div>
         <div v-if="show" style="margin-left:5px;flex:0 0 150px">/共选 <span class="success">{{this.startNewData.length}}</span>{{getKey().obj.unit}}{{getKey().obj.name}}</div>
@@ -11,9 +11,9 @@
       </div>
     </div>
     <div class="f1 jc js" :style="{'min-height':'23px',border:'1px solid #DCDFE6','border-radius': '5px','box-sizing':'border-box'}">
-      <div class="f1" ref="body" :style="{fontSize:fontSize,padding:'0 5px 5px 10px',maxHeight:'60px',overflow:'auto'}">
+      <div class="f1" ref="body" :style="{fontSize:fontSize,padding:'5px 5px 5px 10px',maxHeight:'60px',overflow:'auto'}">
         <common-multi-selection-tag v-if="startNewData.length > 0 && show" :fontSize="fontSize" :startData="startNewData" :data.sync="newData"></common-multi-selection-tag>
-        <div v-else>未选择</div>
+        <div v-else style="height:18px;line-height:18px;">未选择</div>
       </div>
     </div>
     <el-dialog :title="`添加${getKey().obj.name}`" width="70%" top="15vh" :visible.sync="dialogTableVisible">
@@ -108,11 +108,8 @@
     methods: {
       go() {
         this.dialogTableVisible = false;
-        // console.log(this.selectIo);
         if (this.selectIo) {
-          // console.log('111');
           let data = JSON.parse(JSON.stringify(this.startNewData));
-          // console.log('data',data);
           this.tableData.forEach(item => {
             data.push(item);
           });
@@ -173,9 +170,4 @@
 </script>
 
 <style scoped>
-  .t {
-    border-radius: 5px;
-    overflow: auto;
-    flex-wrap: wrap;
-  }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="jc js" style="flex-wrap: wrap">
-    <div :style="{'margin':'5px 10px 0 0',padding:'5px 10px',fontSize:fontSize,border:'1px solid #EBEEF5','box-sizing':'border-box',' border-radius':'4px'}" v-for="(item,index) in newData" :key="index">
+    <div :style="{'margin':'3px 10px 3px 0',padding:'3px 10px',fontSize:fontSize,border:'1px solid #EBEEF5','box-sizing':'border-box',' border-radius':'4px'}" v-for="(item,index) in newData" :key="index">
       <span>{{item.no || item.name || item.nick || item.mobile}}</span>
       <i class="el-icon-error pointer del" :title="title" @click="delTag(index)"></i>
     </div>
@@ -35,7 +35,6 @@ export default {
   watch: {
     newData: {
       handler(val,oldVal) {
-        // console.log(val,oldVal);
         this.$emit("update:data", val);
       },
       deep: true

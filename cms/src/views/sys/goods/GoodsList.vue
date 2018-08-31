@@ -8,7 +8,6 @@
         <div style="width:25%">
           <my-select :disabled="disabled" label="选择公司" :data.sync="companyData" placeholder="选择公司" company></my-select>
         </div>
-        <!-- <my-form-item :disabled="disabled" @change="companyChange" label="选择公司" style="padding-right:10px;" filterable width="25%" size="mini" placeholder="选择公司" v-model="companyData" :options="companyArr" select></my-form-item> -->
       </div>
       <template slot-scope="scope" v-if="scope.prop === 'tag'||scope.prop === 'name'">
             <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
@@ -87,9 +86,6 @@
       };
     },
     watch: {
-      companyData(val){
-        console.log(val);
-      },
       loadingText(val) {
         if (val) {
           this.show = false;

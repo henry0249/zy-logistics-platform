@@ -1,37 +1,30 @@
+
 <template>
   <div>
-    <common-multi-selection company :data.sync="data" :label="label" width="50%" size="mini" border></common-multi-selection>
-    <!-- <my-select :data.sync="value" label="国会山" user width="35%"></my-select> -->
-    <!-- <Test :data.sync="data"></Test>
-    <company-role-user></company-role-user> -->
+    <!-- <div @click="clickMethods">ghghghg</div> -->
+    <Test @test="test"></Test>
   </div>
 </template>
 
 <script>
-import Test from '../common/CommonCompanyRole.vue';
-import CompanyRoleUser from '../common/CompanyRoleUser.vue';
-export default {
-  components: {
-    Test,
-    CompanyRoleUser
-  },
-  data() {
-    return {
-      label:'用户',
-      data:[],
-      value:''
-    };
-  },
-  watch: {
-    data:{
-      handler(val){
-        console.log(val);
+  import Test from './goods/Test.vue';
+  export default {
+    components: {
+      Test
+    },
+    methods: {
+      clickMethods() {
+        console.log('11111');
       },
-      deep:true
+      test() {
+        this.$on('test', function(msg) {
+          console.log(msg)
+        })
+      }
     }
   }
-};
 </script>
 
 <style scoped>
+
 </style>
