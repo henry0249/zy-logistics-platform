@@ -10,7 +10,8 @@
       <div class="hor-scroll" style="margin-bottom:10px">
         <div class="hor-scroll-item" v-for="(item,index) in trains" :key="index">
           <div class="flex ac">
-            <transport-trains-card :order="order" :data.sync="item" :index="index" @remove="remove($event,index)"></transport-trains-card>
+            <transport-trains-card :data.sync="item" :order="order" :index="index" @remove="remove($event,index)">
+            </transport-trains-card>
             <div v-if="index!==trains.length-1" style="padding:0 10px">
               <i class="el-icon-d-arrow-right success"></i>
             </div>
@@ -74,7 +75,6 @@
             </div>
             <div class="tc" style="width:120px">
               总运费：<span style="color:#E6A23C">{{statistics.totalPrice}}</span>
-              <!-- <span style="color:#aaa">（卸货量*单价）</span> -->
             </div>
           </div>
         </div>
@@ -161,6 +161,9 @@ export default {
   methods: {
     areaInfo(item) {
       let res = "请选择地址";
+      if (!item) {
+        return res;
+      }
       if (Number(item.type) === 1) {
         if (item.areaType === 0) {
           if (item.areaArr instanceof Array && item.areaArr.length > 0) {
@@ -200,7 +203,7 @@ export default {
           return;
         }
       }
-      this.trains.splice(this.trains.length - 1, 0, {
+      this.trains.splice(-1, 0, {
         areaType: 0,
         type: 1,
         area: {},
@@ -219,11 +222,26 @@ export default {
       } else {
         this.trains.splice(index, 1);
       }
+      if (this.showIndex > 1) {
+        this.showIndex = this.showIndex - 1;
+      }
     },
     addLogistics(logistics, index) {
-      if (!this.trains[index].area._id) {
-        this.$message.error(`请先选择中转地${index}地址`);
-        return;
+      let lastItem = this.trains[index];
+      if (Number(lastItem.areaType) === 0) {
+        if (lastItem.areaArr.length === 0) {
+          this.$message.error(
+            `请先选择中转地${this.trains.length - 1 - 1}地址`
+          );
+          return;
+        }
+      } else {
+        if (!lastItem.area._id) {
+          this.$message.error(
+            `请先选择中转地${this.trains.length - 1 - 1}地址`
+          );
+          return;
+        }
       }
       if (
         logistics[logistics.length - 1] &&

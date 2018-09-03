@@ -104,13 +104,28 @@ class OrderService extends Service {
         if (!(body.businessTrains instanceof Array && body.businessTrains.length > 0)) {
           ctx.throw(422, '贸易链未添加', info);
         }
-        return payload;
       }
-      if (update.state === 'dispatch') {
-        if (!(body.transportTrains instanceof Array && body.transportTrains.length > 0)) {
+      // if (update.state === 'dispatch') {
+      //   if (!(body.transportTrains instanceof Array && body.transportTrains.length > 0)) {
+      //     ctx.throw(422, '物流链未添加', info);
+      //   }
+      // }
+      if (update.state === 'distributionFinishCheck') {
+        if (body.transportTrains instanceof Array && body.transportTrains.length > 0) {
+          body.transportTrains.forEach((item) => {
+            if (body.transportTrains instanceof Array && item.logistics.length > 0) {
+              item.logistics.forEach((logisticsItem) => {
+                if (Number(logisticsItem.state) !== 5) {
+                  ctx.throw(422, '存在未完成的运单', info);
+                }
+              });
+            } else {
+              ctx.throw(422, '存在未添加运单的物流链', info);
+            }
+          });
+        } else {
           ctx.throw(422, '物流链未添加', info);
         }
-        return payload;
       }
       delete update._id;
       delete update.createdAt;
@@ -162,6 +177,7 @@ class OrderService extends Service {
       return;
     }
     const ctx = this.ctx;
+    let logisticsCount = 0;
     for (let i = 0; i < arr.length; i++) {
       let item = arr[i];
       let logistics = item.logistics;
@@ -200,8 +216,9 @@ class OrderService extends Service {
         });
         await trains.save();
       }
-      if (logistics && logistics instanceof Array) {
+      if (logistics && logistics instanceof Array && logistics.length > 0) {
         for (let j = 0; j < logistics.length; j++) {
+          logisticsCount++;
           let logisticsItem = logistics[j];
           if (Number(logisticsItem.loading) <= 0) {
             ctx.throw(422, '存在装货数量为0的物流运单', logisticsItem);
@@ -227,14 +244,18 @@ class OrderService extends Service {
               no: ctx.helper.no(order.goods._id || order.goods, ctx.user._id, 6),
               order: order._id,
               transportTrains: trains._id,
+              contactName: order.contactName,
+              contactNumber: order.contactNumber,
+              area: order.area._id || order.area,
+              areaInfo: order.address,
               ...logisticsItem
             });
             await logisticsModel.save();
           }
         }
       }
-
     }
+    return logisticsCount;
   }
   async set() {
     const ctx = this.ctx;
@@ -247,6 +268,7 @@ class OrderService extends Service {
     await this.setTransportTrainsData(order, body.transportTrains);
     return 'ok';
   }
+
   async add() {
     return await this.set();
   }
@@ -261,6 +283,25 @@ class OrderService extends Service {
     if (ctx.helper.is('array', body.businessTrains) && body.businessTrains.length > 0) {
       body.businessTrains[0].company = body.transferCompany;
       await this.setBusinessTrainsData(order, body.businessTrains);
+
+    }
+    return 'ok';
+  }
+
+  async dispatch() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    let order = await ctx.model.Order.findById(body.order);
+    if (order.state !== 'dispatch') {
+      ctx.throw(422, '订单不是调度状态', body);
+    }
+    if (body.transportTrains instanceof Array && body.transportTrains.length > 0) {
+      let logisticsCount = await this.setTransportTrainsData(order, body.transportTrains);
+      if (logisticsCount === 0) {
+        ctx.throw(422, '至少添加一张物流单');
+      }
+    } else {
+      ctx.throw(422, '物流链不能为空');
     }
     return 'ok';
   }

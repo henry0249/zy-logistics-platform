@@ -76,7 +76,12 @@ module.exports = {
   },
   area: {
     name: '收货地址',
-    type: 'Object',
+    type: 'ObjectId',
+    ref: 'Area'
+  },
+  areaArr: {
+    name: '收货地址',
+    type: 'Array',
   },
   areaInfo: {
     name: '详细地址',
@@ -84,6 +89,10 @@ module.exports = {
   },
   startAt: {
     name: '出发时间',
+    type: 'Date',
+  },
+  distributionAt: {
+    name: '配送时间',
     type: 'Date',
   },
   finishAt: {

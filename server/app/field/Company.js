@@ -39,7 +39,8 @@ module.exports = {
   },
   stock: {
     name: '库存',
-    type: 'Number'
+    type: 'Number',
+    default: 0
   },
   address: {
     name: '默认地址',

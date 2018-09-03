@@ -5,11 +5,11 @@ module.exports = {
     option: { 
       in: '入库',
       out: '出库',
-      check: '盘点',
       increase: '增益',
       decrease: '损耗',
-      checkIncrease: '盘点增益',
-      checkDecrease: '盘点损耗',
+      check: '盘点',
+      // checkIncrease: '盘点增益',
+      // checkDecrease: '盘点损耗',
     }
   },
   name: {
@@ -18,6 +18,14 @@ module.exports = {
   },
   num: {
     name: '数量',
+    type: 'Number',
+  },
+  old: {
+    name: '操作前库存',
+    type: 'Number',
+  },
+  dv: {
+    name: '差值',
     type: 'Number',
   },
   company: {

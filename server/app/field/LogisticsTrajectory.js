@@ -33,6 +33,11 @@ module.exports = {
   },
   area: {
     name: '收货地址',
+    type: 'ObjectId',
+    ref: 'Area'
+  },
+  areaObj: {
+    name: '收货地址对象',
     type: 'Object',
   },
   areaInfo: {
