@@ -30,20 +30,47 @@
         input: '',
         companyData: {},
         op: {},
-        thead: {
-          name: {
-            name: '库存单名称',
-            readOnly: true,
-            slot: true,
-          },
-          type: {
-            name: '库存变化类型',
-            readOnly: true,
-            slot: true,
-          },
-          num: {
-            name: '数量',
-            readOnly: true,
+      }
+    },
+    computed: {
+      thead() {
+        if (this.sys) {
+          return {
+            name: {
+              name: '库存单名称',
+              readOnly: true,
+              slot: true,
+            },
+            type: {
+              name: '库存变化类型',
+              readOnly: true,
+              slot: true,
+            },
+            num: {
+              name: '数量',
+              readOnly: true,
+            },
+            'company.name': {
+              name: '所属公司',
+              readOnly: true,
+            }
+          }
+        } else {
+          return {
+            name: {
+              name: '库存单名称',
+              readOnly: true,
+              slot: true,
+            },
+            type: {
+              name: '库存变化类型',
+              readOnly: true,
+              slot: true,
+            },
+            num: {
+              name: '数量',
+              readOnly: true,
+            }
           }
         }
       }
@@ -54,7 +81,7 @@
           if (!this.sys) {
             this.$set(this.op, 'company', val._id);
             this.show = false;
-            this.$nextTick(()=>{
+            this.$nextTick(() => {
               this.show = true;
             })
           }

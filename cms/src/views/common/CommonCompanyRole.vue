@@ -3,7 +3,7 @@
     <el-tabs v-model="activeName">
       <el-tab-pane v-for="(value,key,index) in type" :name="key" :key="index" :label="value">
         <my-table max-height="300" :thead="thead" :data.sync="changeData" size="mini" border index op opWidth="45">
-          <div slot="op" slot-scope="scope">
+          <div slot="op" slot-scope="scope" class="jc">
             <remove-check @remove="remove(scope)"></remove-check>
           </div>
         </my-table>
@@ -182,7 +182,7 @@
         });
         if (scope.row._id) {
           let arr = [];
-          arr.push(scope.row._id)
+          arr.push(scope.row._id);
           this.$emit('update:removeList',arr);
         }
       },

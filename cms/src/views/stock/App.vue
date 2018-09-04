@@ -24,7 +24,12 @@ export default {
     };
   },
   created() {
-    this.nav = [
+    this.nav = [{
+        name: "库存主页",
+        icon: "icon-structure",
+        path: "/stock/index",
+        color: "#EF5350"
+      },
       {
         name: "添加库存",
         icon: "icon-structure",

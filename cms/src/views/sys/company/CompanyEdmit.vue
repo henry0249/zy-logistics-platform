@@ -8,7 +8,7 @@
         <common-alert style="margin:15px 0">公司信息</common-alert>
         <company-edmit-item v-if="!loadingText" v-model="loadingText" :data.sync="companyArr" :startData="startCompanyArr"></company-edmit-item>
         <common-alert style="margin:15px 0">公司角色</common-alert>
-        <common-company-role v-if="!loadingText" :startData="roleStartData" :data.sync="roleArr" :removeList="removeList"></common-company-role>
+        <common-company-role v-if="!loadingText" :startData="roleStartData" :data.sync="roleArr" :removeList.sync="removeList"></common-company-role>
         <common-alert style="margin:15px 0">{{isLogistics?'车船信息':'车船信息 (该公司不是物流公司，无车船信息)'}}</common-alert>
         <company-ship v-if="!loadingText&&isLogistics" :startData="startShipObj" :removeObj.sync="shipRemoveObj" :isLogistics="isLogistics" :data.sync="shipObj"></company-ship>
       </div>
@@ -122,19 +122,17 @@
               },
               update: companyOp
             });
-            console.log('111');
+            console.log(this.removeList);
             for (let index = 0; index < this.removeList.length; index++) {
               let delRole = await this.$api.curd({
                 model: 'role',
                 curdType: 'delete',
-                _id: this.removeList[index]
+                user: this.removeList[index],
+                company:this.$route.params._id
               })
             }
-            console.log('2222');
             for (let index = 0; index < this.roleArr.length; index++) {
               if (!this.roleArr[index]._id) {
-                console.log(index);
-                console.log(this.roleArr[index].type);
                 let setRole = await this.$api.curd({
                   model: 'role',
                   curdType: 'set',
@@ -235,9 +233,9 @@
               }
             }
             this.$message.success("更新成功！");
-            this.$router.push({
-              path: "/sys/company"
-            });
+            // this.$router.push({
+            //   path: "/sys/company"
+            // });
           } catch (error) {
             console.log(error);
           }

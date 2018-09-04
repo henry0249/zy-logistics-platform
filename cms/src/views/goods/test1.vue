@@ -1,8 +1,6 @@
 <template>
-  <div class="flex cascader-box" :style="{width:(width || $parent.width)||'100%'}">
-    <i :title="label" v-if="label" class="label-txt" :style="{fontSize,height:''}">{{label}}</i>
-    <el-cascader :size="$attrs.size || 'mini'" style="width:'calc(100% - 60px)'" v-model="data" :options="$attrs.options || []" v-bind="$attrs"></el-cascader>
-  </div>
+  <Chart :option="chartOption">
+  </Chart>
 </template>
 
 <script>
@@ -23,31 +21,37 @@
         default: ''
       }
     },
-    computed: {
-      data() {
-        
-      },
-      fontSize() {
-        let size = null;
-        if (typeof(this.$attrs.size) === 'string') {
-          size = this.$attrs.size
-        } else if (typeof(this.$attrs.size) === 'number') {
-          size = this.$attrs.size + 'px'
+    data() {
+      return {
+        chartOption: {
+          title: {
+            text: 'ECharts 入门示例'
+          },
+          tooltip: {},
+          legend: {
+            data: ['销量']
+          },
+          xAxis: {
+            data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+          },
+          yAxis: {},
+          series: [{
+            name: '销量',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20]
+          }]
         }
-        return size || '12px'
       }
-    },
-    methods: {},
-    created() {}
+    }
   }
 </script>
 
 <style scoped>
-.cascader-box{
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-}
+  .cascader-box {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  }
   .label-txt {
     display: inline-block;
     width: 60px;

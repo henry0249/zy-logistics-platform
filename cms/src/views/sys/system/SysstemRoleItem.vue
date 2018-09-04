@@ -13,7 +13,7 @@
         </template>
       </my-table>
       <el-dialog :title="`选择${userText()}`" width="70%" :visible.sync="dialogTableVisible">
-        <common-table v-if="dialogTableVisible" path="/user/find" @selection-change="selectionChange" :height="tableHeight" :thead="userThead" selection :option="option">
+        <common-table style="padding:0" v-if="dialogTableVisible" path="/user/find" @selection-change="selectionChange" :height="tableHeight" :thead="userThead" selection :option="option">
           <div slot="header">
             <my-form-item input v-model="input" @change="inputChange" width="300px" size="mini" filterable placeholder="搜索用户名或者手机号码"></my-form-item>
           </div>

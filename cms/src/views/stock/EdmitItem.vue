@@ -8,10 +8,9 @@
         <common-alert style="margin:15px 0">库存详情</common-alert>
         <my-form size="mini" width="24%" style="margin:15px 0" v-if="!loadingText">
           <div class="jb">
-            <my-form-item select v-model="data.type" label="库存变化类型" :options="field.Stock.type.option"></my-form-item>
+            <my-form-item select v-model="data.type" @change="change" label="库存变化类型" :options="field.Stock.type.option"></my-form-item>
             <my-form-item placeholder="请输入库存单名称" input v-model="data.name" filterable label="库存单名称"></my-form-item>
-            <my-form-item  number v-model="data.num" filterable label="数量" :min="0"></my-form-item>
-            <!-- <el-input-number v-model="data.num" size="mini" controls-position="right"></el-input-number> -->
+            <my-form-item number v-model="data.num" filterable label="数量" :min="0"></my-form-item>
             <div style="width:24%">
               <my-select :disabled="!sys" label="所属公司" :data.sync="data.company" company></my-select>
             </div>
@@ -40,6 +39,8 @@
     },
     data() {
       return {
+        stock: {},
+        stockIsEmpty: false,
         loadingText: '',
         data: {
           name: '',
@@ -60,6 +61,16 @@
       }
     },
     methods: {
+      async change(val) {
+        await this.getStock();
+        console.log(this.stock);
+        if (Object.keys(this.stock).length > 0 || this.stock) {
+          this.stockIsEmpty = false;
+        } else {
+          this.stockIsEmpty = true;
+        }
+        console.log(this.stockIsEmpty);
+      },
       checkMethods() {
         let io = true
         if (!this.data.name) {
@@ -100,21 +111,20 @@
                   this.$set(data, key, this.data[key]);
                 }
               }
-              let res = await this.$api.curd(data);
-            } else if (this.type === 'read') {
-              let updateStock = await this.$api.curd({
-                model: 'stock',
-                curdType: 'update',
-                find: {
-                  _id: this.$route.params._id
-                },
-                update: {
-                  name: this.data.name,
-                  type: this.data.type,
-                  num: this.data.num,
-                  company: this.data.company._id
+              if (this.stockIsEmpty) {
+                this.$set(data, 'new', this.data.num);
+                this.$set(data, 'old', 0);
+                this.$set(data, 'dv', this.data.num);
+              } else {
+                if (this.data.type === 'in' || this.data.type === 'increase') {
+                  this.$set(data, 'new', this.stock.new + this.data.num);
+                } else if (this.data.type === 'out' || this.data.type === 'decrease') {
+                  this.$set(data, 'new', this.stock.new - this.data.num);
                 }
-              })
+                this.$set(data, 'old', this.stock.new);
+                this.$set(data, 'dv', data.new - data.old);
+              }
+              let res = await this.$api.curd(data);
             }
           }
         } catch (error) {
@@ -123,25 +133,24 @@
         this.loadingText = '';
       },
       async getStock() {
-        let data = {
-          model: 'stock',
-          curdType: 'findOne',
-          populate: [{
-            path: 'company'
-          }]
-        }
-        if (!this.sys) {
-          this.$set(data, 'company', this.company._id);
-        }
-        this.data = await this.$api.curd(data);
+        try {
+          this.loadingText = '加载中';
+          let data = {
+            model: 'stock',
+            curdType: 'findOne',
+            sort: {
+              createdAt: -1
+            },
+            type: this.data.type
+          }
+          this.stock = await this.$api.curd(data);
+        } catch (error) {}
+        this.loadingText = '';
       }
     },
     async created() {
       try {
         this.loadingText = '加载中';
-        if (this.type === 'read') {
-          await this.getStock();
-        }
       } catch (error) {}
       if (!this.sys) {
         this.$set(this.data, 'company', this.company);
