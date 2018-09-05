@@ -96,6 +96,9 @@
               key: 'out',
               type: 'line',
               stack: '总量',
+              areaStyle: {
+                normal: {}
+              },
               data: [220, 182, 191, 234, 290, 330, 310]
             },
             {

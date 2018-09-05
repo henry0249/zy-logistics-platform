@@ -4,7 +4,7 @@
       <div class="jc je" style="height:40px;">
         <el-button type="success" @click="add" :title="`添加${userText()}`" size="mini">{{userText()}}<i class="el-icon-plus el-icon--right"></i></el-button>
       </div>
-      <my-table v-if="!loadingText" height="100vh - 90px" opWidth="45px" border index :thead="thead" :data.sync="data" size="mini" op>
+      <my-table :loadmore="loadmore" v-if="!loadingText" height="100vh - 90px" opWidth="45px" border index :thead="thead" :data.sync="data" size="mini" op>
         <div slot="op" class="jc" slot-scope="scope">
           <remove-check @remove="remove(scope)"></remove-check>
         </div>
@@ -72,6 +72,17 @@
       }
     },
     methods: {
+      async loadmore(){
+        let data = {
+          model:'role',
+          curdType:'find',
+          type:this.type,
+          skip:this.data.length,
+          populate:[{path:'user'}]
+        }
+        let res = await this.$api.curd(data);
+        return res;
+      },
       async remove(scope) {
         if (scope.row._id) {
           this.loadingText = '删除中';

@@ -13,38 +13,44 @@
 </template>
 
 <script>
-import LeftNav from "../common/LeftNav";
-export default {
-  components: {
-    LeftNav
-  },
-  data() {
-    return {
-      nav: []
-    };
-  },
-  created() {
-    this.nav = [{
-        name: "库存主页",
-        icon: "icon-structure",
-        path: "/stock/index",
-        color: "#EF5350"
-      },
-      {
-        name: "添加库存",
-        icon: "icon-structure",
-        path: "/stock/add",
-        color: "#EF5350"
-      },
-      {
-        name: "库存列表",
-        icon: "icon-structure",
-        path: "/stock/list",
-        color: "#EF5350"
-      }
-    ];
-  }
-};
+  import LeftNav from "../common/LeftNav";
+  export default {
+    components: {
+      LeftNav
+    },
+    data() {
+      return {
+        nav: []
+      };
+    },
+    created() {
+      this.nav = [{
+          name: "库存主页",
+          icon: "icon-structure",
+          path: "/stock/index",
+          color: "#EF5350"
+        },
+        {
+          name: "添加库存",
+          icon: "icon-structure",
+          path: "/stock/add",
+          color: "#EF5350"
+        },
+        {
+          name: "库存列表",
+          icon: "icon-structure",
+          path: "/stock/list",
+          color: "#EF5350"
+        },
+        {
+          name: "Test",
+          icon: "icon-structure",
+          path: "/stock/test",
+          color: "#EF5350"
+        }
+      ];
+    }
+  };
 </script>
 
 <style scoped>

@@ -5,8 +5,8 @@
         <my-form-item size="mini" style="padding-right:10px;" @change="inputChange" input placeholder="请输入用户名或手机号" width="250px" v-model="input"></my-form-item>
       </div>
       <template slot-scope="scope" v-if="scope.prop === 'tag'||scope.prop === 'name'">
-          <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
-          <i title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{scope.row['name']}}</i>
+              <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+              <i title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{scope.row['name']}}</i>
 </template>
 </common-table>
   </div>
@@ -39,7 +39,17 @@
           path: "/sys/user/edmit/" + val.row._id
         });
       },
-      inputChange(val) {},
+      inputChange(val) {
+        if (val) {
+          this.$set(this.op, "$or", [{
+            name: {
+              $regex: val
+            }
+          }]);
+        } else {
+          delete this.op.$or;
+        }
+      },
       tagType(index, arr) {
         let type = ["success", "info", "warning", "danger"];
         if (index <= arr.length - 1) {
