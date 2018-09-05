@@ -3,11 +3,6 @@
     <div slot="op" slot-scope="scope" class="jc">
       <remove-check @remove="remove(scope)"></remove-check>
     </div>
-    <!-- <div slot-scope="scope" style="width:20px;height:20px;color:#F56C6C" slot="op" class="jc">
-          <div style="width:20px;height:20px;" class="jc lll" @click="del(scope)">
-            <icon class="pointer" size="16px" title="移除该用户">icon-ec1</icon>
-          </div>
-        </div> -->
     <template slot-scope="scope">
             <div v-if="scope.prop === 'type'">
             <my-form-item size="mini" multiple collapse-tags select v-model="scope.row[scope.prop]" :options="field[str].type.option"></my-form-item>

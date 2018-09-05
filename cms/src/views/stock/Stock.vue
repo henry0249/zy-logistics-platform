@@ -1,22 +1,38 @@
 <template>
-  <loading-box v-model="loadingText">
-    <div class="jb">
-      <my-form-item style="margin:10px 0 10px 8px;" v-model="input" @change="inputChange" select size="mini" :options="option" width="200px" label="选择模式"></my-form-item>
-      <div style="margin:10px 8px 10px 0;">当前库存：{{stock}}</div>
+  <loading-box v-if="show" v-model="loadingText">
+    <div class="jc jb">
+      <div class="jc js">
+        <my-form-item style="margin:10px 0 10px 8px;" v-model="input" @change="inputChange" select size="mini" :options="option" width="200px" label="选择模式"></my-form-item>
+        <div style="margin:10px 8px 10px 10px;">当前库存：<span :style="stock<0?{color:'#E6A23C'}:{color:'#67C23A'}">{{stock}}</span></div>
+      </div>
+      <div class="js" style="height:28px;">
+        <el-button size="mini" @click="add('out')">增加出库</el-button>
+        <el-button size="mini" @click="add('in')">增加入库</el-button>
+        <el-button size="mini" @click="add('increase')">增加增益</el-button>
+        <el-button size="mini" style="margin-right:10px;" @click="add('decrease')">增加损耗</el-button>
+      </div>
     </div>
     <chart v-if="!loadingText" key="line" style="width: 100%;height:400px;" :options="lineOption"></chart>
+    <el-dialog v-if="dialogTableVisible" width="70%" :visible.sync="dialogTableVisible">
+      <edmit-item @sub="sub" @back="back" :type="type"></edmit-item>
+    </el-dialog>
   </loading-box>
 </template>
 
 <script>
   import stockData from './stock.js';
   import StockBox from './StockBox.vue';
+  import EdmitItem from './EdmitItem.vue';
   export default {
     components: {
-      StockBox
+      StockBox,
+      EdmitItem
     },
     data() {
       return {
+        show: true,
+        type: '',
+        dialogTableVisible: false,
         stock: 0,
         data: {
           stock: 363,
@@ -71,9 +87,30 @@
         monthData: stockData.monthData
       }
     },
-    watch: {},
+    watch: {
+      company: {
+        handler(val) {
+          this.show = false;
+          setTimeout(() => {
+            this.show = true;
+          }, 200);
+          console.log(val);
+        },
+        deep: true
+      }
+    },
     computed: {},
     methods: {
+      back(val) {
+        this.dialogTableVisible = val;
+      },
+      sub(val) {
+        this.dialogTableVisible = val;
+      },
+      add(type) {
+        this.dialogTableVisible = true;
+        this.type = type;
+      },
       inputChange(val) {
         this.loadingText = '加载中';
         if (val === 'day') {
@@ -110,7 +147,6 @@
         let stock = await this.$api.curd({
           model: 'stock',
           curdType: 'findOne',
-          limit: 0,
           sort: {
             createdAt: -1
           }

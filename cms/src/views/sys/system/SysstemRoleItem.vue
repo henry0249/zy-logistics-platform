@@ -5,12 +5,12 @@
         <el-button type="success" @click="add" :title="`添加${userText()}`" size="mini">{{userText()}}<i class="el-icon-plus el-icon--right"></i></el-button>
       </div>
       <my-table height="100vh - 90px" opWidth="45px" border index :thead="thead" :data.sync="data" size="mini" op>
-        <div slot="op" slot-scope="scope">
+        <div slot="op" class="jc" slot-scope="scope">
           <remove-check @remove="remove(scope)"></remove-check>
         </div>
         <template slot-scope="scope">
-          <el-tag v-if="scope.prop === 'user.tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['user.tag']" :key="item.id">{{scope.row['user.tag']}}</el-tag>
-        </template>
+            <el-tag v-if="scope.prop === 'user.tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['user.tag']" :key="item.id">{{scope.row['user.tag']}}</el-tag>
+</template>
       </my-table>
       <el-dialog :title="`选择${userText()}`" width="70%" :visible.sync="dialogTableVisible">
         <common-table style="padding:0" v-if="dialogTableVisible" path="/user/find" @selection-change="selectionChange" :height="tableHeight" :thead="userThead" selection :option="option">
@@ -41,7 +41,7 @@
     },
     data() {
       return {
-        loadingText:'',
+        loadingText: '',
         tableHeight: '',
         option: {},
         selectionArr: [],
@@ -53,7 +53,7 @@
           sysSalesman: '系统业务员',
           sysDispatcher: '系统调度员',
         },
-        userThead:{
+        userThead: {
           name: {
             name: "用户名",
           },
@@ -72,20 +72,21 @@
       }
     },
     methods: {
-      async remove(scope){
+      async remove(scope) {
         if (scope.row._id) {
           this.loadingText = '删除中';
           try {
             let del = await this.$api.curd({
-              model:'role',
-              curdType:'delete',
-              _id:scope.row._id
+              model: 'role',
+              curdType: 'delete',
+              _id: scope.row._id
             })
             this.$message.success('删除成功！');
+            this.$router.go(0);
           } catch (error) {}
           this.loadingText = '';
         }
-        this.data.splice(scope.index,1);
+        this.data.splice(scope.index, 1);
       },
       selectionChange(val) {
         this.selectionArr = val;
@@ -113,9 +114,9 @@
           this.loadingText = '添加中';
           this.selectionArr.forEach(item => {
             let obj = {
-              type:this.type,
+              type: this.type,
             }
-            this.$set(obj,'user',item);
+            this.$set(obj, 'user', item);
             this.data.push(obj);
           });
           for (let index = 0; index < this.data.length; index++) {
@@ -128,16 +129,16 @@
           for (let index = 0; index < this.data.length; index++) {
             if (!this.data[index]._id) {
               let setRole = await this.$api.curd({
-                model:'role',
-                curdType:'set',
-                type:this.type,
-                user:this.data[index].user._id
+                model: 'role',
+                curdType: 'set',
+                type: this.type,
+                user: this.data[index].user._id
               })
             }
           }
           this.$message.success('添加成功！');
-        } catch (error) {
-        }
+          this.$router.go(0);
+        } catch (error) {}
         this.loadingText = '';
       },
       go() {
@@ -156,11 +157,9 @@
           model: 'role',
           curdType: 'find',
           type: this.type,
-          populate:[
-            {
-              path:'user'
-            }
-          ]
+          populate: [{
+            path: 'user'
+          }]
         })
       }
     },
@@ -173,7 +172,7 @@
         this.loadingText = '加载中';
         await this.getData();
       } catch (error) {}
-        this.loadingText = '';
+      this.loadingText = '';
     }
   }
 </script>
