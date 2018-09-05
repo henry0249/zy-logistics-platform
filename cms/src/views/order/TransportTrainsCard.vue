@@ -24,8 +24,8 @@
           <my-form-item v-if="Number(data.areaType) === 1" select v-model="data.company" :options="order.handle.businessRelationCompany" size="mini" @change="companyChange" label="公司" placeholder="请选择关联公司"></my-form-item>
           <my-form-item v-if="Number(data.areaType) === 2" select v-model="data.company" :options="getBusinessTrainsArea()" size="mini" @change="companyChange" label="贸易节点" placeholder="请选择贸易节点"></my-form-item>
         </div>
-        <el-tooltip key="areaType0" v-if="data.areaType === 0" effect="dark" :content="areaInfo(data)" placement="top">
-          <al-cascader v-model="data.areaArr" data-type="all" size="small" />
+        <el-tooltip key="areaType0" v-if="Number(data.areaType) === 0" effect="dark" :content="areaInfo(data)" placement="top">
+          <al-cascader v-model="data.areaArr" size="small" />
         </el-tooltip>
         <el-tooltip key="areaType1" v-else effect="dark" :content="areaInfo(data)" placement="top">
           <my-select area :data.sync="data.area" disabled placeholder="请选择地址"></my-select>
@@ -62,6 +62,28 @@ export default {
         return {};
       }
     }
+  },
+  data() {
+    return {
+      temp: [
+        {
+          code: "130000",
+          name: "河北省"
+        },
+        {
+          code: "130700",
+          name: "张家口市"
+        },
+        {
+          code: "130730",
+          name: "怀来县"
+        },
+        {
+          code: "130730104000",
+          name: "官厅镇"
+        }
+      ]
+    };
   },
   computed: {
     title() {
@@ -129,7 +151,7 @@ export default {
       this.data.area = res.area;
     },
     remove() {
-      this.$emit("remove",this.data);
+      this.$emit("remove", this.data);
     },
     getBusinessTrainsArea() {
       let res = [];
@@ -139,6 +161,15 @@ export default {
         }
       });
       return res;
+    }
+  },
+  mounted(){
+    if (this.data.areaArr.length > 0) {
+      let temp = [];
+      this.data.areaArr.forEach((item)=>{
+        temp.push(item.name);
+      });
+      this.data.areaArr = temp;
     }
   }
 };

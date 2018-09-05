@@ -9,11 +9,11 @@ const router = new Router({
     let res = []
     docs.keys().forEach(item => {
       res.push(...docs(item).default)
-    })
+    });
     res.push({
       path: '*',
       redirect: '/notfound'
-    })
+    });
     return res
   })(require.context('./views', true, /router\.js$/))
 })

@@ -14,7 +14,7 @@
           </my-form-item>
           <my-form-item label="卸货数量" v-model="logisticsForm.landed">
           </my-form-item>
-          <my-form-item label="运费单价" v-model="logisticsForm.transportPrice">
+          <my-form-item label="运费单价" v-model="logisticsForm.price">
           </my-form-item>
         </div>
         <div class="flex ac jb" style="margin-top:15px">
@@ -33,12 +33,17 @@
           <div style="width:24%">
             <my-select label="送货地址" area :data.sync="logisticsForm.area"></my-select>
           </div>
-          <my-form-item width="49%" label="详细地址" size="mini" v-model="logisticsForm.address">
+          <my-form-item width="49%" label="详细地址" size="mini" v-model="logisticsForm.areaInfo">
           </my-form-item>
         </div>
         <my-form-item style="margin-top:15px" width="100%" label="运单备注" v-model="logisticsForm.remark">
         </my-form-item>
       </my-form>
+      <div class="flex ac" style="margin-top:15px">
+        <!-- <el-button size="small" @click="back()">返回</el-button> -->
+        <div class="f1"></div>
+        <el-button size="small" type="primary" @click="update()">更新运单信息</el-button>
+      </div>
       <el-alert title="物流信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
       <div>
@@ -47,7 +52,9 @@
     </div>
     <el-alert style="margin:15px 0" title="运单完成后可结算" type="info" center show-icon :closable="false">
     </el-alert>
-    <div class="tr">
+    <div class="flex ac">
+      <el-button size="small" type="danger">删除运单</el-button>
+      <div class="f1"></div>
       <el-button size="small" @click="back()">返回</el-button>
       <el-button size="small" type="success" @click="finish()">运单完成</el-button>
     </div>
@@ -72,16 +79,16 @@ export default {
         transportation: "truck",
         truck: {},
         ship: {},
+        state: 0,
         loading: 0,
         landed: 0,
-        transportPrice: 0,
+        price: 0,
         contactName: "",
         contactNumber: "",
         startAt: "",
         finishAt: "",
         area: {},
-        state: 0,
-        address: "",
+        areaInfo: "",
         remark: ""
       },
       order: {}
@@ -151,7 +158,6 @@ export default {
           ...this.logisticsForm
         });
         this.back();
-        console.log(res);
       } catch (error) {}
       this.loadingText = "";
     }

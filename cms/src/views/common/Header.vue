@@ -13,7 +13,9 @@
     <div v-if="roleCompany.length>0 && $route.path.indexOf('sys')<0">
       <el-dropdown trigger="click" @command="handleCommand">
         <div class="blue pointer">
-          {{company.name || company.nick}}<i class="el-icon-arrow-down el-icon--right"></i>
+          <i class="el-icon-location el-icon--left"></i>
+          {{company.name || company.nick}}
+          <i class="el-icon-caret-bottom el-icon--right"></i>
         </div>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item v-for="(item,index) in roleCompany" :key="index" :command="index">

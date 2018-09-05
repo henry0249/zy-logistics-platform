@@ -190,13 +190,19 @@ class OrderService extends Service {
           delete item[key];
         }
       }
-      if (item.areaType === 0) {
+      if (Number(item.areaType) === 0) {
         if (item.areaArr.length === 0) {
           ctx.throw(422, '物流节点中有地址未填写', item);
         }
+        delete item.company;
+        delete item.area;
       } else {
         if (!item.area) {
           ctx.throw(422, '物流节点中有地址未填写', item);
+        }
+        delete item.areaArr;
+        if (!item.company) {
+          delete item.company;
         }
       }
       let trains = {};
@@ -228,6 +234,7 @@ class OrderService extends Service {
             delete logisticsItem.createdAt;
             delete logisticsItem.updatedAt;
             delete logisticsItem._id;
+            logisticsItem.handle = order.handle;
             await ctx.model.Logistics.update({
               _id: logistics_id
             }, logisticsItem);
@@ -248,6 +255,7 @@ class OrderService extends Service {
               contactNumber: order.contactNumber,
               area: order.area._id || order.area,
               areaInfo: order.address,
+              handle: order.handle,
               ...logisticsItem
             });
             await logisticsModel.save();
@@ -315,11 +323,41 @@ class OrderService extends Service {
         state: key
       });
     }
-    res.distribution = await ctx.model.Logistics.count({
-      state: {
-        $nin: [5]
-      }
+    let sysDispatcherRole = await ctx.model.Role.findOne({
+      type: 'sysDispatcher',
+      user: ctx.user._id
     });
+
+    if (sysDispatcherRole) {
+      res.distribution = await ctx.model.Logistics.count({
+        state: {
+          $nin: [5]
+        }
+      });
+      return res;
+    }
+    res.distribution = 0;
+    let dispatcherRole = await ctx.model.Role.find({
+      type: 'dispatcher',
+      user: ctx.user._id
+    });
+    let mySet = new Set();
+    for (let i = 0; i < dispatcherRole.length; i++) {
+      let item = dispatcherRole[i];
+      if (item.company) {
+        mySet.add(item.company.toString());
+      }
+    }
+    let companyArr = [...mySet];
+    for (let i = 0; i < companyArr.length; i++) {
+      let count = await ctx.model.Logistics.count({
+        state: {
+          $nin: [5]
+        },
+        handle: companyArr[i]
+      });
+      res.distribution += count;
+    }
     return res;
   }
   async companyBadge() {
