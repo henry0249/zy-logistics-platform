@@ -65,7 +65,7 @@
             }
           },
           legend: {
-            data: ['出库', '入库', '盘点', '增益', '损耗', '盘点增益', '盘点损耗']
+            data: ['出库', '入库', '增益', '损耗']
           },
           grid: {
             left: '3%',
@@ -81,10 +81,51 @@
           yAxis: [{
             type: 'value'
           }],
-          series: []
+          series: [{
+              name: '出库',
+              key: 'out',
+              type: 'line',
+              stack: '总量',
+              areaStyle: {
+                normal: {}
+              },
+              data: [120, 132, 101, 134, 90, 230, 210]
+            },
+            {
+              name: '入库',
+              key: 'out',
+              type: 'line',
+              stack: '总量',
+              data: [220, 182, 191, 234, 290, 330, 310]
+            },
+            {
+              name: '增益',
+              key: 'increase',
+              type: 'line',
+              stack: '总量',
+              areaStyle: {
+                normal: {}
+              },
+              data: [320, 332, 301, 334, 390, 330, 320]
+            },
+            {
+              name: '损耗',
+              key: 'decrease',
+              type: 'line',
+              stack: '总量',
+              label: {
+                normal: {
+                  show: true,
+                  position: 'top'
+                }
+              },
+              areaStyle: {
+                normal: {}
+              },
+              data: [820, 932, 901, 934, 1290, 1330, 1320]
+            }
+          ]
         },
-        dayData: stockData.dayData,
-        monthData: stockData.monthData
       }
     },
     watch: {
@@ -114,10 +155,20 @@
       inputChange(val) {
         this.loadingText = '加载中';
         if (val === 'day') {
+          let week = new Date().getUTCDay();
+          let arr = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+          let data = [];
+          for (let index = week; index < week + 7; index++) {
+            if (index > 6) {
+              data.push(arr[index - 7]);
+            } else {
+              data.push(arr[index]);
+            }
+          }
           this.$set(this.lineOption, 'xAxis', [{
             type: 'category',
             boundaryGap: false,
-            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+            data
           }])
           this.$set(this.lineOption, 'series', this.dayData);
         } else if (val === 'month') {
@@ -143,6 +194,25 @@
           this.loadingText = '';
         })
       },
+      async getStockByType(type) {
+        let stock = await this.$api.curd({
+          model: 'stock',
+          curdType: 'find',
+          limit: 0,
+          // createdAt: {
+          //   $lte:
+          // },
+          sort: {
+            createdAt: -1
+          }
+        })
+      },
+      getDate(str) {
+        let date = new Date();
+        if (str === 'day') {
+          console.log(new Date(Date.parse(date)));
+        }
+      },
       async getStock() {
         let stock = await this.$api.curd({
           model: 'stock',
@@ -161,7 +231,7 @@
         this.loadingText = '加载中';
         await this.getStock();
       } catch (error) {}
-      this.$set(this.lineOption, 'series', this.dayData);
+      this.getDate('day');
       this.loadingText = '';
     }
   }

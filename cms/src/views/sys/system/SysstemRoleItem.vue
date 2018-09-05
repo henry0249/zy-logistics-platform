@@ -1,15 +1,15 @@
 <template>
-  <div class="js as">
+  <loading-box v-model="loadingText" class="js as">
     <div style="padding:0 5%;width:100%;">
       <div class="jc je" style="height:40px;">
         <el-button type="success" @click="add" :title="`添加${userText()}`" size="mini">{{userText()}}<i class="el-icon-plus el-icon--right"></i></el-button>
       </div>
-      <my-table height="100vh - 90px" opWidth="45px" border index :thead="thead" :data.sync="data" size="mini" op>
+      <my-table v-if="!loadingText" height="100vh - 90px" opWidth="45px" border index :thead="thead" :data.sync="data" size="mini" op>
         <div slot="op" class="jc" slot-scope="scope">
           <remove-check @remove="remove(scope)"></remove-check>
         </div>
         <template slot-scope="scope">
-            <el-tag v-if="scope.prop === 'user.tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['user.tag']" :key="item.id">{{scope.row['user.tag']}}</el-tag>
+                  <el-tag v-if="scope.prop === 'user.tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['user.tag']" :key="item.id">{{scope.row['user.tag']}}</el-tag>
 </template>
       </my-table>
       <el-dialog :title="`选择${userText()}`" width="70%" :visible.sync="dialogTableVisible">
@@ -24,7 +24,7 @@
         </div>
       </el-dialog>
     </div>
-  </div>
+  </loading-box>
 </template>
 
 <script>
@@ -82,7 +82,7 @@
               _id: scope.row._id
             })
             this.$message.success('删除成功！');
-            this.$router.go(0);
+            await this.getData()
           } catch (error) {}
           this.loadingText = '';
         }
@@ -137,7 +137,7 @@
             }
           }
           this.$message.success('添加成功！');
-          this.$router.go(0);
+          await this.getData();
         } catch (error) {}
         this.loadingText = '';
       },
@@ -153,14 +153,18 @@
       },
       see(scope) {},
       async getData() {
-        this.data = await this.$api.curd({
-          model: 'role',
-          curdType: 'find',
-          type: this.type,
-          populate: [{
-            path: 'user'
-          }]
-        })
+        try {
+          this.loadingText = '加载中';
+          this.data = await this.$api.curd({
+            model: 'role',
+            curdType: 'find',
+            type: this.type,
+            populate: [{
+              path: 'user'
+            }]
+          })
+        } catch (error) {}
+        this.loadingText = '';
       }
     },
     mounted() {
@@ -168,11 +172,7 @@
         document.documentElement.clientHeight * 0.7 - 114 - 58 + "px";
     },
     async created() {
-      try {
-        this.loadingText = '加载中';
-        await this.getData();
-      } catch (error) {}
-      this.loadingText = '';
+      await this.getData();
     }
   }
 </script>
