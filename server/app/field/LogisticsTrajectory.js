@@ -44,6 +44,10 @@ module.exports = {
     type: 'String',
     name: '地址详情'
   },
+  address:{
+    type: 'String',
+    name: '地址详情'
+  },
   title: {
     type: 'String',
     name: '标题'
@@ -56,6 +60,7 @@ module.exports = {
     type: 'String',
     name: '智能地址提示'
   },
+  
   lng: {
     type: 'String',
     name: '经度'

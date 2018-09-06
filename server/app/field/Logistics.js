@@ -20,6 +20,11 @@ module.exports = {
     name: '所属订单',
     ref: 'Order'
   },
+  handle: {
+    name: '处理公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
   transportTrains: {
     type: 'ObjectId',
     name: '所属物流链',

@@ -2,7 +2,8 @@ module.exports = {
   type: {
     name: '库存变化类型',
     type: 'String',
-    option: { in: '入库',
+    option: { 
+      in: '入库',
       out: '出库',
       increase: '增益',
       decrease: '损耗',

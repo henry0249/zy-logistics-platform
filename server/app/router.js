@@ -35,7 +35,8 @@ module.exports = app => {
     .post('/order/transfer', checkToken(), 'order.transfer') //转单
     .post('/order/dispatch', checkToken(), 'order.dispatch') //订单提交配送
     .all('/order/pending/:state', checkToken(), 'order.pending') //获取待处理订单
-    //中转地接口
+    //运单接口
+    .get('/logistics/company/badge', checkToken(), 'logistics.companyBadge') //公司运单标记
     //平台接口
     .post('/platform/orgTree', checkToken(), 'platform.orgTree') //平台组织结构
     //页面接口

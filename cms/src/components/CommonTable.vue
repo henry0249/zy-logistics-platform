@@ -1,6 +1,6 @@
 <template>
   <loading-box class="g-common-table" v-model="loadingText">
-    <my-table highlight-current-row :selection="selection" index border size="mini" :height="height" :loadmore="loadmore" :thead="thead" :data.sync="data" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
+    <my-table :select="select" highlight-current-row :selection="selection" index border size="mini" :height="height" :loadmore="loadmore" :thead="thead" :data.sync="data" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
       <div slot="header">
         <div name="company" v-if="showCompany" style="height:40px">
           <el-tabs v-model="activeCompany">
@@ -45,6 +45,12 @@ export default {
     selection: {
       type: Boolean,
       default: false
+    },
+    select: {
+      type: [Array,Object],
+      default() {
+        return [];
+      }
     },
     state: {
       type: String,

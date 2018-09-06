@@ -127,7 +127,6 @@ class CurdService extends Service {
       data = await this[params.curdType](model, curdParam);
     }
 
-
     if (!curdParam.withoutLog) {
       let ua = ctx.helper.ua();
       let logParms = {
@@ -138,9 +137,6 @@ class CurdService extends Service {
       };
       if (ctx.user) {
         logParms.user = ctx.user._id;
-      }
-      if (ctx.platform) {
-        logParms.platform = ctx.platform._id;
       }
       if (ctx.company) {
         logParms.company = ctx.company._id;
@@ -237,16 +233,23 @@ class CurdService extends Service {
     let multi = param.multi || false;
     delete param.multi;
     let data = await model.find(param);
+    let ctx = this.ctx;
     if (data.length === 0) {
-      this.ctx.throw(404, '未找到要删除的数据', param);
+      ctx.throw(404, '未找到要删除的数据', param);
     }
-    await model.remove(param, {
-      multi
-    });
-    return '删除成功';
+    function p() {
+      return new Promise((res, rej) => {
+        model.remove(param, function (err, docs) {
+          if (err) ctx.throw(404, '删除失败');
+          res();
+        });
+      });
+    }
+    await p();
+    return 'ok';
   }
 
-  //聚合 $push: "$$ROOT" 根数据
+  //聚合 data:{$push: "$$ROOT"} 根数据
   async aggregate(model, param) {
     return await model.aggregate(param);
   }

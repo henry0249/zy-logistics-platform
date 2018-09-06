@@ -58,7 +58,7 @@ export default {
       default: false
     },
     select: {
-      type: Array,
+      type: [Array, Object],
       default() {
         return [];
       }
@@ -245,6 +245,16 @@ export default {
     setTimeout(() => {
       this.loadingText = "";
       this.setTableHeight();
+      if (this.is("array", this.select)) {
+        // console.log(this.data);
+        this.select.forEach(item => {
+          this.data.forEach(row=>{
+            if (item._id === row._id) {
+              this.$refs.table.toggleRowSelection(row);
+            }
+          })
+        });
+      }
     }, 300);
   }
 };
