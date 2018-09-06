@@ -1,5 +1,5 @@
 <template>
-  <loading-box v-model="loadingText">
+  <loading-box v-model="loadingText" v-if="show">
     <div class="g-order-create">
       <div class="g-order">
         <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
@@ -29,6 +29,12 @@
       CompanyEdmitItem,
       CompanyShip,
       CommonCompanyRole
+    },
+    props: {
+      sys: {
+        type: Boolean,
+        default: true
+      }
     },
     data() {
       return {
@@ -62,10 +68,40 @@
       };
     },
     watch: {
+      company: {
+        async handler(val) {
+          if (!this.sys) {
+            this.show = false;
+            this.$nextTick(() => {
+              this.show = true;
+            });
+            if (val.type === 'logistics') {
+              this.isLogistics = true;
+            } else {
+              this.isLogistics = false;
+            }
+          }
+          try {
+            this.loadingText = "加载中";
+            await this.getCompany();
+            await this.getRole();
+            await this.getTruc();
+            await this.getShip();
+            this.data = JSON.parse(JSON.stringify(this.startShipObj));
+          } catch (error) {}
+          this.loadingText = "";
+        },
+        deep: true
+      },
       companyArr: {
         handler(val, oldVal) {
-          if (val.type.length > 0) {}
-          this.disabled = false;
+          let isLogistics = false;
+          val.type.forEach(item => {
+            if (item === 'logistics') {
+              isLogistics = true;
+            }
+          });
+          this.isLogistics = isLogistics;
         },
         deep: true
       },
@@ -77,16 +113,10 @@
         },
         deep: true
       },
-      show(val) {
-        this.disabled = val;
-      }
     },
     methods: {
       myAlert(str) {
         this.$message.warn(str);
-        // this.$alert(str, "提示", {
-        //   confirmButtonText: "确定"
-        // });
       },
       confirmation() {
         let returnIo = true;
@@ -99,10 +129,10 @@
         } else if (!this.companyArr.area._id) {
           this.myAlert("公司地区不能为空");
           returnIo = false;
-        }else if (!(/^1[34578]\d{9}$/.test(this.companyArr.mobile))) {
+        } else if (!(/^1[34578]\d{9}$/.test(this.companyArr.mobile))) {
           this.myAlert("手机号码格式不正确！");
           returnIo = false;
-        }else if (!/^(\(\d{3,4}\)|\d{3,4}-|\s)?\d{7,14}$/.test(this.companyArr.tel)) {
+        } else if (!/^(\(\d{3,4}\)|\d{3,4}-|\s)?\d{7,14}$/.test(this.companyArr.tel)) {
           this.myAlert("公司固话格式不正确！");
           returnIo = false;
         }
@@ -111,6 +141,7 @@
       async sub() {
         if (this.confirmation()) {
           try {
+            let _id = this.sys ? this.$route.params._id : this.company._id;
             this.loadingText = "更新中";
             let companyOp = JSON.parse(JSON.stringify(this.companyArr));
             delete companyOp._id;
@@ -118,7 +149,7 @@
               model: "company",
               curdType: "update",
               find: {
-                _id: this.$route.params._id
+                _id
               },
               update: companyOp
             });
@@ -128,7 +159,7 @@
                 model: 'role',
                 curdType: 'delete',
                 user: this.removeList[index],
-                company:this.$route.params._id
+                company: _id
               })
             }
             for (let index = 0; index < this.roleArr.length; index++) {
@@ -136,7 +167,7 @@
                 let setRole = await this.$api.curd({
                   model: 'role',
                   curdType: 'set',
-                  company: this.$route.params._id,
+                  company: _id,
                   type: this.roleArr[index].type,
                   user: this.roleArr[index].user._id
                 })
@@ -212,7 +243,7 @@
                       no: this.shipObj[key][index].no,
                       owner: this.shipObj[key][index].owner,
                       type: this.shipObj[key][index].type,
-                      company: this.$route.params._id
+                      company: _id
                     });
                   }
                 }
@@ -226,16 +257,26 @@
                       no: this.shipObj[key][index].no,
                       owner: this.shipObj[key][index].owner,
                       type: this.shipObj[key][index].type,
-                      company: this.$route.params._id
+                      company: _id
                     });
                   }
                 }
               }
             }
             this.$message.success("更新成功！");
-            // this.$router.push({
-            //   path: "/sys/company"
-            // });
+            if (this.sys) {
+              this.$router.push({
+                path: '/sys/company'
+              });
+            } else {
+              this.show = false;
+              await this.getCompany();
+              await this.getRole();
+              await this.getTruc();
+              await this.getShip();
+              this.data = JSON.parse(JSON.stringify(this.startShipObj));
+              this.show = true;
+            }
           } catch (error) {
             console.log(error);
           }
@@ -243,90 +284,87 @@
         }
       },
       async getCompany() {
-        try {
-          this.startCompanyArr = await this.$api.curd({
-            model: "company",
-            curdType: "findOne",
-            _id: this.$route.params._id,
-            populate: [{
-                path: "area",
-                populate: [{
+        let _id = this.sys ? this.$route.params._id : this.company._id;
+        this.startCompanyArr = await this.$api.curd({
+          model: "company",
+          curdType: "findOne",
+          _id: _id,
+          populate: [{
+              path: "area",
+              populate: [{
                   path: 'province'
                 },
                 {
                   path: 'county'
-                },{
+                }, {
                   path: 'city'
-                }]
-              },
-              {
-                path: "businessRelationCompany"
-              }
-            ]
-          });
-          this.startCompanyArr.type.forEach(item => {
-            if (item === "logistics") {
-              this.isLogistics = true;
+                }
+              ]
+            },
+            {
+              path: "businessRelationCompany"
             }
-          });
-        } catch (error) {}
+          ]
+        });
+        this.startCompanyArr.type.forEach(item => {
+          if (item === "logistics") {
+            this.isLogistics = true;
+          }
+        });
       },
       async getRole() {
-        try {
-          this.roleStartData = await this.$api.curd({
-            model: "role",
-            curdType: "find",
-            limit: 0,
-            company: this.$route.params._id,
-            populate: [{
-              path: "user"
-            }]
-          });
-        } catch (error) {}
+        let _id = this.sys ? this.$route.params._id : this.company._id;
+        this.roleStartData = await this.$api.curd({
+          model: "role",
+          curdType: "find",
+          limit: 0,
+          company: _id,
+          populate: [{
+            path: "user"
+          }]
+        });
       },
       async getTruc() {
-        try {
-          let truckData = await this.$api.curd({
-            model: "truck",
-            curdType: "find",
-            limit: 0,
-            company: this.$route.params._id,
-            populate: [{
-              path: "owner"
-            }]
+        let _id = this.sys ? this.$route.params._id : this.company._id;
+        let truckData = await this.$api.curd({
+          model: "truck",
+          curdType: "find",
+          limit: 0,
+          company: _id,
+          populate: [{
+            path: "owner"
+          }]
+        });
+        if (truckData.length > 0) {
+          let data = [];
+          truckData.forEach(item => {
+            data.push(item._id);
           });
-          if (truckData.length > 0) {
-            let data = [];
-            truckData.forEach(item => {
-              data.push(item._id);
-            });
-            this.$set(this.startShipObj, "truck", truckData);
-          } else {
-            this.$set(this.startShipObj, "truck", []);
-          }
-        } catch (error) {}
+          this.$set(this.startShipObj, "truck", truckData);
+        } else {
+          this.$set(this.startShipObj, "truck", []);
+        }
       },
       async getShip() {
-        try {
-          let shipData = await this.$api.curd({
-            model: "ship",
-            curdType: "find",
-            limit: 0,
-            company: this.$route.params._id,
-            populate: [{
-              path: "owner"
-            }]
+        let _id = this.sys ? this.$route.params._id : this.company._id;
+        let shipData = await this.$api.curd({
+          model: "ship",
+          curdType: "find",
+          limit: 0,
+          company: _id,
+          populate: [{
+            path: "owner"
+          }]
+        });
+        if (shipData.length > 0) {
+          let data = [];
+          shipData.forEach(item => {
+            data.push(item._id);
           });
-          if (shipData.length > 0) {
-            let data = [];
-            shipData.forEach(item => {
-              data.push(item._id);
-            });
-            this.$set(this.startShipObj, "ship", shipData);
-          } else {
-            this.$set(this.startShipObj, "ship", []);
-          }
-        } catch (error) {}
+          this.$set(this.startShipObj, "ship", shipData);
+        } else {
+          this.$set(this.startShipObj, "ship", []);
+        }
       },
       test() {
         console.log(this.companyArr);

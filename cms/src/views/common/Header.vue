@@ -145,7 +145,7 @@ export default {
           },
           {
             name: "公司管理",
-            path: "",
+            path: "/company",
             icon: "icon-GSB"
           }
         ];
