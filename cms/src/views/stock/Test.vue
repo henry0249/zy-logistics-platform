@@ -10,14 +10,14 @@
             <i class="el-icon-time el-icon--right"></i>更新于<span style="color:#ccc">{{updateAt|formatTime}}</span>
           </div>
         </div>
-        <div class="flex ac jb" style="padding:15px 15%">
+        <div class="flex ac jb" style="line-height:130px;padding:0px 10%">
           <div>
             <el-tooltip effect="dark" content="损耗" placement="top">
               <i class="el-icon-remove-outline danger pointer" style="font-size:18px"></i>
             </el-tooltip>
           </div>
-          <div class="info" style="font-size:70px">
-            {{company.stock}}
+          <div class="info f1 tc" style="font-size:70px">
+            111
           </div>
           <div>
             <el-tooltip effect="dark" content="增益" placement="top">
