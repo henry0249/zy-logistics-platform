@@ -41,12 +41,6 @@
           icon: "icon-structure",
           path: "/stock/list",
           color: "#EF5350"
-        },
-        {
-          name: "Test",
-          icon: "icon-structure",
-          path: "/stock/test",
-          color: "#EF5350"
         }
       ];
     }
