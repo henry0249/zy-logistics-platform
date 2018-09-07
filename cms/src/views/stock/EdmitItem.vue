@@ -97,11 +97,6 @@
       },
       checkMethods() {
         let io = true
-        // if (!this.data.name) {
-        //   this.$message.warn('库存单名称是必填的');
-        //   io = false;
-        //   return
-        // }
         if (!this.data.type) {
           this.$message.warn('库存变化类型是必选的');
           io = false;
@@ -134,19 +129,19 @@
                 this.$set(data, key, this.data[key]);
               }
             }
-            if (this.stockIsEmpty) {
-              this.$set(data, 'new', this.data.num);
-              this.$set(data, 'old', 0);
-              this.$set(data, 'dv', this.data.num);
-            } else {
-              if (this.data.type === 'in' || this.data.type === 'increase') {
-                this.$set(data, 'new', this.stock.new + this.data.num);
-              } else if (this.data.type === 'out' || this.data.type === 'decrease') {
-                this.$set(data, 'new', this.stock.new - this.data.num);
-              }
-              this.$set(data, 'old', this.stock.new);
-              this.$set(data, 'dv', data.new - data.old);
-            }
+            // if (this.stockIsEmpty) {
+            //   this.$set(data, 'new', this.data.num);
+            //   this.$set(data, 'old', 0);
+            //   this.$set(data, 'dv', this.data.num);
+            // } else {
+            //   if (this.data.type === 'in' || this.data.type === 'increase') {
+            //     this.$set(data, 'new', this.stock.new + this.data.num);
+            //   } else if (this.data.type === 'out' || this.data.type === 'decrease') {
+            //     this.$set(data, 'new', this.stock.new - this.data.num);
+            //   }
+            //   this.$set(data, 'old', this.stock.new);
+            //   this.$set(data, 'dv', data.new - data.old);
+            // }
             let res = await this.$api.curd(data);
             this.$message.success('添加成功！');
             this.$router.push('/stock/add');
