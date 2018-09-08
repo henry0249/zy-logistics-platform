@@ -8,10 +8,10 @@
         <common-alert style="margin:15px 0">库存详情</common-alert>
         <my-form size="mini" width="24%" style="margin:15px 0" v-if="!loadingText">
           <div class="jb">
-            <my-form-item :disabled="data.type?true:false" select v-model="data.type" label="库存变化类型" :options="field.Stock.type.option"></my-form-item>
+            <my-form-item v-if="sys" :disabled="data.type?true:false" select v-model="data.type" label="库存变化类型" :options="field.Stock.type.option"></my-form-item>
             <my-form-item placeholder="请输入库存单名称" input v-model="data.name" filterable label="库存单名称"></my-form-item>
             <my-form-item number v-model="data.num" filterable label="数量" :min="0" :max="maxStock"></my-form-item>
-            <div style="width:24%">
+            <div v-if="sys" style="width:24%">
               <my-select :disabled="!sys" label="所属公司" :data.sync="data.company" company></my-select>
             </div>
           </div>
@@ -35,6 +35,10 @@
       type: {
         type: String,
         default: ""
+      },
+      show: {
+        type: Boolean,
+        default: true
       }
     },
     data() {
@@ -70,14 +74,14 @@
       }
     },
     computed: {
-      stockTitle(){
+      stockTitle() {
         if (this.type === 'in') {
           return '添加入库';
-        }else if (this.type === 'out') {
+        } else if (this.type === 'out') {
           return '添加出库';
-        }else if (this.type === 'increase') {
+        } else if (this.type === 'increase') {
           return '添加增益';
-        }else if (this.type === 'decrease') {
+        } else if (this.type === 'decrease') {
           return '添加损耗';
         }
       },
@@ -92,8 +96,8 @@
       }
     },
     methods: {
-      back(){
-        this.$emit('back',false);
+      back() {
+        this.$emit('back', false);
       },
       checkMethods() {
         let io = true
@@ -129,26 +133,13 @@
                 this.$set(data, key, this.data[key]);
               }
             }
-            // if (this.stockIsEmpty) {
-            //   this.$set(data, 'new', this.data.num);
-            //   this.$set(data, 'old', 0);
-            //   this.$set(data, 'dv', this.data.num);
-            // } else {
-            //   if (this.data.type === 'in' || this.data.type === 'increase') {
-            //     this.$set(data, 'new', this.stock.new + this.data.num);
-            //   } else if (this.data.type === 'out' || this.data.type === 'decrease') {
-            //     this.$set(data, 'new', this.stock.new - this.data.num);
-            //   }
-            //   this.$set(data, 'old', this.stock.new);
-            //   this.$set(data, 'dv', data.new - data.old);
-            // }
             let res = await this.$api.curd(data);
             this.$message.success('添加成功！');
-            this.$router.push('/stock/add');
+            this.$emit('sub', '1111111');
+            console.log('22222');
           }
         } catch (error) {}
         this.loadingText = '';
-        this.$emit('sub',false);
       },
       async getStock() {
         try {

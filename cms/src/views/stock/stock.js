@@ -1,75 +1,161 @@
 export default {
-  title: {
-    text: '库存变化图'
-  },
   tooltip: {
-    trigger: 'axis',
+    trigger: "axis",
     axisPointer: {
-      type: 'cross',
-      label: {
-        backgroundColor: '#6a7985'
+      type: "shadow",
+      textStyle: {
+        color: "#fff"
       }
     }
   },
-  legend: {
-    data: ['出库', '入库', '增益', '损耗']
-  },
   grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '3%',
-    containLabel: true
+    borderWidth: 0,
+    top: 110,
+    bottom: 95,
+    textStyle: {
+      color: "#fff"
+    }
   },
+  legend: {
+    textStyle: {
+      color: "#90979c"
+    },
+    data: ["入库", "出库", "损耗", "增益", "盘点", "库存"]
+  },
+  calculable: true,
   xAxis: [{
-    type: 'category',
-    boundaryGap: false,
-    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+    type: "category",
+    axisLine: {
+      lineStyle: {
+        color: "#90979c"
+      }
+    },
+    splitLine: {
+      show: false
+    },
+    axisTick: {
+      show: false
+    },
+    splitArea: {
+      show: false
+    },
+    axisLabel: {
+      interval: 0
+    },
+    data: []
   }],
   yAxis: [{
-    type: 'value'
+    type: "value",
+    splitLine: {
+      show: false
+    },
+    axisLine: {
+      lineStyle: {
+        color: "#90979c"
+      }
+    },
+    axisTick: {
+      show: false
+    },
+    axisLabel: {
+      interval: 0
+    },
+    splitArea: {
+      show: false
+    }
   }],
+  dataZoom: [{
+      show: true,
+      height: 30,
+      xAxisIndex: [0],
+      bottom: 30,
+      start: 0,
+      end: 100,
+      textStyle: {
+        color: "#fff"
+      },
+      borderColor: "#90979c"
+    },
+    {
+      type: "inside",
+      show: true,
+      height: 15,
+      start: 1,
+      end: 35
+    }
+  ],
   series: [{
-      name: '出库',
-      key: 'out',
-      type: 'line',
-      stack: '总量',
-      areaStyle: {
-        normal: {}
-      },
-      data: [120, 132, 101, 134, 90, 230, 210]
-    },
-    {
-      name: '入库',
-      key: 'out',
-      type: 'line',
-      stack: '总量',
-      data: [220, 182, 191, 234, 290, 330, 310]
-    },
-    {
-      name: '增益',
-      key: 'increase',
-      type: 'line',
-      stack: '总量',
-      areaStyle: {
-        normal: {}
-      },
-      data: [320, 332, 301, 334, 390, 330, 320]
-    },
-    {
-      name: '损耗',
-      key: 'decrease',
-      type: 'line',
-      stack: '总量',
-      label: {
+      name: "入库",
+      type: "bar",
+      key: 'in',
+      stack: "总量",
+      itemStyle: {
         normal: {
-          show: true,
-          position: 'top'
+          color: '#3fb1e3'
         }
       },
-      areaStyle: {
-        normal: {}
+      data: []
+    },
+    {
+      name: "出库",
+      type: "bar",
+      key: 'out',
+      stack: "总量",
+      itemStyle: {
+        normal: {
+          color: '#6be6c1'
+        }
       },
-      data: [820, 932, 901, 934, 1290, 1330, 1320]
+      data: []
+    },
+    {
+      name: "损耗",
+      type: "bar",
+      key: 'decrease',
+      stack: "总量",
+      itemStyle: {
+        normal: {
+          color: '#626c91'
+        }
+      },
+      data: []
+    },
+    {
+      name: "增益",
+      type: "bar",
+      key: 'increase',
+      stack: "总量",
+      itemStyle: {
+        normal: {
+          color: '#a0a7e6'
+        }
+      },
+      data: []
+    },
+    {
+      name: "盘点",
+      type: "bar",
+      stack: "总量",
+      key: 'check',
+      itemStyle: {
+        normal: {
+          color: '#c4ebad'
+        }
+      },
+      data: []
+    },
+    {
+      name: "库存",
+      type: "line",
+      key: 'stock',
+      stack: "总量",
+      symbol: "circle",
+      itemStyle: {
+        normal: {
+          color: '#96dee8'
+        }
+      },
+      data: []
     }
   ]
 }

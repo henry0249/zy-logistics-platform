@@ -1,8 +1,8 @@
 <template>
   <loading-box v-model="loadingText">
-    <stock-top :loadingText.sync="loading"></stock-top>
+    <stock-top v-if="show" @sub="sub" :loadingText.sync="loading"></stock-top>
     <div>
-      <common-table :path="path" :thead="thead" height="100vh - 390px" style="padding:0 3%">
+      <common-table v-if="show" :path="path" :thead="thead" height="100vh - 390px" style="padding:0 3%">
       </common-table>
     </div>
   </loading-box>
@@ -16,6 +16,7 @@
     },
     data() {
       return {
+        show:true,
         loadingText: "",
         loading:'',
         updateAt: new Date(),
@@ -58,18 +59,21 @@
       };
     },
     watch: {
-      loading(val){
+      show(val){
         console.log(val);
-        this.loadingText = val;
+      }
+    },
+    methods: {
+      sub(val){
+        console.log('111111');
+        this.show = val;
+        this.$nextTick(()=>{
+          this.show = !val;
+        })
       }
     }
   };
 </script>
 
 <style scoped>
-  .line {
-    height: 20px;
-    width: 1px;
-    background: #ccc;
-  }
 </style>
