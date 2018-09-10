@@ -20,6 +20,9 @@
             trigger: 'axis',
           },
           grid: {
+            left: '0',
+            right: '0',
+            bottom: '40px',
             containLabel: true
           },
           legend: {

@@ -31,13 +31,13 @@
           color: "#EF5350"
         },
         {
-          name: "添加库存",
+          name: "新建库存单",
           icon: "icon-structure",
           path: "/stock/add",
           color: "#EF5350"
         },
         {
-          name: "库存列表",
+          name: "库存单管理",
           icon: "icon-structure",
           path: "/stock/list",
           color: "#EF5350"

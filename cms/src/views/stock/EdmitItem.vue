@@ -3,17 +3,15 @@
     <div class="g-order-create">
       <div class="g-order">
         <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
-          <strong>{{stockTitle}}</strong>
+          <strong>{{field.Stock.type.option[type]}}单</strong>
         </div>
         <common-alert style="margin:15px 0">库存详情</common-alert>
-        <my-form size="mini" width="24%" style="margin:15px 0" v-if="!loadingText">
+        <my-form size="mini" :width="widthStyle" style="margin:15px 0" v-if="!loadingText">
           <div class="jb">
-            <my-form-item v-if="sys" :disabled="data.type?true:false" select v-model="data.type" label="库存变化类型" :options="field.Stock.type.option"></my-form-item>
-            <my-form-item placeholder="请输入库存单名称" input v-model="data.name" filterable label="库存单名称"></my-form-item>
+            <my-form-item v-if="sys" select v-model="data.type" label="库存变化类型" :options="field.Stock.type.option"></my-form-item>
+            <my-form-item placeholder="请输入库存单名称" clearable input v-model="data.name" filterable label="库存单名称"></my-form-item>
             <my-form-item number v-model="data.num" filterable label="数量" :min="0" :max="maxStock"></my-form-item>
-            <div v-if="sys" style="width:24%">
-              <my-select :disabled="!sys" label="所属公司" :data.sync="data.company" company></my-select>
-            </div>
+            <my-form-item v-if="!isFinish" select v-model="data.state" label="状态" :options="field.Stock.state.option"></my-form-item>
           </div>
         </my-form>
       </div>
@@ -28,6 +26,10 @@
 <script>
   export default {
     props: {
+      isFinish: {
+        type: Boolean,
+        default: true
+      },
       sys: {
         type: Boolean,
         default: false
@@ -50,7 +52,8 @@
           name: '',
           type: '',
           num: 0,
-          company: {}
+          company: {},
+          state: 'ready'
         }
       }
     },
@@ -62,7 +65,7 @@
         } else {
           this.stockIsEmpty = true;
         }
-        this.$set(this.data, 'type', val);
+        this.$set(this.data, 'name', this.changeDate(new Date()) + ' ' + this.field.Stock.type.option[this.type]);
       },
       company: {
         handler(val) {
@@ -76,7 +79,7 @@
     computed: {
       stockTitle() {
         if (this.type === 'in') {
-          return '添加入库';
+          return '入库单';
         } else if (this.type === 'out') {
           return '添加出库';
         } else if (this.type === 'increase') {
@@ -84,6 +87,12 @@
         } else if (this.type === 'decrease') {
           return '添加损耗';
         }
+      },
+      widthStyle() {
+        if (this.isFinish) {
+          return '48%';
+        }
+        return '32%';
       },
       maxStock() {
         let data = 0
@@ -133,9 +142,17 @@
                 this.$set(data, key, this.data[key]);
               }
             }
+            if (this.isFinish) {
+              this.$set(data, 'state', 'finish');
+            } else {
+              this.$set(data, 'state', 'ready');
+            }
+            if (!data.name) {
+              this.$set(data, 'name', this.changeDate(new Date()) + '的' + this.field.Stock.type.option[this.type] + '单');
+            }
             let res = await this.$api.curd(data);
             this.$message.success('添加成功！');
-            this.$emit('sub', '1111111');
+            this.$emit('sub');
           }
         } catch (error) {}
         this.loadingText = '';
@@ -153,7 +170,29 @@
           this.stock = await this.$api.curd(data);
         } catch (error) {}
         this.loadingText = '';
-      }
+      },
+      changeDate(msec) {
+        let datetime = new Date(msec);
+        let year = datetime.getFullYear();
+        let month = datetime.getMonth();
+        let date = datetime.getDate();
+        let hour = datetime.getHours();
+        let minute = datetime.getMinutes();
+        let second = datetime.getSeconds();
+        let result =
+          year +
+          "-" +
+          (month + 1 >= 10 ? month + 1 : "0" + (month + 1)) +
+          "-" +
+          (date + 1 < 10 ? "0" + date : date) +
+          " " +
+          (hour + 1 < 10 ? "0" + hour : hour) +
+          ":" +
+          (minute + 1 < 10 ? "0" + minute : minute) +
+          ":" +
+          (second + 1 < 10 ? "0" + second : second);
+        return result;
+      },
     },
     async created() {
       try {
@@ -165,6 +204,7 @@
       if (!this.sys) {
         this.$set(this.data, 'company', this.company);
       }
+      this.$set(this.data, 'name', this.changeDate(new Date()) + '的' + this.field.Stock.type.option[this.type] + '单');
       this.loadingText = '';
     }
   };
