@@ -2,7 +2,7 @@
   <loading-box v-model="loadingText">
     <stock-top v-if="show" @sub="sub" :loadingText.sync="loading"></stock-top>
     <div>
-      <common-table v-if="show" :path="path" :thead="thead" height="100vh - 40vh - 102px" style="padding:0 3%" :option="op">
+      <common-table v-if="show" :path="path" :thead="thead" height="100vh - 40vh - 90px;margin-top:40px;" style="padding:0 3%" :option="op">
         <div slot="header">
           <my-form-item @change="typeChange" label="变化类型" style="padding-right:10px;" filterable width="25%" size="mini" v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
         </div>

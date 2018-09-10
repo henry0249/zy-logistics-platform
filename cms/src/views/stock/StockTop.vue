@@ -1,6 +1,6 @@
 <template>
   <div class="flex jb" style="padding:15px 3%;width:100%;height:40vh">
-    <div style="width:30%;">
+    <div style="width:30%;" class="col-flex jb">
       <div class="flex ac jb">
         <div class="blue">
           <i class="el-icon-menu el-icon--right"></i>当前库存

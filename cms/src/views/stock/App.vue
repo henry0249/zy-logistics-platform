@@ -41,6 +41,12 @@
           icon: "icon-structure",
           path: "/stock/list",
           color: "#EF5350"
+        },
+        {
+          name: "未完成库存单",
+          icon: "icon-structure",
+          path: "/stock/ready_list",
+          color: "#EF5350"
         }
       ];
     }
