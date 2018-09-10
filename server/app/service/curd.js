@@ -10,7 +10,7 @@ class CurdService extends Service {
     } = ctx;
     let acceptObj = {
       'GET': ['find', 'findOne', 'findById'],
-      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete', 'aggregate'],
+      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete', 'aggregate', 'chart'],
       'PUT': ['update'],
       'DELETE': ['delete']
     }
@@ -252,6 +252,10 @@ class CurdService extends Service {
   //聚合 data:{$push: "$$ROOT"} 根数据
   async aggregate(model, param) {
     return await model.aggregate(param);
+  }
+
+  async chart(model, param) {
+    return 'ok';
   }
 
   async log(model, param) {

@@ -73,7 +73,6 @@ class LogisticsService extends Service {
         $in:companylist
       }
     });
-    console.log(companyData);
     for (let i = 0; i < companyData.length; i++) {
       let item =  JSON.parse(JSON.stringify(companyData[i]));
       item.badge = await ctx.model.Logistics.count({

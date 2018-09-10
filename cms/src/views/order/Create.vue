@@ -23,7 +23,7 @@ export default {
   components: {
     Info,
     GoodsTable,
-    BusinessTrains,
+    BusinessTrains
   },
   data() {
     return {
@@ -64,6 +64,12 @@ export default {
       } catch (error) {}
       this.loadingText = "";
     }
+  },
+  async mounted() {
+    // await this.$ajax.post("/stock/chart", {
+    //   company: this.company._id,
+    //   type: "month"
+    // });
   }
 };
 </script>

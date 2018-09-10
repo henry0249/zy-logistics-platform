@@ -47,7 +47,7 @@ export default {
       default: false
     },
     select: {
-      type: [Array,Object],
+      type: [Array, Object],
       default() {
         return [];
       }
@@ -63,6 +63,10 @@ export default {
     handle: {
       type: String,
       default: ""
+    },
+    searchSlot: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -82,7 +86,7 @@ export default {
   },
   computed: {
     showSearch() {
-      if (this.$attrs.option === undefined) {
+      if (this.$attrs.option === undefined && this.searchSlot) {
         return false;
       }
       return true;

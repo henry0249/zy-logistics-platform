@@ -1,4 +1,12 @@
 module.exports = {
+  state:{
+    name: '状态',
+    type: 'String',
+    option: { 
+      ready: '准备',
+      finish: '完成',
+    }
+  },
   type: {
     name: '库存变化类型',
     type: 'String',
@@ -34,6 +42,10 @@ module.exports = {
   },
   company: {
     name: '所属公司',
+    type: 'ObjectId'
+  },
+  businessTrains: {
+    name: '所属贸易链',
     type: 'ObjectId'
   }
 }
