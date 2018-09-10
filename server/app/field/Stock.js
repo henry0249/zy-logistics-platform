@@ -1,17 +1,17 @@
 module.exports = {
-  state:{
+  state: {
     name: '状态',
     type: 'String',
-    option: { 
-      ready: '准备',
+    default: 'finish',
+    option: {
+      ready: '待处理',
       finish: '完成',
     }
   },
   type: {
     name: '库存变化类型',
     type: 'String',
-    option: { 
-      in: '入库',
+    option: { in: '入库',
       out: '出库',
       increase: '增益',
       decrease: '损耗',

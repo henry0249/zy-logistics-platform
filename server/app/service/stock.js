@@ -104,6 +104,13 @@ class StockService extends Service {
         xData[i] = `${new Date(xData[i]).getFullYear()}-${new Date(xData[i]).getMonth()+1}-${new Date(xData[i]).getDate()}`;
       }
       let stocks = await ctx.model.Stock.find({
+        $or: [{
+          state: 'finish'
+        }, {
+          state: {
+            $exists: false
+          }
+        }],
         company: company._id,
         createdAt: {
           $gte: minDate,
