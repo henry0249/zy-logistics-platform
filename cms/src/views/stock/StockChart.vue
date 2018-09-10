@@ -34,8 +34,8 @@
             axisTick: {
               alignWithLabel: true
             },
-            axisLabel:{
-              rotate:45
+            axisLabel: {
+              rotate: 45
             },
             data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
           }],
@@ -60,7 +60,7 @@
               show: true,
               height: 30,
               xAxisIndex: [0],
-              bottom: 30,
+              bottom: 0,
               start: 0,
               end: 100,
               textStyle: {
@@ -78,7 +78,7 @@
           ],
           series: [{
             name: '库存',
-            key:'stock',
+            key: 'stock',
             type: 'line',
             label: {
               normal: {
@@ -97,25 +97,25 @@
             data: []
           }, {
             name: '入库',
-            key:'in',
+            key: 'in',
             type: 'bar',
             yAxisIndex: 1,
             data: []
           }, {
             name: '出库',
-            key:'out',
+            key: 'out',
             type: 'bar',
             yAxisIndex: 1,
             data: []
           }, {
             name: '增益',
-            key:'increase',
+            key: 'increase',
             type: 'bar',
             yAxisIndex: 1,
             data: []
           }, {
             name: '损耗',
-            key:'decrease',
+            key: 'decrease',
             type: 'bar',
             yAxisIndex: 1,
             data: []
@@ -125,44 +125,15 @@
     },
     watch: {},
     methods: {
-      changeDate(msec) {
-        let datetime = new Date(msec);
-        let year = datetime.getFullYear();
-        let month = datetime.getMonth();
-        let date = datetime.getDate();
-        let hour = datetime.getHours();
-        let minute = datetime.getMinutes();
-        let second = datetime.getSeconds();
-        let result =
-          year +
-          "-" +
-          (month + 1 >= 10 ? month + 1 : "0" + (month + 1)) +
-          "-" +
-          (date + 1 < 10 ? "0" + date : date) +
-          " " +
-          (hour + 1 < 10 ? "0" + hour : hour) +
-          ":" +
-          (minute + 1 < 10 ? "0" + minute : minute) +
-          ":" +
-          (second + 1 < 10 ? "0" + second : second);
-        return result;
-      },
       changeStock() {
         this.options.series.forEach((seriesItem, index) => {
-
           for (const key in this.data.yData) {
-            console.log(seriesItem);
-            console.log(key);
-            console.log('==');
             if (seriesItem.key === key) {
-              console.log('!!!',this.data.yData[key]);
               this.$set(this.options.series[index], 'data', this.data.yData[key]);
             }
           }
         });
-
         this.$set(this.options.xAxis[0], 'data', this.data.xData);
-        console.log(this.options);
       }
     },
     created() {

@@ -136,7 +136,6 @@
             let res = await this.$api.curd(data);
             this.$message.success('添加成功！');
             this.$emit('sub', '1111111');
-            console.log('22222');
           }
         } catch (error) {}
         this.loadingText = '';

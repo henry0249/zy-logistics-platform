@@ -1,6 +1,6 @@
 <template>
-  <div class="flex jb" style="padding:15px 3%;width:100%">
-    <div style="width:30%;height:40vh">
+  <div class="flex jb" style="padding:15px 3%;width:100%;height:40vh">
+    <div style="width:30%;">
       <div class="flex ac jb">
         <div class="blue">
           <i class="el-icon-menu el-icon--right"></i>当前库存
@@ -16,7 +16,7 @@
           </el-tooltip>
         </div>
         <div class="info" style="font-size:70px">
-          {{stock}}
+          {{stock || 0}}
         </div>
         <div>
           <el-tooltip effect="dark" content="增益" placement="top">
@@ -47,7 +47,7 @@
       </div>
     </div>
     <div style="width:67%">
-      <div style="width:100%;height:40vh;margin: 0 auto">
+      <div style="width:100%;height:calc(40vh - 30px);margin: 0 auto">
         <stock-chart v-if="!loadingText" :data="stockObj"></stock-chart>
       </div>
     </div>
@@ -137,7 +137,7 @@
             createdAt: -1
           }
         })
-        this.stock = stock[0].new;
+        this.stock = stock[0].new || 0;
       },
       async getStockByDate(type) {
         this.stockObj = await this.$ajax.post('stock/chart', {
