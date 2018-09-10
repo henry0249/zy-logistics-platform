@@ -86,7 +86,7 @@ export default {
   },
   computed: {
     showSearch() {
-      if (this.$attrs.option === undefined && !this.searchSlot) {
+      if (this.$attrs.option === undefined || !this.searchSlot) {
         return false;
       }
       return true;
