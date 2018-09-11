@@ -4,11 +4,11 @@
       <my-form-item width='300px' label="变化类型" @change="typeChange" style="padding-right:10px;" size="mini" multiple collapse-tags v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
     </div>
     <template slot-scope="scope">
-      <div v-if="scope.prop === 'type'">{{field.Stock.type.option[scope.row['type']]}}</div>
-      <div v-if="scope.prop === 'createdAt'">{{changeDate(scope.row['createdAt'])}}</div>
-      <div v-if="scope.prop === 'state'">{{field.Stock.state.option[scope.row['state']]}}</div>
-      <div v-if="scope.prop === 'op'" @click="toFinish(scope)">标记成已完成</div>
-    </template>
+        <div v-if="scope.prop === 'type'">{{field.Stock.type.option[scope.row['type']]}}</div>
+        <div v-if="scope.prop === 'createdAt'">{{changeDate(scope.row['createdAt'])}}</div>
+        <div v-if="scope.prop === 'state'">{{field.Stock.state.option[scope.row['state']]}}</div>
+        <div v-if="scope.prop === 'op'" @click="toFinish(scope)">标记成已完成</div>
+</template>
   </common-table>
 </template>
 
@@ -57,7 +57,15 @@
       }
     },
     methods: {
-      toFinish(scope){},
+      toFinish(scope) {
+        this.$router.push({
+          path: '/stock/edmit',
+          query:{
+            type:scope.row.type,
+            _id:scope.row._id,
+          }
+        })
+      },
       typeChange(val) {
         if (val.length > 0) {
           let data = [];
@@ -95,7 +103,6 @@
       },
       changetype() {
         if (this.$attrs.state) {
-          
         }
         if (!this.$attrs.state) {
           delete this.option.state;
@@ -107,9 +114,9 @@
         });
         this.$set(this.option, 'company', this.company._id);
         if (this.$attrs.state === 'ready') {
-          this.$set(this.thead,'op',{
-            name:'操作',
-            slot:true
+          this.$set(this.thead, 'op', {
+            name: '操作',
+            slot: true
           })
         }
       }

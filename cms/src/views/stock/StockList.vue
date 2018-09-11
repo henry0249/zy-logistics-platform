@@ -13,7 +13,7 @@
     props: {
       activeName: {
         type: String,
-        default: ''
+        default: 'finish'
       },
     },
     data() {

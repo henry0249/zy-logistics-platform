@@ -22,7 +22,7 @@ export default [{
     path: 'ready_list',
     component: StockReadyList
   },{
-    path: 'edmit/:_id',
+    path: 'edmit',
     component: Edmit
   }]
 } ]

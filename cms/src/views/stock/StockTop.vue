@@ -46,24 +46,19 @@
         </div>
       </div>
     </div>
-    <div style="width:67%">
+    <loading-box style="width:67%">
       <div style="width:100%;height:calc(40vh - 30px);margin: 0 auto">
         <stock-chart v-if="!loadingText" :data="stockObj"></stock-chart>
       </div>
-    </div>
-    <el-dialog width="70%" :visible.sync="dialogTableVisible">
-      <edmit-item show.sync="stockTopShow" @back="back" @sub="sub" v-if="dialogTableVisible" :type="type"></edmit-item>
-    </el-dialog>
+    </loading-box>
   </div>
 </template>
 
 <script>
   import StockChart from './StockChart.vue'
-  import EdmitItem from './EdmitItem.vue';
   export default {
     components: {
       StockChart,
-      EdmitItem
     },
     props: {
       loadingText: {
@@ -71,16 +66,10 @@
         default: ''
       },
     },
-    watch: {
-      show(val) {
-        console.log(val);
-      }
-    },
     data() {
       return {
         stockTopShow: true,
         type: '',
-        dialogTableVisible: false,
         stock: 0,
         stockObj: {},
         updateAt: '',
@@ -110,16 +99,13 @@
       }
     },
     methods: {
-      back(val) {
-        this.dialogTableVisible = val;
-      },
-      sub(val) {
-        this.dialogTableVisible = false;
-        this.$emit('sub', false);
-      },
       add(type) {
-        this.dialogTableVisible = true;
-        this.type = type;
+        this.$router.push({
+          path: '/stock/add',
+          query: {
+            type
+          }
+        })
       },
       async typeChange(val) {
         try {
@@ -135,7 +121,8 @@
           company: this.company._id,
           sort: {
             createdAt: -1
-          }
+          },
+          state: 'finish'
         })
         this.stock = stock[0].new || 0;
       },
@@ -152,7 +139,6 @@
         await this.getStock();
         await this.getStockByDate('week');
       } catch (error) {
-        console.log(error);
       }
       this.$emit('update:loadingText', '');
     }

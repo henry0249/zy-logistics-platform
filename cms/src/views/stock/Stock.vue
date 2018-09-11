@@ -1,15 +1,15 @@
 <template>
   <loading-box v-model="loadingText">
-    <stock-top v-if="show" @sub="sub" :loadingText.sync="loading"></stock-top>
+    <stock-top v-if="show" @sub="sub" :loadingText.sync="loadingText"></stock-top>
     <div>
-      <common-table v-if="show" :path="path" :thead="thead" height="100vh - 40vh - 90px;margin-top:40px;" style="padding:0 3%" :option="op">
-        <div slot="header">
-          <my-form-item @change="typeChange" label="变化类型" style="padding-right:10px;" filterable width="25%" size="mini" v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
+      <common-table v-if="show" :path="path" :thead="thead" height="100vh - 40vh - 50px" style="padding:0 3%" :option="op">
+        <div slot="header" class="jc js">
+          <my-form-item multiple collapse-tags @change="typeChange" label="变化类型" style="padding-right:10px;" filterable width="25%" size="mini" v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
         </div>
         <template slot-scope="scope">
-          <div v-if="scope.prop === 'type'">{{field.Stock.type.option[scope.row['type']]}}</div>
-          <div v-if="scope.prop === 'createdAt'">{{changeDate(scope.row['createdAt'])}}</div>
-        </template>
+            <div v-if="scope.prop === 'type'">{{field.Stock.type.option[scope.row['type']]}}</div>
+            <div v-if="scope.prop === 'createdAt'">{{changeDate(scope.row['createdAt'])}}</div>
+</template>
       </common-table>
     </div>
   </loading-box>
@@ -23,11 +23,13 @@
     },
     data() {
       return {
-        typeData:'',
+        typeData: [],
+        stateData: '',
         op: {
           sort: {
             createdAt: -1
-          }
+          },
+          state:"finish"
         },
         show: true,
         loadingText: "",
@@ -83,16 +85,29 @@
           })
         },
         deep: true
-      },
-      op: {
-        handler(val) {
-          console.log(val);
-        },
-        deep: true
       }
     },
     methods: {
-      typeChange(val){},
+      typeChange(val) {
+        if (val.length > 0) {
+          let data = [];
+          val.forEach(item => {
+            data.push({
+              type:item
+            })
+          });
+          this.$set(this.op,'$or',data)
+        }else {
+          delete this.op.$or;
+        }
+      },
+      stateChange(val) {
+        if (val) {
+          this.$set(this.op, 'state', val);
+        } else {
+          delete this.op.state;
+        }
+      },
       changeDate(msec) {
         let datetime = new Date(msec);
         let year = datetime.getFullYear();
