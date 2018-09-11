@@ -1,85 +1,30 @@
 <template>
   <loading-box v-model="loadingText">
-    <stock-top v-if="show" @sub="sub" :loadingText.sync="loadingText"></stock-top>
+    <stock-top v-if="show" :loadingText.sync="loadingText"></stock-top>
     <div>
-      <common-table v-if="show" :path="path" :thead="thead" height="100vh - 40vh - 50px" style="padding:0 3%" :option="op">
-        <div slot="header" class="jc js">
-          <my-form-item multiple collapse-tags @change="typeChange" label="变化类型" style="padding-right:10px;" filterable width="25%" size="mini" v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
-        </div>
-        <template slot-scope="scope">
-            <div v-if="scope.prop === 'type'">{{field.Stock.type.option[scope.row['type']]}}</div>
-            <div v-if="scope.prop === 'createdAt'">{{changeDate(scope.row['createdAt'])}}</div>
-</template>
-      </common-table>
+      <stock-table v-if="!loadingText" @remove="remove" state="finish" height="100vh - 40vh - 50px" style="padding:0 3%"></stock-table>
     </div>
   </loading-box>
 </template>
 
 <script>
   import StockTop from './StockTop.vue';
+  import StockTable from './StockTable.vue';
   export default {
     components: {
-      StockTop
+      StockTop,
+      StockTable
     },
     data() {
       return {
-        typeData: [],
-        stateData: '',
-        op: {
-          sort: {
-            createdAt: -1
-          },
-          state:"finish"
-        },
         show: true,
         loadingText: "",
-        loading: '',
-        updateAt: new Date(),
-        historyType: "week",
-        historyTypeOptions: [{
-            value: "week",
-            label: "最近一周"
-          },
-          {
-            value: "month",
-            label: "最近一月"
-          },
-          {
-            value: "quarter",
-            label: "最近一季度"
-          },
-          {
-            value: "year",
-            label: "最近一年"
-          }
-        ],
-        path: "/stock/find",
-        thead: {
-          type: {
-            name: "变化类型",
-            slot: true
-          },
-          num: {
-            name: "数量",
-          },
-          new: {
-            name: "操作后库存",
-          },
-          dv: {
-            name: "差值",
-          },
-          createdAt: {
-            name: "操作日期",
-            slot: true
-          }
-        }
       };
     },
     watch: {
       company: {
         handler(val) {
           this.show = false;
-          this.$set(this.op, 'company', val._id);
           this.$nextTick(() => {
             this.show = true;
           })
@@ -88,16 +33,28 @@
       }
     },
     methods: {
+      async remove(val) {
+        try {
+          this.loadingText = '删除中';
+          let del = await this.$api.curd({
+            model: 'stock',
+            curdType: 'delete',
+            _id: val.row._id
+          })
+          this.$message.success('删除成功！');
+        } catch (error) {}
+        this.loadingText = '';
+      },
       typeChange(val) {
         if (val.length > 0) {
           let data = [];
           val.forEach(item => {
             data.push({
-              type:item
+              type: item
             })
           });
-          this.$set(this.op,'$or',data)
-        }else {
+          this.$set(this.op, '$or', data)
+        } else {
           delete this.op.$or;
         }
       },
@@ -129,16 +86,7 @@
           ":" +
           (second + 1 < 10 ? "0" + second : second);
         return result;
-      },
-      sub(val) {
-        this.show = val;
-        this.$nextTick(() => {
-          this.show = !val;
-        })
       }
-    },
-    created() {
-      this.$set(this.op, 'company', this.company._id);
     }
   };
 </script>

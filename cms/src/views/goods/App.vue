@@ -28,15 +28,15 @@
         activeIndex: 0,
         nav: [{
             name: '添加商品',
-            icon: 'icon-icon-test',
+            icon: 'icon-jia',
             path: '/goods/add'
           }, {
             name: '添加品牌',
-            icon: 'icon-icon-test',
+            icon: 'icon-jia',
             path: '/goods/brand_add'
           }, {
             name: '添加分类',
-            icon: 'icon-icon-test',
+            icon: 'icon-jia',
             path: '/goods/category_add'
           }, {
             name: '商品列表',
@@ -56,41 +56,6 @@
             iconSize: '15',
             path: "/goods/brand"
           }
-          // {
-          //   name: "商品列表",
-          //   color: "orange",
-          //   icon: "icon-liebiao",
-          //   path: "/goods/list"
-          // },
-          // {
-          //   name: "分类管理",
-          //   color: "orange",
-          //   icon: "icon-fenlei",
-          //   // path: "/goods/category"
-          //   children: [{
-          //     name: '一级分类',
-          //     color: "orange",
-          //     // icon: "icon-fenlei",
-          //     path: '/goods/category/1'
-          //   }, {
-          //     name: '二级分类',
-          //     color: "orange",
-          //     // icon: "icon-fenlei",
-          //     path: '/goods/category/2'
-          //   }]
-          // },
-          // {
-          //   name: "品牌管理",
-          //   color: "orange",
-          //   icon: "icon-shangbiao",
-          //   iconSize: '15',
-          //   path: "/goods/brand"
-          // }, {
-          //   name: "添加商品",
-          //   icon: "icon-tianjiashangpin1",
-          //   color: "#1565C0",
-          //   path: "/goods/add"
-          // }
         ]
       };
     },

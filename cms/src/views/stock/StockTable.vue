@@ -1,21 +1,44 @@
 <template>
-  <common-table v-if="show" height="calc(100vh - 50px)" style="padding:0" path="stock/find" :option="option" :thead="thead" op>
-    <div slot="header">
+  <common-table v-if="show" :height="height" style="padding:0" path="stock/find" :option="option" :thead="thead">
+    <div slot="header" class="jc js">
       <my-form-item width='300px' label="变化类型" @change="typeChange" style="padding-right:10px;" size="mini" multiple collapse-tags v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
+      <my-form-item label="开始时间" datetime style="padding-right:10px;" width="33%" size="mini" v-model="dateObj.startDate"></my-form-item>
+      <my-form-item label="结束时间" datetime style="padding-right:10px;" width="33%" size="mini" v-model="dateObj.endDate"></my-form-item>
     </div>
     <template slot-scope="scope">
         <div v-if="scope.prop === 'type'">{{field.Stock.type.option[scope.row['type']]}}</div>
         <div v-if="scope.prop === 'createdAt'">{{changeDate(scope.row['createdAt'])}}</div>
         <div v-if="scope.prop === 'state'">{{field.Stock.state.option[scope.row['state']]}}</div>
-        <div v-if="scope.prop === 'op'" @click="toFinish(scope)">标记成已完成</div>
+        <div class="link" v-if="scope.prop === 'op'&&$attrs.state === 'ready'" @click="toFinish(scope)">标记已完成</div>
+        <div v-if="scope.prop === 'op'&&$attrs.state === 'finish'">
+          <remove-check @remove="remove(scope)"></remove-check>
+        </div>
 </template>
   </common-table>
 </template>
 
 <script>
   export default {
+    props: {
+      op: {
+        type: Object,
+        default () {
+          return {}
+        }
+      },
+      height: {
+        type: String,
+        default: 'calc(100vh - 50px)'
+      }
+    },
     data() {
       return {
+        startDate: '',
+        endDate: '',
+        dateObj: {
+          endDate: '',
+          startDate: ''
+        },
         show: true,
         typeData: [],
         option: {},
@@ -40,11 +63,31 @@
           state: {
             name: '状态',
             slot: true
+          },
+          op: {
+            name: '操作',
+            slot: true
           }
         }
       }
     },
     watch: {
+      dateObj: {
+        handler(val) {
+          this.$set(this.option, 'createdAt', {
+            $lt: new Date(val.endDate).getTime(),
+            $gt: new Date(val.startDate).getTime()
+          })
+          if (!this.option.createdAt.$lt) {
+            delete this.option.createdAt.$lt
+          }
+          if (!this.option.createdAt.$gt) {
+            delete this.option.createdAt.$gt
+          }
+          console.log(this.option);
+        },
+        deep: true
+      },
       company: {
         handler(val) {
           this.show = false;
@@ -57,14 +100,14 @@
       }
     },
     methods: {
+      dateChange(val) {
+        console.log(val);
+      },
       toFinish(scope) {
-        this.$router.push({
-          path: '/stock/edmit',
-          query:{
-            type:scope.row.type,
-            _id:scope.row._id,
-          }
-        })
+        this.$emit('sub', scope);
+      },
+      remove(scope) {
+        this.$emit('remove', scope);
       },
       typeChange(val) {
         if (val.length > 0) {
@@ -102,8 +145,7 @@
         return result;
       },
       changetype() {
-        if (this.$attrs.state) {
-        }
+        if (this.$attrs.state) {}
         if (!this.$attrs.state) {
           delete this.option.state;
         } else {
@@ -113,15 +155,18 @@
           createdAt: -1
         });
         this.$set(this.option, 'company', this.company._id);
-        if (this.$attrs.state === 'ready') {
-          this.$set(this.thead, 'op', {
-            name: '操作',
-            slot: true
-          })
-        }
+        // if (this.$attrs.state === 'ready') {
+        //   this.$set(this.thead, 'op', {
+        //     name: '操作',
+        //     slot: true
+        //   })
+        // }
       }
     },
     created() {
+      if (Object.keys(this.op).length > 0) {
+        this.option = JSON.parse(JSON.stringify(this.op));
+      }
       this.changetype();
     }
   }

@@ -1,5 +1,6 @@
 <template>
-  <stock-list activeName="ready"></stock-list>
+  <stock-list activeName="ready">
+  </stock-list>
 </template>
 
 <script>
@@ -7,6 +8,8 @@
   export default {
     components: {
       StockList
+    },
+    methods: {
     }
   }
 </script>

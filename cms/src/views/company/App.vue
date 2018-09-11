@@ -28,7 +28,7 @@
         activeIndex: 0,
         nav: [{
             name: '公司详情',
-            icon: 'icon-icon-test',
+            icon: 'icon-xiangqing',
             path: '/company/edmit'
           }
         ]

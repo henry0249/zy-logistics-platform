@@ -2,7 +2,7 @@ export default {
   user:[
     {
       name: '添加用户',
-      icon: 'icon-icon-test',
+      icon: 'icon-jia',
       path: '/sys/user/add'
     },{
     name: '用户列表',
@@ -11,7 +11,7 @@ export default {
   }],
   company:[{
     name: '添加公司',
-    icon: 'icon-icon-test',
+    icon: 'icon-jia',
     path: '/sys/company/add'
   },{
     name: '公司列表',
@@ -20,15 +20,15 @@ export default {
   }],
   goods:[{
     name: '添加商品',
-    icon: 'icon-icon-test',
+    icon: 'icon-jia',
     path: '/sys/goods/add'
   },{
     name: '添加品牌',
-    icon: 'icon-icon-test',
+    icon: 'icon-jia',
     path: '/sys/goods/brand_add'
   },{
     name: '添加分类',
-    icon: 'icon-icon-test',
+    icon: 'icon-jia',
     path: '/sys/goods/category_add'
   },{
     name: '商品列表',
@@ -49,7 +49,7 @@ export default {
     path: "/sys/goods/brand"
   }],
   area:[{
-    name: '添加地区',
+    name: 'icon-jia',
     icon: 'icon-icon-test',
     path: '/sys/area/add'
   },{

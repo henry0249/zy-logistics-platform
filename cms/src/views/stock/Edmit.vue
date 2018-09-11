@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="loadingText" style="padding: 3% 5%;margin:0 auto">
-    <stock-info v-if="!loadingText" @submit="submit" :val="data"></stock-info>
+    <stock-info v-if="!loadingText" @submit="submit" :val="data" :submit-text="`确认${field.Stock.type.option[$route.query.type]}`"></stock-info>
   </loading-box>
 </template>
 
@@ -48,12 +48,11 @@
             curdType: 'delete',
             _id: val._id
           })
-          // this.$router.push({
-          //   path: '/stock/index'
-          // });
+          this.$router.push({
+            path: '/stock/index'
+          });
           this.$message.success('修改成功！');
-        } catch (error) {
-        }
+        } catch (error) {}
         this.loadingText = '';
       },
       async getStockById() {
@@ -64,8 +63,7 @@
             curdType: 'findOne',
             _id: this.$route.query._id
           })
-        } catch (error) {
-        }
+        } catch (error) {}
         this.loadingText = '';
       }
     },
