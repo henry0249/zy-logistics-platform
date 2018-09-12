@@ -112,7 +112,7 @@ class OrderService extends Service {
       // }
       if (update.state === 'distributionFinishCheck') {
         if (body.transportTrains instanceof Array && body.transportTrains.length > 0) {
-          body.transportTrains.forEach((item) => {
+          body.transportTrains.forEach((item,index) => {
             if (body.transportTrains instanceof Array && item.logistics.length > 0) {
               item.logistics.forEach((logisticsItem) => {
                 if (Number(logisticsItem.state) !== 5) {
@@ -120,7 +120,9 @@ class OrderService extends Service {
                 }
               });
             } else {
-              ctx.throw(422, '存在未添加运单的物流链', info);
+              if (index!==0) {
+                ctx.throw(422, '存在未添加运单的物流链', info);
+              }
             }
           });
         } else {
@@ -229,6 +231,19 @@ class OrderService extends Service {
           if (Number(logisticsItem.loading) <= 0) {
             ctx.throw(422, '存在装货数量为0的物流运单', logisticsItem);
           }
+          for (const logisticsKey in logisticsItem) {
+            if (logisticsItem[logisticsKey] && logisticsItem[logisticsKey]._id) {
+              logisticsItem[logisticsKey] = logisticsItem[logisticsKey]._id
+            }
+            if (JSON.stringify(logisticsItem[logisticsKey]) === '{}') {
+              delete logisticsItem[logisticsKey];
+            }
+          }
+          if (Number(logisticsItem.state) > 0) {
+            if (!logisticsItem[logisticsItem.transportation]) {
+              ctx.throw(422, '存在未填写 车/船 信息的运单', logisticsItem);
+            }
+          }
           if (logisticsItem._id) {
             let logistics_id = logisticsItem._id;
             delete logisticsItem.createdAt;
@@ -239,14 +254,6 @@ class OrderService extends Service {
               _id: logistics_id
             }, logisticsItem);
           } else {
-            for (const logisticsKey in logisticsItem) {
-              if (logisticsItem[logisticsKey] && logisticsItem[logisticsKey]._id) {
-                logisticsItem[logisticsKey] = logisticsItem[logisticsKey]._id
-              }
-              if (JSON.stringify(logisticsItem[logisticsKey]) === '{}') {
-                delete logisticsItem[logisticsKey];
-              }
-            }
             let logisticsModel = new ctx.model.Logistics({
               no: ctx.helper.no(order.goods._id || order.goods, ctx.user._id, 6),
               order: order._id,

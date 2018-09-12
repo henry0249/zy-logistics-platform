@@ -103,5 +103,10 @@ module.exports = {
   finishAt: {
     name: '送达时间',
     type: 'Date'
+  },
+  stock:{
+    name: '关联的库存单',
+    type: 'ObjectId',
+    ref: 'Stock'
   }
 }

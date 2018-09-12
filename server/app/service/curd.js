@@ -10,7 +10,7 @@ class CurdService extends Service {
     } = ctx;
     let acceptObj = {
       'GET': ['find', 'findOne', 'findById'],
-      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete', 'aggregate', 'chart'],
+      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete', 'aggregate', 'chart', 'count'],
       'PUT': ['update'],
       'DELETE': ['delete']
     }
@@ -237,6 +237,7 @@ class CurdService extends Service {
     if (data.length === 0) {
       ctx.throw(404, '未找到要删除的数据', param);
     }
+
     function p() {
       return new Promise((res, rej) => {
         model.remove(param, function (err, docs) {
@@ -256,6 +257,19 @@ class CurdService extends Service {
 
   async chart(model, param) {
     return 'ok';
+  }
+
+  async count(model, param) {
+    let limit = isNaN(Number(param.limit)) ? 10 : Number(param.limit),
+      skip = Number(param.skip) || 0;
+    delete param.sort;
+    delete param.populate;
+    delete param.select;
+    delete param.limit;
+    delete param.skip;
+    return await model.count(param)
+      .limit(limit)
+      .skip(skip);
   }
 
   async log(model, param) {

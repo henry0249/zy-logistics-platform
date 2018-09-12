@@ -25,14 +25,18 @@ class StockService extends Service {
       }
     }
     let newStock = 0;
-    if (body.type === 'in' || body.type === 'increase') {
-      newStock = Number(company.stock) + Number(body.num);
-    }
-    if (body.type === 'out' || body.type === 'decrease') {
-      newStock = Number(company.stock) - Number(body.num);
-    }
-    if (body.type === 'check') {
-      newStock = Number(body.num);
+    if (body.state === 'finish') {
+      if (body.type === 'in' || body.type === 'increase') {
+        newStock = Number(company.stock) + Number(body.num);
+      }
+      if (body.type === 'out' || body.type === 'decrease') {
+        newStock = Number(company.stock) - Number(body.num);
+      }
+      if (body.type === 'check') {
+        newStock = Number(body.num);
+      }
+    } else {
+      newStock = Number(company.stock);
     }
     let stockModel = new ctx.model.Stock({
       ...body,

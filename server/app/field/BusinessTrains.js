@@ -53,12 +53,17 @@ module.exports = {
     name: '损耗数量',
     type: 'Number',
   },
-  balancePrice:{
+  balancePrice: {
     name: '结算价格',
     type: 'Number',
   },
-  balanceCount:{
+  balanceCount: {
     name: '结算数量',
     type: 'Number',
+  },
+  stock: {
+    name: '关联的库存单',
+    type: 'ObjectId',
+    ref: 'Stock'
   }
 }

@@ -88,4 +88,7 @@ body {
 .ivu-input-small{
   height: 28px
 }
+.el-menu .is-active{
+  background: #aaa
+}
 </style>

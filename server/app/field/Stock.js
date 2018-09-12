@@ -15,9 +15,7 @@ module.exports = {
       out: '出库',
       increase: '增益',
       decrease: '损耗',
-      check: '盘点',
-      // checkIncrease: '盘点增益',
-      // checkDecrease: '盘点损耗',
+      check: '盘点'
     }
   },
   name: {
@@ -45,7 +43,18 @@ module.exports = {
     type: 'ObjectId'
   },
   businessTrains: {
-    name: '所属贸易链',
-    type: 'ObjectId'
-  }
+    name: '关联的贸易链',
+    type: 'ObjectId',
+    ref: 'BusinessTrains'
+  },
+  transportTrains: {
+    name: '关联的物流链',
+    type: 'ObjectIdArray',
+    ref :'TransportTrains'
+  },
+  logistics: {
+    name: '关联的物流单',
+    type: 'ObjectIdArray',
+    ref :'Logistics'
+  },
 }

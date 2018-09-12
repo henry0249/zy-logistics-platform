@@ -97,7 +97,11 @@ export default {
         icon: "icon-shenhe1",
         path: "/order/distributionFinishCheck",
         state:'check',
-        badge: this.orderBadge.check
+        badge: this.orderBadge.distributionFinishCheck
+      },
+      {
+        name: "财务结算",
+        disabled:true,
       },
       {
         name: "结算前审核",
@@ -115,13 +119,13 @@ export default {
         state:'settle',
         badge: this.orderBadge.settle
       },
-      {
-        name: "所有订单",
-        color: "red",
-        icon: "icon-liebiao",
-        state:'all',
-        path: "/order/all"
-      }
+      // {
+      //   name: "所有订单",
+      //   color: "red",
+      //   icon: "icon-liebiao",
+      //   state:'all',
+      //   path: "/order/all"
+      // }
     ];
     if (localStorage.token) {
       this.$store.dispatch("orderBadgeNotify");
