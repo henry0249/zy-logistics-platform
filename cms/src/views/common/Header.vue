@@ -121,9 +121,14 @@ export default {
             icon: "icon-daichulidingdan"
           },
           {
-            name: "运单管理",
+            name: "调度中心",
             path: "",
             icon: "icon-wuliu"
+          },
+          {
+            name: "财务结算",
+            path: "",
+            icon: "icon-jiesuan"
           },
           {
             name: "库存管理",
@@ -134,11 +139,6 @@ export default {
             name: "商品管理",
             path: "/goods",
             icon: "icon-leixing"
-          },
-          {
-            name: "财务管理",
-            path: "",
-            icon: "icon-jiesuan"
           },
           {
             name: "统计报表",

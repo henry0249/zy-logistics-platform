@@ -21,11 +21,10 @@ module.exports = {
       dispatch: '待调度',
       distributionFinishCheck: '配送完成审核',
       beforeSettleCheck: '结算前审核',
-      settle: '待结算',
       //财务结算环节
-      // yu:'订单预审',
-      // jie:'账户结算',
-      // kuan:'账款确认',
+      financialPretrial:'订单预审',
+      accountSettlement:'账户结算',
+      accountConfirmation:'账款确认',
       finish: '订单完成',
       delete: '已删除'
     },

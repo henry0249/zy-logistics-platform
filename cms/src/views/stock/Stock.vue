@@ -1,96 +1,71 @@
 <template>
   <loading-box v-model="loadingText">
-    <stock-top v-if="show" :loadingText.sync="loadingText"></stock-top>
-    <!-- <div>
-      <stock-table v-if="!loadingText" @remove="remove" state="finish" height="100vh - 40vh - 50px" style="padding:0 3%"></stock-table>
-    </div> -->
+    <div class="flex ac jb">
+      <div style="width:33%">
+        <div class="flex ac jb">
+          <div class="blue">
+            <i class="el-icon-menu el-icon--right"></i>当前库存
+          </div>
+          <div class="info">
+            <i class="el-icon-time el-icon--right"></i>更新于<span style="color:#ccc">{{stock.updateAt|formatTime}}</span>
+          </div>
+        </div>
+        <div class="flex ac jb" style="padding:15px 15%">
+          <div>
+            <el-tooltip effect="dark" content="损耗" placement="top">
+              <i class="el-icon-remove-outline danger pointer" style="font-size:18px" @click="add('decrease')"></i>
+            </el-tooltip>
+          </div>
+          <div class="info" :style="{fontSize:stockFontSize}">
+            {{stock.new || 0}}
+          </div>
+          <div>
+            <el-tooltip effect="dark" content="增益" placement="top">
+              <i class="el-icon-circle-plus-outline success pointer" @click="add('increase')" style="font-size:18px"></i>
+            </el-tooltip>
+          </div>
+        </div>
+        <div class="flex ac jb" style="padding:0 1px">
+          <div class="line"></div>
+          <div class="pointer blue" @click="add('in')">入库</div>
+          <div class="line"></div>
+          <div class="pointer danger" @click="add('out')">出库</div>
+          <div class="line"></div>
+          <div class="pointer warning" @click="add('check')">盘点</div>
+          <div class="line"></div>
+        </div>
+      </div>
+      <div style="width:66%">
+      </div>
+    </div>
   </loading-box>
 </template>
 
 <script>
-  import StockTop from './StockTop.vue';
-  import StockTable from './StockTable.vue';
-  export default {
-    components: {
-      StockTop,
-      StockTable
-    },
-    data() {
-      return {
-        show: true,
-        loadingText: "",
-      };
-    },
-    watch: {
-      company: {
-        handler(val) {
-          this.show = false;
-          this.$nextTick(() => {
-            this.show = true;
-          })
-        },
-        deep: true
-      }
-    },
-    methods: {
-      async remove(val) {
-        try {
-          this.loadingText = '删除中';
-          let del = await this.$api.curd({
-            model: 'stock',
-            curdType: 'delete',
-            _id: val.row._id
-          })
-          this.$message.success('删除成功！');
-        } catch (error) {}
-        this.loadingText = '';
-      },
-      typeChange(val) {
-        if (val.length > 0) {
-          let data = [];
-          val.forEach(item => {
-            data.push({
-              type: item
-            })
-          });
-          this.$set(this.op, '$or', data)
-        } else {
-          delete this.op.$or;
-        }
-      },
-      stateChange(val) {
-        if (val) {
-          this.$set(this.op, 'state', val);
-        } else {
-          delete this.op.state;
-        }
-      },
-      changeDate(msec) {
-        let datetime = new Date(msec);
-        let year = datetime.getFullYear();
-        let month = datetime.getMonth();
-        let date = datetime.getDate();
-        let hour = datetime.getHours();
-        let minute = datetime.getMinutes();
-        let second = datetime.getSeconds();
-        let result =
-          year +
-          "-" +
-          (month + 1 >= 10 ? month + 1 : "0" + (month + 1)) +
-          "-" +
-          (date + 1 < 10 ? "0" + date : date) +
-          " " +
-          (hour + 1 < 10 ? "0" + hour : hour) +
-          ":" +
-          (minute + 1 < 10 ? "0" + minute : minute) +
-          ":" +
-          (second + 1 < 10 ? "0" + second : second);
-        return result;
+export default {
+  data() {
+    return {
+      loadingText: "",
+      stock:{}
+    };
+  },
+  watch: {
+    company: {
+      handler(val) {},
+      deep: true
+    }
+  },
+  computed:{
+    stockFontSize(){
+      let num = stock.new || 0;
+      for (let i = 0; i < 5; i++) {
+        
       }
     }
-  };
+  },
+  methods: {}
+};
 </script>
 
 <style scoped>
-
 </style>
