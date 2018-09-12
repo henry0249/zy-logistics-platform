@@ -47,8 +47,15 @@
           </div>
         </div>
       </div>
-      <div class="jb" style="width:68%;padding:3%">
-        <div style="width:30%;height:100%;background:#409EFF;border-radius:4px;"></div>
+      <div class="jb" style="width:68%;padding:2%;color:#fff;">
+        <div class="js col-flex" style="width:30%;height:100%;background:#409EFF;border-radius:4px;">
+          <div>累计入库</div>
+          <div class="jc f1">
+            <span>累计入库</span>
+            <span class="jc">10000</span>
+          </div>
+          <div>今日库存</div>
+        </div>
         <div style="width:30%;height:100%;background:#67C23A;border-radius:4px;"></div>
         <div style="width:30%;height:100%;background:#E6A23C;border-radius:4px;"></div>
       </div>
@@ -167,8 +174,8 @@
           },
           state: 'finish'
         })
-        // this.stock = stock[0].new || 0;
-        this.stock = 10000000;
+        this.stock = stock[0].new || 0;
+        // this.stock = 10000000;
         this.updateAt = this.changeDate(stock[0].createdAt);
       },
       changeDate(msec) {
