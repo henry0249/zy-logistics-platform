@@ -1,9 +1,9 @@
 <template>
   <loading-box v-model="loadingText">
     <stock-top v-if="show" :loadingText.sync="loadingText"></stock-top>
-    <div>
+    <!-- <div>
       <stock-table v-if="!loadingText" @remove="remove" state="finish" height="100vh - 40vh - 50px" style="padding:0 3%"></stock-table>
-    </div>
+    </div> -->
   </loading-box>
 </template>
 

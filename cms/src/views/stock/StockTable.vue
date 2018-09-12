@@ -1,18 +1,19 @@
 <template>
   <common-table v-if="show" :height="height" style="padding:0" path="stock/find" :option="option" :thead="thead">
     <div slot="header" class="jc js">
-      <my-form-item width='300px' label="变化类型" @change="typeChange" style="padding-right:10px;" size="mini" multiple collapse-tags v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
-      <my-form-item label="开始时间" datetime style="padding-right:10px;" width="33%" size="mini" v-model="dateObj.startDate"></my-form-item>
-      <my-form-item label="结束时间" datetime style="padding-right:10px;" width="33%" size="mini" v-model="dateObj.endDate"></my-form-item>
+      <my-form-item width='200px' label="变化类型" @change="typeChange" style="margin-right:20px;" size="mini" multiple collapse-tags v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
+      <my-form-item type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" label="起始时间" date style="padding-right:10px;" width="44%" size="mini" v-model="dateArr">
+      </my-form-item>
+      <!-- <my-form-item label="结束时间" datetime style="padding-right:10px;" width="33%" size="mini" v-model="dateObj.endDate"></my-form-item> -->
     </div>
     <template slot-scope="scope">
-        <div v-if="scope.prop === 'type'">{{field.Stock.type.option[scope.row['type']]}}</div>
-        <div v-if="scope.prop === 'createdAt'">{{changeDate(scope.row['createdAt'])}}</div>
-        <div v-if="scope.prop === 'state'">{{field.Stock.state.option[scope.row['state']]}}</div>
-        <div class="link" v-if="scope.prop === 'op'&&$attrs.state === 'ready'" @click="toFinish(scope)">标记已完成</div>
-        <div v-if="scope.prop === 'op'&&$attrs.state === 'finish'">
-          <remove-check @remove="remove(scope)"></remove-check>
-        </div>
+                            <div v-if="scope.prop === 'type'">{{field.Stock.type.option[scope.row['type']]}}</div>
+                            <div v-if="scope.prop === 'createdAt'">{{changeDate(scope.row['createdAt'])}}</div>
+                            <div v-if="scope.prop === 'state'">{{field.Stock.state.option[scope.row['state']]}}</div>
+                            <div class="link" v-if="scope.prop === 'op'&&$attrs.state === 'ready'" @click="toFinish(scope)">标记已完成</div>
+                            <div v-if="scope.prop === 'op'&&$attrs.state === 'finish'">
+                              <remove-check @remove="remove(scope)"></remove-check>
+                            </div>
 </template>
   </common-table>
 </template>
@@ -35,10 +36,7 @@
       return {
         startDate: '',
         endDate: '',
-        dateObj: {
-          endDate: '',
-          startDate: ''
-        },
+        dateArr: [],
         show: true,
         typeData: [],
         option: {},
@@ -72,19 +70,16 @@
       }
     },
     watch: {
-      dateObj: {
+      dateArr: {
         handler(val) {
-          this.$set(this.option, 'createdAt', {
-            $lt: new Date(val.endDate).getTime(),
-            $gt: new Date(val.startDate).getTime()
-          })
-          if (!this.option.createdAt.$lt) {
-            delete this.option.createdAt.$lt
+          if (!val) {
+            delete this.option.createdAt;
+          } else {
+            this.$set(this.option, 'createdAt', {
+              $lt: new Date(val[1]).getTime(),
+              $gt: new Date(val[0]).getTime()
+            })
           }
-          if (!this.option.createdAt.$gt) {
-            delete this.option.createdAt.$gt
-          }
-          console.log(this.option);
         },
         deep: true
       },
@@ -155,12 +150,6 @@
           createdAt: -1
         });
         this.$set(this.option, 'company', this.company._id);
-        // if (this.$attrs.state === 'ready') {
-        //   this.$set(this.thead, 'op', {
-        //     name: '操作',
-        //     slot: true
-        //   })
-        // }
       }
     },
     created() {

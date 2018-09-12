@@ -11,6 +11,10 @@
         default () {
           return {};
         }
+      },
+      historyType: {
+        type: String,
+        default: 'week'
       }
     },
     data() {
@@ -26,6 +30,7 @@
             containLabel: true
           },
           legend: {
+            left: 'right',
             data: ['库存', '入库', '出库', '增益', '损耗'],
             selected: {
               '增益': false,
@@ -52,7 +57,7 @@
             }
           }, {
             type: 'value',
-            name: '数量',
+            name: '',
             min: 0,
             position: 'right',
             axisLabel: {
@@ -102,31 +107,26 @@
             name: '入库',
             key: 'in',
             type: 'bar',
-            yAxisIndex: 1,
             data: []
           }, {
             name: '出库',
             key: 'out',
             type: 'bar',
-            yAxisIndex: 1,
             data: []
           }, {
             name: '增益',
             key: 'increase',
             type: 'bar',
-            yAxisIndex: 1,
             data: []
           }, {
             name: '损耗',
             key: 'decrease',
             type: 'bar',
-            yAxisIndex: 1,
             data: []
           }]
         }
       };
     },
-    watch: {},
     methods: {
       changeStock() {
         this.options.series.forEach((seriesItem, index) => {
@@ -137,6 +137,13 @@
           }
         });
         this.$set(this.options.xAxis[0], 'data', this.data.xData);
+        if (this.historyType === 'week') {
+          delete this.options.xAxis[0].axisLabel;
+        } else {
+          this.$set(this.options.xAxis[0], 'axisLabel', {
+            rotate: 45
+          });
+        }
       }
     },
     created() {
