@@ -81,6 +81,13 @@ body {
   color: #909399
 }
 
+.black {
+  color: #263238
+}
+.fw600{
+  font-weight: 600
+}
+
 .disabled {
   color: #C0C4CC;
   cursor: not-allowed
@@ -111,18 +118,23 @@ p {
   line-height: 1.6;
   font-size: 14px;
 }
-.brtl{
-  border-top-left-radius: 4px; 
+
+.brtl {
+  border-top-left-radius: 4px;
 }
-.brtr{
-  border-top-right-radius: 4px; 
+
+.brtr {
+  border-top-right-radius: 4px;
 }
-.brbl{
-  border-bottom-left-radius: 4px; 
+
+.brbl {
+  border-bottom-left-radius: 4px;
 }
-.brbr{
-  border-bottom-right-radius: 4px; 
+
+.brbr {
+  border-bottom-right-radius: 4px;
 }
+
 .tc {
   text-align: center
 }
@@ -313,6 +325,7 @@ p {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }

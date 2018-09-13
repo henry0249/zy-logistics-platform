@@ -29,7 +29,7 @@
               this.$set(op, key, data[key])
             }
             let res = await this.$api.curd(op);
-            this.$message.warn('添加成功！');
+            this.$message.success('操作成功！');
             this.$router.push({
               path: '/stock/index'
             })

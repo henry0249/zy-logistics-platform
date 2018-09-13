@@ -117,7 +117,7 @@ class StockService extends Service {
         }],
         company: company._id,
         createdAt: {
-          $gte: minDate,
+          // $gte: minDate,
           $lte: maxDate
         }
       });
@@ -142,6 +142,77 @@ class StockService extends Service {
       xData,
       yData
     };
+  }
+
+  async simpleStatistics() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    if (!body.company) {
+      ctx.throw(422, '公司信息必填', body);
+    }
+    let company = await ctx.model.Company.findById(body.company);
+    if (!company) {
+      ctx.throw(422, '公司不存在', body);
+    }
+    let res = {
+      stock: {
+        num: 0
+      },
+      in: {
+        num: 0
+      },
+      out: {
+        num: 0
+      },
+      check: {
+        num: 0
+      }
+    };
+    let lastStock = await ctx.model.Stock.findOne({
+      company: company._id,
+      state: "finish"
+    }).sort({
+      createdAt: -1
+    });
+    res.stock = {
+      num: lastStock.new,
+      createdAt: lastStock.createdAt
+    };
+    //累计入库
+    let stockInData = await ctx.model.Stock.find({
+      type: 'in',
+      company: company._id,
+      state: "finish"
+    });
+    stockInData.forEach((item) => {
+      res.in.num += item.num;
+      res.in.createdAt = item.createdAt;
+    });
+    //累计出库
+    let stockOutData = await ctx.model.Stock.find({
+      type: 'out',
+      company: company._id,
+      state: "finish"
+    });
+    stockOutData.forEach((item) => {
+      res.out.num += item.num;
+      res.out.createdAt = item.createdAt;
+    });
+    res.check.num = await ctx.model.Stock.count({
+      type: 'check',
+      company: company._id,
+      state: "finish"
+    });
+    let lastStockCheck = await ctx.model.Stock.findOne({
+      type: 'check',
+      company: company._id,
+      state: "finish",
+    }).sort({
+      createdAt: -1
+    });
+
+    res.check.createdAt = lastStockCheck.createdAt;
+    return res;
   }
 }
 module.exports = StockService;

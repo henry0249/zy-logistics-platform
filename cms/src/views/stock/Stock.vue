@@ -1,71 +1,67 @@
 <template>
   <loading-box v-model="loadingText">
-    <div class="flex ac jb">
-      <div style="width:33%">
-        <div class="flex ac jb">
-          <div class="blue">
-            <i class="el-icon-menu el-icon--right"></i>当前库存
+    <div>
+      <div style="padding:2vh">
+        <div class="flex ac jb"  style="height:174px">
+          <div style="width:24%" v-for="(val,key) in data" :key="val.id">
+            <stock-card :type="key" :data="val.num" :time="val.createdAt"></stock-card>
           </div>
-          <div class="info">
-            <i class="el-icon-time el-icon--right"></i>更新于<span style="color:#ccc">{{stock.updateAt|formatTime}}</span>
-          </div>
-        </div>
-        <div class="flex ac jb" style="padding:15px 15%">
-          <div>
-            <el-tooltip effect="dark" content="损耗" placement="top">
-              <i class="el-icon-remove-outline danger pointer" style="font-size:18px" @click="add('decrease')"></i>
-            </el-tooltip>
-          </div>
-          <div class="info" :style="{fontSize:stockFontSize}">
-            {{stock.new || 0}}
-          </div>
-          <div>
-            <el-tooltip effect="dark" content="增益" placement="top">
-              <i class="el-icon-circle-plus-outline success pointer" @click="add('increase')" style="font-size:18px"></i>
-            </el-tooltip>
-          </div>
-        </div>
-        <div class="flex ac jb" style="padding:0 1px">
-          <div class="line"></div>
-          <div class="pointer blue" @click="add('in')">入库</div>
-          <div class="line"></div>
-          <div class="pointer danger" @click="add('out')">出库</div>
-          <div class="line"></div>
-          <div class="pointer warning" @click="add('check')">盘点</div>
-          <div class="line"></div>
         </div>
       </div>
-      <div style="width:66%">
+      <div style="padding:0 2vh">
+        <div class="chart-card">
+          <stock-chart></stock-chart>
+        </div>
       </div>
     </div>
   </loading-box>
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      loadingText: "",
-      stock:{}
-    };
-  },
-  watch: {
-    company: {
-      handler(val) {},
-      deep: true
-    }
-  },
-  computed:{
-    stockFontSize(){
-      let num = stock.new || 0;
-      for (let i = 0; i < 5; i++) {
-        
+  import StockCard from "./StockCard.vue";
+  import StockChart from "./StockChart.vue";
+  export default {
+    components: {
+      StockCard,
+      StockChart
+    },
+    data() {
+      return {
+        loadingText: "",
+        data: {}
+      };
+    },
+    watch: {
+      company: {
+        handler(val) {
+          this.getLastStock();
+        },
+        deep: true
       }
+    },
+    methods: {
+      async getLastStock() {
+        this.loadingText = "加载中...";
+        try {
+          this.data = await this.$ajax.post("/stock/simpleStatistics", {
+            company: this.company._id
+          });
+        } catch (error) {}
+        this.loadingText = "";
+      }
+    },
+    mounted() {
+      this.getLastStock();
     }
-  },
-  methods: {}
-};
+  };
 </script>
 
 <style scoped>
+  .chart-card {
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    border: 1px solid #ebeef5;
+    padding: 2vh;
+    height: calc(100vh - 174px - 50px - 4vh - 1vh);
+  }
 </style>

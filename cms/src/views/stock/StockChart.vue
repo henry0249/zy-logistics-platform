@@ -1,157 +1,173 @@
 <template>
-  <chart style="width:100%;height:100%" :options="options">
+  <chart ref="chart" style="width:100%;height:100%" :options="options" @datarangeselected="datarangeselected">
   </chart>
 </template>
 
 <script>
-  export default {
-    props: {
-      data: {
-        type: Object,
-        default () {
-          return {};
-        }
+export default {
+  data() {
+    return {
+      stockDateTypeObj: {
+        // day: "日",
+        week: "周",
+        month: "月",
+        year: "年"
       },
-      historyType: {
-        type: String,
-        default: 'week'
-      }
-    },
-    data() {
-      return {
-        options: {
-          tooltip: {
-            trigger: 'axis',
-          },
-          grid: {
-            left: '0',
-            right: '0',
-            bottom: '40px',
-            containLabel: true
-          },
-          legend: {
-            left: 'right',
-            data: ['库存', '入库', '出库', '增益', '损耗'],
-            selected: {
-              '增益': false,
-              '损耗': false
-            }
-          },
-          xAxis: [{
-            type: 'category',
-            axisTick: {
-              alignWithLabel: true
-            },
-            axisLabel: {
-              rotate: 45
-            },
-            data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
-          }],
-          yAxis: [{
-            type: 'value',
-            name: '库存',
-            min: 0,
-            position: 'left',
-            axisLabel: {
-              formatter: '{value}'
-            }
-          }, {
-            type: 'value',
-            name: '',
-            min: 0,
-            position: 'right',
-            axisLabel: {
-              formatter: '{value}'
-            }
-          }],
-          dataZoom: [{
-              show: true,
-              height: 30,
-              xAxisIndex: [0],
-              bottom: 0,
-              start: 0,
-              end: 100,
-              textStyle: {
-                color: "#fff"
-              },
-              borderColor: "#90979c"
-            },
-            {
-              type: "inside",
-              show: true,
-              height: 15,
-              start: 1,
-              end: 35
-            }
-          ],
-          series: [{
-            name: '库存',
-            key: 'stock',
-            type: 'line',
+      stockDateType: "week",
+      dataType: {
+        stock: "库存",
+        in: "入库",
+        out: "出库",
+        check: "盘点",
+        increase: "增益",
+        decrease: "损耗"
+      },
+      options: {
+        // title: {
+        //   text: "堆叠区域图"
+        // },
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "cross",
             label: {
-              normal: {
-                show: true,
-                position: 'top',
-              }
-            },
-            lineStyle: {
-              normal: {
-                width: 3,
-                shadowColor: 'rgba(0,0,0,0.4)',
-                shadowBlur: 10,
-                shadowOffsetY: 10
-              }
-            },
-            data: []
-          }, {
-            name: '入库',
-            key: 'in',
-            type: 'bar',
-            data: []
-          }, {
-            name: '出库',
-            key: 'out',
-            type: 'bar',
-            data: []
-          }, {
-            name: '增益',
-            key: 'increase',
-            type: 'bar',
-            data: []
-          }, {
-            name: '损耗',
-            key: 'decrease',
-            type: 'bar',
-            data: []
-          }]
-        }
-      };
-    },
-    methods: {
-      changeStock() {
-        this.options.series.forEach((seriesItem, index) => {
-          for (const key in this.data.yData) {
-            if (seriesItem.key === key) {
-              this.$set(this.options.series[index], 'data', this.data.yData[key]);
+              backgroundColor: "#6a7985"
             }
           }
+        },
+        legend: {},
+        grid: {
+          left: "3%",
+          right: "4%",
+          bottom: "3%",
+          containLabel: true
+        },
+        xAxis: {},
+        yAxis: [
+          {
+            type: "value"
+          }
+        ],
+        series: []
+      }
+    };
+  },
+  methods: {
+    async getChartData() {
+      this.$refs.chart.showLoading("default", {
+        text: "加载中..."
+      });
+      try {
+        let data = await this.$ajax.post("/stock/chart", {
+          company: this.company._id,
+          type: this.stockDateType
         });
-        this.$set(this.options.xAxis[0], 'data', this.data.xData);
-        if (this.historyType === 'week') {
-          delete this.options.xAxis[0].axisLabel;
-        } else {
-          this.$set(this.options.xAxis[0], 'axisLabel', {
-            rotate: 45
+        let xAxis = {
+          type: "category",
+          boundaryGap: false,
+          data: data.xData
+        };
+        let series = [];
+        let legend = {
+          right: "3%",
+          selectedMode: "single",
+          data: []
+        };
+        for (const key in this.dataType) {
+          series.push({
+            name: this.dataType[key],
+            type: "line",
+            stack: "总量",
+            areaStyle: { normal: {} },
+            data: data.yData[key],
+            markPoint: {
+              data: [
+                {
+                  type: "max",
+                  name: "最大值",
+                  itemStyle: { color: "#c23531" }
+                },
+                { type: "min", name: "最小值", itemStyle: { color: "#2f4554" } }
+              ]
+            },
+            markLine: {
+              data: [
+                {
+                  type: "average",
+                  name: "平均值",
+                  itemStyle: { color: "#409EFF" }
+                }
+              ]
+            }
+          });
+          legend.data.push(this.dataType[key]);
+        }
+        let visualMap = [];
+        for (const key in this.stockDateTypeObj) {
+          let item = this.stockDateTypeObj[key];
+          let color = key === this.stockDateType ? "#F56C6C" : "#ccc";
+          visualMap.push({
+            type: "piecewise",
+            orient: "horizontal",
+            categories: [item],
+            hoverLink: false,
+            selectedMode: "single",
+            top: "top",
+            left: 5 * (visualMap.length + 1) + "%",
+            inRange: {
+              symbol: "circle",
+              color
+            },
+            outOfRange: {
+              symbol: "circle",
+              color
+            },
+            seriesIndex: series.length + 1
           });
         }
-      }
+        if (this.stockDateType === "year") {
+          this.options.dataZoom = {
+            show: true,
+            type: "slider",
+            bottom: 10,
+            start: 70,
+            end: 100,
+            handleIcon:
+              "M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z",
+            handleSize: "85%"
+          };
+          this.options.grid.bottom = '12%'
+        }else{
+          this.options.dataZoom = {
+            show: false
+          };
+          this.options.grid.bottom = '3%'
+        }
+        this.options.legend = legend;
+        this.options.xAxis = xAxis;
+        this.options.series = series;
+        this.options.visualMap = visualMap;
+      } catch (error) {}
+      this.$refs.chart.hideLoading();
     },
-    created() {
-      this.changeStock();
+    datarangeselected(val) {
+      for (const name in val.selected) {
+        if (val.selected[name] === true) {
+          for (const key in this.stockDateTypeObj) {
+            if (this.stockDateTypeObj[key] === name) {
+              this.stockDateType = key;
+            }
+          }
+        }
+      }
+      this.getChartData();
     }
-  };
+  },
+  mounted() {
+    this.getChartData();
+  }
+};
 </script>
 
 <style scoped>
-
 </style>
