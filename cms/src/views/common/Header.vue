@@ -122,7 +122,7 @@ export default {
           },
           {
             name: "调度中心",
-            path: "",
+            path: "/logistics",
             icon: "icon-wuliu"
           },
           {

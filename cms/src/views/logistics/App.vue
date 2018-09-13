@@ -30,6 +30,10 @@
           name: '创建运单',
           icon: 'icon-jia',
           path: '/logistics/add'
+        },{
+          name: '运单列表',
+          icon: 'icon-jia',
+          path: '/logistics/list'
         }]
       };
     },
