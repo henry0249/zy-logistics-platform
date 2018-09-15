@@ -9,6 +9,11 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Category'
   },
+  stock: {
+    name: '库存',
+    type: 'Number',
+    default: 0
+  },
   name: {
     name: '名称',
     type: 'String',

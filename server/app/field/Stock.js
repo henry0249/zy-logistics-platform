@@ -22,6 +22,11 @@ module.exports = {
     name: '库存单名称',
     type: 'String',
   },
+  goods: {
+    name: '商品',
+    type: 'ObjectId',
+    ref: 'Goods'
+  },
   num: {
     name: '数量',
     type: 'Number',
@@ -40,7 +45,8 @@ module.exports = {
   },
   company: {
     name: '所属公司',
-    type: 'ObjectId'
+    type: 'ObjectId',
+    ref: 'Company'
   },
   businessTrains: {
     name: '关联的贸易链',
@@ -50,11 +56,11 @@ module.exports = {
   transportTrains: {
     name: '关联的物流链',
     type: 'ObjectIdArray',
-    ref :'TransportTrains'
+    ref: 'TransportTrains'
   },
   logistics: {
     name: '关联的物流单',
     type: 'ObjectIdArray',
-    ref :'Logistics'
+    ref: 'Logistics'
   },
 }

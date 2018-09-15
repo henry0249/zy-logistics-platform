@@ -7,22 +7,12 @@ import TakingEdit from './TakingEdit.vue';
 import BeforeDispatchCheck from './BeforeDispatchCheck';
 import BeforeDispatchCheckEdit from './BeforeDispatchCheckEdit';
 
-import Dispatch from './Dispatch';
-import DispatchEdit from './DispatchEdit';
-
-import Distribution from './Distribution.vue';
-import DistributionEdit from './DistributionEdit.vue';
-
 import DistributionFinishCheck from './DistributionFinishCheck';
 import DistributionFinishCheckEdit from './DistributionFinishCheckEdit';
 
 import BeforeSettleCheck from './BeforeSettleCheck';
 import BeforeSettleCheckEdit from './BeforeSettleCheckEdit';
 
-import Settle from './Settle';
-import SettleEdit from './SettleEdit';
-
-import All from './All.vue';
 import Edit from './Edit.vue';
 
 export default [{
@@ -48,18 +38,6 @@ export default [{
     path: '/edit/beforeDispatchCheck/:_id',
     component: BeforeDispatchCheckEdit,
   }, {
-    path: 'dispatch',
-    component: Dispatch,
-  }, {
-    path: '/edit/dispatch/:_id',
-    component: DispatchEdit
-  }, {
-    path: 'distribution',
-    component: Distribution,
-  }, {
-    path: '/edit/distribution/:_id',
-    component: DistributionEdit,
-  }, {
     path: 'distributionFinishCheck',
     component: DistributionFinishCheck,
   }, {
@@ -71,15 +49,6 @@ export default [{
   }, {
     path: '/edit/beforeSettleCheck/:_id',
     component: BeforeSettleCheckEdit,
-  }, {
-    path: 'settle',
-    component: Settle,
-  }, {
-    path: '/edit/settle/:_id',
-    component: SettleEdit,
-  }, {
-    path: 'all',
-    component: All,
   }, {
     path: '/edit/:_id',
     component: Edit,

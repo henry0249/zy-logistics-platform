@@ -183,6 +183,15 @@ export default {
         this.companylist = await this.$ajax.post("/order/company/badge", {
           state: this.state
         });
+        let addActiveCompany = true;
+        this.companylist.forEach(item => {
+          if (item._id === this.activeCompany) {
+            addActiveCompany = false;
+          }
+        });
+        if (addActiveCompany) {
+          this.companylist.push(this.company);
+        }
       } catch (error) {}
       this.loadingText = "";
     }

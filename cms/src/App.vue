@@ -70,6 +70,15 @@ body {
 .g-container::-webkit-scrollbar {
   display: none;
 }
+.g-order-container {
+  padding: 3% 5%;
+}
+.g-order-container-border {
+  margin: 0 auto;
+  padding: 30px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
 .base-bg {
   background: #f3f4f5;
 }
@@ -82,13 +91,13 @@ body {
   font-size: 20px;
   text-align: center;
 }
-.el-tabs__header{
-  margin-bottom: 0px
+.el-tabs__header {
+  margin-bottom: 0px;
 }
-.ivu-input-small{
-  height: 28px
+.ivu-input-small {
+  height: 28px;
 }
-.el-menu .is-active{
-  background: #aaa
+.el-menu .is-active {
+  background: #aaa;
 }
 </style>

@@ -122,12 +122,12 @@ export default {
           },
           {
             name: "调度中心",
-            path: "/logistics",
+            path: "/dispatch",
             icon: "icon-wuliu"
           },
           {
             name: "财务结算",
-            path: "",
+            path: "/settle",
             icon: "icon-jiesuan"
           },
           {
@@ -209,5 +209,6 @@ export default {
 .nav-item.active {
   color: #42a5f5;
   border-bottom: 1px solid #42a5f5;
+  background: rgba(66,165,245,.1)
 }
 </style>

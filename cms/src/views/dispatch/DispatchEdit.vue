@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import Edit from "./Edit.vue";
+import Edit from "../order/Edit.vue";
 export default {
   components: {
     Edit

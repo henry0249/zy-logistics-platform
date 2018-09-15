@@ -3,7 +3,7 @@
 </template>
 
 <script>
-  import All from './All.vue';
+  import All from '../order/All.vue';
   export default {
     components:{
       All

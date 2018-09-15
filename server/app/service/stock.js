@@ -5,6 +5,13 @@ class StockService extends Service {
   async add() {
     const ctx = this.ctx;
     let body = ctx.request.body;
+    if (!body.goods) {
+      ctx.throw(422, '商品信息必填', body);
+    }
+    let goods = await ctx.model.Goods.findById(body.goods);
+    if (!goods) {
+      ctx.throw(422, '商品不存在', body);
+    }
     if (!body.company) {
       ctx.throw(422, '公司信息必填', body);
     }
@@ -15,9 +22,10 @@ class StockService extends Service {
     if (!stockField.type.option[body.type]) {
       ctx.throw(422, '库存修改类型不存在', body);
     }
+    
     if (body.type === 'out' || body.type === 'decrease') {
-      if (Number(body.num) > Number(company.stock)) {
-        ctx.throw(422, '不能超出当前公司库存', body);
+      if (Number(body.num) > Number(goods.stock)) {
+        ctx.throw(422, '不能超出当前商品库存', body);
       }
     } else {
       if (Number(body.num) < 0) {
@@ -27,25 +35,25 @@ class StockService extends Service {
     let newStock = 0;
     if (body.state === 'finish') {
       if (body.type === 'in' || body.type === 'increase') {
-        newStock = Number(company.stock) + Number(body.num);
+        newStock = Number(goods.stock) + Number(body.num);
       }
       if (body.type === 'out' || body.type === 'decrease') {
-        newStock = Number(company.stock) - Number(body.num);
+        newStock = Number(goods.stock) - Number(body.num);
       }
       if (body.type === 'check') {
         newStock = Number(body.num);
       }
     } else {
-      newStock = Number(company.stock);
+      newStock = Number(goods.stock);
     }
     let stockModel = new ctx.model.Stock({
       ...body,
       old: company.stock,
       new: newStock,
-      dv: newStock - Number(company.stock)
+      dv: newStock - Number(goods.stock),
     });
     await stockModel.save();
-    await company.update({
+    await goods.update({
       stock: newStock
     });
     return 'ok';
@@ -210,8 +218,9 @@ class StockService extends Service {
     }).sort({
       createdAt: -1
     });
-
-    res.check.createdAt = lastStockCheck.createdAt;
+    if (lastStockCheck) {
+      res.check.createdAt = lastStockCheck.createdAt;
+    }
     return res;
   }
 }

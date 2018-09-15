@@ -21,7 +21,9 @@ class OrderService extends Service {
       dispatch: ['beforeDispatchCheck'],
       distributionFinishCheck: ['dispatcher', 'sysDispatcher'],
       beforeSettleCheck: ['financial', 'documentClerk'],
-      settle: ['beforeSettleCheck'],
+      financialPretrial: ['beforeSettleCheck'],
+      accountSettlement: ['financial', 'documentClerk'],
+      accountConfirmation: ['financial', 'documentClerk'],
       finish: ['financial', 'documentClerk']
     };
     return await ctx.service.check.role(statePower[order.state], order.handle._id || order.handle);
@@ -35,7 +37,9 @@ class OrderService extends Service {
       distribution: ['dispatcher', 'sysDispatcher'],
       distributionFinishCheck: ['financial', 'documentClerk'],
       beforeSettleCheck: ['beforeSettleCheck'],
-      settle: ['financial', 'documentClerk']
+      financialPretrial: ['financial', 'documentClerk'],
+      accountSettlement: ['financial', 'documentClerk'],
+      accountConfirmation: ['financial', 'documentClerk'],
     }
     return userType[state];
   }
@@ -112,7 +116,7 @@ class OrderService extends Service {
       // }
       if (update.state === 'distributionFinishCheck') {
         if (body.transportTrains instanceof Array && body.transportTrains.length > 0) {
-          body.transportTrains.forEach((item,index) => {
+          body.transportTrains.forEach((item, index) => {
             if (body.transportTrains instanceof Array && item.logistics.length > 0) {
               item.logistics.forEach((logisticsItem) => {
                 if (Number(logisticsItem.state) !== 5) {
@@ -120,7 +124,7 @@ class OrderService extends Service {
                 }
               });
             } else {
-              if (index!==0) {
+              if (index !== 0) {
                 ctx.throw(422, '存在未添加运单的物流链', info);
               }
             }

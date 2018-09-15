@@ -62,8 +62,8 @@
 </template>
 
 <script>
-import Info from "./Info.vue";
-import GoodsTable from "./GoodsTable.vue";
+import Info from "../order/Info.vue";
+import GoodsTable from "../order/GoodsTable.vue";
 import DistributionMap from "./DistributionMap.vue";
 export default {
   components: {

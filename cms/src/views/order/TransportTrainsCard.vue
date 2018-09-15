@@ -64,26 +64,7 @@ export default {
     }
   },
   data() {
-    return {
-      temp: [
-        {
-          code: "130000",
-          name: "河北省"
-        },
-        {
-          code: "130700",
-          name: "张家口市"
-        },
-        {
-          code: "130730",
-          name: "怀来县"
-        },
-        {
-          code: "130730104000",
-          name: "官厅镇"
-        }
-      ]
-    };
+    return {};
   },
   computed: {
     title() {
@@ -163,10 +144,10 @@ export default {
       return res;
     }
   },
-  mounted(){
+  mounted() {
     if (this.data.areaArr.length > 0) {
       let temp = [];
-      this.data.areaArr.forEach((item)=>{
+      this.data.areaArr.forEach(item => {
         temp.push(item.name);
       });
       this.data.areaArr = temp;

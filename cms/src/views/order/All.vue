@@ -36,6 +36,10 @@ export default {
     autoHref: {
       type: Boolean,
       default: false
+    },
+    path: {
+      type: String,
+      default: ""
     }
   },
   data() {
@@ -59,8 +63,8 @@ export default {
   methods: {
     toDetail(item, index) {
       if (item._id) {
-        if (this.autoHref) {
-          this.$router.push(`/edit/${item._id}`);
+        if (this.path) {
+          this.$router.push(`/${this.path}/${item._id}`);
         } else {
           this.$router.push(`/edit/${this.state}/${item._id}`);
         }

@@ -37,11 +37,11 @@ module.exports = {
     name: '自营',
     type: 'Boolean'
   },
-  stock: {
-    name: '库存',
-    type: 'Number',
-    default: 0
-  },
+  // stock: {
+  //   name: '库存',
+  //   type: 'Number',
+  //   default: 0
+  // },
   address: {
     name: '默认地址',
     type: 'ObjectId',
