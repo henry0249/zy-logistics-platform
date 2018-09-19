@@ -32,10 +32,15 @@ export default {
   created() {
     let path = this.$route.path;
     this.$store.commit("globalLoadingToggle", true);
-    this.$store.commit(
-      "headerToggle",
-      !(path.indexOf("login") > -1 || path.indexOf("notfound") > -1)
-    );
+    if (
+      path.indexOf("login") > -1 ||
+      path.indexOf("notfound") > -1 ||
+      path.indexOf("index") > -1
+    ) {
+      this.$store.commit("globalLoadingToggle", false);
+    } else {
+      this.$store.commit("headerToggle", true);
+    }
   }
 };
 </script>

@@ -2,9 +2,21 @@ const Service = require('egg').Service;
 const stockField = require('../field/Stock');
 
 class StockService extends Service {
-  async add() {
+  async multi(){
     const ctx = this.ctx;
     let body = ctx.request.body;
+    if (!(body && body instanceof Array && body.length>0)) {
+      ctx.throw(422, '批量操作失败,未接收到操作数据', body);
+    }
+    for (let i = 0; i < body.length; i++) {
+      const item = body[i];
+      await this.add(item);
+    }
+    return 'ok';
+  }
+  async add(data) {
+    const ctx = this.ctx;
+    let body = ctx.request.body || data;
     if (!body.goods) {
       ctx.throw(422, '商品信息必填', body);
     }

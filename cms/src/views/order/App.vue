@@ -26,11 +26,6 @@ export default {
     }
   },
   watch: {
-    async $route(val) {
-      if (localStorage.token) {
-        await this.$store.dispatch("orderBadgeNotify");
-      }
-    },
     orderBadge: {
       handler: function(val) {
         for (const key in val) {
@@ -75,22 +70,6 @@ export default {
         state:'beforeDispatchCheck',
         badge: this.orderBadge.beforeDispatchCheck
       },
-      // {
-      //   name: "待调度",
-      //   color: "red",
-      //   icon: "icon-tiaoduzhongxin",
-      //   path: "/order/dispatch",
-      //   state:'dispatch',
-      //   badge: this.orderBadge.dispatch
-      // },
-      // {
-      //   name: "待配送",
-      //   color: "red",
-      //   icon: "icon-cf-c97",
-      //   path: "/order/distribution",
-      //   state:'distribution',
-      //   badge: this.orderBadge.distribution
-      // },
       {
         name: "配送完成审核",
         color: "red",
@@ -107,45 +86,14 @@ export default {
         state:'beforeSettleCheck',
         badge: this.orderBadge.beforeSettleCheck
       },
-      // {
-      //   name: "财务结算",
-      //   disabled:true,
-      // },
-      // {
-      //   name: "订单预审",
-      //   color: "red",
-      //   icon: "icon-jiesuan",
-      //   path: "/order/financialPretrial",
-      //   state:'financialPretrial',
-      //   badge: this.orderBadge.financialPretrial
-      // },
-      // {
-      //   name: "账户结算",
-      //   color: "red",
-      //   icon: "icon-jiesuan",
-      //   path: "/order/accountSettlement",
-      //   state:'accountSettlement',
-      //   badge: this.orderBadge.accountSettlement
-      // },
-      // {
-      //   name: "账款确认",
-      //   color: "red",
-      //   icon: "icon-jiesuan",
-      //   path: "/order/accountConfirmation",
-      //   state:'accountConfirmation',
-      //   badge: this.orderBadge.accountConfirmation
-      // },
-      // {
-      //   name: "所有订单",
-      //   color: "red",
-      //   icon: "icon-liebiao",
-      //   state:'all',
-      //   path: "/order/all"
-      // }
+      {
+        name: "所有订单",
+        color: "red",
+        icon: "icon-liebiao",
+        state:'all',
+        path: "/order/all"
+      }
     ];
-    if (localStorage.token) {
-      this.$store.dispatch("orderBadgeNotify");
-    }
   }
 };
 </script>

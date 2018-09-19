@@ -153,6 +153,16 @@ export default {
       }
     }
   },
+  watch: {
+    company: {
+      handler(val,old) {
+        if (old && old._id) {
+          this.$message.success(`${val.name}`);
+        }
+      },
+      deep: true
+    }
+  },
   methods: {
     navClick(item, index) {
       if (!item.path) {
@@ -162,7 +172,6 @@ export default {
     },
     handleCommand(index) {
       this.$store.commit("setCompany", this.roleCompany[index]);
-      this.$message.success(`当前公司已切换`);
     }
   },
   async created() {

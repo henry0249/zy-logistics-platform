@@ -26,11 +26,6 @@ export default {
     }
   },
   watch: {
-    async $route(val) {
-      if (localStorage.token) {
-        await this.$store.dispatch("orderBadgeNotify");
-      }
-    },
     orderBadge: {
       handler: function(val) {
         for (const key in val) {
@@ -77,9 +72,6 @@ export default {
         badge: this.orderBadge.accountConfirmation
       }
     ];
-    if (localStorage.token) {
-      this.$store.dispatch("orderBadgeNotify");
-    }
   }
 };
 </script>

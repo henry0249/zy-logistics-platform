@@ -62,16 +62,11 @@ ajax.interceptors.response.use(response => {
       exp: ''
     });
     router.replace('/');
+    return Promise.reject(err)
+  }else{
+    return Promise.resolve();
   }
-  // .then(() => {
-  //   if (err.response.status === 401) {
-  //     router.replace('/')
-  //   }
-  // }).catch(() => {
-
-  // });
-  return Promise.reject(err)
-})
+});
 
 export default {
   install(Vue) {

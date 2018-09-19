@@ -3,6 +3,7 @@ const Service = require('egg').Service;
 class jwtService extends Service {
   async sign(user, option = {}) {
     const ctx = this.ctx;
+    // option.exp = Math.floor(Date.now() / 1000) + (60);
     let token = await ctx.helper.jwtSign(user, option);
     let uaObj = ctx.helper.ua();
     let tokenData = await ctx.model.Jwt.findOne({

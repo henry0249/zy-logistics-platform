@@ -7,6 +7,10 @@ class StockController extends Controller {
     const ctx = this.ctx;
     ctx.body = await ctx.service.stock.simpleStatistics();
   }
+  async multi(){
+    const ctx = this.ctx;
+    ctx.body = await ctx.service.stock.multi();
+  }
 }
 
 module.exports = StockController;

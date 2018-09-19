@@ -39,6 +39,7 @@ module.exports = app => {
     .get('/logistics/company/badge', checkToken(), 'logistics.companyBadge') //公司运单标记
     .post('/logistics/company/badge', checkToken(), 'logistics.companyBadge') //公司运单标记
     //库存接口
+    .post('/stock/multi', checkToken(), 'stock.multi') //批量添加库存单
     .post('/stock/simpleStatistics', checkToken(), 'stock.simpleStatistics') //简单的库存统计
     //页面接口
     .get('/', 'static.views') //根路径匹配
