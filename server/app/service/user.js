@@ -50,9 +50,6 @@ class UserService extends Service {
   async loginLocal() {
     const ctx = this.ctx;
     let user = await this.getUserInfo();
-    // if (!user.company) {
-      
-    // }
     let roleCompany = await ctx.model.Role.findOne({
       user: user._id
     }).sort({

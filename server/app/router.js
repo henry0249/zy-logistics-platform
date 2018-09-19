@@ -37,6 +37,7 @@ module.exports = app => {
     .all('/order/pending/:state', checkToken(), 'order.pending') //获取待处理订单
     //运单接口
     .get('/logistics/company/badge', checkToken(), 'logistics.companyBadge') //公司运单标记
+    .post('/logistics/company/badge', checkToken(), 'logistics.companyBadge') //公司运单标记
     //库存接口
     .post('/stock/simpleStatistics', checkToken(), 'stock.simpleStatistics') //简单的库存统计
     //页面接口

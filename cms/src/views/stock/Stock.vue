@@ -10,7 +10,7 @@
       </div>
       <div style="padding:0 2vh">
         <div class="chart-card">
-          <stock-chart></stock-chart>
+          <stock-chart v-if="!loadingText"></stock-chart>
         </div>
       </div>
     </div>

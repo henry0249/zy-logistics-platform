@@ -52,11 +52,19 @@ export default {
       }
     };
   },
+  // watch: {
+  //   company: {
+  //     handler(val) {
+  //       this.getChartData();
+  //     },
+  //     deep: true
+  //   }
+  // },
   methods: {
     async getChartData() {
-      this.$refs.chart.showLoading("default", {
-        text: "加载中..."
-      });
+      // this.$refs.chart.showLoading("default", {
+      //   text: "加载中..."
+      // });
       try {
         let data = await this.$ajax.post("/stock/chart", {
           company: this.company._id,
@@ -136,19 +144,19 @@ export default {
               "M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z",
             handleSize: "85%"
           };
-          this.options.grid.bottom = '12%'
-        }else{
+          this.options.grid.bottom = "12%";
+        } else {
           this.options.dataZoom = {
             show: false
           };
-          this.options.grid.bottom = '3%'
+          this.options.grid.bottom = "3%";
         }
         this.options.legend = legend;
         this.options.xAxis = xAxis;
         this.options.series = series;
         this.options.visualMap = visualMap;
       } catch (error) {}
-      this.$refs.chart.hideLoading();
+      // this.$refs.chart.hideLoading();
     },
     datarangeselected(val) {
       for (const name in val.selected) {
@@ -164,7 +172,9 @@ export default {
     }
   },
   mounted() {
-    this.getChartData();
+    this.$nextTick(() => {
+      this.getChartData();
+    });
   }
 };
 </script>

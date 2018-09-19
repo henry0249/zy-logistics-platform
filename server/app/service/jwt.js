@@ -54,31 +54,6 @@ class jwtService extends Service {
     if (!tokenData) {
       ctx.throw(401, '登录已失效,请尝试重新登录');
     }
-    // let dayjs = require('dayjs');
-    // let refleshRange = dayjs(tokenData.expAt).diff(dayjs(), 'second');
-    // if (refleshRange > 0 && refleshRange <= 60 * 60) {
-    //   let option = {};
-    //   if (!ctx.tokenData) {
-    //     ctx.throw(401, '登录已失效,请尝试重新登录');
-    //   }
-    //   if (ctx.tokenData.company) {
-    //     option.company = ctx.tokenData.company;
-    //   }
-    //   if (ctx.tokenData.platform) {
-    //     option.platform = ctx.tokenData.platform;
-    //   }
-    //   option.sys = ctx.tokenData.sys;
-    //   let newToken = await this.sign(tokenData.user, option);
-    //   ctx.set({
-    //     refleshRange,
-    //     refleshtoken: newToken.value,
-    //     tokenexp: newToken.expAt
-    //   });
-    //   await tokenData.update({
-    //     value: newToken.value,
-    //     expAt: newToken.expAt
-    //   });
-    // }
     return tokenData;
   }
   async reflesh() {

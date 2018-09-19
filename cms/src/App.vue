@@ -1,11 +1,11 @@
 <template>
   <div>
     <message></message>
-    <my-header style="border-bottom:1px solid #f3f4f5;box-sizing:border-box;"></my-header>
-    <loading-box class="hide-scroll" v-model="loadingText">
-      <div class="g-container" v-if="loadingText">
+    <my-header v-if="showGlobalHeader" style="border-bottom:1px solid #f3f4f5;box-sizing:border-box;"></my-header>
+    <div class="hide-scroll" v-loading="globalLoading" element-loading-text="加载中..." element-loading-spinner="el-icon-loading" element-loading-background="rgba(255, 255, 255, 0.7)">
+      <div class="g-container" v-if="globalLoading">
       </div>
-      <div v-if="!loadingText">
+      <div v-if="!globalLoading">
         <keep-alive>
           <transition name="fade">
             <router-view v-if="$route.meta.keepAlive">
@@ -19,7 +19,7 @@
           </router-view>
         </transition>
       </div>
-    </loading-box>
+    </div>
   </div>
 </template>
 
@@ -29,31 +29,13 @@ export default {
   components: {
     MyHeader
   },
-  data() {
-    return {
-      loadingText: "加载中"
-    };
-  },
-  computed: {
-    showHeader() {
-      let flag = true;
-      if (
-        this.$route.path.indexOf("login") > -1 ||
-        this.$route.path.indexOf("chooseCompany") > -1 ||
-        this.$route.path.indexOf("notfound") > -1
-      ) {
-        flag = false;
-      }
-      return flag;
-    }
-  },
-  async created() {
-    if (localStorage.token && this.showHeader) {
-      try {
-        await this.$store.dispatch("getLoginInfo");
-      } catch (error) {}
-    }
-    this.loadingText = "";
+  created() {
+    let path = this.$route.path;
+    this.$store.commit("globalLoadingToggle", true);
+    this.$store.commit(
+      "headerToggle",
+      !(path.indexOf("login") > -1 || path.indexOf("notfound") > -1)
+    );
   }
 };
 </script>
@@ -71,11 +53,17 @@ body {
   display: none;
 }
 .g-order-container {
-  padding: 3% 5%;
+  padding: 0% 5%;
+  min-height: calc(100vh - 50px);
 }
 .g-order-container-border {
   margin: 0 auto;
   padding: 30px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+.g-order-body {
+  padding: 3%;
   border: 1px solid #eee;
   border-radius: 4px;
 }

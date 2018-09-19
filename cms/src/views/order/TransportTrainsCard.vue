@@ -145,7 +145,7 @@ export default {
     }
   },
   mounted() {
-    if (this.data.areaArr.length > 0) {
+    if (this.data.areaArr && this.data.areaArr.length > 0) {
       let temp = [];
       this.data.areaArr.forEach(item => {
         temp.push(item.name);

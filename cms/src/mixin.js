@@ -24,6 +24,12 @@ Vue.mixin({
     $state() {
       return this.$store.state;
     },
+    showGlobalHeader() {
+      return this.$store.state.showGlobalHeader;
+    },
+    globalLoading() {
+      return this.$store.state.globalLoading;
+    }
   },
   methods: {
     back() {
@@ -31,7 +37,7 @@ Vue.mixin({
     },
     area2arr(data) {
       if (!data) {
-        return '';
+        return [];
       }
       let res = [];
       let areaSelectType = ["province", "city", "county", "township"];

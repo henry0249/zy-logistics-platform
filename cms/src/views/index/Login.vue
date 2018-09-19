@@ -32,6 +32,9 @@ export default {
       boxImg:
         "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-04-25-9619470c930836d7f3a9b9ff8136acb2.png"
     };
+  },
+  created() {
+    this.$store.commit("headerToggle", false);
   }
 };
 </script>
@@ -60,14 +63,14 @@ export default {
 .box-img img {
   width: 200px;
 }
-.my-index-btn{
-  outline:none;
+.my-index-btn {
+  outline: none;
   border: 1px solid #fff;
   color: #fff;
   background: transparent;
   line-height: 30px;
   border-radius: 30px;
   padding: 0 10px;
-  font-size: 15px
+  font-size: 15px;
 }
 </style>

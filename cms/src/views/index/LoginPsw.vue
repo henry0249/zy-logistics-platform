@@ -21,8 +21,7 @@
     <div style="padding-top:30px;width:100%">
       <div v-ripple class="login-btn" @click="login">立即登录</div>
       <div class="flex ac" style="padding-top:30px;color:#aaa;font-size:13px">
-        <!-- <i class="material-icons" style="font-size:16px">arrow_back</i> -->
-        <div class="pointer" @click="sheet=!sheet">第三方登录</div>
+        <div class="pointer" @click="$message.info('即将开放')">第三方登录</div>
         <div class="f1"></div>
         <div class="pointer" style="color:#EF9A9A" @click="$router.push('/login/resetPsw')">重设密码</div>
       </div>
@@ -48,50 +47,6 @@ export default {
       showPsw: false,
       sendSmsInterval: 0,
       sheet: false,
-      tiles: [
-        {
-          img:
-            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-%E5%BE%AE%E4%BF%A1.png",
-          title: "微信"
-        },
-        {
-          img:
-            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-1b5b65183acb4566a5a4c639fc8cc1f3.png",
-          title: "钉钉",
-          style: { width: "23.5px" }
-        },
-        {
-          img:
-            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-8f18b4ec7aaed05e0beb66af005fce92.png",
-          title: "QQ",
-          style: { width: "20px", marginRight: "14px" }
-        },
-        {
-          img:
-            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-02-%E6%B7%98%E5%AE%9D.png",
-          title: "淘宝"
-        },
-        {
-          img:
-            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-social-weibo.png",
-          title: "微博"
-        },
-        {
-          img:
-            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-github-2.png",
-          title: "github"
-        },
-        {
-          img:
-            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-twitter.png",
-          title: "twitter"
-        },
-        {
-          img:
-            "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-01-google_plus.png",
-          title: "google+"
-        }
-      ]
     };
   },
   watch: {
@@ -130,9 +85,9 @@ export default {
           sys: "cms"
         });
         this.$store.commit("setToken", res);
-        await this.$store.dispatch("getLoginInfo");
         this.$router.push("/order");
         this.loadingText = "";
+        this.$store.commit("headerToggle", true);
       } catch (error) {
         this.loadingText = "";
         localStorage.removeItem("token");

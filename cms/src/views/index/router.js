@@ -1,10 +1,8 @@
 import Index from './Index.vue';
 import Login from './Login.vue';
-import LoginQuick from './LoginQuick.vue';
 import LoginPsw from './LoginPsw.vue';
 import Reg from './Reg.vue';
 import RestPsw from './RestPsw.vue';
-import ChooseCompany from './ChooseCompany.vue';
 import Sys from './SysLogin.vue';
 
 export default [{
@@ -25,12 +23,6 @@ export default [{
     pass: true //放行
   },
   children: [{
-    path: 'quick',
-    component: LoginQuick,
-    meta: {
-      pass: true //放行
-    }
-  }, {
     path: 'reg',
     component: Reg,
     meta: {
@@ -55,10 +47,4 @@ export default [{
       pass: true //放行
     }
   }]
-},{
-  path: '/chooseCompany',
-  component: ChooseCompany,
-  meta: {
-    pass: true //放行
-  }
 }]

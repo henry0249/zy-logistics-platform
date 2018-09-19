@@ -211,22 +211,24 @@ class OrderService extends Service {
           delete item.company;
         }
       }
-      let trains = {};
+      let trains_id = '';
       if (item._id) {
-        let _id = item._id;
+        trains_id = item._id;
         delete item.createdAt;
         delete item.updatedAt;
         delete item._id;
         await ctx.model.TransportTrains.update({
-          _id: _id
-        }, item);
-        trains = item;
+          _id: trains_id
+        }, {
+          ...item
+        });
       } else {
-        trains = new ctx.model.TransportTrains({
+        let trainsModel = new ctx.model.TransportTrains({
           order: order._id,
           ...item
         });
-        await trains.save();
+        await trainsModel.save();
+        trains_id = trainsModel._id;
       }
       if (logistics && logistics instanceof Array && logistics.length > 0) {
         for (let j = 0; j < logistics.length; j++) {
@@ -248,11 +250,15 @@ class OrderService extends Service {
               ctx.throw(422, '存在未填写 车/船 信息的运单', logisticsItem);
             }
           }
+          if (!trains_id) {
+            ctx.throw(422, '物流链信息设置错误');
+          }
           if (logisticsItem._id) {
             let logistics_id = logisticsItem._id;
             delete logisticsItem.createdAt;
             delete logisticsItem.updatedAt;
             delete logisticsItem._id;
+            delete logisticsItem.no;
             logisticsItem.handle = order.handle;
             await ctx.model.Logistics.update({
               _id: logistics_id
@@ -261,7 +267,7 @@ class OrderService extends Service {
             let logisticsModel = new ctx.model.Logistics({
               no: ctx.helper.no(order.goods._id || order.goods, ctx.user._id, 6),
               order: order._id,
-              transportTrains: trains._id,
+              transportTrains: trains_id,
               contactName: order.contactName,
               contactNumber: order.contactNumber,
               area: order.area._id || order.area,
@@ -329,9 +335,26 @@ class OrderService extends Service {
     const ctx = this.ctx;
     let state = orderField.state.option;
     let res = {};
+
     for (const key in state) {
+      let roleType = this.pendingRoleUserType(key);
+      let role = await ctx.model.Role.find({
+        user: ctx.user._id,
+        type: {
+          $in: roleType
+        }
+      });
+      let companySet = new Set();
+      role.forEach(item => {
+        if (item.company) {
+          companySet.add(item.company);
+        }
+      });
       res[key] = await ctx.model.Order.count({
-        state: key
+        handle: {
+          $in: [...companySet]
+        },
+        state: key,
       });
     }
     let sysDispatcherRole = await ctx.model.Role.findOne({
@@ -380,19 +403,44 @@ class OrderService extends Service {
     }).populate([{
       path: 'company'
     }]);
+    if (!body.handle) {
+      ctx.throw(422, '当前公司信息必填');
+    }
+    let appendAcitiveCompany = true;
     let companySet = new Set();
     role.forEach(item => {
       if (item.company) {
         companySet.add(item.company);
+        if (item.company._id.toString() === body.handle) {
+          appendAcitiveCompany = false;
+        }
       }
     });
+    if (appendAcitiveCompany) {
+      let handle = await ctx.model.Company.findById(body.handle);
+      if (!handle) {
+        ctx.throw(404, '未找到当前公司');
+      }
+      companySet.add(JSON.parse(JSON.stringify(handle)));
+    }
+
     let company = [...companySet];
+    let roleType = this.pendingRoleUserType(body.state);
     for (let i = 0; i < company.length; i++) {
       let item = JSON.parse(JSON.stringify(company[i]));
-      item.badge = await ctx.model.Order.count({
-        state: body.state,
-        handle: item._id
+      let hasCompanyRole = await ctx.model.Role.find({
+        type: {
+          $in: roleType
+        },
+        user: ctx.user._id,
+        company: item._id
       });
+      if (hasCompanyRole.length > 0) {
+        item.badge = await ctx.model.Order.count({
+          state: body.state,
+          handle: item._id
+        });
+      }
       res.push(item);
     }
 
@@ -512,7 +560,6 @@ class OrderService extends Service {
       updatedAt: 1
     });
     res.transportTrains = [];
-    // let transportTrains = JSON.parse(JSON.stringify(transportTrainsData));
     for (let j = 0; j < transportTrains.length; j++) {
       let item = JSON.parse(JSON.stringify(transportTrains[j]));
       item.logistics = await ctx.model.Logistics.find({

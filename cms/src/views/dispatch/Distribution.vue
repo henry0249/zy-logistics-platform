@@ -3,7 +3,13 @@
     <div style="padding:0 3%">
       <div style="height:40px">
         <el-tabs v-model="activeCompany">
-          <el-tab-pane :label="item.name || item.nick" :name="item._id" v-for="(item) in companylist" :key="item._id"></el-tab-pane>
+          <el-tab-pane :label="item.name || item.nick" :name="item._id" v-for="(item) in companylist" :key="item._id">
+            <div slot="label" style="position:relative">
+              {{item.name || item.nick}}
+              <el-badge :value="item.badge" v-if="item.badge!==undefined && item.badge>0">
+              </el-badge>
+            </div>
+          </el-tab-pane>
         </el-tabs>
       </div>
       <my-table border size="mini" height="100vh - 50px - 40px" index :loadmore="loadmore" :thead="thead" :data.sync="data">
@@ -49,8 +55,8 @@ export default {
       activeCompany: ""
     };
   },
-  watch:{
-    activeCompany(){
+  watch: {
+    activeCompany() {
       this.getData();
     }
   },
@@ -88,67 +94,18 @@ export default {
           }
         ]
       });
-    },
-    setTabBadge() {
-      let tab = this.getElementByAttr("div", "role", "tab");
-      tab.forEach(item => {
-        let appedndFlag = false;
-        let value = 0;
-        this.companylist.forEach(companyItem => {
-          if ("tab-" + companyItem._id === item.id && companyItem.badge > 0) {
-            appedndFlag = true;
-            value = companyItem.badge;
-          }
-        });
-        if (appedndFlag) {
-          appedndFlag = true;
-          let div = document.createElement("div");
-          div.innerHTML = value + "";
-          let style = {
-            position: "absolute",
-            top: "0",
-            right: "0",
-            height: "20px",
-            minWidth: "20px",
-            lineHeight: "20px",
-            fontSize: "10px",
-            textAlign: "center",
-            borderRadius: "20px",
-            padding: "0px 5px",
-            background: "#F56C6C",
-            color: "#fff",
-            transform: "scale(.9)",
-            zIndex: 1
-          };
-          for (const key in style) {
-            div.style[key] = style[key];
-          }
-          item.style.position = "relative";
-          item.appendChild(div);
-        }
-      });
     }
   },
   async mounted() {
     this.activeCompany = this.company._id;
     this.loadingText = "加载中";
     try {
-      this.companylist = await this.$ajax("/logistics/company/badge");
-      let addActiveCompany = true;
-      this.companylist.forEach((item)=>{
-        if (item._id === this.company._id) {
-          addActiveCompany = false;
-        }
+      this.companylist = await this.$ajax.post("/logistics/company/badge", {
+        handle: this.activeCompany
       });
-      if (addActiveCompany) {
-        this.companylist.push(this.company);
-      }
     } catch (error) {}
     this.loadingText = "";
     await this.getData();
-    this.$nextTick(() => {
-      this.setTabBadge();
-    });
   }
 };
 </script>

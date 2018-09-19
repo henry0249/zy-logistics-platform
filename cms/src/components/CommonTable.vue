@@ -4,7 +4,13 @@
       <div slot="header">
         <div name="company" v-if="showCompany" style="height:40px">
           <el-tabs v-model="activeCompany">
-            <el-tab-pane :label="item.name || item.nick" :name="item._id" v-for="(item) in companylist" :key="item._id"></el-tab-pane>
+            <el-tab-pane :name="item._id" v-for="(item) in companylist" :key="item._id">
+              <div slot="label" style="position:relative">
+                {{item.name || item.nick}}
+                <el-badge :value="item.badge" v-if="item.badge!==undefined && item.badge>0">
+                </el-badge>
+              </div>
+            </el-tab-pane>
           </el-tabs>
         </div>
         <div v-if="showSearch" class="flex jb" style="padding:12px 0">
@@ -134,45 +140,6 @@ export default {
       if (!this.selection) {
         this.$emit("current-change", val);
       }
-    },
-    setTabBadge() {
-      let tab = this.getElementByAttr("div", "role", "tab");
-      tab.forEach(item => {
-        let appedndFlag = false;
-        let value = 0;
-        this.companylist.forEach(companyItem => {
-          if ("tab-" + companyItem._id === item.id && companyItem.badge > 0) {
-            appedndFlag = true;
-            value = companyItem.badge;
-          }
-        });
-        if (appedndFlag) {
-          appedndFlag = true;
-          let div = document.createElement("div");
-          div.innerHTML = value + "";
-          let style = {
-            position: "absolute",
-            top: "0",
-            right: "0",
-            height: "20px",
-            minWidth: "20px",
-            lineHeight: "20px",
-            fontSize: "10px",
-            textAlign: "center",
-            borderRadius: "20px",
-            padding: "0px 5px",
-            background: "#F56C6C",
-            color: "#fff",
-            transform: "scale(.9)",
-            zIndex: 1
-          };
-          for (const key in style) {
-            div.style[key] = style[key];
-          }
-          item.style.position = "relative";
-          item.appendChild(div);
-        }
-      });
     }
   },
   async mounted() {
@@ -181,24 +148,13 @@ export default {
       this.loadingText = "加载中";
       try {
         this.companylist = await this.$ajax.post("/order/company/badge", {
-          state: this.state
+          state: this.state,
+          handle: this.activeCompany
         });
-        let addActiveCompany = true;
-        this.companylist.forEach(item => {
-          if (item._id === this.activeCompany) {
-            addActiveCompany = false;
-          }
-        });
-        if (addActiveCompany) {
-          this.companylist.push(this.company);
-        }
       } catch (error) {}
       this.loadingText = "";
     }
     await this.getData();
-    this.$nextTick(() => {
-      this.setTabBadge();
-    });
   }
 };
 </script>

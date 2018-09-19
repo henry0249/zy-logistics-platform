@@ -1,5 +1,5 @@
 <template>
-  <Edit ref="edit" title="结算前审核" newState="dispatch" alert="审核通过后将进入调度流程" submitText="审核通过" transport>
+  <Edit ref="edit" title="结算前审核" newState="financialPretrial" alert="审核通过后将进入结算预审流程" submitText="审核通过" transport>
     <el-button size="small" type="danger" slot="toolLeft">审核失败</el-button>
   </Edit>
 </template>

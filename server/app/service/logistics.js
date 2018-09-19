@@ -36,6 +36,7 @@ class LogisticsService extends Service {
   }
   async companyBadge() {
     const ctx = this.ctx;
+    let body = ctx.request.body;
     let res = [];
     let sysDispatcherRole = await ctx.model.Role.findOne({
       type: 'sysDispatcher',
@@ -54,6 +55,7 @@ class LogisticsService extends Service {
       aggregateCompany.forEach(item => {
         companylist.push(item._id);
       });
+      companylist.push(body.handle);
     }else{
       let dispatcherRole = await ctx.model.Role.find({
         type: 'dispatcher',
@@ -66,6 +68,7 @@ class LogisticsService extends Service {
           mySet.add(item.company.toString());
         }
       }
+      companylist.add(body.handle);
       companylist = [...mySet];
     }
     let companyData = await ctx.model.Company.find({

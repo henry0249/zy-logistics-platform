@@ -8,14 +8,22 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
+    showGlobalHeader: false,
+    globalLoading: true,
     roleCompany: [],
-    company:{},
+    company: {},
     loginInfo: {},
     field: {},
     orderBadge: {},
     baseUrl: window.location.protocol + '//' + window.location.host,
   },
   mutations: {
+    headerToggle(state, flag) {
+      state.showGlobalHeader = flag;
+    },
+    globalLoadingToggle(state, flag) {
+      state.globalLoading = flag;
+    },
     setLoginInfo(state, data) {
       state.loginInfo = data || {};
     },
@@ -55,7 +63,7 @@ const store = new Vuex.Store({
         context.commit('setField', fieldRes);
         let roleCompanyRes = await ajax('/roleCompany');
         context.commit('setRoleCompany', roleCompanyRes);
-        if (roleCompanyRes.length>0) {
+        if (roleCompanyRes.length > 0) {
           context.commit('setCompany', roleCompanyRes[0]);
         }
         let orderBadgeRes = await ajax('/order/badge');

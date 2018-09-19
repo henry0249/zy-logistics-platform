@@ -56,7 +56,7 @@ export default {
         name: "订单预审",
         color: "red",
         icon: "icon-jiesuan",
-        path: "/order/financialPretrial",
+        path: "/settle/financialPretrial",
         state: "financialPretrial",
         badge: this.orderBadge.financialPretrial
       },
@@ -64,7 +64,7 @@ export default {
         name: "账户结算",
         color: "red",
         icon: "icon-jiesuan",
-        path: "/order/accountSettlement",
+        path: "/settle/accountSettlement",
         state: "accountSettlement",
         badge: this.orderBadge.accountSettlement
       },
@@ -72,7 +72,7 @@ export default {
         name: "账款确认",
         color: "red",
         icon: "icon-jiesuan",
-        path: "/order/accountConfirmation",
+        path: "/settle/accountConfirmation",
         state: "accountConfirmation",
         badge: this.orderBadge.accountConfirmation
       }
@@ -85,13 +85,4 @@ export default {
 </script>
 
 <style>
-.g-order-container {
-  padding: 3% 5%;
-  min-height: calc(100vh - 50px);
-}
-.g-order-body {
-  padding: 3%;
-  border: 1px solid #eee;
-  border-radius: 4px;
-}
 </style>

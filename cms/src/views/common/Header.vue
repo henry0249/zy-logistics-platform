@@ -1,5 +1,5 @@
 <template>
-  <div class="flex ac g-header" v-if="showHeader">
+  <div class="flex ac g-header" v-if="showGlobalHeader">
     <img class="logo" :src="logoImg" alt="">
     <div class="flex ac my-nav" style="margin-left:20px">
       <div v-if="!item.hide" @click="navClick(item,index)" v-ripple class="ac nav-item" :class="{active:index === activeNavIndex}" v-for="(item,index) in nav" :key="index">
@@ -49,11 +49,10 @@ export default {
     return {
       logoImg:
         "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-16-zyfz_logo.png"
-      // nav: []
     };
   },
   computed: {
-    showHeader() {
+    showGlobalHeader() {
       let flag = true;
       if (
         this.$route.path.indexOf("login") > -1 ||
@@ -163,29 +162,19 @@ export default {
     },
     handleCommand(index) {
       this.$store.commit("setCompany", this.roleCompany[index]);
-      this.$message.success(
-        `【${this.roleCompany[index].name}】切换为当前公司`
-      );
+      this.$message.success(`当前公司已切换`);
     }
   },
-  watch: {
-    async $route(val) {
-      if (localStorage.token && val.redirectedFrom !== "/") {
-        // let res = await this.$store.dispatch("orderBadgeNotify");
-      } else {
-        MessageBox.confirm(`您的登录状态已失效`, "提示", {
-          showCancelButton: false,
-          confirmButtonText: "重新登录",
-          type: "error",
-          center: true
-        }).then(() => {
-          this.$router.replace("/");
-        });
-      }
+  async created() {
+    this.$store.commit("globalLoadingToggle", true);
+    try {
+      await this.$store.dispatch("getLoginInfo");
+    } catch (error) {
+      this.$route.replace("/login");
+      this.$store.commit("globalLoadingToggle", false);
     }
-  },
-
-  mounted() {}
+    this.$store.commit("globalLoadingToggle", false);
+  }
 };
 </script>
 
@@ -209,6 +198,6 @@ export default {
 .nav-item.active {
   color: #42a5f5;
   border-bottom: 1px solid #42a5f5;
-  background: rgba(66,165,245,.1)
+  background: rgba(66, 165, 245, 0.1);
 }
 </style>
