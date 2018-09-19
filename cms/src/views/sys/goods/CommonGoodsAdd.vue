@@ -28,7 +28,7 @@
             <div style="width:24%" class="jb">
               <my-form-item width="50%" switch v-model="goods.selfDeliverySupport" label="支持自提">
               </my-form-item>
-              <my-form-item width="50%" switch v-model="goods.freeDelivery" label="包配送费">
+              <my-form-item class="flex" style="justify-content: flex-end;" width="50%" switch v-model="goods.freeDelivery" label="包配送费">
               </my-form-item>
             </div>
           </div>
@@ -317,5 +317,6 @@
   }
   .form-right {
     padding-right: 20px;
+    
   }
 </style>
