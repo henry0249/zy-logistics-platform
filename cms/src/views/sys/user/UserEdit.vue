@@ -4,10 +4,10 @@
 </template>
 
 <script>
-import UserEdmitItem from './UserEdmitItem';
+import UserEditItem from './UserEditItem';
 export default {
   components: {
-    UserEdmitItem
+    UserEditItem
   },
   data() {
     return {

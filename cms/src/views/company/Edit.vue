@@ -3,10 +3,10 @@
 </template>
 
 <script>
-import CompanyEdmit from '../sys/company/CompanyEdmit.vue';
+import CompanyEdit from '../sys/company/CompanyEdit.vue';
   export default {
     components: {
-      CompanyEdmit
+      CompanyEdit
     }
   }
 </script>

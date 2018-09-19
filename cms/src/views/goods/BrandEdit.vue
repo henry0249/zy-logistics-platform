@@ -5,10 +5,10 @@
 </template>
 
 <script>
-  import GoodsBrandEdmit from '../sys/goods/GoodsBrandEdmit.vue';
+  import GoodsBrandEdit from '../sys/goods/GoodsBrandEdit.vue';
   export default {
     components: {
-      GoodsBrandEdmit
+      GoodsBrandEdit
     },
     data () {
       return {

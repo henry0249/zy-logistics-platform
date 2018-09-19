@@ -2,10 +2,10 @@ import App from './App.vue';
 import GoodsList from './GoodsList.vue';
 import Add from './Add.vue';
 import GoodsBrand from './GoodsBrand.vue';
-import BrandEdmit from './BrandEdmit.vue';
+import BrandEdit from './BrandEdit.vue';
 import GoodsCategory from './GoodsCategory.vue';
 import CategoryAdd from './CategoryAdd.vue';
-import CategoryEdmit from './CategoryEdmit.vue';
+import CategoryEdit from './CategoryEdit.vue';
 import Edit from './Edit.vue';
 import brandAdd from './brandAdd.vue';
 import test from './test.vue';
@@ -28,7 +28,7 @@ export default [{
     component: CategoryAdd
   },{
     path: 'category_edit/:_id',
-    component: CategoryEdmit
+    component: CategoryEdit
   },{
     path: 'brand',
     component: GoodsBrand
@@ -37,7 +37,7 @@ export default [{
     component: brandAdd
   },{
     path: 'brand_edit/:_id',
-    component: BrandEdmit
+    component: BrandEdit
   },{
     path: 'edit/:_id',
     component: Edit

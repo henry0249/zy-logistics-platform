@@ -7,11 +7,11 @@ import Area from './Area.vue';
 import AreaAdd from './AreaAdd.vue';
 import Transfer from './Transfer.vue';
 import TransferAdd from './TransferAdd.vue';
-import CompanyEdmit from './CompanyEdmit.vue';
+import CompanyEdit from './CompanyEdit.vue';
 import CompanyAdd from './CompanyAdd.vue';
-import UserEdmit from './UserEdmit.vue';
+import UserEdit from './UserEdit.vue';
 import UserAdd from './UserAdd.vue';
-import UserAccountEdmit from './UserAccountEdmit.vue';
+import UserAccountEdit from './UserAccountEdit.vue';
 import Test from './Test.vue';
 
 export default [{
@@ -44,10 +44,10 @@ export default [{
     component: TransferAdd
   }, {
     path: 'company_edit/:_id',
-    component: CompanyEdmit
+    component: CompanyEdit
   }, {
     path: 'user_edit/:_id',
-    component: UserEdmit
+    component: UserEdit
   }, {
     path: 'company_add',
     component: CompanyAdd
@@ -56,7 +56,7 @@ export default [{
     component: UserAdd
   }, {
     path: 'user_account_edit/:_id',
-    component: UserAccountEdmit
+    component: UserAccountEdit
   }, {
     path: 'test',
     component: Test

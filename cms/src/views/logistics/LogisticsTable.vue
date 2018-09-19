@@ -6,7 +6,7 @@
         <my-form-item clearable size="mini" @change="stateChange" select v-model="state" label="状态" :options="field.Logistics.state.option" width="200px"></my-form-item>
       </div>
       <template slot-scope="scope">
-        <div v-if="scope.prop === 'no'" class="link" @click="goEdmit(scope)">{{scope.row['no']}}</div>
+        <div v-if="scope.prop === 'no'" class="link" @click="goEdit(scope)">{{scope.row['no']}}</div>
         <div v-if="scope.prop === 'state'">{{field.Logistics.state.option[scope.row['state']]}}</div>
         <div v-if="scope.prop === 'startAt'">{{scope.row['startAt']?changeDate(scope.row['startAt']):'暂未开车'}}</div>
         <div v-if="scope.prop === 'finishAt'">{{scope.row['finishAt']?changeDate(scope.row['finishAt']):'暂未到达'}}</div>
@@ -93,7 +93,7 @@
           delete this.option.$or;
         }
       },
-      goEdmit(val) {
+      goEdit(val) {
         console.log(val.row._id);
         this.$router.push({
           path: '/logistics/edit/' + val.row._id,

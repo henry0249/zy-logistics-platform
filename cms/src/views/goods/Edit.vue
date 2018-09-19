@@ -3,10 +3,10 @@
 </template>
 
 <script>
-import GoodsEdmitItem from '../sys/goods/CommonGoodsEdmitItem.vue';
+import GoodsEditItem from '../sys/goods/CommonGoodsEditItem.vue';
   export default {
     components: {
-      GoodsEdmitItem
+      GoodsEditItem
     }
   }
 </script>

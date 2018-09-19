@@ -6,10 +6,10 @@
 </template>
 
 <script>
-import GoodsCategoryEdmitItem from "./GoodsCategoryEdmitItem.vue";
+import GoodsCategoryEditItem from "./GoodsCategoryEditItem.vue";
 export default {
   components: {
-    GoodsCategoryEdmitItem
+    GoodsCategoryEditItem
   },
   data() {
     return {

@@ -5,10 +5,10 @@
 </template>
 
 <script>
-import CategoryEdmit from '../sys/goods/GoodsCategoryEdmit.vue';
+import CategoryEdit from '../sys/goods/GoodsCategoryEdit.vue';
   export default {
     components: {
-      CategoryEdmit
+      CategoryEdit
     }
   }
 </script>

@@ -17,10 +17,10 @@
 </template>
 
 <script>
-import UserEdmitItemForm from "./UserEdmitItemForm.vue";
+import UserEditItemForm from "./UserEditItemForm.vue";
 export default {
   components: {
-    UserEdmitItemForm
+    UserEditItemForm
   },
   props: {
     value: {

@@ -15,10 +15,10 @@
 </template>
 
 <script>
-  import LogisticsEdmitItem from './LogisticsEdmitItem.vue';
+  import LogisticsEditItem from './LogisticsEditItem.vue';
   export default {
     components: {
-      LogisticsEdmitItem
+      LogisticsEditItem
     },
     data() {
       return {

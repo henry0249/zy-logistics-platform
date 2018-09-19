@@ -7,10 +7,10 @@
 </template>
 
 <script>
-  import CompanyEdmitItem from './CompanyEdmitItem.vue';
+  import CompanyEditItem from './CompanyEditItem.vue';
   export default {
     components: {
-      CompanyEdmitItem
+      CompanyEditItem
     },
     data() {
       return {

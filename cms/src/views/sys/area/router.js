@@ -1,7 +1,7 @@
 import App from './App.vue';
 import List from './AraeList.vue';
 import AreaAdd from './AreaAdd.vue';
-// import AreaEdmit from './AreaEdmit.vue';
+// import AreaEdit from './AreaEdit.vue';
 
 export default [{
   path: 'area',

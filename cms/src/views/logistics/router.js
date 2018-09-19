@@ -1,7 +1,7 @@
 import App from './App.vue';
 import LogisticsAdd from './LogisticsAdd.vue';
 import LogisticsList from './LogisticsList.vue';
-import LogisticsEdmit from './LogisticsEdmit.vue';
+import LogisticsEdit from './LogisticsEdit.vue';
 import Test from './Test.vue';
 
 export default [{
@@ -23,7 +23,7 @@ export default [{
     },
     {
       path: 'edit/:_id',
-      component: LogisticsEdmit
+      component: LogisticsEdit
     }
   ]
 }]

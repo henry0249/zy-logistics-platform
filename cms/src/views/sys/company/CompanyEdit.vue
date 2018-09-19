@@ -21,12 +21,12 @@
 </template>
 
 <script>
-  import CompanyEdmitItem from "./CompanyEdmitItem.vue";
+  import CompanyEditItem from "./CompanyEditItem.vue";
   import CommonCompanyRole from "../../common/CommonCompanyRole.vue";
   import CompanyShip from "./CompanyShip.vue";
   export default {
     components: {
-      CompanyEdmitItem,
+      CompanyEditItem,
       CompanyShip,
       CommonCompanyRole
     },

@@ -1,6 +1,6 @@
 import App from './App.vue';
 import List from './CompanyList.vue';
-import Edit from './CompanyEdmit.vue';
+import Edit from './CompanyEdit.vue';
 import CompanyAdd from './CompanyAdd.vue';
 
 export default [{

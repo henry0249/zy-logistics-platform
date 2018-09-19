@@ -15,10 +15,10 @@
 </template>
 
 <script>
-  import UserAccountEdmitItem from './UserAccountEdmitItem.vue';
+  import UserAccountEditItem from './UserAccountEditItem.vue';
   export default {
     components: {
-      UserAccountEdmitItem
+      UserAccountEditItem
     },
     data() {
       return {
