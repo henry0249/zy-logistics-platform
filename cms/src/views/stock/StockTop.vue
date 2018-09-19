@@ -175,7 +175,6 @@
           state: 'finish'
         })
         this.stock = stock[0].new || 0;
-        // this.stock = 10000000;
         this.updateAt = this.changeDate(stock[0].createdAt);
       },
       changeDate(msec) {

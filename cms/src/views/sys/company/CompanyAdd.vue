@@ -55,12 +55,6 @@
       };
     },
     watch: {
-      shipObj: {
-        handler(val) {
-          console.log(val);
-        },
-        deep: true
-      },
       "companyArr.type" (val) {
         let io = false;
         val.forEach(item => {

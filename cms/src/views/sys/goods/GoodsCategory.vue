@@ -7,7 +7,7 @@
         <my-form-item :disabled="disabled" @change="categoryChange" label="选择上级分类" style="padding-right:10px;" filterable width="250px" size="mini" placeholder="选择上级分类" v-model="categoryData" :options="categoryArr" select></my-form-item>
       </div>
       <template slot-scope="scope">
-          <i title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{scope.row['name']}}</i>
+            <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{setName(scope)}}</div>
 </template>
    </common-table>
   </div>
@@ -29,7 +29,7 @@
             path: "parent"
           }]
         },
-        disabled:false,
+        disabled: false,
         categoryData: '',
         categoryArr: [],
         categoryCheck: null,
@@ -60,6 +60,9 @@
       };
     },
     methods: {
+      setName(scope) {
+        return scope.row.name || scope.row.nick || scope.row.mobile || scope.row._id;
+      },
       tagType(index, arr) {
         let type = ["success", "info", "warning", "danger"];
         if (index <= arr.length - 1) {
@@ -71,7 +74,7 @@
       see(val) {
         let data = '/sys/goods/category_edmit/';
         if (!this.sys) {
-          data = '/goods/category_edmit/' 
+          data = '/goods/category_edmit/'
         }
         this.$router.push({
           path: data + val.row._id
@@ -82,7 +85,7 @@
         if (val === 2) {
           data = true;
           this.disabled = false;
-        }else {
+        } else {
           this.disabled = true;
         }
         this.$set(this.op, 'parent', {

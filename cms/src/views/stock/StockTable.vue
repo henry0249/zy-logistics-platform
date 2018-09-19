@@ -97,9 +97,6 @@
       }
     },
     methods: {
-      dateChange(val) {
-        console.log(val);
-      },
       toFinish(scope) {
         this.$emit('sub', scope);
       },

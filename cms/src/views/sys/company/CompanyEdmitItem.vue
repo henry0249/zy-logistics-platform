@@ -70,7 +70,6 @@
     },
     watch: {
       'companyData.area' (val) {
-        console.log(val);
         let areaInfo = val.province.name + val.city.name + val.county.name + val.name
         this.$set(this.companyData, 'areaInfo', areaInfo)
       },
@@ -83,7 +82,6 @@
     },
     methods: {
       setCaretPosition(tObj, sPos) {
-        console.log("1111");
         if (tObj.setSelectionRange) {
           setTimeout(function() {
             tObj.setSelectionRange(sPos, sPos);

@@ -49,11 +49,6 @@ export default {
       ]
     };
   },
-  watch: {
-    type(val) {
-      // this.area = [];
-    }
-  },
   methods: {
     typeChange(val) {
       this.loadingText = "加载中...";

@@ -119,9 +119,6 @@
       };
     },
     watch: {
-      activeName(val) {
-        console.log(val);
-      },
       startShowData(val) {
         this.$emit("update:showData", val);
       },

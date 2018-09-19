@@ -1,7 +1,7 @@
 <template>
   <common-table border :thead="thead" path="/area/find" :option="option">
     <template slot-scope="scope">
-        <i title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'key'" @click="see(scope)">{{scope.row['key']}}</i>
+        <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'key'" @click="see(scope)">{{scope.row['key']}}</div>
     </template>
   </common-table>
 </template>
@@ -40,7 +40,6 @@
     },
     methods: {
       see(val){
-        console.log(val);
         this.$router.push({
           path:'/sys/area/edmit/' + val.row._id
         })

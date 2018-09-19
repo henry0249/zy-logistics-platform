@@ -25,7 +25,6 @@ export default {
   },
   methods: {
     async sub(val) {
-      console.log(val);
       if (this.confirmation(val)) {
         try {
           let data = {
@@ -76,7 +75,6 @@ export default {
           }
         ]
       });
-      console.log(this.startData);
     },
     async getCategory() {
       this.categoryArr = await this.$api.curd({

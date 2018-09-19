@@ -1,7 +1,7 @@
 <template>
   <my-form size="mini" width="24%" style="margin:15px 0">
     <div class="flex jb">
-      <my-form-item input v-model="userData.name" filterable label="商品名"></my-form-item>
+      <my-form-item input v-model="userData.name" filterable label="用户名"></my-form-item>
       <my-form-item size="mini" input v-model="userData.mobile" label="手机号"></my-form-item>
       <my-form-item size="mini" input v-model="userData.type" label="类型"></my-form-item>
       <my-form-item size="mini" input v-model="userData.email" filterable label="邮箱"></my-form-item>
@@ -16,9 +16,6 @@
       <div style="width:24%">
         <my-select label="父级" :data.sync="userData.parent" user></my-select>
       </div>
-      <!-- <common-select style="width:24%" border :data.sync="userData.recommendedByUser" type="user" label="推荐人"></common-select>
-          <common-select style="width:24%" border :data.sync="userData.superior" type="user" label="上级"></common-select>
-          <common-select style="width:24%" border :data.sync="userData.parent" type="user" label="父级"></common-select> -->
       <div style="width:24%;"></div>
     </div>
     <div class="flex jb" style="margin-top:15px;">

@@ -15,22 +15,25 @@
             </el-card>
           </div>
         </div>
-        <el-alert style="margin-top:15px" :title="isCheck?'商品信息()':'商品信息'" type="info" :closable="false">
+        <el-alert style="margin-top:15px" :title="isCheck?'商品信息(盘点是更新各个商品的库存)':'商品信息'" type="info" :closable="false">
         </el-alert>
-        <my-form size="small" v-if="!isCheck" width="19%">
+        <my-form size="mini" v-if="!isCheck" width="30%">
           <div class="flex ac jb" style="margin-top:15px">
             <my-form-item @change="goodsChange" label="商品名" v-model="goodsSelect" select :options="goods"></my-form-item>
+            <my-form-item label="库存" size="mini" v-if="goodsSelect" v-model="goodsObj.stock" number :min="0"></my-form-item>
             <my-form-item label="所属品牌" disabled v-if="goodsSelect" v-model="goodsObj.brand.name" input></my-form-item>
+          </div>
+          <div class="flex ac jb" style="margin-top:15px">
             <my-form-item label="所属分类" disabled v-if="goodsSelect" v-model="goodsObj.category.name" input></my-form-item>
             <my-form-item label="单位" disabled input v-if="goodsSelect" v-model="goodsObj.unit"></my-form-item>
             <my-form-item label="状态" disabled input v-if="goodsSelect" v-model="goodsObj.saleState"></my-form-item>
           </div>
         </my-form>
+        <goods-list style="margin-top:15px;" v-else :initData="goods" :data.sync="goodsData"></goods-list>
         <el-alert style="margin-top:15px" title="库存单信息" type="info" :closable="false">
         </el-alert>
-        <my-form size="small" width="32%">
+        <my-form size="small" width="49%">
           <div class="flex ac jb" style="margin-top:15px">
-            <my-form-item label="数量" v-model="form.num" number :min="0"></my-form-item>
             <my-form-item label="名称" v-model="form.name"></my-form-item>
             <my-form-item label="状态" v-model="form.state" select :options="field.Stock.state.option"></my-form-item>
           </div>
@@ -53,7 +56,11 @@
 </template>
 
 <script>
+  import GoodsList from './GoodsList.vue';
   export default {
+    components: {
+      GoodsList
+    },
     props: {
       goodsId: {
         type: String,
@@ -84,7 +91,8 @@
     },
     data() {
       return {
-        isCheck:false,
+        isCheck: false,
+        goodsData: [],
         goodsSelect: '',
         goodsObj: {},
         loadingText: "",
@@ -92,13 +100,18 @@
           state: "finish",
           type: "in",
           name: "",
-          num: 0,
           remake: ""
         },
-        typeObj: {}
+        typeObj: {},
+        option: {},
       };
     },
     watch: {
+      goodsData: {
+        handler(val) {
+        },
+        deep: true
+      },
       company: {
         handler(val) {
           this.$emit('update:goodsId', '');
@@ -115,7 +128,7 @@
         this.setName();
         if (val === 'check') {
           this.isCheck = true;
-        }else {
+        } else {
           this.isCheck = false;
         }
       },
@@ -142,6 +155,7 @@
             this.$set(this.goodsObj, 'category', item.category);
             this.$set(this.goodsObj, 'name', item.name);
             this.$set(this.goodsObj, 'unit', item.unit);
+            this.$set(this.goodsObj, 'stock', item.stock);
             this.$set(this.goodsObj, 'saleState', this.field.Goods.saleState.option[item.saleState]);
           }
         });
@@ -159,7 +173,21 @@
       },
       submit() {
         this.form.company = this.company._id;
-        this.$emit("submit", this.form);
+        this.$emit("submit", {
+          stock: this.form,
+          goods: this.goodsData.length > 0 ? this.goodsData : this.goodsObj
+        });
+      },
+      checkMethods(data) {
+        let check = true;
+        if (this.goodsObj.stock <= 0 && this.goodsData.length === 0) {
+          this.$message.warn('数量必须大于0');
+          check = false;
+        } else if (!(Object.keys(this.goodsObj).length > 0 || this.goodsData.length > 0)) {
+          this.$message.warn('必须选择商品');
+          check = false;
+        }
+        return check;
       }
     },
     mounted() {
@@ -180,7 +208,6 @@
 <style scoped>
   .g-stock-info {
     padding: 30px;
-    /* box-shadow: 0 0 10px rgba(0,0,0,.2); */
     border: 1px solid #eee;
     border-radius: 4px;
   }

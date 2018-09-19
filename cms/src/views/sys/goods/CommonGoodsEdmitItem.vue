@@ -146,7 +146,6 @@ export default {
     tableList: {
       handler: function(val, oldVal) {
         if (oldVal.length > 0) {
-          console.log(val, oldVal);
           this.disabled = false;
           this.priceChange = true;
         }

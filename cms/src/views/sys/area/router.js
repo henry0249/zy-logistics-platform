@@ -1,7 +1,7 @@
 import App from './App.vue';
 import List from './AraeList.vue';
 import AreaAdd from './AreaAdd.vue';
-import AreaEdmit from './AreaEdmit.vue';
+// import AreaEdmit from './AreaEdmit.vue';
 
 export default [{
   path: 'area',
@@ -16,8 +16,5 @@ export default [{
   },{
     path:'add',
     component:AreaAdd
-  },{
-    path:'edmit/:_id',
-    component:AreaEdmit
   }]
 }]

@@ -5,9 +5,9 @@
       <my-form-item width='300px' label="公司类型" @change="typeChange" style="padding-right:10px;" size="mini" multiple collapse-tags placeholder="选择公司类型" v-model="typeData" :options="field.Company.type.option" select></my-form-item>
     </div>
     <template slot-scope="scope">
-      <i title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see({type:'read',value:scope})">{{scope.row['name']}}</i>
-      <div v-if="scope.prop === 'area'">{{areaText(scope.row['area'])}}</div>
-    </template>
+        <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see({type:'read',value:scope})">{{setName(scope)}}</div>
+        <div v-if="scope.prop === 'area'">{{areaText(scope.row['area'])}}</div>
+</template>
   </common-table>
 </template>
 
@@ -78,12 +78,15 @@
         }
         return str;
       },
+      setName(scope) {
+        return scope.row.name || scope.row.nick || scope.row.mobile || scope.row._id;
+      },
       typeChange(val) {
         if (val.length > 0) {
           this.$set(this.option, 'type', {
             $in: val
           })
-        }else {
+        } else {
           delete this.option.type
         }
       },
@@ -100,13 +103,13 @@
               }
             }
           ])
-        }else {
+        } else {
           delete this.option.$or
         }
       },
       see(val) {
         this.$router.push({
-          path:'/sys/company/edmit/' + val.value.row._id
+          path: '/sys/company/edmit/' + val.value.row._id
         })
       }
     }

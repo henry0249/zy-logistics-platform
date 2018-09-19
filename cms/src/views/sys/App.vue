@@ -24,15 +24,6 @@
     data() {
       return {
         navObj
-        // nav: [{
-        //   name: "商品管理",
-        //   icon: "icon-quyu",
-        //   path: "/sys/area"
-        // }, {
-        //   name: "区域管理",
-        //   icon: "icon-quyu",
-        //   path: "/sys/area"
-        // }]
       };
     },
     computed: {

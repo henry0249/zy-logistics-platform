@@ -177,8 +177,6 @@ export default {
         this.$set(this.startUserData, key, this.startData[key]);
       }
       this.$set(this.startUserData, "_id", this.startData._id);
-      console.log(this.startUserData);
-      console.log(this.startData);
     }
   }
 };

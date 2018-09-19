@@ -10,7 +10,7 @@
       <template slot-scope="scope">
         <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
         <el-tag v-if="scope.prop === 'category'" :type="tagType(index,scope.row['category'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['category']" :key="item.id">{{item.name}}</el-tag>
-        <i title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{scope.row['name']}}</i>
+        <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{setName(scope)}}</div>
       </template>
    </common-table>
   </div>
@@ -90,6 +90,9 @@
       }
     },
     methods: {
+      setName(scope){
+        return scope.row.name || scope.row.nick || scope.row.mobile || scope.row._id;
+      },
       tagType(index, arr) {
         let type = ["success", "info", "warning", "danger"];
         if (index <= arr.length - 1) {
@@ -103,7 +106,6 @@
         if (!this.sys) {
           path = '/goods/brand_edmit/';
         }
-        console.log(path + val.row._id);
         this.$router.push({
           path: path + val.row._id
         });

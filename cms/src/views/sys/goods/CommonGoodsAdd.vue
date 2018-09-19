@@ -289,7 +289,6 @@
       await this.getCategory();
       if (!this.sys) {
         this.$set(this.goods, 'company', this.company);
-        console.log(this.goods);
       }
       this.value = "";
     }

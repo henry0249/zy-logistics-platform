@@ -45,7 +45,6 @@
         return returnIo;
       },
       async sub(val) {
-        // console.log(Object.keys(val.company).length > 0);
         if (this.confirmation(val)) {
           try {
             this.loadingText = "添加中";

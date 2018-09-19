@@ -10,8 +10,8 @@
         </div>
       </div>
       <template slot-scope="scope" v-if="scope.prop === 'tag'||scope.prop === 'name'">
-            <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
-            <i title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see({type:'read',value:scope})">{{scope.row['name']}}</i>
+              <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+              <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see({type:'read',value:scope})">{{setName(scope)}}</div>
 </template>
     </common-table>
   </loading-box>
@@ -73,7 +73,6 @@
         disabled: false,
         show: true,
         op: {
-          // company:'5b728c9aea70bf646696efb1'
         },
         input: "",
         brandData: "",
@@ -82,7 +81,6 @@
         loadingText: "",
         brandArr: [],
         categoryArr: [],
-        companyArr: []
       };
     },
     watch: {
@@ -117,6 +115,9 @@
       }
     },
     methods: {
+      setName(scope) {
+        return scope.row.name || scope.row.nick || scope.row.mobile || scope.row._id;
+      },
       see(obj) {
         this.$router.push({
           path: this.path + "/" + obj.value.row._id
@@ -167,21 +168,12 @@
             curdType: "find"
           });
         } catch (error) {}
-      },
-      async getCompany() {
-        try {
-          this.companyArr = await this.$api.curd({
-            model: "company",
-            curdType: "find"
-          });
-        } catch (error) {}
       }
     },
     async created() {
       this.loadingText = "加载中";
       await this.getBrand();
       await this.getCategory();
-      // await this.getCompany();
       if (!this.sys) {
         this.disabled = true;
         this.companyData = this.company;

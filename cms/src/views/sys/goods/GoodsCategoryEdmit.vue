@@ -22,7 +22,6 @@ export default {
   },
   methods: {
     async sub(val) {
-      console.log(val);
       try {
         let data = {
           model: "category",

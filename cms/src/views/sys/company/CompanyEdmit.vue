@@ -107,7 +107,6 @@
       },
       shipObj: {
         handler(val) {
-          console.log("shipObj", val);
           this.disabled = false;
           this.shipIo = true;
         },
@@ -153,7 +152,6 @@
               },
               update: companyOp
             });
-            console.log(this.removeList);
             for (let index = 0; index < this.removeList.length; index++) {
               let delRole = await this.$api.curd({
                 model: 'role',
@@ -278,7 +276,6 @@
               this.show = true;
             }
           } catch (error) {
-            console.log(error);
           }
           this.loadingText = "";
         }
@@ -365,9 +362,6 @@
         } else {
           this.$set(this.startShipObj, "ship", []);
         }
-      },
-      test() {
-        console.log(this.companyArr);
       }
     },
     async created() {

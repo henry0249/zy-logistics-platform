@@ -61,10 +61,4 @@
 </script>
 
 <style scoped>
-  .my-card {
-    width: 49%;
-    max-height: 250px;
-    background: #ccc;
-    overflow: auto;
-  }
 </style>
