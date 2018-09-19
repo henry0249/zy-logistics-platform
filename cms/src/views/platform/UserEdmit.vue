@@ -14,7 +14,7 @@
       </div>
       <div class="tr jb" style="margin-top:30px">
         <div>
-          <el-button size="small" @click="$router.push({path:`/platform/user_account_edmit/${$route.params._id}`})">账户管理</el-button>
+          <el-button size="small" @click="$router.push({path:`/platform/user_account_edit/${$route.params._id}`})">账户管理</el-button>
         </div>
         <div>
           <el-button size="small" @click="back()">返 回</el-button>

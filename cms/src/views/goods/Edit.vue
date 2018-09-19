@@ -1,5 +1,5 @@
 <template>
-  <goods-edmit-item :sys="false"></goods-edmit-item>
+  <goods-edit-item :sys="false"></goods-edit-item>
 </template>
 
 <script>

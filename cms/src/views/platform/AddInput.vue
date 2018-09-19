@@ -8,7 +8,7 @@
       </p>
       <p style="background:#f0f2f5;border-radius: 4px;padding: 0 5px;margin-left:5px;" v-if="newsValue.length > 1">+ {{newsValue.length - 1}}</p>
     </div>
-    <el-button style="margin-left:10px;" size="mini" class="button-new-tag" @click="edmit">编辑</el-button>
+    <el-button style="margin-left:10px;" size="mini" class="button-new-tag" @click="edit">编辑</el-button>
     <el-dialog width="70%" :visible.sync="dialogVisible">
       <dialog-item :tagValue.sync="newsValue" :loadingText.sync="loadingText" :thead="thead" :dialogVisible.sync="dialogVisible" v-model="io"></dialog-item>
       <div slot="footer" class="dialog-footer">
@@ -97,7 +97,7 @@
           this.value = {}
         }
       },
-      edmit() {
+      edit() {
         this.dialogVisible = true
       }
     },

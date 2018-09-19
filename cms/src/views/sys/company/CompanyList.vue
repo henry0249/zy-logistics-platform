@@ -109,7 +109,7 @@
       },
       see(val) {
         this.$router.push({
-          path: '/sys/company/edmit/' + val.value.row._id
+          path: '/sys/company/edit/' + val.value.row._id
         })
       }
     }

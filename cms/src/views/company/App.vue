@@ -29,7 +29,7 @@
         nav: [{
             name: '公司详情',
             icon: 'icon-xiangqing',
-            path: '/company/edmit'
+            path: '/company/edit'
           }
         ]
       };

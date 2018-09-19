@@ -110,7 +110,7 @@
       op(val) {
         console.log(val);
         this.$router.push({
-          path: `/platform/company_edmit/${val.row._id}`,
+          path: `/platform/company_edit/${val.row._id}`,
         })
       },
       async getData(data) {

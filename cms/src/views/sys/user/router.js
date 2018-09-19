@@ -17,7 +17,7 @@ export default [{
     path:'add',
     component:UserAdd
   },{
-    path:'edmit/:_id',
+    path:'edit/:_id',
     component:UserEdmit
   }]
 }]

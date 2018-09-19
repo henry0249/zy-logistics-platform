@@ -6,7 +6,7 @@
           <strong>{{type === 'add'?'用户添加':'用户详情'}}</strong>
         </div>
         <common-alert style="margin:15px 0">用户信息</common-alert>
-        <user-edmit-item-form v-if="!value" :data.sync="userData" :startData="startUserData" :type="type"></user-edmit-item-form>
+        <user-edit-item-form v-if="!value" :data.sync="userData" :startData="startUserData" :type="type"></user-edit-item-form>
       </div>
       <div class="tr" style="margin-top:30px">
         <el-button size="small" @click="$router.go(-1)">返 回</el-button>
@@ -96,7 +96,7 @@ export default {
         try {
           if (this.type === "add") {
             this.$emit("input", "添加中");
-          } else if (this.type === "edmit") {
+          } else if (this.type === "edit") {
             this.$emit("input", "更新中");
           }
           let op = {
@@ -127,7 +127,7 @@ export default {
               }
             }
             this.$set(op, "curdType", "set");
-          } else if (this.type === "edmit") {
+          } else if (this.type === "edit") {
             Object.assign(op, {
               find: {
                 _id: this.$route.params._id
@@ -171,7 +171,7 @@ export default {
     }
   },
   created() {
-    if (this.type === "edmit") {
+    if (this.type === "edit") {
       this.userData = JSON.parse(JSON.stringify(this.startData));
       for (const key in this.startUserData) {
         this.$set(this.startUserData, key, this.startData[key]);
@@ -192,7 +192,7 @@ export default {
   border: 1px solid #eee;
   border-radius: 4px;
 }
-.edmit-tag {
+.edit-tag {
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;

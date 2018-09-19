@@ -5,7 +5,7 @@
         <strong>运单详情</strong>
       </div>
       <common-alert style="margin:15px 0">运单信息</common-alert>
-      <logistics-edmit-item v-if="!loadingText" :data.sync="logisticsData" :initialData="logisticsInitialData"></logistics-edmit-item>
+      <logistics-edit-item v-if="!loadingText" :data.sync="logisticsData" :initialData="logisticsInitialData"></logistics-edit-item>
       <common-alert v-if="!loadingText" style="margin:15px 0">订单信息({{logisticsInitialData.order.type==='company'?'公司订单':'个人订单'}})</common-alert>
     </div>
     <div class="tr" style="margin-top:30px">

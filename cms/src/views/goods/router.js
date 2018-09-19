@@ -6,7 +6,7 @@ import BrandEdmit from './BrandEdmit.vue';
 import GoodsCategory from './GoodsCategory.vue';
 import CategoryAdd from './CategoryAdd.vue';
 import CategoryEdmit from './CategoryEdmit.vue';
-import Edmit from './Edmit.vue';
+import Edit from './Edit.vue';
 import brandAdd from './brandAdd.vue';
 import test from './test.vue';
 
@@ -27,7 +27,7 @@ export default [{
     path: 'category_add',
     component: CategoryAdd
   },{
-    path: 'category_edmit/:_id',
+    path: 'category_edit/:_id',
     component: CategoryEdmit
   },{
     path: 'brand',
@@ -36,11 +36,11 @@ export default [{
     path: 'brand_add',
     component: brandAdd
   },{
-    path: 'brand_edmit/:_id',
+    path: 'brand_edit/:_id',
     component: BrandEdmit
   },{
-    path: 'edmit/:_id',
-    component: Edmit
+    path: 'edit/:_id',
+    component: Edit
   },{
     path: 'test',
     component: test

@@ -6,7 +6,7 @@
           <strong>添加公司</strong>
         </div>
         <common-alert style="margin:15px 0">公司信息</common-alert>
-        <company-edmit-item v-if="!loadingText" type="add" v-model="loadingText" :data.sync="companyArr"></company-edmit-item>
+        <company-edit-item v-if="!loadingText" type="add" v-model="loadingText" :data.sync="companyArr"></company-edit-item>
         <common-alert style="margin:15px 0">公司角色</common-alert>
         <common-company-role :data.sync="roleArr" :removeList="removeList"></common-company-role>
         <common-alert style="margin:15px 0">{{isLogistics?'车船信息':'车船信息 (该公司不是物流公司，无车船信息)'}}</common-alert>

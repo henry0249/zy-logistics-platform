@@ -32,7 +32,7 @@
     props: {
       type: {
         type: String,
-        default: "edmit"
+        default: "edit"
       },
       startRoleObj: {
         type: Object,
@@ -139,7 +139,7 @@
               }
             }
           }
-          if (this.type === "edmit") {
+          if (this.type === "edit") {
             let op =
               oldVal.admin.length === 0 &&
               oldVal.salesman.length === 0 &&
@@ -278,7 +278,7 @@
         document.documentElement.clientHeight * 0.7 - 114 - 58 + "px";
     },
     async created() {
-      if (this.type === "edmit") {
+      if (this.type === "edit") {
         this.roleArr = JSON.parse(JSON.stringify(this.startRoleObj));
       }
     }

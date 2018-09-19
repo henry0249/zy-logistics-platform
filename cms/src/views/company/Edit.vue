@@ -1,5 +1,5 @@
 <template>
-  <company-edmit :sys="false"></company-edmit>
+  <company-edit :sys="false"></company-edit>
 </template>
 
 <script>

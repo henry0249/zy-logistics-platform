@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="loadingText">
-    <goods-brand-edmit-item :sys="sys" v-if="!loadingText" @sub="sub" type="edmit" :startData="startData" :categoryArr="categoryArr"></goods-brand-edmit-item>
+    <goods-brand-edit-item :sys="sys" v-if="!loadingText" @sub="sub" type="edit" :startData="startData" :categoryArr="categoryArr"></goods-brand-edit-item>
   </loading-box>
 </template>
 

@@ -1,6 +1,6 @@
 import App from './App.vue';
 import StockList from './StockList.vue';
-import Edmit from './Edmit.vue';
+import Edit from './Edit.vue';
 import Stock from './Stock.vue';
 import Add from './AddStock.vue';
 import StockReadyList from './StockReadyList.vue';
@@ -22,7 +22,7 @@ export default [{
     path: 'ready_list',
     component: StockReadyList
   },{
-    path: 'edmit',
-    component: Edmit
+    path: 'edit',
+    component: Edit
   }]
 } ]

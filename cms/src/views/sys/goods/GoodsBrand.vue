@@ -102,9 +102,9 @@
         }
       },
       see(val) {
-        let path = '/sys/goods/brand_edmit/';
+        let path = '/sys/goods/brand_edit/';
         if (!this.sys) {
-          path = '/goods/brand_edmit/';
+          path = '/goods/brand_edit/';
         }
         this.$router.push({
           path: path + val.row._id

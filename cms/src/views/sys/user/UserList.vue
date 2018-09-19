@@ -39,7 +39,7 @@
       },
       see(val) {
         this.$router.push({
-          path: "/sys/user/edmit/" + val.row._id
+          path: "/sys/user/edit/" + val.row._id
         });
       },
       inputChange(val) {

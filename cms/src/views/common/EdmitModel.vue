@@ -1,8 +1,8 @@
 <template>
-  <div class="edmit-box">
-    <div class="edmit-list-box">
-      <div class="edmit-span-box" v-for="item in keyArr" :key="item.id">
-        <span class="edmit-span">{{item.keyValue}}</span>
+  <div class="edit-box">
+    <div class="edit-list-box">
+      <div class="edit-span-box" v-for="item in keyArr" :key="item.id">
+        <span class="edit-span">{{item.keyValue}}</span>
         <el-input v-if="item.type == 'input'" v-model="item.value" :placeholder="`请输入${item.keyValue}`" style="width:222px;"></el-input>
         <el-select v-else-if="item.type == 'select'" v-model="item.value" :placeholder="'请选择'+item.keyValue" style="width:222px;">
           <el-option v-for="v in item.options" :key="v.id" :label="v.label" :value="v.value">
@@ -25,7 +25,7 @@
         </el-switch>
       </div>
     </div>
-    <div class="edmit-btm-box">
+    <div class="edit-btm-box">
       <el-button style="float:right" size="mini" type="success">提交修改</el-button>
     </div>
   </div>
@@ -88,25 +88,25 @@
 </script>
 
 <style scoped>
-  .edmit-box {
+  .edit-box {
     width: 100%;
     max-height: calc(85vh - 190px);
     overflow: auto;
   }
-  .edmit-list-box {
+  .edit-list-box {
     width: 100%;
     max-height: calc(100% - 30px);
     overflow: auto;
   }
-  .edmit-span-box {
+  .edit-span-box {
     float: left;
   }
-  .edmit-span {
+  .edit-span {
     width: 100%;
     display: block;
     float: left;
   }
-  .edmit-btm-box {
+  .edit-btm-box {
     width: 100%;
     height: 30px
   }

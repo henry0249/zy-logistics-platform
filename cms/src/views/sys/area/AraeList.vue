@@ -41,7 +41,7 @@
     methods: {
       see(val){
         this.$router.push({
-          path:'/sys/area/edmit/' + val.row._id
+          path:'/sys/area/edit/' + val.row._id
         })
       }
     },

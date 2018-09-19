@@ -22,7 +22,7 @@
       <common-multi-selection label="所在区域" :data.sync="userData.area" border title="所在区域" area size="mini"></common-multi-selection>
     </div>
     <div class="flex jb" style="margin-top:15px;">
-      <div class="flex jc js edmit-tag" style="flex:0 0 25%;">
+      <div class="flex jc js edit-tag" style="flex:0 0 25%;">
         <div style="width:60px;fontSize:12px;">标签</div>
         <el-tag size="mini" style="margin-right:10px;" :key="tag" v-for="tag in userData.tag" closable :disable-transitions="false" @close="handleClose(tag)">
           {{tag}}
@@ -78,7 +78,7 @@
         handler(val, oldVal) {
           if (this.type === "add") {
             this.$emit("update:data", val);
-          } else if (this.type === "edmit") {
+          } else if (this.type === "edit") {
             if (oldVal._id) {
               this.$emit("update:data", val);
             }
@@ -107,7 +107,7 @@
       }
     },
     created() {
-      if (this.type === "edmit") {
+      if (this.type === "edit") {
         this.userData = JSON.parse(JSON.stringify(this.startData));
       }
     }

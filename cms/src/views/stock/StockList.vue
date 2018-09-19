@@ -24,7 +24,7 @@
     methods: {
       sub(scope) {
         this.$router.push({
-          path: '/stock/edmit',
+          path: '/stock/edit',
           query: {
             type: scope.row.type,
             _id: scope.row._id,

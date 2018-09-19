@@ -30,7 +30,7 @@
       },
       path: {
         type: String,
-        default: "/sys/goods/edmit"
+        default: "/sys/goods/edit"
       },
       thead: {
         type: Object,

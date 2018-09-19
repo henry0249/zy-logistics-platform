@@ -9,7 +9,7 @@
         </p>
         <p ref="length" style="background:#f0f2f5;border-radius: 4px;padding: 0 5px;margin-left:5px;" v-if="newsValue.length > 1">+ {{newsValue.length - 1}}</p>
       </div>
-      <i style="margin-left:10px;color:#409EFF" size="mini" class="button-new-tag el-icon-edit pointer" @click="edmit"></i>
+      <i style="margin-left:10px;color:#409EFF" size="mini" class="button-new-tag el-icon-edit pointer" @click="edit"></i>
     </div>
     <el-dialog @close="close" :top="top" width="70%" :visible.sync="dialogVisible">
       <dialog-item v-if="dialogVisible" :op="op" :io="io" :label="label" :newsValue="newsValue" :startValue.sync="startValue" :thead="thead" :dialogVisible.sync="dialogVisible" :admin="value"></dialog-item>
@@ -102,7 +102,7 @@
         console.log('del');
         this.newsValue.splice(0, 1);
       },
-      edmit() {
+      edit() {
         this.dialogVisible = true
       },
     },

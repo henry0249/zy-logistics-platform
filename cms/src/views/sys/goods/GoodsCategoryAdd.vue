@@ -1,7 +1,7 @@
 <template>
   <loading-box v-model="loadingText">
-    <goods-category-edmit-item @sub="sub" haveParent :parentCategoryArr="parentCategoryArr">
-    </goods-category-edmit-item>
+    <goods-category-edit-item @sub="sub" haveParent :parentCategoryArr="parentCategoryArr">
+    </goods-category-edit-item>
   </loading-box>
 </template>
 

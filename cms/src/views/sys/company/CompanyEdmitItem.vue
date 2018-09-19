@@ -28,7 +28,7 @@
     props: {
       type: {
         type: String,
-        default: "edmit"
+        default: "edit"
       },
       show: {
         type: Boolean,
@@ -113,7 +113,7 @@
           roleDate[key] = [];
         }
       }
-      if (this.type === "edmit") {
+      if (this.type === "edit") {
         this.roleDate = JSON.parse(JSON.stringify(roleDate));
         this.companyData = JSON.parse(JSON.stringify(companyData));
       }

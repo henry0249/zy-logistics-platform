@@ -33,7 +33,7 @@
             </div>
           </div>
           <div class="jb" style="margin-top:20px;">
-            <div class="flex edmit-tag">
+            <div class="flex edit-tag">
               <span style="width:60px;font-size: 12px;">标签</span>
               <el-tag size="mini" style="margin-right:10px;" :type="tagType(index,goods.tag)" :key="tag" v-for="(tag,index) in goods.tag" closable :disable-transitions="false" @close="handleClose(goods.tag,tag)">
                 {{tag}}
@@ -366,7 +366,7 @@ export default {
   border: 1px solid #eee;
   border-radius: 4px;
 }
-.edmit-tag {
+.edit-tag {
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;

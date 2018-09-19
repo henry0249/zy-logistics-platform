@@ -1,6 +1,6 @@
 <template>
   <loading-box>
-    <logistics-edmit-item @sub="sub"></logistics-edmit-item>
+    <logistics-edit-item @sub="sub"></logistics-edit-item>
   </loading-box>
 </template>
 

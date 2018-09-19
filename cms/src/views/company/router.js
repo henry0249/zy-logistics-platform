@@ -1,12 +1,12 @@
 import App from './App.vue';
-import Edmit from './Edmit.vue';
+import Edit from './Edit.vue';
 
 export default [{
   path: '/company',
-  redirect: '/company/edmit',
+  redirect: '/company/edit',
   component: App,
   children: [{
-    path: 'edmit',
-    component: Edmit
+    path: 'edit',
+    component: Edit
   }]
 }]

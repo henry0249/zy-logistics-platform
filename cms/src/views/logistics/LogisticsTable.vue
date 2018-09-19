@@ -96,7 +96,7 @@
       goEdmit(val) {
         console.log(val.row._id);
         this.$router.push({
-          path: '/logistics/edmit/' + val.row._id,
+          path: '/logistics/edit/' + val.row._id,
         });
       },
       setArea(val) {

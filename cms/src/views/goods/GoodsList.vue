@@ -1,5 +1,5 @@
 <template>
-  <goods-list :sys="false" path="/goods/edmit">
+  <goods-list :sys="false" path="/goods/edit">
   </goods-list>
 </template>
 

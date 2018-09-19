@@ -1,6 +1,6 @@
 <template>
   <div>
-    <category-edmit :sys="false"></category-edmit>
+    <category-edit :sys="false"></category-edit>
   </div>
 </template>
 

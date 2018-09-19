@@ -1,6 +1,6 @@
 <template>
   <div>
-    <goods-brand-edmit :sys="false"></goods-brand-edmit>
+    <goods-brand-edit :sys="false"></goods-brand-edit>
   </div>
 </template>
 

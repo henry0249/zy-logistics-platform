@@ -43,10 +43,10 @@ export default [{
     path: 'transferAdd',
     component: TransferAdd
   }, {
-    path: 'company_edmit/:_id',
+    path: 'company_edit/:_id',
     component: CompanyEdmit
   }, {
-    path: 'user_edmit/:_id',
+    path: 'user_edit/:_id',
     component: UserEdmit
   }, {
     path: 'company_add',
@@ -55,7 +55,7 @@ export default [{
     path: 'user_add',
     component: UserAdd
   }, {
-    path: 'user_account_edmit/:_id',
+    path: 'user_account_edit/:_id',
     component: UserAccountEdmit
   }, {
     path: 'test',

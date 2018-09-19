@@ -89,7 +89,7 @@
         handler(val) {
           if (!this.sys) {
             this.$set(this.brandData, 'company', val);
-            if (this.type === 'edmit') {
+            if (this.type === 'edit') {
               this.$router.push({path:'/goods/brand'})
             }
           }
@@ -120,7 +120,7 @@
       }
     },
     created() {
-      if (this.type === 'edmit') {
+      if (this.type === 'edit') {
         this.brandData = JSON.parse(JSON.stringify(this.startData));
       }
       if (!this.sys) {

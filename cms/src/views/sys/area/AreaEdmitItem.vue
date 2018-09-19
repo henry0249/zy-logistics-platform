@@ -29,7 +29,7 @@
     props: {
       type: {
         type: String,
-        default: "edmit"
+        default: "edit"
       },
       data: {
         type: Object,

@@ -59,7 +59,7 @@
       },
       op(val) {
         this.$router.push({
-          path: `/platform/user_edmit/${val}`
+          path: `/platform/user_edit/${val}`
         })
       },
       async test() {

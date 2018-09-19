@@ -72,9 +72,9 @@
         }
       },
       see(val) {
-        let data = '/sys/goods/category_edmit/';
+        let data = '/sys/goods/category_edit/';
         if (!this.sys) {
-          data = '/goods/category_edmit/'
+          data = '/goods/category_edit/'
         }
         this.$router.push({
           path: data + val.row._id

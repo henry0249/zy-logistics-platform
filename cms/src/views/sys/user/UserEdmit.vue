@@ -1,6 +1,6 @@
 <template>
-  <user-edmit-item v-if="!loadingText" type="edmit" :startData="startData" v-model="loadingText">
-  </user-edmit-item>
+  <user-edit-item v-if="!loadingText" type="edit" :startData="startData" v-model="loadingText">
+  </user-edit-item>
 </template>
 
 <script>

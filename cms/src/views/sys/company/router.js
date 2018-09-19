@@ -1,6 +1,6 @@
 import App from './App.vue';
 import List from './CompanyList.vue';
-import Edmit from './CompanyEdmit.vue';
+import Edit from './CompanyEdmit.vue';
 import CompanyAdd from './CompanyAdd.vue';
 
 export default [{
@@ -14,8 +14,8 @@ export default [{
     path:'list',
     component:List
   },{
-    path:'edmit/:_id',
-    component:Edmit
+    path:'edit/:_id',
+    component:Edit
   },{
     path:'add',
     component:CompanyAdd

@@ -1,5 +1,5 @@
 <template>
-  <user-edmit-item></user-edmit-item>
+  <user-edit-item></user-edit-item>
 </template>
 
 <script>

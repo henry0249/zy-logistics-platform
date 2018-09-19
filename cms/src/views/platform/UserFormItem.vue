@@ -9,7 +9,7 @@
     <div class="flex form-box" style="margin-top:20px;">
       <my-form-item width="25%" class="form-right" size="mini" label="平台" multiple collapse-tags select v-model="obj.platform"  :options="platformArr"></my-form-item>
       <my-form-item width="25%" class="form-right" size="mini" label="公司" multiple collapse-tags select v-model="obj.company"  :options="companyArr"></my-form-item>
-      <div class="flex edmit-tag" style="flex:0 0 25%;">
+      <div class="flex edit-tag" style="flex:0 0 25%;">
         <div style="width:60px;fontSize:12px;">标签</div>
         <el-tag size="mini" style="margin-right:10px;" :key="tag" v-for="tag in obj.tag" closable :disable-transitions="false" @close="handleClose(obj.tag,tag)">
           {{tag}}
@@ -191,7 +191,7 @@
     justify-content: flex-start;
     align-items: center;
   }
-  .edmit-tag {
+  .edit-tag {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;

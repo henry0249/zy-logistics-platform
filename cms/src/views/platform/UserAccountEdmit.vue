@@ -5,7 +5,7 @@
         <div v-if="!loadingText" class="flex ac jc" style="font-size:22px;padding-bottom:20px">
           <strong>账户管理</strong>
         </div>
-        <user-account-edmit-item v-if="!loadingText" :accountValue="value" @recharge="recharge" :data="data" :accountObj.sync="accountObj"></user-account-edmit-item>
+        <user-account-edit-item v-if="!loadingText" :accountValue="value" @recharge="recharge" :data="data" :accountObj.sync="accountObj"></user-account-edit-item>
       </div>
       <div class="je" style="margin-top:20px;">
         <el-button size="small" type="primary" @click="sub">修 改</el-button>

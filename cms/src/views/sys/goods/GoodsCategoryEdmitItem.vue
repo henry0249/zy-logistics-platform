@@ -69,7 +69,7 @@ export default {
     }
   },
   created() {
-    if (this.type === "edmit") {
+    if (this.type === "edit") {
       this.categoryData = JSON.parse(JSON.stringify(this.startData));
     }
   }

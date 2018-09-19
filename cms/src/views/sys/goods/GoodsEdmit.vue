@@ -1,5 +1,5 @@
 <template>
-  <goods-edmit-item></goods-edmit-item>
+  <goods-edit-item></goods-edit-item>
 </template>
 
 <script>

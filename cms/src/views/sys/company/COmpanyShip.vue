@@ -23,7 +23,7 @@
     props: {
       type: {
         type: String,
-        default: "edmit"
+        default: "edit"
       },
       removeObj: {
         type: Object,
@@ -172,7 +172,7 @@
       }
     },
     async created() {
-      if (this.type === 'edmit') {
+      if (this.type === 'edit') {
         this.truckData = JSON.parse(JSON.stringify(this.startData.truck));
         this.shipData = JSON.parse(JSON.stringify(this.startData.ship));
       }

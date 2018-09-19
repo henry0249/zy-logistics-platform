@@ -1,7 +1,7 @@
 <template>
   <loading-box v-model="loadingText">
     <div class="g-order-create">
-      <company-edmit-item :companyType="type" :ship="ship" :truck="truck" :platformArr="platformArr" :loadingText.sync="loadingText" @sub="sub" :data="data"></company-edmit-item>
+      <company-edit-item :companyType="type" :ship="ship" :truck="truck" :platformArr="platformArr" :loadingText.sync="loadingText" @sub="sub" :data="data"></company-edit-item>
     </div>
   </loading-box>
 </template>
