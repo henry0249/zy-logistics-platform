@@ -8,7 +8,6 @@ import CategoryAdd from './CategoryAdd.vue';
 import CategoryEdit from './CategoryEdit.vue';
 import Edit from './Edit.vue';
 import brandAdd from './brandAdd.vue';
-import test from './test.vue';
 
 export default [{
   path: '/goods',
@@ -41,8 +40,5 @@ export default [{
   },{
     path: 'edit/:_id',
     component: Edit
-  },{
-    path: 'test',
-    component: test
   }]
 }]

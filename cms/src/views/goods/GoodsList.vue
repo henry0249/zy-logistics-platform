@@ -17,7 +17,6 @@ export default {
   watch: {
     option: {
       handler(val) {
-        console.log(val);
         this.show = true;
         setTimeout(() => {
           this.show = false;
