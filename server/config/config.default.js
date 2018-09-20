@@ -10,7 +10,7 @@ module.exports = appInfo => {
   //登录有效时长
   config.loginExp = 24 * 60 * 60 * 1000;
   //token有效时长
-  config.tokenExp = 1 * 1 * 60 * 1000;
+  config.tokenExp = 1 * 60 * 60 * 1000;
 
   // 中间件配置
   config.middleware = ['errorHandler'];

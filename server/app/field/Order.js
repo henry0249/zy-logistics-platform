@@ -22,9 +22,9 @@ module.exports = {
       distributionFinishCheck: '配送完成审核',
       beforeSettleCheck: '结算前审核',
       //财务结算环节
-      financialPretrial:'订单预审',
-      accountSettlement:'账户结算',
-      accountConfirmation:'账款确认',
+      financialPretrial: '订单预审',
+      accountSettlement: '账户结算',
+      accountConfirmation: '账款确认',
       finish: '订单完成',
       delete: '已删除'
     },
@@ -161,5 +161,13 @@ module.exports = {
   temporaryBrokerBonus: {
     name: '临时经纪人提成',
     type: 'Number',
+  },
+  settlePrice: {
+    name: '结算金额',
+    type: 'Number'
+  },
+  settleNum: {
+    name: '结算数量',
+    type: 'Number'
   }
 }

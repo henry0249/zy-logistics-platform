@@ -73,6 +73,10 @@ export default {
     searchSlot: {
       type: Boolean,
       default: true
+    },
+    currentCompany: {
+      type: String,
+      default: ""
     }
   },
   data() {
@@ -114,6 +118,9 @@ export default {
         if (this.showCompany) {
           body.handle = this.activeCompany;
         }
+        if (this.currentCompany) {
+          body.company = this.currentCompany;
+        }
         this.data = await this.$ajax.post(this.path, body);
       } catch (error) {}
       this.loadingText = "";
@@ -128,6 +135,10 @@ export default {
       if (this.showCompany) {
         body.handle = this.activeCompany;
       }
+      if (this.currentCompany) {
+        body.company = this.currentCompany;
+      }
+      
       return await this.$ajax.post(this.path, body);
     },
     async search() {
