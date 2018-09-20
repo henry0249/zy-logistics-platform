@@ -15,21 +15,13 @@
             </el-card>
           </div>
         </div>
-        <el-alert style="margin-top:15px" :title="isCheck?'商品信息(盘点是更新各个商品的库存)':'商品信息'" type="info" :closable="false">
-        </el-alert>
-        <my-form size="mini" v-if="!isCheck" width="30%">
-          <div class="flex ac jb" style="margin-top:15px">
-            <my-form-item @change="goodsChange" label="商品名" v-model="goodsSelect" select :options="goods"></my-form-item>
-            <my-form-item label="库存" size="mini" v-if="goodsSelect" v-model="goodsObj.stock" number :min="0"></my-form-item>
-            <my-form-item label="所属品牌" disabled v-if="goodsSelect" v-model="goodsObj.brand.name" input></my-form-item>
+        <common-alert style="margin-top:15px;">
+          <div class="jc jb" style="width:100%">
+            <div>商品信息</div>
+            <el-button v-if="isCheck" type="success" size="mini" @click="checkAllGoods">盘点所有商品</el-button>
           </div>
-          <div class="flex ac jb" style="margin-top:15px">
-            <my-form-item label="所属分类" disabled v-if="goodsSelect" v-model="goodsObj.category.name" input></my-form-item>
-            <my-form-item label="单位" disabled input v-if="goodsSelect" v-model="goodsObj.unit"></my-form-item>
-            <my-form-item label="状态" disabled input v-if="goodsSelect" v-model="goodsObj.saleState"></my-form-item>
-          </div>
-        </my-form>
-        <goods-list style="margin-top:15px;" v-else :initData="goods" :data.sync="goodsData"></goods-list>
+        </common-alert>
+        <goods-list style="margin-top:15px;" :type="form.type" :checkAll.sync="checkAll" :data.sync="goodsData"></goods-list>
         <el-alert style="margin-top:15px" title="库存单信息" type="info" :closable="false">
         </el-alert>
         <my-form size="small" width="49%">
@@ -66,18 +58,6 @@
         type: String,
         default: ''
       },
-      goods: {
-        type: Array,
-        default () {
-          return [];
-        }
-      },
-      data: {
-        type: Object,
-        default () {
-          return {};
-        }
-      },
       val: {
         type: Object,
         default () {
@@ -91,9 +71,8 @@
     },
     data() {
       return {
-        isCheck: false,
+        checkAll: false,
         goodsData: [],
-        goodsSelect: '',
         goodsObj: {},
         loadingText: "",
         form: {
@@ -102,8 +81,6 @@
           name: "",
           remake: ""
         },
-        typeObj: {},
-        option: {},
       };
     },
     watch: {
@@ -126,40 +103,22 @@
       },
       "form.type" (val) {
         this.setName();
-        if (val === 'check') {
-          this.isCheck = true;
-        } else {
-          this.isCheck = false;
-        }
       },
-      goodsObj: {
-        handler(val) {
-          this.setName();
-        },
-        deep: true
-      }
     },
     computed: {
+      isCheck() {
+        return this.form.type === 'check';
+      },
       typeText() {
         return this.field.Stock.type.option[this.form.type] || "未知类型";
-      }
+      },
     },
     methods: {
+      checkAllGoods() {
+        this.checkAll = true;
+      },
       changeKey(key) {
         this.form.type = key
-      },
-      goodsChange(val) {
-        this.goods.forEach(item => {
-          if (val === item._id) {
-            this.$set(this.goodsObj, 'brand', item.brand);
-            this.$set(this.goodsObj, 'category', item.category);
-            this.$set(this.goodsObj, 'name', item.name);
-            this.$set(this.goodsObj, 'unit', item.unit);
-            this.$set(this.goodsObj, 'stock', item.stock);
-            this.$set(this.goodsObj, 'saleState', this.field.Goods.saleState.option[item.saleState]);
-          }
-        });
-        this.$emit('update:goodsId', val);
       },
       setName() {
         let date = this.formatTime(new Date(), "YYYY年MM月DD日A");
@@ -172,21 +131,34 @@
         }
       },
       submit() {
-        this.form.company = this.company._id;
-        this.$emit("submit", {
-          stock: this.form,
-          goods: this.goodsData.length > 0 ? this.goodsData : this.goodsObj
-        });
+        if (this.checkMethods()) {
+          let data = [];
+          this.form.company = this.company._id;
+          this.goodsData.forEach(item => {
+            let obj = JSON.parse(JSON.stringify(this.form));
+            this.$set(obj,'goods',item._id);
+            this.$set(obj,'num',item.key);
+            data.push(obj);
+          });
+          this.$emit("submit", data);
+        }
       },
-      checkMethods(data) {
+      checkMethods() {
         let check = true;
-        if (this.goodsObj.stock <= 0 && this.goodsData.length === 0) {
-          this.$message.warn('数量必须大于0');
-          check = false;
-        } else if (!(Object.keys(this.goodsObj).length > 0 || this.goodsData.length > 0)) {
+        if (this.goodsData.length === 0) {
           this.$message.warn('必须选择商品');
           check = false;
         }
+        this.goodsData.forEach(item => {
+          if (!item._id) {
+            this.$message.warn('必须选择商品');
+            check = false;
+          }
+          if (!item.key) {
+            this.$message.warn(`${this.field.Stock.type.option[this.form.type]}数量必须大于0`);
+            check = false;
+          }
+        });
         return check;
       }
     },

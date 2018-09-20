@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import UserEditItem from './UserEditItem';
+import UserEditItem from './UserEditItem.vue';
   export default {
     components: {
       UserEditItem

@@ -17,122 +17,92 @@
 </template>
 
 <script>
-import UserEditItemForm from "./UserEditItemForm.vue";
-export default {
-  components: {
-    UserEditItemForm
-  },
-  props: {
-    value: {
-      type: String,
-      default: ""
+  import UserEditItemForm from "./UserEditItemForm.vue";
+  export default {
+    components: {
+      UserEditItemForm
     },
-    type: {
-      type: String,
-      default: "add"
-    },
-    startData: {
-      type: Object,
-      default() {
-        return {};
-      }
-    },
-    data: {
-      type: Object,
-      default() {
-        return {};
-      }
-    }
-  },
-  data() {
-    return {
-      // value: "",
-      disabled: true,
-      userData: {},
-      startUserData: {
-        name: "",
-        mobile: "",
-        type: "",
-        email: "",
-        area: [],
-        address: "",
-        recommendedByUser: {},
-        superior: {},
-        parent: {},
-        tag: []
-      }
-    };
-  },
-  watch: {
-    userData: {
-      handler(val, oldVal) {
-        this.disabled = false;
+    props: {
+      value: {
+        type: String,
+        default: ""
       },
-      deep: true
-    }
-  },
-  methods: {
-    checkMethods() {
-      let subIo = true;
-      if (!this.userData.name) {
-        this.$alert("名字是必填的", "提示", {
-          confirmButtonText: "确定",
-          callback: action => {
-            subIo = false;
-          }
-        });
-      } else if (!this.userData.mobile) {
-        this.$alert("手机号是必填的", "提示", {
-          confirmButtonText: "确定",
-          callback: action => {
-            subIo = false;
-          }
-        });
+      type: {
+        type: String,
+        default: "add"
+      },
+      startData: {
+        type: Object,
+        default () {
+          return {};
+        }
+      },
+      data: {
+        type: Object,
+        default () {
+          return {};
+        }
+      },
+      sys: {
+        type: Boolean,
+        default: true
       }
-      return subIo;
     },
-    async sub() {
-      if (this.checkMethods()) {
-        try {
-          if (this.type === "add") {
-            this.$emit("input", "添加中");
-          } else if (this.type === "edit") {
-            this.$emit("input", "更新中");
-          }
-          let op = {
-            model: "user",
-            curdType: "update"
-          };
-          // let res;
-          if (this.type === "add") {
-            Object.assign(op, {
-              name: this.userData.name,
-              mobile: this.userData.mobile,
-              type: this.userData.type,
-              email: this.userData.email,
-              tag: this.userData.tag,
-              recommendedByUser: this.userData.recommendedByUser._id,
-              superior: this.userData.superior._id,
-              parent: this.userData.parent._id
-            });
-            if (this.userData.area.length > 0) {
-              op.area = [];
-              this.userData.area.forEach(areaItem => {
-                op.area.push(areaItem._id);
-              });
+    data() {
+      return {
+        disabled: true,
+        userData: {},
+        startUserData: {
+          name: "",
+          mobile: "",
+          type: "",
+          email: "",
+          area: [],
+          address: "",
+          recommendedByUser: {},
+          superior: {},
+          parent: {},
+          tag: []
+        }
+      };
+    },
+    watch: {
+      userData: {
+        handler(val, oldVal) {
+          this.disabled = false;
+        },
+        deep: true
+      }
+    },
+    methods: {
+      checkMethods() {
+        let subIo = true;
+        if (!this.userData.name) {
+          this.$message.warn('名字是必填的');
+          subIo = false;
+        } else if (!this.userData.mobile) {
+          this.$message.warn('手机号是必填的');
+          subIo = false;
+        } else if (!(/^1[34578]\d{9}$/.test(this.userData.mobile))) {
+          this.$message.warn("手机号码格式不正确！");
+          subIo = false;
+        }
+        return subIo;
+      },
+      async sub() {
+        if (this.checkMethods()) {
+          try {
+            if (this.type === "add") {
+              this.$emit("input", "添加中");
+            } else if (this.type === "edit") {
+              this.$emit("input", "更新中");
             }
-            for (const key in op) {
-              if (!op[key]) {
-                delete op[key];
-              }
-            }
-            this.$set(op, "curdType", "set");
-          } else if (this.type === "edit") {
-            Object.assign(op, {
-              find: {
-                _id: this.$route.params._id
-              },
-              update: {
+            let op = {
+              model: "user",
+              curdType: "update"
+            };
+            if (this.type === "add") {
+              Object.assign(op, {
                 name: this.userData.name,
                 mobile: this.userData.mobile,
                 type: this.userData.type,
@@ -141,60 +111,77 @@ export default {
                 recommendedByUser: this.userData.recommendedByUser._id,
                 superior: this.userData.superior._id,
                 parent: this.userData.parent._id
-              }
-            });
-          }
-          let res = await this.$api.curd(op);
-          if (!res) {
-            this.$confirm(`${this.type === 'add'?'添加失败':'更新失败'}`, "提示", {
-              confirmButtonText:  `${this.type === 'add'?'继续添加':'继续修改'}`,
-              cancelButtonText: "返回",
-              type: "warning"
-            })
-              .then(() => {
-                // this.$router.go(0);
-              })
-              .catch(() => {
-                this.$router.go(-1);
               });
-          } else {
-            this.$alert(`${this.type === 'add'?'添加成功':'修改成功'}`, "提示", {
-              confirmButtonText: "确定",
-              callback: action => {
-                this.$router.go(-1);
+              if (this.userData.area.length > 0) {
+                op.area = [];
+                this.userData.area.forEach(areaItem => {
+                  op.area.push(areaItem._id);
+                });
               }
+              for (const key in op) {
+                if (!op[key]) {
+                  delete op[key];
+                }
+              }
+              this.$set(op, "curdType", "set");
+            } else if (this.type === "edit") {
+              Object.assign(op, {
+                find: {
+                  _id: this.$route.params._id
+                },
+                update: {
+                  name: this.userData.name,
+                  mobile: this.userData.mobile,
+                  type: this.userData.type,
+                  email: this.userData.email,
+                  tag: this.userData.tag,
+                  recommendedByUser: this.userData.recommendedByUser._id,
+                  superior: this.userData.superior._id,
+                  parent: this.userData.parent._id
+                }
+              });
+            }
+            let res = await this.$api.curd(op);
+            this.$message.success(`${this.type === 'add'?'添加成功':'更新成功'}`);
+            let path = '/sys/user/list';
+            if (this.sys) {
+              path = '/sys/user/list';
+            } else {
+              // path = '/sys/user/list';
+            }
+            this.$router.push({
+              path
             });
-          }
-        } catch (error) {}
-        this.$emit("input", "");
+          } catch (error) {}
+          this.$emit("input", "");
+        }
+      }
+    },
+    created() {
+      if (this.type === "edit") {
+        this.userData = JSON.parse(JSON.stringify(this.startData));
+        for (const key in this.startUserData) {
+          this.$set(this.startUserData, key, this.startData[key]);
+        }
+        this.$set(this.startUserData, "_id", this.startData._id);
       }
     }
-  },
-  created() {
-    if (this.type === "edit") {
-      this.userData = JSON.parse(JSON.stringify(this.startData));
-      for (const key in this.startUserData) {
-        this.$set(this.startUserData, key, this.startData[key]);
-      }
-      this.$set(this.startUserData, "_id", this.startData._id);
-    }
-  }
-};
+  };
 </script>
 
 <style scoped>
-.g-order-create {
-  padding: 3% 5%;
-}
-.g-order {
-  margin: 0 auto;
-  padding: 30px;
-  border: 1px solid #eee;
-  border-radius: 4px;
-}
-.edit-tag {
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-}
+  .g-order-create {
+    padding: 3% 5%;
+  }
+  .g-order {
+    margin: 0 auto;
+    padding: 30px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+  }
+  .edit-tag {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  }
 </style>
