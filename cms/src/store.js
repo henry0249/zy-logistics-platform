@@ -40,17 +40,14 @@ const store = new Vuex.Store({
       state.orderBadge = data || {};
     },
     setToken(state, data) {
-      if (data.token && data.exp) {
-        localStorage.token = data.token;
-        localStorage.tokenExp = data.exp;
+      if (data) {
+        localStorage.token = data;
       } else {
         localStorage.removeItem('token');
-        localStorage.removeItem('tokenExp');
       }
     },
     logout(state) {
       localStorage.removeItem('token');
-      localStorage.removeItem('tokenExp');
       router.replace('/');
     }
   },

@@ -38,34 +38,34 @@ ajax.interceptors.request.use(async config => {
 }, err => {
   return Promise.reject(err)
 })
+let errCount = 0; //错误计数器,防止错误提示多次弹出
 // 注册响应拦截器
 ajax.interceptors.response.use(response => {
+  errCount = 0;
   if (response.headers.refleshtoken) {
-    store.commit('setToken', {
-      token: response.headers.refleshtoken,
-      exp: response.headers.tokenexp
-    });
+    store.commit('setToken', response.headers.refleshtoken);
     localStorage.token = response.headers.refleshtoken;
-    localStorage.tokenExp = response.headers.tokenexp;
   }
   return Promise.resolve(response.data);
 }, err => {
-  MessageBox.confirm(`${err.response.status}:${err.response.data.message || err.message }`, '提示', {
-    showCancelButton: false,
-    confirmButtonText: err.response.status === 401 ? '重新登录' : '确定',
-    type: 'error',
-    center: true
-  });
-  if (err.response.status === 401) {
-    store.commit('setToken', {
-      token: '',
-      exp: ''
+  errCount++;
+  if (errCount === 1) {
+    MessageBox.confirm(`${err.response.status}:${err.response.data.message || err.message }`, '提示', {
+      showCancelButton: false,
+      confirmButtonText: err.response.status === 401 ? '重新登录' : '确定',
+      type: 'error',
+      center: true
+    }).then((data) => {
+      errCount = 0;
+    }).catch((err) => {
+      errCount = 0;
     });
-    router.replace('/');
-    return Promise.reject(err)
-  }else{
-    return Promise.resolve();
   }
+  if (err.response.status === 401) {
+    store.commit('setToken', '');
+    router.replace('/');
+  }
+  return Promise.reject(err);
 });
 
 export default {

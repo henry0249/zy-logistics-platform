@@ -46,7 +46,7 @@ export default {
       password: "",
       showPsw: false,
       sendSmsInterval: 0,
-      sheet: false,
+      sheet: false
     };
   },
   watch: {
@@ -79,19 +79,20 @@ export default {
       }
       this.loadingText = "正在登录";
       try {
-        let res = await this.$api.login_local({
+        let token = await this.$api.login_local({
           username: this.mobile,
           password: md5(this.password),
           sys: "cms"
         });
-        this.$store.commit("setToken", res);
+        this.$store.commit("setToken", token);
         this.$router.push("/order");
         this.loadingText = "";
         this.$store.commit("headerToggle", true);
       } catch (error) {
-        this.loadingText = "";
         localStorage.removeItem("token");
         sessionStorage.removeItem("token");
+      } finally {
+        this.loadingText = "";
       }
     }
   }

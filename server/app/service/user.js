@@ -66,7 +66,7 @@ class UserService extends Service {
     let token = await ctx.service.jwt.sign(user);
     res.token = token.value;
     res.exp = token.expAt;
-    return res;
+    return token.value;
   }
   async loginSys() {
     const ctx = this.ctx;

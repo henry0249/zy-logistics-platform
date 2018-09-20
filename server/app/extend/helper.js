@@ -31,18 +31,19 @@ module.exports = {
     return decrypted;
   },
   async jwtSign(user_info, option = {}) {
-    let exp = option.exp || Math.floor(Date.now() / 1000) + (24 * 60 * 60);
+    let exp = option.exp || this.config.loginExp;
     delete option.exp;
     let token = await jwt.sign({
       user: {
         ...user_info,
         ...option
       },
-      exp
-    }, this.config.jwtKey)
+      exp: Math.floor((new Date().getTime() + exp) / 1000)
+    }, this.config.jwtKey);
     return {
       value: token,
-      expAt: new Date(exp * 1000)
+      exp,
+      expAt: new Date(new Date().getTime() + exp)
     }
   },
   async jwtVerify(token) {

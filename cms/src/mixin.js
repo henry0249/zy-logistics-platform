@@ -29,6 +29,9 @@ Vue.mixin({
     },
     globalLoading() {
       return this.$store.state.globalLoading;
+    },
+    orderBadge() {
+      return this.$store.state.orderBadge;
     }
   },
   methods: {

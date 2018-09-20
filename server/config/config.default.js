@@ -7,6 +7,11 @@ module.exports = appInfo => {
   config.keys = 'bymm_stjk';
   config.jwtKey = 'bymm_jwt';
 
+  //登录有效时长
+  config.loginExp = 24 * 60 * 60 * 1000;
+  //token有效时长
+  config.tokenExp = 1 * 1 * 60 * 1000;
+
   // 中间件配置
   config.middleware = ['errorHandler'];
 

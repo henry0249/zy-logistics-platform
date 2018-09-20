@@ -161,6 +161,9 @@ export default {
         }
       },
       deep: true
+    },
+    $route(){
+      this.$store.dispatch("getOrderBadge");
     }
   },
   methods: {

@@ -16,62 +16,38 @@
 
 <script>
 import LeftNav from "../common/LeftNav";
+import { settle } from "../common/orderLeftNav.js";
 export default {
   components: {
     LeftNav
   },
-  computed: {
-    orderBadge() {
-      return this.$store.state.orderBadge;
-    }
-  },
   watch: {
     orderBadge: {
       handler: function(val) {
-        for (const key in val) {
-          this.nav.forEach((item, index) => {
-            if (item.state === key) {
-              item.badge = val[key];
-            }
-            this.$set(this.nav, index, item);
-          });
-        }
+        this.setNav(val);
       },
       deep: true
     }
   },
   data() {
     return {
-      nav: []
+      nav: [...settle]
     };
   },
-  mounted() {
-    this.nav = [
-      {
-        name: "订单预审",
-        color: "red",
-        icon: "icon-jiesuan",
-        path: "/settle/financialPretrial",
-        state: "financialPretrial",
-        badge: this.orderBadge.financialPretrial
-      },
-      {
-        name: "账户结算",
-        color: "red",
-        icon: "icon-jiesuan",
-        path: "/settle/accountSettlement",
-        state: "accountSettlement",
-        badge: this.orderBadge.accountSettlement
-      },
-      {
-        name: "账款确认",
-        color: "red",
-        icon: "icon-jiesuan",
-        path: "/settle/accountConfirmation",
-        state: "accountConfirmation",
-        badge: this.orderBadge.accountConfirmation
+  methods: {
+    setNav(val) {
+      for (const key in val) {
+        this.nav.forEach((item, index) => {
+          if (item.state === key) {
+            item.badge = val[key];
+          }
+          this.$set(this.nav, index, item);
+        });
       }
-    ];
+    }
+  },
+  mounted() {
+    this.setNav(this.orderBadge);
   }
 };
 </script>

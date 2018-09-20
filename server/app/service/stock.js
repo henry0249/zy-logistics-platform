@@ -16,7 +16,7 @@ class StockService extends Service {
   }
   async add(data) {
     const ctx = this.ctx;
-    let body = ctx.request.body || data;
+    let body = data || ctx.request.body;
     if (!body.goods) {
       ctx.throw(422, '商品信息必填', body);
     }

@@ -27,6 +27,10 @@ module.exports = {
     name: '历史登录设备信息',
     type: 'Array'
   },
+  exp: {
+    name: '登录有效时长(毫秒)',
+    type: 'Number'
+  },
   expAt: {
     name: '过期时间',
     type: 'Date'
@@ -38,5 +42,9 @@ module.exports = {
   logoutAt: {
     name: '注销时间',
     type: 'Date'
-  }
+  },
+  lastAccessAt: {
+    name: '最近访问时间',
+    type: 'Date'
+  },
 }

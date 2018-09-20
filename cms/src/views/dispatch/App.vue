@@ -16,54 +16,41 @@
 
 <script>
 import LeftNav from "../common/LeftNav";
+import { dispatch } from "../common/orderLeftNav.js";
 export default {
   components: {
     LeftNav
   },
-  computed: {
-    orderBadge() {
-      return this.$store.state.orderBadge;
-    }
-  },
   watch: {
     orderBadge: {
       handler: function(val) {
-        for (const key in val) {
-          this.nav.forEach((item, index) => {
-            if (item.state === key) {
-              item.badge = val[key];
-            }
-            this.$set(this.nav, index, item);
-          });
-        }
+        this.setNav(val);
       },
       deep: true
     }
   },
   data() {
     return {
-      nav: []
+      nav: [...dispatch]
     };
   },
-  mounted() {
-    this.nav = [
-      {
-        name: "待调度订单",
-        color: "red",
-        icon: "icon-tiaoduzhongxin",
-        path: "/dispatch/order",
-        state:'dispatch',
-        badge: this.orderBadge.dispatch
-      },
-      {
-        name: "待配送运单",
-        color: "red",
-        icon: "icon-cf-c97",
-        path: "/dispatch/distribution",
-        state:'distribution',
-        badge: this.orderBadge.distribution
+  methods: {
+    setNav(val) {
+      for (const key in val) {
+        this.nav.forEach((item, index) => {
+          if (item.state === key) {
+            item.badge = val[key];
+          }
+          this.$set(this.nav, index, item);
+        });
       }
-    ];
+    }
+  },
+  mounted() {
+    this.setNav(this.orderBadge);
   }
 };
 </script>
+
+<style>
+</style>

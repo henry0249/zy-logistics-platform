@@ -146,10 +146,12 @@ export default {
     this.activeCompany = this.handle || this.company._id;
     if (this.showCompany) {
       this.loadingText = "加载中";
-      this.companylist = await this.$ajax.post("/order/company/badge", {
-        state: this.state,
-        handle: this.activeCompany
-      });
+      try {
+        this.companylist = await this.$ajax.post("/order/company/badge", {
+          state: this.state,
+          handle: this.activeCompany
+        });
+      } catch (error) {}
       this.loadingText = "";
     }
     await this.getData();
