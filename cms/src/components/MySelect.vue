@@ -183,7 +183,7 @@ export default {
   },
   methods: {
     text(data) {
-      if ((this.is("array", data) && data, length > 0)) {
+      if ((this.is("array", data) && data.length > 0)) {
         data = data[0];
       }
       if (typeof data === "object") {
