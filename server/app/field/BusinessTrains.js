@@ -12,9 +12,9 @@ module.exports = {
     type: 'String',
     name: '类型',
     option: {
-      'supplier': '源头供货商',
-      'pool': '联营商',
-      'customer': '客户'
+      supplier: '源头供货商',
+      pool: '联营商',
+      customer: '客户'
     }
   },
   check: {
@@ -40,26 +40,32 @@ module.exports = {
   supplyPrice: {
     name: '供货价格',
     type: 'Number',
+    default: 0
   },
   supplyCount: {
     name: '供货数量',
     type: 'Number',
+    default: 0
   },
   receive: {
     name: '实收数量',
     type: 'Number',
+    default: 0
   },
   loss: {
     name: '损耗数量',
     type: 'Number',
+    default: 0
   },
   balancePrice: {
     name: '结算价格',
     type: 'Number',
+    default: 0
   },
   balanceCount: {
     name: '结算数量',
     type: 'Number',
+    default: 0
   },
   stock: {
     name: '关联的库存单',

@@ -84,7 +84,7 @@ export default {
       loadingText: "",
       data: [],
       activeCompany: "",
-      companylist: []
+      companylist: [],
     };
   },
   watch: {
@@ -138,7 +138,7 @@ export default {
       if (this.currentCompany) {
         body.company = this.currentCompany;
       }
-      
+
       return await this.$ajax.post(this.path, body);
     },
     async search() {

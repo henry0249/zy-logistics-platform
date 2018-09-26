@@ -30,11 +30,14 @@
             </slot>
           </div>
         </el-table-column>
-        <div v-ripple @click="loadmoreFun" v-if="loadmore&&data.length>0 && loadmoreText!=='nomore'" class="loadmore" slot="append">
-          {{loadmoreText}}
-        </div>
-        <div v-if="loadmore&&data.length>0&&loadmoreText==='nomore'" class="loadmore nomore" slot="append">
-          没有更多数据了
+        <div slot="append">
+          <div v-ripple @click="loadmoreFun" v-if="loadmore&&data.length>0 && loadmoreText!=='nomore'" class="loadmore">
+            <i class="el-icon-refresh el-icon--right"></i>{{loadmoreText}}
+            <span v-if="Number(count)>0"> - 共 <span class="blue fw500">{{count}}</span> 条数据，已加载 <span class="success fw500">{{data.length}}</span> 条数据</span>
+          </div>
+          <div v-if="loadmore&&data.length>0&&loadmoreText==='nomore'" class="loadmore nomore">
+            <i class="el-icon-warning el-icon--right"></i>没有更多数据了，已加载全部 <span class="info fw500">{{data.length}}</span> 条数据
+          </div>
         </div>
       </el-table>
     </loading-box>
@@ -93,6 +96,10 @@ export default {
     opWidth: {
       type: [String, Number],
       default: "90"
+    },
+    count: {
+      type: [String, Number],
+      default: 0
     }
   },
   data() {
@@ -239,6 +246,15 @@ export default {
     },
     handleCurrentChange(val) {
       this.$emit("current-change", val);
+    },
+    toggleRowSelection(data) {
+      data.forEach(item => {
+        this.data.forEach(row => {
+          if (item._id === row._id) {
+            this.$refs.table.toggleRowSelection(row);
+          }
+        });
+      });
     }
   },
   mounted() {
@@ -246,14 +262,7 @@ export default {
       this.loadingText = "";
       this.setTableHeight();
       if (this.is("array", this.select)) {
-        // console.log(this.data);
-        this.select.forEach(item => {
-          this.data.forEach(row=>{
-            if (item._id === row._id) {
-              this.$refs.table.toggleRowSelection(row);
-            }
-          })
-        });
+        this.toggleRowSelection(this.select);
       }
     }, 300);
   }

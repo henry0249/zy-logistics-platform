@@ -62,9 +62,11 @@ export default {
   // },
   methods: {
     async getChartData() {
-      // this.$refs.chart.showLoading("default", {
-      //   text: "加载中..."
-      // });
+      if (this.$refs.chart) {
+        this.$refs.chart.showLoading("default", {
+          text: "加载中..."
+        });
+      }
       try {
         let data = await this.$ajax.post("/stock/chart", {
           company: this.company._id,
@@ -156,7 +158,9 @@ export default {
         this.options.series = series;
         this.options.visualMap = visualMap;
       } catch (error) {}
-      // this.$refs.chart.hideLoading();
+      if (this.$refs.chart) {
+        this.$refs.chart.hideLoading();
+      }
     },
     datarangeselected(val) {
       for (const name in val.selected) {

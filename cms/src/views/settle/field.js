@@ -32,13 +32,13 @@ module.exports = {
       name: '备注',
       // width: 150
     },
-    settlePrice: {
+    balancePrice: {
       type: 'String',
       name: '结算金额',
       slot: true,
       width: 100
     },
-    settleNum: {
+    balanceCount: {
       type: 'String',
       name: '结算数量',
       slot: true,

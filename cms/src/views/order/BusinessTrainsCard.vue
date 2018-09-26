@@ -45,9 +45,9 @@
         </my-form-item>
       </div>
     </el-card>
-    <el-dialog title="选择关联物流单" :visible.sync="dialogVisible" width="70%">
+    <el-dialog title="选择关联物流单" :visible.sync="dialogVisible" width="80%">
       <div>
-        
+        <transport-trains-select :order="order"></transport-trains-select>
       </div>
       <div slot="footer">
         <el-button @click="dialogVisible = false" size="mini">取 消</el-button>
@@ -58,7 +58,11 @@
 </template>
 
 <script>
+import TransportTrainsSelect from './TransportTrainsSelect';
 export default {
+  components:{
+    TransportTrainsSelect
+  },
   props: {
     index: {
       type: Number,

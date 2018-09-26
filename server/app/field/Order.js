@@ -26,6 +26,7 @@ module.exports = {
       accountSettlement: '账户结算',
       accountConfirmation: '账款确认',
       finish: '订单完成',
+      cancel: '已取消',
       delete: '已删除'
     },
     default: 'taking'
@@ -34,11 +35,6 @@ module.exports = {
     name: '处理公司',
     type: 'ObjectId',
     ref: 'Company'
-  },
-  platform: {
-    name: '所属平台',
-    type: 'ObjectId',
-    ref: 'Platform'
   },
   user: {
     type: 'ObjectId',
@@ -141,33 +137,13 @@ module.exports = {
     name: '运输单单价',
     type: 'Number',
   },
-  brokerType: {
-    name: '经纪人类型',
-    type: 'String',
-    option: {
-      normal: '直接经纪人',
-      temporary: '临时经纪人'
-    }
-  },
-  broker: {
-    name: '经纪人',
+  brokerTemporary: {
+    name: '临时经纪人',
     type: 'ObjectId',
-    ref: 'Broker'
-  },
-  brokerBonus: {
-    name: '经纪人提成',
-    type: 'Number',
+    ref: 'User'
   },
   temporaryBrokerBonus: {
     name: '临时经纪人提成',
     type: 'Number',
-  },
-  settlePrice: {
-    name: '结算金额',
-    type: 'Number'
-  },
-  settleNum: {
-    name: '结算数量',
-    type: 'Number'
   }
 }

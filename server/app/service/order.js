@@ -109,11 +109,6 @@ class OrderService extends Service {
           ctx.throw(422, '贸易链未添加', info);
         }
       }
-      // if (update.state === 'dispatch') {
-      //   if (!(body.transportTrains instanceof Array && body.transportTrains.length > 0)) {
-      //     ctx.throw(422, '物流链未添加', info);
-      //   }
-      // }
       if (update.state === 'distributionFinishCheck') {
         if (body.transportTrains instanceof Array && body.transportTrains.length > 0) {
           body.transportTrains.forEach((item, index) => {
@@ -496,6 +491,21 @@ class OrderService extends Service {
     }]).sort({
       updatedAt: -1
     }).limit(limit).skip(skip);
+
+    if (state === 'financialPretrial') {
+      let res = [];
+      for (let i = 0; i < orders.length; i++) {
+        let item = JSON.parse(JSON.stringify(orders[i]));
+        let businessTrains = await ctx.model.BusinessTrains.findOne({
+          order: item._id
+        });
+        if (businessTrains) {
+          item.businessTrains = businessTrains;
+          res.push(item);
+        }
+      }
+      return res;
+    }
     return orders;
   }
   async getOrderById() {

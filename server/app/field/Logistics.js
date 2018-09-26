@@ -104,9 +104,14 @@ module.exports = {
     name: '送达时间',
     type: 'Date'
   },
-  stock:{
+  stock: {
     name: '关联的库存单',
     type: 'ObjectId',
     ref: 'Stock'
+  },
+  businessTrains: {
+    name: '关联的贸易链',
+    type: 'ObjectId',
+    ref: 'BusinessTrains'
   }
 }

@@ -15,9 +15,10 @@ module.exports = {
       // temporaryBroker:'临时经纪人',
       truck: '货车司机',
       ship: '货船船员',
-      sys:'系统管理员',
-      sysSalesman:'系统业务员',
-      sysDispatcher:'系统调度员'
+      sys: '系统管理员',
+      sysSalesman: '系统业务员',
+      sysDispatcher: '系统调度员',
+      broker: '经纪人'
     }
   },
   user: {
@@ -35,14 +36,19 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Order'
   },
-  truck:{
+  truck: {
     name: '所属车辆',
     type: 'ObjectId',
     ref: 'Truck'
   },
-  ship:{
+  ship: {
     name: '所属船只',
     type: 'ObjectId',
     ref: 'Ship'
-  }
+  },
+  area: {
+    name: '所属区域',
+    type: 'ObjectIdArray',
+    ref: 'Area'
+  },
 }

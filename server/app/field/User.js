@@ -52,7 +52,7 @@ module.exports = {
     ref: 'Address'
   },
   area: {
-    name: '区域',
+    name: '所属区域',
     type: 'ObjectIdArray',
     ref: 'Area'
   },

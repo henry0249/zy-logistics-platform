@@ -14,7 +14,7 @@
       </div>
       <div>
         <div style="height:calc(100vh - 50px - 40px - 15px - 60px)">
-          <my-table :thead="thead" :data.sync="data" selection border height="100vh - 50px - 40px - 15px - 60px" size="mini" @selection-change="handleSelectionChange" :loadmore="loadmore">
+          <my-table ref="table" :thead="thead" :data.sync="data" selection border height="100vh - 50px - 40px - 15px - 60px" size="mini" @selection-change="handleSelectionChange" :loadmore="loadmore">
             <template slot-scope="scope">
               <div class="link" v-if="scope.prop==='no'" @click="toDetail(scope.row,scope.index)">
                 {{scope.row.no}}
@@ -33,11 +33,11 @@
               <div v-if="scope.prop==='area'">
                 {{area2name(scope.row.area)}}
               </div>
-              <div v-if="scope.prop === 'settlePrice'">
-                <my-form-item size="mini" number></my-form-item>
+              <div v-if="scope.prop === 'balancePrice'">
+                <my-form-item v-model="scope.row.businessTrains.balancePrice" size="mini" number :min="0"></my-form-item>
               </div>
-              <div v-if="scope.prop === 'settleNum'">
-                <my-form-item size="mini" number></my-form-item>
+              <div v-if="scope.prop === 'balanceCount'">
+                <my-form-item v-model="scope.row.businessTrains.balanceCount" size="mini" number :min="0"></my-form-item>
               </div>
             </template>
           </my-table>
@@ -48,18 +48,18 @@
           </el-badge>
           <div class="flex ac">
             <div class="flex ac jb" style="width:250px">
-              <my-form-item size="mini" label="结算金额" number width="150px" :min="0">
+              <my-form-item v-model="balancePriceMutil" size="mini" label="结算金额" number width="150px" :min="0">
               </my-form-item>
               <el-badge :value="select.length" class="item">
-                <el-button type="warning" size="mini">批量修改</el-button>
+                <el-button type="warning" size="mini" @click="balancePriceMutilEdit">批量修改</el-button>
               </el-badge>
             </div>
             <div style="width:3vw"></div>
             <div class="flex ac jb" style="width:250px">
-              <my-form-item size="mini" label="结算数量" number width="150px" :min="0">
+              <my-form-item v-model="balanceCountMutil" size="mini" label="结算数量" number width="150px" :min="0">
               </my-form-item>
               <el-badge :value="select.length" class="item">
-                <el-button type="warning" size="mini">批量修改</el-button>
+                <el-button type="warning" size="mini" @click="balanceCountMutilEdit">批量修改</el-button>
               </el-badge>
             </div>
           </div>
@@ -80,16 +80,25 @@ export default {
       loadingText: "",
       activeCompany: "",
       companylist: [],
+      tableEl: "",
       thead: table,
       data: [],
       select: [],
       path: "/order/pending/financialPretrial",
-      limit: 10
+      limit: 10,
+      balancePriceMutil: 0,
+      balanceCountMutil: 0
     };
   },
   watch: {
     activeCompany(newValue, oldValue) {
       this.getData();
+    },
+    balancePriceMutil(val) {
+      this.balanceMutilChange("balancePrice", val);
+    },
+    balanceCountMutil(val) {
+      this.balanceMutilChange("balanceCount", val);
     }
   },
   methods: {
@@ -123,15 +132,26 @@ export default {
     },
     toDetail(item, index) {
       if (item._id) {
-        if (this.path) {
-          this.$router.push(`/${this.path}/${item._id}`);
-        } else {
-          this.$router.push(`/edit/${this.state}/${item._id}`);
-        }
+        this.$router.push(`/edit/FinancialPretrial/${item._id}`);
       }
     },
     handleSelectionChange(val) {
       this.select = val;
+    },
+    balancePriceMutilEdit() {},
+    balanceCountMutilEdit() {},
+    balanceMutilChange(type, val) {
+      let selectTemp = [...this.select];
+      this.select.forEach(selectItem => {
+        this.data.forEach((dataItem, index) => {
+          if (selectItem._id === dataItem._id) {
+            let newItem = JSON.parse(JSON.stringify(dataItem));
+            newItem.businessTrains[type] = val;
+            this.$set(this.data, index, newItem);
+          }
+        });
+      });
+      this.$refs.table.toggleRowSelection(selectTemp);
     }
   },
   async mounted() {
