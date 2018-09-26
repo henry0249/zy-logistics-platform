@@ -7,7 +7,7 @@
       <div style="position:relative">
         <div class="disabled-hide" v-if="disabled">
         </div>
-        <el-input style="width:100%" :value="multi?(text(data)+' +'+(data.length-1)):text(data)" v-bind="$attrs" :placeholder="$attrs.placeholder || autoPlaceholder" :size="size||$parent.size" class="input-with-select">
+        <el-input style="width:100%" :value="multi?multiText(data):text(data)" v-bind="$attrs" :placeholder="$attrs.placeholder || autoPlaceholder" :size="size||$parent.size" class="input-with-select">
           <text-dropdown v-if="userCompanyTypeChoose" slot="prepend" v-model="innerType" :options="field.Order.type.option" :color="['#E6A23C','#409EFF']"></text-dropdown>
           <text-dropdown v-if="truckShipTypeChoose" slot="prepend" v-model="innerType" :options="field.Logistics.transportation.option" :color="['#67C23A','#E6A23C']"></text-dropdown>
         </el-input>
@@ -183,8 +183,8 @@ export default {
   },
   methods: {
     text(data) {
-      if ((this.is("array", data) && data.length > 0)) {
-        data = data[0];
+      if (this.is("array", data)) {
+        return data;
       }
       if (typeof data === "object") {
         if (!data) {
@@ -196,6 +196,23 @@ export default {
         return data || "";
       }
       return "";
+    },
+    multiText(data) {
+      if (!data || !(data instanceof Array)) {
+        return "";
+      }
+      if (!data[0]) {
+        return "";
+      }
+      if (data.length === 0) {
+        return "";
+      }
+      if (data.length === 1) {
+        return this.text(data[0]);
+      }
+      if (data.length > 1) {
+        return this.text(data[0]) + " +" + (data.length - 1);
+      }
     },
     selectChange(val) {
       this.$emit("update:data", val);
