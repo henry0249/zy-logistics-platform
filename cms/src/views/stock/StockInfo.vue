@@ -15,13 +15,7 @@
             </el-card>
           </div>
         </div>
-        <common-alert style="margin-top:15px;">
-          <div class="jc jb" style="width:100%">
-            <div>商品信息</div>
-            <el-button v-if="isCheck" type="success" size="mini" @click="checkAllGoods">盘点所有商品</el-button>
-          </div>
-        </common-alert>
-        <goods-list style="margin-top:15px;" :type="form.type" :checkAll.sync="checkAll" :data.sync="goodsData"></goods-list>
+        <goods-list style="margin-top:15px;" :isCheck="isCheck" :type="form.type" :addCheck.sync="addCheck" :data.sync="goodsData"></goods-list>
         <el-alert style="margin-top:15px" title="库存单信息" type="info" :closable="false">
         </el-alert>
         <my-form size="small" width="49%">
@@ -71,7 +65,8 @@
     },
     data() {
       return {
-        checkAll: false,
+        checkAll:false,
+        addCheck:false,
         goodsData: [],
         goodsObj: {},
         loadingText: "",
@@ -85,8 +80,7 @@
     },
     watch: {
       goodsData: {
-        handler(val) {
-        },
+        handler(val) {},
         deep: true
       },
       company: {
@@ -114,6 +108,9 @@
       },
     },
     methods: {
+      add(){
+        this.addCheck = true;
+      },
       checkAllGoods() {
         this.checkAll = true;
       },
@@ -136,8 +133,8 @@
           this.form.company = this.company._id;
           this.goodsData.forEach(item => {
             let obj = JSON.parse(JSON.stringify(this.form));
-            this.$set(obj,'goods',item._id);
-            this.$set(obj,'num',item.key);
+            this.$set(obj, 'goods', item._id);
+            this.$set(obj, 'num', item.key);
             data.push(obj);
           });
           this.$emit("submit", data);

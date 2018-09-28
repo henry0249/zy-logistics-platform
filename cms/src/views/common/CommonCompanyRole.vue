@@ -6,6 +6,9 @@
           <div slot="op" slot-scope="scope" class="jc">
             <remove-check @remove="remove(scope)"></remove-check>
           </div>
+          <div slot-scope="scope">
+            <my-select v-if="scope.prop === 'stockArea'" area :data.sync="changeData[scope.index]['stockArea']" multi size="mini"></my-select>
+          </div>
         </my-table>
       </el-tab-pane>
     </el-tabs>
@@ -74,18 +77,9 @@
           dispatcher: "调度专员",
           beforeSettleCheck: "结算前审核员",
           financial: "财务文员",
-          documentClerk: "单据文员"
+          documentClerk: "单据文员",
+          normalBroker: '经纪人'
         },
-        thead: {
-          name: {
-            name: "用户名",
-            readOnly: true
-          },
-          mobile: {
-            name: "手机号",
-            readOnly: true
-          }
-        }
       };
     },
     watch: {
@@ -95,7 +89,26 @@
         },
         deep: true
       },
-      changeData(val) {},
+      changeData: {
+        handler(val) {
+          if (val.length > 0 && this.activeName !== 'admin') {
+            val.forEach(item => {
+              this.newData.forEach((newDataItem, index) => {
+                if (item.stockId === newDataItem._id) {
+                  let data = [];
+                  if (item.stockArea) {
+                    item.stockArea.forEach(element => {
+                      data.push(element);
+                    });
+                    this.$set(this.newData[index], 'area', data);
+                  }
+                }
+              });
+            });
+          }
+        },
+        deep: true
+      },
       dialogTableVisible(val) {
         if (!val) {
           this.currentValue = {};
@@ -103,6 +116,28 @@
       }
     },
     computed: {
+      thead() {
+        let thead = {
+          name: {
+            name: "用户名",
+            readOnly: true
+          },
+          mobile: {
+            name: "手机号",
+            readOnly: true
+          }
+        }
+        if (this.activeName === 'admin') {
+          delete thead.stockArea;
+        } else {
+          this.$set(thead, 'stockArea', {
+            name: "地区",
+            readOnly: true,
+            slot: true
+          })
+        }
+        return thead;
+      },
       btmText() {
         return this.type[this.activeName];
       },
@@ -110,7 +145,9 @@
         let data = [];
         this.newData.forEach(item => {
           if (item.type === this.activeName) {
-            data.push(item.user);
+            let obj = JSON.parse(JSON.stringify(item.user));
+            obj.stockId = item._id;
+            data.push(obj);
           }
         });
         return data;
@@ -183,7 +220,7 @@
         if (scope.row._id) {
           let arr = [];
           arr.push(scope.row._id);
-          this.$emit('update:removeList',arr);
+          this.$emit('update:removeList', arr);
         }
       },
       addUser() {
@@ -197,4 +234,5 @@
 </script>
 
 <style scoped>
+
 </style>

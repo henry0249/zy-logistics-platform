@@ -139,6 +139,7 @@
       },
       async sub() {
         if (this.confirmation()) {
+          console.log(this.roleArr);
           try {
             let _id = this.sys ? this.$route.params._id : this.company._id;
             this.loadingText = "更新中";
@@ -167,8 +168,28 @@
                   curdType: 'set',
                   company: _id,
                   type: this.roleArr[index].type,
-                  user: this.roleArr[index].user._id
+                  user: this.roleArr[index].user._id,
+                  area: this.roleArr[index].area._id
                 })
+              } else {
+                let updateOp = {
+                  model: 'role',
+                  curdType: 'update',
+                  find: {
+                    _id: this.roleArr[index]._id
+                  },
+                  update: {}
+                };
+                if (this.roleArr[index].area.length > 0) {
+                  let areaData = [];
+                  this.roleArr[index].area.forEach(areaItem => {
+                    areaData.push(areaItem._id);
+                  });
+                  this.$set(updateOp, 'update', {
+                    area: areaData
+                  })
+                  let updateRole = await this.$api.curd(updateOp);
+                }
               }
             }
             for (const key in this.shipObj) {
@@ -263,9 +284,9 @@
             }
             this.$message.success("更新成功！");
             if (this.sys) {
-              this.$router.push({
-                path: '/sys/company'
-              });
+              // this.$router.push({
+              //   path: '/sys/company'
+              // });
             } else {
               this.show = false;
               await this.getCompany();
@@ -275,8 +296,7 @@
               this.data = JSON.parse(JSON.stringify(this.startShipObj));
               this.show = true;
             }
-          } catch (error) {
-          }
+          } catch (error) {}
           this.loadingText = "";
         }
       },
@@ -318,6 +338,8 @@
           company: _id,
           populate: [{
             path: "user"
+          },{
+            path: "area"
           }]
         });
       },

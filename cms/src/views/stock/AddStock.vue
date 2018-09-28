@@ -18,6 +18,16 @@
         loadingText: ''
       };
     },
+    watch: {
+      company:{
+        handler(val){
+          this.loadingText = '加载中';
+          this.$nextTick(()=>{
+            this.loadingText = '';
+          })
+        }
+      }
+    },
     methods: {
       async submit(data) {
         try {
