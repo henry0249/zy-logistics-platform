@@ -61,6 +61,24 @@ module.exports = {
     type: 'Number',
     require: true,
   },
+  balanceCount: {
+    name: '结算数量',
+    type: 'Number',
+  },
+  balanceCompany: {
+    name: '运费承担公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
+  loss: {
+    name: '损耗数量',
+    type: 'Number',
+  },
+  lossCompany: {
+    name: '损耗承担公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
   user: {
     type: 'ObjectId',
     name: '收货人',

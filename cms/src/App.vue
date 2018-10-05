@@ -50,6 +50,13 @@ html,
 body {
   min-width: 1024px;
 }
+.body-height {
+  height: calc(100vh - 50px - 35px - 35px);
+  overflow-y: auto;
+}
+.body-padding{
+  padding: 0% 1%;
+}
 .g-container {
   height: calc(100vh - 50px);
   overflow-y: auto;
@@ -68,7 +75,7 @@ body {
   border-radius: 4px;
 }
 .g-order-body {
-  padding: 3%;
+  padding: 2%;
   border: 1px solid #eee;
   border-radius: 4px;
 }

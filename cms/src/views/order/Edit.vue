@@ -1,5 +1,5 @@
 <template>
-  <loading-box v-model="loadingText" class="g-order-container">
+  <loading-box v-model="loadingText" class="body-padding">
     <div class="g-order-body" v-if="!bodyLoading">
       <div class="my-title">订单<span style="color:#409EFF;font-weight:600">{{order.no}}</span>{{title}}</div>
       <Info :val="order" :data.sync="orderAsync"></Info>
@@ -9,7 +9,7 @@
     </div>
     <el-alert v-if="alert" style="margin-top:15px" :title="alert" type="info" center show-icon :closable="false">
     </el-alert>
-    <div class="flex ac" style="margin-top:15px">
+    <div class="flex ac" style="margin:15px 0">
       <slot name="toolLeft"></slot>
       <div class="f1"></div>
       <slot name="back">

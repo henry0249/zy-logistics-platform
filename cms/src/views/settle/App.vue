@@ -1,7 +1,7 @@
 <template>
-  <div class="flex">
-    <left-nav :nav="nav"></left-nav>
-    <div class="f1 g-container">
+  <div>
+    <center-nav :data.sync="nav"></center-nav>
+    <div class="body-height">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
           <!-- 这里是会被缓存的视图组件-->
@@ -15,11 +15,11 @@
 </template>
 
 <script>
-import LeftNav from "../common/LeftNav";
+import CenterNav from "../common/CenterNav";
 import { settle } from "../common/orderLeftNav.js";
 export default {
   components: {
-    LeftNav
+    CenterNav
   },
   watch: {
     orderBadge: {
@@ -53,4 +53,10 @@ export default {
 </script>
 
 <style>
+.order-border{
+  margin: 0 auto;
+  padding: 30px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
 </style>

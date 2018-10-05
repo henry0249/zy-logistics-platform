@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="loadingText">
-    <div class="g-order-container">
+    <div class="body-padding">
       <div style="height:40px;margin-bottom:15px">
         <el-tabs v-model="activeCompany">
           <el-tab-pane :name="item._id" v-for="(item) in companylist" :key="item._id">
@@ -132,7 +132,7 @@ export default {
     },
     toDetail(item, index) {
       if (item._id) {
-        this.$router.push(`/edit/FinancialPretrial/${item._id}`);
+        this.$router.push(`${this.$route.path}/edit/${item._id}?parentPath=${this.$route.path}&parentName=${this.$route.name}`);
       }
     },
     handleSelectionChange(val) {

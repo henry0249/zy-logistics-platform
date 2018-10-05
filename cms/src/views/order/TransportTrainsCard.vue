@@ -21,7 +21,7 @@
       <div v-if="Number(data.type)===1">
         <div class="marginBottom">
           <my-form-item v-if="Number(data.areaType) === 0" size="mini" text value="根据实际地址自行选择"></my-form-item>
-          <my-form-item v-if="Number(data.areaType) === 1" select v-model="data.company" :options="order.handle.businessRelationCompany" size="mini" @change="companyChange" label="公司" placeholder="请选择关联公司"></my-form-item>
+          <my-form-item v-if="Number(data.areaType) === 1" select v-model="data.company" :options="order.handle.businessRelationCompany || []" size="mini" @change="companyChange" label="公司" placeholder="请选择关联公司"></my-form-item>
           <my-form-item v-if="Number(data.areaType) === 2" select v-model="data.company" :options="getBusinessTrainsArea()" size="mini" @change="companyChange" label="贸易节点" placeholder="请选择贸易节点"></my-form-item>
         </div>
         <el-tooltip key="areaType0" v-if="Number(data.areaType) === 0" effect="dark" :content="areaInfo(data)" placement="top">

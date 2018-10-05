@@ -1,5 +1,5 @@
 <template>
-  <loading-box v-model="loadingText" class="g-order-container">
+  <loading-box v-model="loadingText" class="body-padding">
     <div class="g-order-body">
       <div class="my-title">运单{{logistics.no}}详情</div>
       <goods-table :order="order" :edit="false"></goods-table>

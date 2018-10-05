@@ -46,12 +46,26 @@
               <div v-if="scope.prop==='transportation'">
                 <my-select truck :type.sync="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]" placeholder="运输工具"></my-select>
               </div>
-              <my-form-item v-if="scope.prop==='loading'" number v-model="scope.row.loading" size="mini" :min="0" :max="order.count">
+              <my-form-item v-if="scope.prop==='loading'" v-model="scope.row.loading" size="mini" :min="0" >
               </my-form-item>
-              <my-form-item v-if="scope.prop==='landed'" number v-model="scope.row.landed" size="mini" :max="scope.row.loading" :min="0">
+              <my-form-item v-if="scope.prop==='landed'"  v-model="scope.row.landed" size="mini" :min="0">
               </my-form-item>
-              <my-form-item v-if="scope.prop==='price'" number v-model="scope.row.price" size="mini" :min="0">
+              <my-form-item v-if="scope.prop==='price'"  v-model="scope.row.price" size="mini" :min="0">
               </my-form-item>
+              <my-form-item v-if="scope.prop==='balanceCount'"  v-model="scope.row.balanceCount" size="mini" :min="0">
+              </my-form-item>
+              <el-tooltip v-if="scope.prop==='balanceCompany'" effect="dark" content="仅可从本公司关联的物流公司中选择" placement="top">
+                <my-form-item size="mini" v-model="scope.row.balanceCompany" select :options="company.transportTrainsRelationCompany || []">
+
+                </my-form-item>
+              </el-tooltip>
+              <my-form-item v-if="scope.prop==='loss'"  v-model="scope.row.loss" size="mini" :min="0">
+              </my-form-item>
+              <el-tooltip v-if="scope.prop==='lossCompany'" effect="dark" content="仅可从本公司关联的物流公司中选择" placement="top">
+                <my-form-item size="mini" v-model="scope.row.lossCompany" select :options="company.transportTrainsRelationCompany || []">
+
+                </my-form-item>
+              </el-tooltip>
               <div v-if="scope.prop==='total'">
                 {{Number(scope.row.price) * Number(scope.row.landed)}}
               </div>

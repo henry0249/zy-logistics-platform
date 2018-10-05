@@ -64,10 +64,10 @@ module.exports = {
       name: "销售单价",
       slot: true,
     },
-    transportPrice: {
-      name: "运输单价",
-      slot: true,
-    },
+    // transportPrice: {
+    //   name: "运输单价",
+    //   slot: true,
+    // },
     totalPrice: {
       name: "合计金额",
       readOnly: true,
@@ -138,12 +138,23 @@ module.exports = {
       slot: true,
       require: true
     },
-    total: {
-      name: '运费合计',
-      type: 'Number',
-      require: true,
+    balanceCount: {
+      name: '结算数量',
+      slot: true
+    },
+    balanceCompany: {
+      name: '运费承担方',
       slot: true,
-      readOnly: true
+      width: 150
+    },
+    loss: {
+      name: '损耗数量',
+      slot: true
+    },
+    lossCompany: {
+      name: '损耗承担方',
+      slot: true,
+      width: 150
     },
     // startAt: {
     //   name: '出发时间',

@@ -19,36 +19,48 @@ export default [{
   path: '/order',
   component: App,
   redirect: '/order/create',
+  name: '订单管理',
   meta: {
     keepAlive: true // 需要被缓存
   },
   children: [{
     path: 'create',
     component: Create,
+    name: '订单计划',
   }, {
     path: 'taking',
     component: Taking,
+    name: '待接单'
   }, {
-    path: '/edit/taking/:_id',
+    path: 'taking/edit/:_id',
     component: TakingEdit,
+    name: '详情处理',
   }, {
     path: 'beforeDispatchCheck',
     component: BeforeDispatchCheck,
-  }, {
-    path: '/edit/beforeDispatchCheck/:_id',
+    name: '调度前审核'
+  },{
+    path: 'beforeDispatchCheck/edit/:_id',
     component: BeforeDispatchCheckEdit,
+    name: '详情处理',
   }, {
     path: 'distributionFinishCheck',
     component: DistributionFinishCheck,
-  }, {
-    path: '/edit/distributionFinishCheck/:_id',
-    component: DistributionFinishCheckEdit,
+    name: '配送完成审核',
+    children: [{
+      path: 'edit/:_id',
+      component: DistributionFinishCheckEdit,
+      name: '详情处理',
+    }]
   }, {
     path: 'beforeSettleCheck',
     component: BeforeSettleCheck,
-  }, {
-    path: '/edit/beforeSettleCheck/:_id',
-    component: BeforeSettleCheckEdit,
+    name: '结算前审核',
+    children: [{
+      path: '/edit/:_id',
+      component: BeforeSettleCheckEdit,
+      name: '详情处理',
+    }]
   }, {
     path: '/edit/:_id',
     component: Edit,

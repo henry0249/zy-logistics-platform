@@ -60,5 +60,10 @@ module.exports = {
     name: '贸易链关联公司',
     type: 'ObjectIdArray',
     ref: 'Company'
+  },
+  transportTrainsRelationCompany: {
+    name: '物流链关联公司',
+    type: 'ObjectIdArray',
+    ref: 'Company'
   }
 }

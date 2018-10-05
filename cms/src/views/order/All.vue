@@ -1,28 +1,30 @@
 <template>
-  <common-table :path="'/order/pending/'+state" :thead="thead" :option="option" showCompany :state="state">
-    <my-form width="24%" class="flex ac" slot="header">
-      <my-form-item size="mini" v-model="no" label="单号"></my-form-item>
-    </my-form>
-    <div slot-scope="scope">
-      <div class="link" v-if="scope.prop==='no'" @click="toDetail(scope.row,scope.index)">
-        {{scope.row.no}}
+  <div class="body-padding">
+    <common-table style="padding:0" height="100vh - 50px - 35px - 35px" :path="'/order/pending/'+state" :thead="thead" :option="option" showCompany :state="state">
+      <my-form width="24%" class="flex ac" slot="header">
+        <my-form-item size="mini" v-model="no" label="单号"></my-form-item>
+      </my-form>
+      <div slot-scope="scope">
+        <div class="link" v-if="scope.prop==='no'" @click="toDetail(scope.row,scope.index)">
+          {{scope.row.no}}
+        </div>
+        <div v-if="scope.prop==='customer'">
+          <el-tag v-if="scope.row.user" size="mini" style="margin-right:5px" type="warning">个人</el-tag>
+          <el-tag v-if="scope.row.company" size="mini" style="margin-right:5px" type="success">公司</el-tag>
+          {{scope.row | customerName}}
+        </div>
+        <div v-if="scope.prop==='goodsName'">
+          {{scope.row.goods && scope.row.goods.name}}
+        </div>
+        <div v-if="scope.prop==='goodsCount'">
+          {{scope.row.count}}{{scope.row.goods && scope.row.goods.unit}}
+        </div>
+        <div v-if="scope.prop==='area'">
+          {{area2name(scope.row.area)}}
+        </div>
       </div>
-      <div v-if="scope.prop==='customer'">
-        <el-tag v-if="scope.row.user" size="mini" style="margin-right:5px" type="warning">个人</el-tag>
-        <el-tag v-if="scope.row.company" size="mini" style="margin-right:5px" type="success">公司</el-tag>
-        {{scope.row | customerName}}
-      </div>
-      <div v-if="scope.prop==='goodsName'">
-        {{scope.row.goods && scope.row.goods.name}}
-      </div>
-      <div v-if="scope.prop==='goodsCount'">
-        {{scope.row.count}}{{scope.row.goods && scope.row.goods.unit}}
-      </div>
-      <div v-if="scope.prop==='area'">
-        {{area2name(scope.row.area)}}
-      </div>
-    </div>
-  </common-table>
+    </common-table>
+  </div>
 </template>
 
 <script>
@@ -66,7 +68,7 @@ export default {
         if (this.path) {
           this.$router.push(`/${this.path}/${item._id}`);
         } else {
-          this.$router.push(`/edit/${this.state}/${item._id}`);
+          this.$router.push(`${this.$route.path}/edit/${item._id}?parentPath=${this.$route.path}&parentName=${this.$route.name}`);
         }
       }
     }

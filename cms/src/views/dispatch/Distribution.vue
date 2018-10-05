@@ -21,7 +21,7 @@
           <el-button type="primary" icon="el-icon-search" size="mini">搜索</el-button>
         </my-form>
         <div slot-scope="scope">
-          <div @click="$router.push('/edit/distribution/'+scope.row._id)" class="link" v-if="scope.prop==='no'">
+          <div @click="toDetail(scope.row)" class="link" v-if="scope.prop==='no'">
             {{scope.row.no}}
           </div>
           <div v-if="scope.prop==='transportation'">
@@ -94,6 +94,16 @@ export default {
           }
         ]
       });
+    },
+    toDetail(item) {
+      if (item._id) {
+        if (this.path) {
+          this.$router.push(`/${this.path}/${item._id}`);
+        } else {
+          console.log(`${this.$route.path}/edit/${item._id}`);
+          this.$router.push(`${this.$route.path}/edit/${item._id}?parentPath=${this.$route.path}&parentName=${this.$route.name}`);
+        }
+      }
     }
   },
   async mounted() {

@@ -526,6 +526,12 @@ class OrderService extends Service {
           path: 'area',
           populate: areaPopulate
         }]
+      }, {
+        path: 'transportTrainsRelationCompany',
+        populate: [{
+          path: 'area',
+          populate: areaPopulate
+        }]
       }]
     }, {
       path: 'goods',

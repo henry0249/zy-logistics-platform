@@ -1,7 +1,7 @@
 <template>
   <loading-box v-model="loadingText">
-    <div class="g-order-create" v-if="show">
-      <div class="g-order">
+    <div class="body-padding" v-if="show">
+      <div class="order-border">
         <div class="my-title">销售订单</div>
         <Info ref="orderInfo" selectType :data.sync="order"></Info>
         <goods-table :order.sync="order"></goods-table>
@@ -75,14 +75,5 @@ export default {
 </script>
 
 <style scoped>
-.g-order-create {
-  padding: 3% 5%;
-}
-.g-order {
-  margin: 0 auto;
-  padding: 30px;
-  /* box-shadow: 0 0 10px rgba(0,0,0,.2); */
-  border: 1px solid #eee;
-  border-radius: 4px;
-}
+
 </style>

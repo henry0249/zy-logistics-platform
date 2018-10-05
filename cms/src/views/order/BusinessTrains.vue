@@ -175,14 +175,14 @@ export default {
           customerType: this.order.type
         });
       } else {
-        if (!(this.data[this.data.length - 1 - 1].company._id)) {
+        if (!this.data[this.data.length - 1 - 1].company) {
           this.$message.warn(`请先选择联营商公司`);
           return;
         }
         this.data.splice(this.data.length - 1, 0, {
           ...body,
           type: "pool",
-          company: {},
+          company: "",
           supplyCount: this.data[this.data.length - 1 - 1].supplyCount,
           supplyPrice: this.data[this.data.length - 1 - 1].supplyPrice
         });

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex ac g-header" v-if="showGlobalHeader">
+  <div class="flex ac g-header body-padding" v-if="showGlobalHeader">
     <img class="logo" :src="logoImg" alt="">
     <div class="flex ac my-nav" style="margin-left:20px">
       <div v-if="!item.hide" @click="navClick(item,index)" v-ripple class="ac nav-item" :class="{active:index === activeNavIndex}" v-for="(item,index) in nav" :key="index">
@@ -12,7 +12,7 @@
     <div class="f1"></div>
     <div v-if="roleCompany.length>0 && $route.path.indexOf('sys')<0">
       <el-dropdown trigger="click" @command="handleCommand">
-        <div class="blue pointer">
+        <div class="pointer" style="color:rgb(255, 208, 75)">
           <i class="el-icon-location el-icon--left"></i>
           {{company.name || company.nick}}
           <i class="el-icon-caret-bottom el-icon--right"></i>
@@ -24,12 +24,13 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-    <el-badge value="6" class="item" style="margin:0 20px">
-      <i class="el-icon-bell" style="font-size:18px;color:#FFB300"></i>
-    </el-badge>
+    <div style="width:20px"></div>
+    <!-- <el-badge value="6" class="item" style="margin:0 25px">
+      <i class="el-icon-bell" style="font-size:18px;color:rgb(255, 208, 75)"></i>
+    </el-badge> -->
     <el-dropdown>
-      <div class="flex ac pointer">
-        <icon size="20" style="margin-right:5px;margin-bottom:2px" color="#2196F3">face</icon>
+      <div class="flex ac pointer" style="color:#fff">
+        <icon size="20" style="margin-right:5px;margin-bottom:2px">face</icon>
         <div>{{user.name || user.mobile|hideMobile}}</div>
       </div>
       <el-dropdown-menu slot="dropdown" style="width:100px">
@@ -192,9 +193,9 @@ export default {
 
 <style scoped>
 .g-header {
-  background: #fff;
+  background: #545c64;
   height: 50px;
-  padding: 0 2rem;
+  color: #fff
 }
 .logo {
   width: 30px;
@@ -205,11 +206,11 @@ export default {
   padding: 0 15px;
   line-height: 50px;
   cursor: pointer;
-  color: #757575;
+  color: #fff;
 }
 .nav-item.active {
-  color: #42a5f5;
-  border-bottom: 1px solid #42a5f5;
-  background: rgba(66, 165, 245, 0.1);
+  color: rgb(255, 208, 75);
+  /* border-bottom: 1px solid rgb(255, 208, 75); */
+  background: rgba(255, 208, 75, 0.1);
 }
 </style>
