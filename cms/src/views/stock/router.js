@@ -8,21 +8,27 @@ import StockReadyList from './StockReadyList.vue';
 export default [{
   path: '/stock',
   component: App,
-  redirect: '/stock/index',
+  redirect: '/stock/home',
+  name:'库存管理',
   children: [{
-    path: 'index',
+    path: 'home',
+    name:'库存主页',
     component: Stock
   },{
     path: 'list',
+    name:'库存记录',
     component: StockList
   },{
     path: 'add',
+    name:'添加库存',
     component: Add
   },{
     path: 'ready_list',
+    name:'未完成库存单',
     component: StockReadyList
   },{
     path: 'edit',
+    name:'修改库存单',
     component: Edit
   }]
 } ]

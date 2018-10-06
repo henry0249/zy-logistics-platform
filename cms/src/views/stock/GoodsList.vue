@@ -19,8 +19,7 @@
         </div>
       </div>
     </common-alert>
-    <my-table @selection-change="selectionChange" :selection="$attrs.type === 'check'" size="mini" border stripe style="padding:0" :thead="thead" :op="$attrs.type === 'check'" opWidth="50px"
-      :data.sync="goodsData" max-height="200">
+    <my-table @selection-change="selectionChange" :selection="$attrs.type === 'check'" size="mini" border stripe style="padding:0" :thead="thead" :op="$attrs.type === 'check'" opWidth="50px" :data.sync="goodsData" max-height="200">
       <div class="jc" slot="op" slot-scope="scope">
         <remove-check class="danger" @remove="remove(scope)"></remove-check>
       </div>
@@ -75,7 +74,7 @@
       };
     },
     watch: {
-      show(val){
+      show(val) {
         if (!val) {
           this.allCheckValue = 0;
         }
@@ -95,10 +94,30 @@
         handler(val, oldVal) {
           let data = val;
           data.forEach((item, index) => {
+            if (oldVal[index].key) {
+              this.$set(data[index], 'key', oldVal[index].key);
+            } else
             if (!item.key) {
               this.$set(data[index], 'key', 0);
             }
           });
+          for (let index = 0; index < data.length; index++) {
+            for (let i = index + 1; i < data.length; i++) {
+              if (data[index]._id) {
+                if (data[index]._id === data[i]._id) {
+                  data.splice(i, 1, {
+                    name: "",
+                    brand: "",
+                    category: "",
+                    unit: "",
+                    stock: 0,
+                    key: 0
+                  });
+                  this.$message.warn('已选择该商品')
+                }
+              }
+            }
+          }
           this.goodsData = data;
           this.$emit("update:data", val);
         },
@@ -194,21 +213,43 @@
           obj.key = 0;
           data.push(obj);
         });
+        for (let index = 0; index < data.length; index++) {
+          for (let i = index + 1; i < data.length; i++) {
+            if (data[i]._id === data[index]._id) {
+              data.splice(i,1);
+            }
+          }
+        }
         this.goodsData = data;
         this.disabled = true;
       },
       batchUpdate() {
         if (this.selectionChangeData.length > 0) {
           this.selectionChangeData.forEach(item => {
-            this.goodsData.forEach((goodsItem, index) => {
-              if (item._id === goodsItem._id) {
-                this.$set(this.goodsData[index], 'key', this.allCheckValue);
-              }
-            });
+            if (!item._id) {
+              this.$message.warn('请先选择商品');
+              return;
+            } else {
+              this.goodsData.forEach((goodsItem, index) => {
+                if (item._id === goodsItem._id) {
+                  this.$set(this.goodsData[index], 'key', this.allCheckValue);
+                }
+              });
+            }
           });
         }
       },
       selectionChange(val) {
+        let io = true;
+        val.forEach(item => {
+          if (!item._id) {
+            io = false;
+            return;
+          }
+        });
+        if (!io) {
+          this.$message.warn('请先选择商品');
+        }
         this.selectionChangeData = val;
         this.count = val.length;
         if (val.length > 0) {
@@ -231,7 +272,7 @@
             key: 0
           })
         } else {
-          this.$message.warn('yi')
+          this.$message.warn(`只能添加${this.allCount}个商品`);
         }
         this.addCheck = false;
       },
@@ -253,6 +294,13 @@
         this.allCount = await this.$ajax.post('/goods/count', {
           company: this.company._id
         })
+      }
+    },
+    created () {
+      console.log(this.data);
+      if (this.data.length > 0) {
+        this.goodsData = JSON.parse(JSON.stringify(this.data));
+        console.log(this.goodsData);
       }
     }
   };

@@ -1,9 +1,7 @@
 <template>
-  <div class="g-goods flex">
-    <div>
-      <left-nav :nav="nav" :default-active="path"></left-nav>
-    </div>
-    <div class="f1 g-container">
+  <div>
+    <center-nav :data.sync="nav"></center-nav>
+    <div class="body-height">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
           <!-- 这里是会被缓存的视图组件-->
@@ -17,10 +15,10 @@
 </template>
 
 <script>
-  import LeftNav from "../common/LeftNav";
+  import CenterNav from "../common/CenterNav";
   export default {
     components: {
-      LeftNav
+      CenterNav
     },
     data() {
       return {
@@ -59,16 +57,28 @@
         ]
       };
     },
+    watch: {
+      orderBadge: {
+        handler: function(val) {
+          this.setNav(val);
+        },
+        deep: true
+      }
+    },
     methods: {
-      async test() {
-        let res0 = await this.$ajax.post("/test/add", {
-          value: "测试"
-        });
-        let res = await this.$ajax.get("/field");
+      setNav(val) {
+        for (const key in val) {
+          this.nav.forEach((item, index) => {
+            if (item.state === key) {
+              item.badge = val[key];
+            }
+            this.$set(this.nav, index, item);
+          });
+        }
       }
     },
     mounted() {
-      this.path = this.$route.path;
+      this.setNav(this.orderBadge);
     }
   };
 </script>

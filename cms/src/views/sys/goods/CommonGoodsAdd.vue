@@ -58,14 +58,14 @@
         <div class="jc" style="color:#ccc;" v-if="tableList.length === 0">请先添加价格</div>
         <my-table v-else size="mini" edit :thead="thead" :data.sync="tableList" index border op opWidth="50px">
           <div slot="op" slot-scope="scope" class="tc" style="width:100%;color:#F56C6C">
-            <i v-if="tableList.length>0" title="删除该地区" class="pointer" @click="delAdr(scope['index'])">
-                                                <icon size="16px">icon-ec1</icon>
-                                              </i>
+            <div v-if="tableList.length>0" title="删除该地区" class="pointer" @click="delAdr(scope['index'])">
+              <icon size="16px">icon-ec1</icon>
+            </div>
           </div>
-          <template slot-scope="scope">
-                                  <my-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" area></my-select>
-                                              <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
-</template>
+          <div slot-scope="scope">
+            <my-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" area></my-select>
+            <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
+          </div>
         </my-table>
       </div>
       <div class="tr" style="margin-top:30px">
@@ -297,7 +297,7 @@
 
 <style scoped>
   .g-order-create {
-    padding: 3% 5%;
+    padding: 0 1% 1% 1%;
   }
   .g-order {
     margin: 0 auto;
@@ -317,6 +317,5 @@
   }
   .form-right {
     padding-right: 20px;
-    
   }
 </style>

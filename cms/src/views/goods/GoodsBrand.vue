@@ -1,5 +1,5 @@
 <template>
-  <goods-brand :sys="false"></goods-brand>
+  <goods-brand class="body-padding" :sys="false"></goods-brand>
 </template>
 
 <script>

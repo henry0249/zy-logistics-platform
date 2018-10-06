@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="loadingText">
-    <common-table v-if="show" path="/goods/find" :thead="thead" :option="op">
+    <common-table v-if="show" style="padding:0 1%" height="calc(100vh - 50px - 35px - 35px)" path="/goods/find" :thead="thead" :option="op">
       <div slot="header" class="jc js">
         <my-form-item size="mini" style="padding-right:10px;" @change="inputChange" input label="商品名" placeholder="请输入商品名" width="25%" v-model="input"></my-form-item>
         <my-form-item width='25%' label="选择品牌" @change="brandChange" style="padding-right:10px;" size="mini" collapse-tags placeholder="选择品牌" v-model="brandData" :options="brandArr" select></my-form-item>
@@ -10,9 +10,9 @@
         </div>
       </div>
       <template slot-scope="scope" v-if="scope.prop === 'tag'||scope.prop === 'name'">
-              <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
-              <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see({type:'read',value:scope})">{{setName(scope)}}</div>
-</template>
+        <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+        <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see({type:'read',value:scope})">{{setName(scope)}}</div>
+      </template>
     </common-table>
   </loading-box>
 </template>
@@ -72,8 +72,7 @@
       return {
         disabled: false,
         show: true,
-        op: {
-        },
+        op: {},
         input: "",
         brandData: "",
         categoryData: "",

@@ -1,14 +1,14 @@
 <template>
   <div>
-    <common-table path="/user/find" :thead="thead" :option="op">
+    <common-table path="/user/find" :thead="thead" height="calc(100vh - 50px - 35px - 35px)" style="padding:0 1%" :option="op">
       <div slot="header" class="jc js">
         <my-form-item size="mini" style="padding-right:10px;" @change="inputChange" input placeholder="请输入用户名或手机号" width="250px" v-model="input"></my-form-item>
       </div>
-      <template slot-scope="scope" v-if="scope.prop === 'tag'||scope.prop === 'name'">
-                <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
-                <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{setName(scope)}}</div>
-</template>
-</common-table>
+      <div slot-scope="scope" v-if="scope.prop === 'tag'||scope.prop === 'name'">
+        <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+        <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{setName(scope)}}</div>
+      </div>
+    </common-table>
   </div>
 </template>
 

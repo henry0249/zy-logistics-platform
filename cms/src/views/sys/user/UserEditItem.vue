@@ -92,15 +92,15 @@
       async sub() {
         if (this.checkMethods()) {
           try {
+            let op = {
+              model: "user",
+              curdType: "update"
+            };
             if (this.type === "add") {
               this.$emit("input", "添加中");
             } else if (this.type === "edit") {
               this.$emit("input", "更新中");
             }
-            let op = {
-              model: "user",
-              curdType: "update"
-            };
             if (this.type === "add") {
               Object.assign(op, {
                 name: this.userData.name,
@@ -125,20 +125,33 @@
               }
               this.$set(op, "curdType", "set");
             } else if (this.type === "edit") {
+              let update = {
+                name: this.userData.name,
+                mobile: this.userData.mobile,
+                type: this.userData.type,
+                email: this.userData.email,
+                tag: this.userData.tag,
+              }
+              if (this.userData.recommendedByUser) {
+                this.$set(update, 'recommendedByUser', this.userData.recommendedByUser._id);
+              } else {
+                delete update.recommendedByUser;
+              }
+              if (this.userData.superior) {
+                this.$set(update, 'superior', this.userData.superior._id);
+              } else {
+                delete update.superior;
+              }
+              if (this.userData.parent) {
+                this.$set(update, 'parent', this.userData.parent._id);
+              } else {
+                delete update.parent;
+              }
               Object.assign(op, {
                 find: {
                   _id: this.$route.params._id
                 },
-                update: {
-                  name: this.userData.name,
-                  mobile: this.userData.mobile,
-                  type: this.userData.type,
-                  email: this.userData.email,
-                  tag: this.userData.tag,
-                  recommendedByUser: this.userData.recommendedByUser._id,
-                  superior: this.userData.superior._id,
-                  parent: this.userData.parent._id
-                }
+                update
               });
             }
             let res = await this.$api.curd(op);
@@ -147,12 +160,14 @@
             if (this.sys) {
               path = '/sys/user/list';
             } else {
-              // path = '/sys/user/list';
+              path = '/sys/user/list';
             }
             this.$router.push({
               path
             });
-          } catch (error) {}
+          } catch (error) {
+            console.log(error);
+          }
           this.$emit("input", "");
         }
       }
@@ -171,7 +186,7 @@
 
 <style scoped>
   .g-order-create {
-    padding: 3% 5%;
+    padding: 0 1% 1% 1%;
   }
   .g-order {
     margin: 0 auto;

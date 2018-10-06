@@ -12,7 +12,7 @@
         <common-alert style="margin:15px 0">{{isLogistics?'车船信息':'车船信息 (该公司不是物流公司，无车船信息)'}}</common-alert>
         <company-ship v-if="!loadingText&&isLogistics" :startData="startShipObj" :removeObj.sync="shipRemoveObj" :isLogistics="isLogistics" :data.sync="shipObj"></company-ship>
       </div>
-      <div class="tr" style="margin-top:30px">
+      <div class="tr jb" style="margin-top:30px">
         <el-button size="small" @click="$router.go(-1)">返 回</el-button>
         <el-button size="small" type="primary" @click="sub">修 改</el-button>
       </div>
@@ -284,9 +284,9 @@
             }
             this.$message.success("更新成功！");
             if (this.sys) {
-              // this.$router.push({
-              //   path: '/sys/company'
-              // });
+              this.$router.push({
+                path: '/sys/company'
+              });
             } else {
               this.show = false;
               await this.getCompany();
@@ -400,7 +400,7 @@
 
 <style scoped>
   .g-order-create {
-    padding: 3% 5%;
+    padding: 0 1% 1% 1%;
   }
   .g-order {
     margin: 0 auto;

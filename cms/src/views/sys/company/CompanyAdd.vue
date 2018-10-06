@@ -165,7 +165,7 @@
 
 <style scoped>
   .g-order-create {
-    padding: 3% 5%;
+    padding: 0 1% 1% 1%;
   }
   .g-order {
     margin: 0 auto;

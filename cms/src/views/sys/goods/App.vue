@@ -1,7 +1,7 @@
 <template>
-  <div class="flex">
-    <left-nav :nav="nav"></left-nav>
-    <div class="f1 g-container">
+  <div>
+    <center-nav :data.sync="nav"></center-nav>
+    <div class="body-height">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
           <!-- 这里是会被缓存的视图组件-->
@@ -15,26 +15,69 @@
 </template>
 
 <script>
-  import LeftNav from "../../common/LeftNav.vue";
+  import CenterNav from "../../common/CenterNav";
   import navObj from '../nav.js';
   export default {
     components: {
-      LeftNav
+      CenterNav
     },
     data() {
       return {
-        navObj
+        nav: [{
+            name: '添加商品',
+            icon: 'icon-jia',
+            path: '/sys/goods/add'
+          }, {
+            name: '添加品牌',
+            icon: 'icon-jia',
+            path: '/sys/goods/brand_add'
+          }, {
+            name: '添加分类',
+            icon: 'icon-jia',
+            path: '/sys/goods/category_add'
+          }, {
+            name: '商品列表',
+            icon: 'icon-liebiao',
+            path: '/sys/goods/list'
+          },
+          {
+            name: "分类列表",
+            color: "orange",
+            icon: "icon-fenlei",
+            path: "/sys/goods/category"
+          },
+          {
+            name: "品牌列表",
+            color: "orange",
+            icon: "icon-shangbiao",
+            iconSize: '15',
+            path: "/sys/goods/brand"
+          }
+        ]
       }
     },
-    computed: {
-      nav() {
-        for (const key in this.navObj) {
-          let str = this.$route.path.split('/')[2];
-          if (str === key) {
-            return this.navObj[key];
-          }
+    watch: {
+      orderBadge: {
+        handler: function(val) {
+          this.setNav(val);
+        },
+        deep: true
+      }
+    },
+    methods: {
+      setNav(val) {
+        for (const key in val) {
+          this.nav.forEach((item, index) => {
+            if (item.state === key) {
+              item.badge = val[key];
+            }
+            this.$set(this.nav, index, item);
+          });
         }
       }
+    },
+    mounted() {
+      this.setNav(this.orderBadge);
     }
   }
 </script>

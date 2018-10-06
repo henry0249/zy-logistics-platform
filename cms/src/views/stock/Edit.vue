@@ -1,5 +1,5 @@
 <template>
-  <loading-box v-model="loadingText" style="padding: 3% 5%;margin:0 auto">
+  <loading-box v-model="loadingText" style="padding: 0 1%;margin:0 auto">
     <stock-info v-if="!loadingText" @submit="submit" :val="data" :submit-text="`确认${field.Stock.type.option[$route.query.type]}`"></stock-info>
   </loading-box>
 </template>
@@ -18,7 +18,7 @@
     },
     methods: {
       async submit(val) {
-        this.$confirm(`是否提交修改将该${this.field.Stock.type.option[val.type]}单状态更改为完成？`, '提示', {
+        this.$confirm(`是否提交修改将该${this.field.Stock.type.option[this.$route.query.type]}单状态更改为完成？`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -27,29 +27,27 @@
         }).catch(() => {});
       },
       async sub(val) {
+        console.log(val);
         try {
           this.loadingText = '修改中';
-          let data = {
-            model: 'stock',
-            curdType: 'set',
-            state: 'finish',
-            name: val.name,
-            type: val.type,
-            num: val.num,
-            old: val.old,
-            new: val.new,
-            businessTrains: val.businessTrains,
-            dv: val.dv,
-            company: val.company,
-          }
-          let res = await this.$api.curd(data);
-          let del = await this.$api.curd({
+          let delStock = await this.$api.curd({
             model: 'stock',
             curdType: 'delete',
-            _id: val._id
+            _id: this.$route.query._id
+          })
+          let setStock = await this.$api.curd({
+            model: 'stock',
+            curdType: 'set',
+            goods: val[0].goods,
+            name: val[0].name,
+            num: val[0].num,
+            remake: val[0].remake,
+            type: val[0].type,
+            state: 'finish',
+            company: this.company._id
           })
           this.$router.push({
-            path: '/stock/index'
+            path: '/stock/home'
           });
           this.$message.success('修改成功！');
         } catch (error) {}
@@ -61,8 +59,17 @@
           this.data = await this.$api.curd({
             model: 'stock',
             curdType: 'findOne',
-            _id: this.$route.query._id
+            _id: this.$route.query._id,
+            populate: [{
+              path: 'goods',
+              populate: [{
+                path: 'category'
+              }, {
+                path: 'brand'
+              }]
+            }]
           })
+          this.$set(this.data, 'state', 'finish');
         } catch (error) {}
         this.loadingText = '';
       }

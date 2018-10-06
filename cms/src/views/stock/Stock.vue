@@ -1,14 +1,14 @@
 <template>
   <loading-box v-model="loadingText">
-    <div>
+    <div style="height:calc(100vh - 50px - 35px - 35px)" class="col-flex">
       <div style="padding:2vh">
-        <div class="flex ac jb"  style="height:174px">
+        <div class="flex ac jb" style="height:174px">
           <div style="width:24%" v-for="(val,key) in data" :key="val.id">
             <stock-card :type="key" :data="val.num" :time="val.createdAt"></stock-card>
           </div>
         </div>
       </div>
-      <div style="padding:0 2vh">
+      <div class="f1" style="padding:0 2vh;width:100%">
         <div class="chart-card">
           <stock-chart v-if="!loadingText"></stock-chart>
         </div>
@@ -62,6 +62,6 @@
     border-radius: 4px;
     border: 1px solid #ebeef5;
     padding: 2vh;
-    height: calc(100vh - 174px - 50px - 4vh - 1vh);
+    height:100%;
   }
 </style>

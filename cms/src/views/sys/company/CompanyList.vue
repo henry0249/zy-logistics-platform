@@ -1,13 +1,13 @@
 <template>
-  <common-table stripe path="/company/find" :thead="thead" :option="option">
+  <common-table stripe path="/company/find" height="calc(100vh - 50px - 35px - 35px)" style="padding:0 1%" :thead="thead" :option="option">
     <div slot="header" class="jc js">
       <my-form-item size="mini" style="padding-right:10px;" @change="inputChange" input placeholder="请输入公司名称或别称" width="240px" v-model="input"></my-form-item>
       <my-form-item width='300px' label="公司类型" @change="typeChange" style="padding-right:10px;" size="mini" multiple collapse-tags placeholder="选择公司类型" v-model="typeData" :options="field.Company.type.option" select></my-form-item>
     </div>
-    <template slot-scope="scope">
-        <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see({type:'read',value:scope})">{{setName(scope)}}</div>
-        <div v-if="scope.prop === 'area'">{{areaText(scope.row['area'])}}</div>
-</template>
+    <div slot-scope="scope">
+      <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see({type:'read',value:scope})">{{setName(scope)}}</div>
+      <div v-if="scope.prop === 'area'">{{areaText(scope.row['area'])}}</div>
+    </div>
   </common-table>
 </template>
 

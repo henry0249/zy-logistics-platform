@@ -8,7 +8,8 @@ import User from './user/router';
 export default [{
   path: '/sys',
   component: App,
-  redirect: '/sys/area',
+  redirect: '/sys/system',
+  name:'系统后台',
   meta: {
     keepAlive: true // 需要被缓存
   },

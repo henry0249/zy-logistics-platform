@@ -1,7 +1,7 @@
 <template>
-  <div class="flex">
-    <left-nav :nav="nav"></left-nav>
-    <div class="f1 g-container">
+  <div>
+    <center-nav :data.sync="nav"></center-nav>
+    <div class="body-height">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">
           <!-- 这里是会被缓存的视图组件-->
@@ -15,11 +15,11 @@
 </template>
 
 <script>
-  import LeftNav from "../../common/LeftNav.vue";
+  import CenterNav from "../../common/CenterNav";
   import navObj from '../nav.js';
   export default {
     components: {
-      LeftNav
+      CenterNav
     },
     data() {
       return {
@@ -35,6 +35,29 @@
           }
         }
       }
+    },
+    watch: {
+      orderBadge: {
+        handler: function(val) {
+          this.setNav(val);
+        },
+        deep: true
+      }
+    },
+    methods: {
+      setNav(val) {
+        for (const key in val) {
+          this.nav.forEach((item, index) => {
+            if (item.state === key) {
+              item.badge = val[key];
+            }
+            this.$set(this.nav, index, item);
+          });
+        }
+      }
+    },
+    mounted() {
+      this.setNav(this.orderBadge);
     }
   }
 </script>

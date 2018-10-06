@@ -1,6 +1,6 @@
 <template>
   <div>
-    <goods-category :sys="false"></goods-category>
+    <goods-category class="body-padding" :sys="false"></goods-category>
   </div>
 </template>
 

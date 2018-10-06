@@ -8,8 +8,6 @@
   export default {
     components: {
       StockList
-    },
-    methods: {
     }
   }
 </script>

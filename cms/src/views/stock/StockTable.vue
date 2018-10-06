@@ -1,5 +1,5 @@
 <template>
-  <common-table v-if="show" :height="height" style="padding:0" path="stock/find" :option="option" :thead="thead">
+  <common-table v-if="show" height="calc(100vh - 50px - 35px - 35px)" style="padding:0 1%" path="stock/find" :option="option" :thead="thead">
     <div slot="header" class="jc js">
       <my-form-item width='200px' label="变化类型" @change="typeChange" style="margin-right:20px;" size="mini" multiple collapse-tags v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
       <my-form-item type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" label="起始时间" date style="padding-right:10px;" width="44%" size="mini" v-model="dateArr">

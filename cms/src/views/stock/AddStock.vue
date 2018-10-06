@@ -1,5 +1,5 @@
 <template>
-  <loading-box v-model="loadingText" style="padding: 3% 5%;margin:0 auto">
+  <loading-box v-model="loadingText" style="padding: 0 1%;margin:0 auto">
     <stock-info ref="info" v-if="!loadingText" :goodsId.sync="goodsId" @submit="submit"></stock-info>
   </loading-box>
 </template>
@@ -35,7 +35,7 @@
           console.log(data);
           let setStock = await this.$ajax.post('/stock/multi',data);
           this.$message.success('操作成功');
-          this.$router.push({path:'/stock/index'});
+          this.$router.push({path:'/stock/home'});
         } catch (error) {}
         this.loadingText = '';
       }

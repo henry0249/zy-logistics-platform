@@ -1,6 +1,6 @@
 <template>
   <div>
-    <common-table path="/category/find" :thead="thead" :option="op">
+    <common-table path="/category/find" style="padding:0 1%" height="calc(100vh - 50px - 35px - 35px)" :thead="thead" :option="op">
       <div slot="header" class="jc js">
         <my-form-item size="mini" style="padding-right:10px;" @change="inputChange" input label="分类名" placeholder="请输入分类名" width="250px" v-model="input"></my-form-item>
         <my-form-item @change="categoryCheckChange" label="选择分类类型" style="padding-right:10px;" filterable width="250px" size="mini" placeholder="选择分类类型" v-model="categoryCheck" :options="categoryOption" select></my-form-item>

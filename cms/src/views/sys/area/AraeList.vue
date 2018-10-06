@@ -1,5 +1,5 @@
 <template>
-  <common-table border :thead="thead" path="/area/find" :option="option">
+  <common-table border :thead="thead" height="calc(100vh - 50px - 35px - 35px)" path="/area/find" :option="option" :searchSlot="false">
     <template slot-scope="scope">
         <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'key'" @click="see(scope)">{{scope.row['key']}}</div>
     </template>

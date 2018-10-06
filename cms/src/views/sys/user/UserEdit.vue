@@ -41,7 +41,7 @@ export default {
     }
   },
   async created() {
-    this.loadingText = '更新中';
+    this.loadingText = '加载中';
     await this.getData();
     this.loadingText = '';
   }

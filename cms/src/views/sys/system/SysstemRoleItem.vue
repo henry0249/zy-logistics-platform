@@ -1,16 +1,16 @@
 <template>
   <loading-box v-model="loadingText" class="js as">
-    <div style="padding:0 5%;width:100%;">
+    <div style="padding:0 1%;width:100%;">
       <div class="jc je" style="height:40px;">
         <el-button type="success" @click="add" :title="`添加${userText()}`" size="mini">{{userText()}}<i class="el-icon-plus el-icon--right"></i></el-button>
       </div>
-      <my-table :loadmore="loadmore" v-if="!loadingText" height="100vh - 90px" opWidth="45px" border index :thead="thead" :data.sync="data" size="mini" op>
+      <my-table :loadmore="loadmore" v-if="!loadingText" height="calc(100vh - 50px - 35px - 35px - 40px)" opWidth="45px" border index :thead="thead" :data.sync="data" size="mini" op>
         <div slot="op" class="jc" slot-scope="scope">
           <remove-check @remove="remove(scope)"></remove-check>
         </div>
-        <template slot-scope="scope">
-                  <el-tag v-if="scope.prop === 'user.tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['user.tag']" :key="item.id">{{scope.row['user.tag']}}</el-tag>
-</template>
+        <div slot-scope="scope">
+          <el-tag v-if="scope.prop === 'user.tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['user.tag']" :key="item.id">{{scope.row['user.tag']}}</el-tag>
+        </div>
       </my-table>
       <el-dialog :title="`选择${userText()}`" width="70%" :visible.sync="dialogTableVisible">
         <common-table style="padding:0" v-if="dialogTableVisible" path="/user/find" @selection-change="selectionChange" :height="tableHeight" :thead="userThead" selection :option="option">
@@ -72,13 +72,15 @@
       }
     },
     methods: {
-      async loadmore(){
+      async loadmore() {
         let data = {
-          model:'role',
-          curdType:'find',
-          type:this.type,
-          skip:this.data.length,
-          populate:[{path:'user'}]
+          model: 'role',
+          curdType: 'find',
+          type: this.type,
+          skip: this.data.length,
+          populate: [{
+            path: 'user'
+          }]
         }
         let res = await this.$api.curd(data);
         return res;

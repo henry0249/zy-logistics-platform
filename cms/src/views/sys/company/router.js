@@ -6,18 +6,22 @@ import CompanyAdd from './CompanyAdd.vue';
 export default [{
   path: 'company',
   component: App,
+  name:'公司管理',
   redirect: 'company/list',
   meta: {
     keepAlive: true // 需要被缓存
   },
   children:[{
     path:'list',
+    name:'公司列表',
     component:List
   },{
     path:'edit/:_id',
+    name:'公司详情',
     component:Edit
   },{
     path:'add',
+    name:'添加公司',
     component:CompanyAdd
   }]
 }]

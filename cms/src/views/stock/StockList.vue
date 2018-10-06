@@ -1,5 +1,5 @@
 <template>
-  <loading-box v-model="loadingText" style="padding:0 3%;position: relative;">
+  <loading-box v-model="loadingText" style="position: relative;">
     <stock-table v-if="!loadingText" @remove="remove" @sub="sub" :state="activeName"></stock-table>
   </loading-box>
 </template>

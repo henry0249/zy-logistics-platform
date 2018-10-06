@@ -1,6 +1,6 @@
 <template>
   <div>
-    <common-table v-if="show" path="/brand/find" :thead="thead" :option="op">
+    <common-table style="padding:0 1%" height="calc(100vh - 50px - 35px - 35px)" v-if="show" path="/brand/find" :thead="thead" :option="op">
       <div slot="header" class="jc js">
         <my-form-item size="mini" style="padding-right:10px;" @change="inputChange" input label="品牌名" placeholder="请输入品牌名" width="25%" v-model="input"></my-form-item>
         <div style="width:25%">

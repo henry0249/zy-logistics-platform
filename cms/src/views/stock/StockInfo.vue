@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="loadingText">
-    <div>
+    <div style="padding-bottom:1%">
       <div class="g-stock-info">
         <slot name="title">
           <div class="title">
@@ -65,8 +65,8 @@
     },
     data() {
       return {
-        checkAll:false,
-        addCheck:false,
+        checkAll: false,
+        addCheck: false,
         goodsData: [],
         goodsObj: {},
         loadingText: "",
@@ -108,7 +108,7 @@
       },
     },
     methods: {
-      add(){
+      add() {
         this.addCheck = true;
       },
       checkAllGoods() {
@@ -137,6 +137,7 @@
             this.$set(obj, 'num', item.key);
             data.push(obj);
           });
+          console.log(data);
           this.$emit("submit", data);
         }
       },
@@ -169,6 +170,17 @@
         if (this.$route.query.type && this.field.Stock.type.option[this.$route.query.type]) {
           this.form.type = this.$route.query.type
         }
+      }
+    },
+    created() {
+      if (this.val && this.val._id) {
+        let obj = this.val.goods;
+        console.log(this.val.num);
+        if (this.val.num) {
+          this.$set(obj, 'key', this.val.num);
+        }
+        this.goodsData.push(obj);
+        console.log(this.goodsData, '!!!!');
       }
     }
   };
