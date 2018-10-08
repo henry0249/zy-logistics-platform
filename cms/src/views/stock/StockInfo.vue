@@ -23,7 +23,7 @@
             <my-form-item label="名称" v-model="form.name"></my-form-item>
             <my-form-item label="状态" v-model="form.state" select :options="field.Stock.state.option"></my-form-item>
           </div>
-          <my-form-item style="margin-top:15px" width="100%" label="备注" v-model="form.remake"></my-form-item>
+          <my-form-item style="margin-top:15px" width="100%" label="备注" v-model="form.remark"></my-form-item>
         </my-form>
         <el-alert style="margin-top:15px" title="待处理状态的库存单不会使库存立即变化,完成状态会立即修改库存" type="warning" :closable="false" center show-icon>
         </el-alert>
@@ -74,13 +74,15 @@
           state: "finish",
           type: "in",
           name: "",
-          remake: ""
+          remark: ""
         },
       };
     },
     watch: {
       goodsData: {
-        handler(val) {},
+        handler(val) {
+          console.log(val);
+        },
         deep: true
       },
       company: {
@@ -91,6 +93,7 @@
       },
       form: {
         handler: function(val) {
+          this.goodsData = [val.goods];
           this.$emit("update:data", val);
         },
         deep: true
@@ -142,6 +145,7 @@
         }
       },
       checkMethods() {
+        console.log(this.goodsData);
         let check = true;
         if (this.goodsData.length === 0) {
           this.$message.warn('必须选择商品');

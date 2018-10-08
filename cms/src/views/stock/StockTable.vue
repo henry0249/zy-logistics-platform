@@ -1,19 +1,21 @@
 <template>
   <common-table v-if="show" height="calc(100vh - 50px - 35px - 35px)" style="padding:0 1%" path="stock/find" :option="option" :thead="thead">
     <div slot="header" class="jc js">
-      <my-form-item width='200px' label="变化类型" @change="typeChange" style="margin-right:20px;" size="mini" multiple collapse-tags v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
+      <my-form-item width='200px' label="库存单类型" @change="typeChange" style="margin-right:20px;" size="mini" multiple collapse-tags v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
+      <my-form-item width='200px' label="变化类型" @change="dvChange" style="margin-right:20px;" size="mini" collapse-tags v-model="dvData" :options="dvOption" select></my-form-item>
       <my-form-item type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" label="起始时间" date style="padding-right:10px;" width="44%" size="mini" v-model="dateArr">
       </my-form-item>
     </div>
-    <template slot-scope="scope">
+    <div slot-scope="scope">
       <div v-if="scope.prop === 'type'">{{field.Stock.type.option[scope.row['type']]}}</div>
       <div v-if="scope.prop === 'createdAt'">{{changeDate(scope.row['createdAt'])}}</div>
       <div v-if="scope.prop === 'state'">{{field.Stock.state.option[scope.row['state']]}}</div>
+      <el-tag size="mini" v-if="scope.prop === 'dv'" :type="dvValue(scope.row['dv']).type">{{dvValue(scope.row['dv']).value}}</el-tag>
       <div class="link" v-if="scope.prop === 'op'&&$attrs.state === 'ready'" @click="toFinish(scope)">标记已完成</div>
-      <div v-if="scope.prop === 'op'&&$attrs.state === 'finish'">
-        <remove-check @remove="remove(scope)"></remove-check>
-      </div>
-    </template>
+      <!-- <div v-if="scope.prop === 'op'&&$attrs.state === 'finish'">
+                                            <remove-check @remove="remove(scope)"></remove-check>
+                                          </div> -->
+    </div>
   </common-table>
 </template>
 
@@ -36,39 +38,20 @@
         startDate: '',
         endDate: '',
         dateArr: [],
+        dvData: '',
         show: true,
         typeData: [],
         option: {},
-        thead: {
-          type: {
-            name: "变化类型",
-            slot: true
-          },
-          num: {
-            name: "数量",
-          },
-          new: {
-            name: "操作后库存",
-          },
-          dv: {
-            name: "差值",
-          },
-          'goods.name':{
-            name:'商品',
-          },
-          createdAt: {
-            name: "操作日期",
-            slot: true
-          },
-          state: {
-            name: '状态',
-            slot: true
-          },
-          op: {
-            name: '操作',
-            slot: true
-          }
-        }
+        dvOption: [{
+          label: '增加',
+          value: 'jia'
+        }, {
+          label: '不变',
+          value: 'bubian'
+        }, {
+          label: '减少',
+          value: 'jian'
+        }]
       }
     },
     watch: {
@@ -96,12 +79,108 @@
         deep: true
       }
     },
+    computed: {
+      thead() {
+        let thead = {
+          name: {
+            name: '库存单名称'
+          },
+          type: {
+            name: "库存单类型",
+            slot: true
+          },
+          num: {
+            name: "数量",
+          },
+          // new: {
+          //   name: "操作后库存",
+          // },
+          dv: {
+            name: "变化类型",
+            slot: true
+          },
+          'goods.name': {
+            name: '操作商品',
+          },
+          remake: {
+            name: "备注",
+          },
+          createdAt: {
+            name: "操作日期",
+            slot: true
+          },
+          state: {
+            name: '状态',
+            slot: true
+          },
+          op: {
+            name: '操作',
+            slot: true
+          }
+        }
+        if (this.$attrs.state === 'finish') {
+          delete thead.op
+        } else {
+          this.$set(thead, 'op', {
+            name: '操作',
+            slot: true
+          })
+        }
+        return thead;
+      }
+    },
     methods: {
+      dvValue(val) {
+        let data = {
+          type: '',
+          value: ''
+        }
+        if (val > 0) {
+          data.value = '增加';
+          data.type = 'success';
+        } else if (val === 0) {
+          data.value = '不变';
+          data.type = 'info';
+        } else {
+          data.value = '减少';
+          data.type = 'danger';
+        }
+        return data;
+      },
       toFinish(scope) {
         this.$emit('sub', scope);
       },
       remove(scope) {
         this.$emit('remove', scope);
+      },
+      dvChange(val) {
+        // if (this.option.$or) {
+        //   this.option.$or.forEach((item, index) => {
+        //     if (item.dv) {
+        //       this.option.$or.splice(index, 1);
+        //     }
+        //   });
+        // }
+        // let obj = {}
+        if (val === 'jia') {
+          this.$set(this.option, 'dv', {
+            $gt: 0
+          });
+        } else if (val === 'bubian') {
+          this.$set(this.option, 'dv', 0);
+        } else {
+          this.$set(this.option, 'dv', {
+            $lt: 0
+          });
+        }
+        // data.push(obj);
+        // if (this.option.$or) {
+        //   data.forEach(item => {
+        //     this.option.$or.push(item);
+        //   });
+        // } else {
+        //   this.$set(this.option, '$or', data);
+        // }
       },
       typeChange(val) {
         if (val.length > 0) {
@@ -155,8 +234,8 @@
       if (Object.keys(this.op).length > 0) {
         this.option = JSON.parse(JSON.stringify(this.op));
       }
-      this.$set(this.option,'populate',[{
-        path:'goods'
+      this.$set(this.option, 'populate', [{
+        path: 'goods'
       }])
       this.changetype();
     }

@@ -94,10 +94,9 @@
         handler(val, oldVal) {
           let data = val;
           data.forEach((item, index) => {
-            if (oldVal[index].key) {
+            if (oldVal[index] && oldVal[index].key) {
               this.$set(data[index], 'key', oldVal[index].key);
-            } else
-            if (!item.key) {
+            } else {
               this.$set(data[index], 'key', 0);
             }
           });
@@ -125,14 +124,19 @@
       },
       async "$attrs.type" (val) {
         if (val !== "check") {
-          this.goodsData = [{
-            name: "",
-            brand: "",
-            category: "",
-            unit: "",
-            stock: 0,
-            key: 0
-          }];
+          if (this.$route.query._id) {
+            if (this.goodsData.length > 1) {
+              let data = JSON.parse(JSON.stringify(this.data[0]));
+              this.goodsData = [data];
+            } else {
+              this.goodsData = JSON.parse(JSON.stringify(this.data));
+            }
+          } else {
+            if (this.goodsData.length > 1) {
+              let data = JSON.parse(JSON.stringify(this.goodsData[0]));
+              this.goodsData = [data];
+            }
+          }
           this.disabled = false;
           this.checkAll = false
         } else {
@@ -216,7 +220,7 @@
         for (let index = 0; index < data.length; index++) {
           for (let i = index + 1; i < data.length; i++) {
             if (data[i]._id === data[index]._id) {
-              data.splice(i,1);
+              data.splice(i, 1);
             }
           }
         }
@@ -272,7 +276,7 @@
             key: 0
           })
         } else {
-          this.$message.warn(`只能添加${this.allCount}个商品`);
+          this.$message.warn(`您已盘点所有商品`);
         }
         this.addCheck = false;
       },
@@ -296,7 +300,7 @@
         })
       }
     },
-    created () {
+    created() {
       console.log(this.data);
       if (this.data.length > 0) {
         this.goodsData = JSON.parse(JSON.stringify(this.data));

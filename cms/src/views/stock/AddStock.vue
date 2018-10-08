@@ -30,6 +30,7 @@
     },
     methods: {
       async submit(data) {
+        console.log(data);
         try {
           this.loadingText = '加载中';
           console.log(data);
