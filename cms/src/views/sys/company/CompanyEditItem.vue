@@ -20,6 +20,9 @@
     <div class="flex jb" style="margin-top:15px;">
       <common-multi-selection label="贸易链关联公司" :data.sync="companyData.businessRelationCompany" border title="贸易链关联公司选择" company size="mini"></common-multi-selection>
     </div>
+    <div class="flex jb" style="margin-top:15px;">
+      <common-multi-selection label="物流链关联公司" :data.sync="companyData.transportTrainsRelationCompany" border title="物流链关联公司选择" company size="mini"></common-multi-selection>
+    </div>
   </my-form>
 </template>
 
@@ -64,7 +67,8 @@
           self: false,
           areaInfo: "",
           area: {},
-          businessRelationCompany: []
+          businessRelationCompany: [],
+          transportTrainsRelationCompany:[]
         }
       };
     },

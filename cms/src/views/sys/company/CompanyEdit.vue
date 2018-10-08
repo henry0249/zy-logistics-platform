@@ -145,6 +145,21 @@
             this.loadingText = "更新中";
             let companyOp = JSON.parse(JSON.stringify(this.companyArr));
             delete companyOp._id;
+            console.log(companyOp);
+            if (companyOp.businessRelationCompany.length > 0) {
+              let data = [];
+              companyOp.businessRelationCompany.forEach(item => {
+                data.push(item._id);
+              });
+              this.$set(companyOp, 'businessRelationCompany', data);
+            }
+            if (companyOp.transportTrainsRelationCompany.length > 0) {
+              let data = [];
+              companyOp.transportTrainsRelationCompany.forEach(item => {
+                data.push(item._id);
+              });
+              this.$set(companyOp, 'transportTrainsRelationCompany', data);
+            }
             let company = await this.$api.curd({
               model: "company",
               curdType: "update",
@@ -338,7 +353,7 @@
           company: _id,
           populate: [{
             path: "user"
-          },{
+          }, {
             path: "area"
           }]
         });
