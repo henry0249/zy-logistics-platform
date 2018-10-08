@@ -46,6 +46,10 @@ module.exports = {
       readOnly: true,
       slot: true,
     },
+    stock: {
+      name: "库存数量",
+      slot: true,
+    },
     unit: {
       name: "单位",
       readOnly: true,

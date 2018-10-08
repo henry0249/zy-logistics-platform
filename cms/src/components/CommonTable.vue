@@ -77,6 +77,12 @@ export default {
     currentCompany: {
       type: String,
       default: ""
+    },
+    preOption: {
+      type: Object,
+      default() {
+        return {};
+      }
     }
   },
   data() {
@@ -84,7 +90,7 @@ export default {
       loadingText: "",
       data: [],
       activeCompany: "",
-      companylist: [],
+      companylist: []
     };
   },
   watch: {
@@ -111,9 +117,11 @@ export default {
       this.loadingText = "加载中";
       try {
         this.data = [];
+        console.log(this.preOption);
         let body = {
           limit: Number(this.limit),
-          ...option
+          ...option,
+          ...this.preOption
         };
         if (this.showCompany) {
           body.handle = this.activeCompany;
@@ -130,7 +138,8 @@ export default {
       let body = {
         limit: Number(this.limit),
         skip: this.data.length,
-        ...option
+        ...option,
+        ...this.preOption
       };
       if (this.showCompany) {
         body.handle = this.activeCompany;

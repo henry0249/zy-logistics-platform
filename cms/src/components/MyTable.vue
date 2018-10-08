@@ -248,6 +248,7 @@ export default {
       this.$emit("current-change", val);
     },
     toggleRowSelection(data) {
+      this.$refs.table.clearSelection();
       data.forEach(item => {
         this.data.forEach(row => {
           if (item._id === row._id) {

@@ -2,10 +2,10 @@ const Service = require('egg').Service;
 const stockField = require('../field/Stock');
 
 class StockService extends Service {
-  async multi(){
+  async multi() {
     const ctx = this.ctx;
     let body = ctx.request.body;
-    if (!(body && body instanceof Array && body.length>0)) {
+    if (!(body && body instanceof Array && body.length > 0)) {
       ctx.throw(422, '批量操作失败,未接收到操作数据', body);
     }
     for (let i = 0; i < body.length; i++) {
@@ -24,17 +24,10 @@ class StockService extends Service {
     if (!goods) {
       ctx.throw(422, '商品不存在', body);
     }
-    if (!body.company) {
-      ctx.throw(422, '公司信息必填', body);
-    }
-    let company = await ctx.model.Company.findById(body.company);
-    if (!company) {
-      ctx.throw(422, '公司不存在', body);
-    }
     if (!stockField.type.option[body.type]) {
       ctx.throw(422, '库存修改类型不存在', body);
     }
-    
+
     if (body.type === 'out' || body.type === 'decrease') {
       if (Number(body.num) > Number(goods.stock)) {
         ctx.throw(422, '不能超出当前商品库存', body);
@@ -60,9 +53,10 @@ class StockService extends Service {
     }
     let stockModel = new ctx.model.Stock({
       ...body,
-      old: company.stock,
+      company: goods.company,
+      old: goods.stock,
       new: newStock,
-      dv: newStock - Number(goods.stock),
+      dv: newStock - Number(goods.stock)
     });
     await stockModel.save();
     await goods.update({

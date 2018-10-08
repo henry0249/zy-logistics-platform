@@ -9,7 +9,7 @@
           <div style="width:150px">商品名称：{{order.goods.name}}</div>
           <div class="goods-info-padding">品牌：{{order.goods.brand.name}}</div>
           <div class="goods-info-padding">规格：{{order.goods.spec}}</div>
-          <div class="goods-info-padding">单位：{{order.goods.unit}}</div>
+          <div class="goods-info-padding">库存：{{order.goods.stock}} {{order.goods.unit}}</div>
         </div>
         <div @click="add" class="success pointer" style="padding:10px">
           贸易节点<i class="el-icon-plus"></i>
@@ -19,8 +19,8 @@
         <div class="hor-scroll" style="margin-bottom:10px">
           <div class="hor-scroll-item" style="padding:10px 0" v-for="(item,index) in data" :key="index">
             <div class="flex ac">
-              <business-trains-card :order="order" :index="index" :last.sync="index>0?data[index-1]:undefined" :next.sync="data[index+1]?data[index+1]:undefined" :title="businessTrainsTitle(index)" :data.sync="item" @remove="remove($event,index)"></business-trains-card>
-              <div v-if="index!==data.length-1" style="padding:0 10px">
+              <business-trains-card :key="item._id" :order="order" :index="index" :last.sync="index>0?data[index-1]:undefined" :next.sync="data[index+1]?data[index+1]:undefined" :title="businessTrainsTitle(index)" :data.sync="item" @remove="remove($event,index)"></business-trains-card>
+              <div class="tc" v-if="index!==data.length-1" style="width:50px">
                 <i class="el-icon-d-arrow-right success"></i>
               </div>
             </div>
@@ -136,14 +136,14 @@ export default {
         if (item._id) {
           this.loadingText = "加载中...";
           try {
+            await this.$ajax.post('/businessTrains/delete',{
+              _id:item._id
+            });
             this.data.splice(index, 1);
           } catch (error) {}
           this.loadingText = "";
         } else {
           this.data.splice(index, 1);
-        }
-        if (this.data.length === 2) {
-          // this.data = [];
         }
       } else {
         this.data = [];
@@ -155,7 +155,8 @@ export default {
         supplyCount: this.order.count,
         loss: 0,
         receive: this.order.count,
-        remark: ""
+        remark: "",
+        logistics: []
       };
       if (this.data.length === 0) {
         this.data.push({
@@ -172,7 +173,7 @@ export default {
           ...body,
           type: "customer",
           [this.order.type]: this.order[this.order.type],
-          customerType: this.order.type
+          customerType: this.order.type,
         });
       } else {
         if (!this.data[this.data.length - 1 - 1].company) {
@@ -184,7 +185,7 @@ export default {
           type: "pool",
           company: "",
           supplyCount: this.data[this.data.length - 1 - 1].supplyCount,
-          supplyPrice: this.data[this.data.length - 1 - 1].supplyPrice
+          supplyPrice: this.data[this.data.length - 1 - 1].supplyPrice,
         });
       }
     },

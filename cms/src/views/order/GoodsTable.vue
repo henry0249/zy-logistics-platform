@@ -9,6 +9,9 @@
         <div v-if="scope.prop === 'brand'">
           {{order.goods.brand ? order.goods.brand.name : '-'}}
         </div>
+        <div v-if="scope.prop === 'stock'">
+          {{order.goods.stock || '-'}}
+        </div>
         <div v-if="scope.prop === 'unit'">
           {{order.goods.unit || '-'}}
         </div>

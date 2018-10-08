@@ -1,6 +1,6 @@
 <template>
-  <div class="body-padding">
-    <common-table style="padding:0" height="100vh - 50px - 35px - 35px" :path="'/order/pending/'+state" :thead="thead" :option="option" showCompany :state="state">
+  <div class="body-height body-padding" v-getHeight>
+    <common-table v-if="tableHeight>0" style="padding:0" :height="tableHeight+'px'" :path="'/order/pending/'+state" :thead="thead" :option="option" showCompany :state="state">
       <my-form width="24%" class="flex ac" slot="header">
         <my-form-item size="mini" v-model="no" label="单号"></my-form-item>
       </my-form>
@@ -46,6 +46,7 @@ export default {
   },
   data() {
     return {
+      tableHeight: 0,
       thead: table,
       no: ""
     };
@@ -62,13 +63,24 @@ export default {
       return res;
     }
   },
+  directives: {
+    getHeight: {
+      inserted(el, binding, vnode) {
+        vnode.context.tableHeight = el.clientHeight;
+      }
+    }
+  },
   methods: {
     toDetail(item, index) {
       if (item._id) {
         if (this.path) {
           this.$router.push(`/${this.path}/${item._id}`);
         } else {
-          this.$router.push(`${this.$route.path}/edit/${item._id}?parentPath=${this.$route.path}&parentName=${this.$route.name}`);
+          this.$router.push(
+            `${this.$route.path}/edit/${item._id}?parentPath=${
+              this.$route.path
+            }&parentName=${this.$route.name}`
+          );
         }
       }
     }

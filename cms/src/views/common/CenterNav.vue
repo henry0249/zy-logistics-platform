@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="g-nav flex ac jc">
-      <div @click="navClick(item)" class="flex ac nav-item" :class="{active:item.path === defaultActive}" v-for="item in data" :key="item.id">
+      <div @click="navClick(item)" class="flex ac nav-item" :class="{active:item.path === defaultActive,borderRight:index!== data.length-1}" v-for="(item,index) in data" :key="item.id">
         <icon v-if="item.icon" :size="''+item.iconSize||14" class="el-icon--left">{{item.icon}}</icon>
         {{ item.name }}
         <el-badge v-if="item.badge!==undefined && item.badge>0" :value="item.badge" />
@@ -67,6 +67,9 @@ export default {
   line-height: 35px;
   padding: 0 30px;
   cursor: pointer;
+}
+.borderRight{
+  border-right: 1px solid #E4E7ED
 }
 .nav-item.active {
   color: #409eff;

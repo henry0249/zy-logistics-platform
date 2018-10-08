@@ -24,45 +24,55 @@ export default [{
     keepAlive: true // 需要被缓存
   },
   children: [{
-    path: 'create',
+    path: '/order/create',
     component: Create,
     name: '订单计划',
+    meta: {
+      nav: true,
+    }
   }, {
-    path: 'taking',
+    path: '/order/taking',
     component: Taking,
-    name: '待接单'
+    name: '待接订单',
+    meta: {
+      nav: true
+    }
   }, {
-    path: 'taking/edit/:_id',
+    path: '/order/taking/edit/:_id',
     component: TakingEdit,
-    name: '详情处理',
+    name: '接单处理'
   }, {
-    path: 'beforeDispatchCheck',
+    path: '/order/beforeDispatchCheck',
     component: BeforeDispatchCheck,
-    name: '调度前审核'
-  },{
-    path: 'beforeDispatchCheck/edit/:_id',
+    name: '待审核订单(调度前)',
+    meta: {
+      nav: true
+    }
+  }, {
+    path: '/order/beforeDispatchCheck/edit/:_id',
     component: BeforeDispatchCheckEdit,
-    name: '详情处理',
+    name: '调度前审核'
   }, {
-    path: 'distributionFinishCheck',
+    path: '/order/distributionFinishCheck',
     component: DistributionFinishCheck,
-    name: '配送完成审核',
-    children: [{
-      path: 'edit/:_id',
-      component: DistributionFinishCheckEdit,
-      name: '详情处理',
-    }]
+    name: '待审核订单(配送完成)',
+    meta: {
+      nav: true
+    }
   }, {
-    path: 'beforeSettleCheck',
+    path: 'd/order/istributionFinishCheck/edit/:_id',
+    component: DistributionFinishCheckEdit,
+    name: '配送完成审核'
+  }, {
+    path: '/order/beforeSettleCheck',
     component: BeforeSettleCheck,
-    name: '结算前审核',
-    children: [{
-      path: '/edit/:_id',
-      component: BeforeSettleCheckEdit,
-      name: '详情处理',
-    }]
+    name: '待审核订单(结算前)',
+    meta: {
+      nav: true
+    }
   }, {
-    path: '/edit/:_id',
-    component: Edit,
+    path: '/order/beforeSettleCheck/edit/:_id',
+    component: BeforeSettleCheckEdit,
+    name: '结算前审核',
   }]
 }]

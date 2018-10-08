@@ -9,17 +9,18 @@
     <div>
       <div class="hor-scroll" style="margin-bottom:10px">
         <div class="hor-scroll-item" v-for="(item,index) in trains" :key="index">
-          <div class="flex ac">
+          <div class="flex">
             <transport-trains-card :data.sync="item" :order="order" :index="index" @remove="remove($event,index)">
             </transport-trains-card>
-            <div v-if="index!==trains.length-1" style="padding:0 10px">
-              <i class="el-icon-d-arrow-right success"></i>
+            <div class="tc col-flex jb" v-if="index!==trains.length-1" style="width:50px;height:220px">
+              <div></div>
+              <i class="el-icon-d-arrow-right success" :style="{color:showIndex === (index+1)?'#67C23A':'#C0C4CC'}"></i>
+              <i class="el-icon-d-arrow-right success" :style="{color:showIndex === (index+1)?'#67C23A':'#C0C4CC'}"></i>
+              <div @click="showIndex = (index+1)" class="tc pointer" style="margin-top:10px">
+                <icon class="to-table" :color="showIndex === (index+1)?'#67C23A':'#C0C4CC'">icon-xiajiang</icon>
+                <div style="font-size:12px" :style="{color:showIndex === (index+1)?'#67C23A':'#C0C4CC'}">运单详情</div>
+              </div>
             </div>
-          </div>
-          <div class="pointer flex ac jc" style="height:40px;line-height:40px" @click="changeShowIndex(index)">
-            <icon v-if="index!==0" class="to-table" :color="showIndex === index?'#67C23A':'#eee'">icon-xiajiang</icon>
-            <span v-if="index!==0" style="font-size:12px" :style="{color:showIndex === index?'#67C23A':'#eee'}">运单详情</span>
-            <i v-if="index===0" style="opacity:0" class="el-icon-d-arrow-right success"></i>
           </div>
         </div>
       </div>
@@ -34,7 +35,7 @@
               物流单<i class="el-icon-plus"></i>
             </div>
           </div>
-          <my-table max-height="300" opWidth="45" size="mini" index border :thead="thead" op :data.sync="item.logistics">
+          <my-table max-height="300" opWidth="45" size="mini" index border :thead="thead" :data.sync="item.logistics">
             <div class="tc" slot="op" slot-scope="scope">
               <remove-check @remove="removeLogistics(item.logistics,scope.index)"></remove-check>
             </div>
@@ -46,24 +47,22 @@
               <div v-if="scope.prop==='transportation'">
                 <my-select truck :type.sync="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]" placeholder="运输工具"></my-select>
               </div>
-              <my-form-item v-if="scope.prop==='loading'" v-model="scope.row.loading" size="mini" :min="0" >
+              <my-form-item v-if="scope.prop==='loading'" v-model="scope.row.loading" size="mini" :min="0">
               </my-form-item>
-              <my-form-item v-if="scope.prop==='landed'"  v-model="scope.row.landed" size="mini" :min="0">
+              <my-form-item v-if="scope.prop==='landed'" v-model="scope.row.landed" size="mini" :min="0">
               </my-form-item>
-              <my-form-item v-if="scope.prop==='price'"  v-model="scope.row.price" size="mini" :min="0">
+              <my-form-item v-if="scope.prop==='price'" v-model="scope.row.price" size="mini" :min="0">
               </my-form-item>
-              <my-form-item v-if="scope.prop==='balanceCount'"  v-model="scope.row.balanceCount" size="mini" :min="0">
+              <my-form-item v-if="scope.prop==='balanceCount'" v-model="scope.row.balanceCount" size="mini" :min="0">
               </my-form-item>
-              <el-tooltip v-if="scope.prop==='balanceCompany'" effect="dark" content="仅可从本公司关联的物流公司中选择" placement="top">
-                <my-form-item size="mini" v-model="scope.row.balanceCompany" select :options="company.transportTrainsRelationCompany || []">
-
+              <el-tooltip v-if="scope.prop==='balanceCompany'" effect="dark" content="仅可从本公司关联的公司中选择" placement="top">
+                <my-form-item size="mini" v-model="scope.row.balanceCompany" select :options="companySelectList">
                 </my-form-item>
               </el-tooltip>
-              <my-form-item v-if="scope.prop==='loss'"  v-model="scope.row.loss" size="mini" :min="0">
+              <my-form-item v-if="scope.prop==='loss'" v-model="scope.row.loss" size="mini" :min="0">
               </my-form-item>
-              <el-tooltip v-if="scope.prop==='lossCompany'" effect="dark" content="仅可从本公司关联的物流公司中选择" placement="top">
-                <my-form-item size="mini" v-model="scope.row.lossCompany" select :options="company.transportTrainsRelationCompany || []">
-
+              <el-tooltip v-if="scope.prop==='lossCompany'" effect="dark" content="仅可从本公司关联的公司中选择" placement="top">
+                <my-form-item size="mini" v-model="scope.row.lossCompany" select :options="companySelectList">
                 </my-form-item>
               </el-tooltip>
               <div v-if="scope.prop==='total'">
@@ -74,20 +73,20 @@
             </div>
           </my-table>
           <div class="flex ac bob bor bol brbl brbr" style="font-size:13px;color:#909399;padding:10px 0;background:#f4f4f5">
-            <div class="tc" style="width:120px">
+            <div class="tc" style="min-width:120px">
               订单数量：<span style="color:#409EFF">{{order.count}}</span>
             </div>
             <div class="f1"></div>
-            <div class="tc" style="width:120px">
+            <div class="tc" style="min-width:120px">
               总装货量：<span style="color:#67C23A">{{statistics.loading}}</span>
             </div>
-            <div class="tc" style="width:120px">
+            <div class="tc" style="min-width:120px">
               总卸货量：<span style="color:#F56C6C">{{statistics.landed}}</span>
             </div>
-            <div class="tc" style="width:120px">
+            <div class="tc" style="min-width:120px">
               平均运费：<span style="color:#E6A23C">{{statistics.average}}</span>
             </div>
-            <div class="tc" style="width:120px">
+            <div class="tc" style="min-width:120px">
               总运费：<span style="color:#E6A23C">{{statistics.totalPrice}}</span>
             </div>
           </div>
@@ -141,9 +140,9 @@ export default {
         if (item.logistics) {
           item.logistics.forEach(logisticsItem => {
             res.count++;
-            res.loading += logisticsItem.loading || 0;
-            res.landed += logisticsItem.landed || 0;
-            res.totalPrice += logisticsItem.price || 0;
+            res.loading += Number(logisticsItem.loading) || 0;
+            res.landed += Number(logisticsItem.landed) || 0;
+            res.totalPrice += Number(logisticsItem.price) || 0;
           });
         }
       });
@@ -152,8 +151,12 @@ export default {
       }
       return res;
     },
-    totalLoading() {
-      return 0;
+    companySelectList() {
+      let transportTrainsRelationCompany =
+        this.order.handle.transportTrainsRelationCompany || [];
+      let businessRelationCompany =
+        this.order.handle.businessRelationCompany || [];
+      return [...transportTrainsRelationCompany, ...businessRelationCompany];
     }
   },
   watch: {
@@ -218,7 +221,7 @@ export default {
         }
       }
       this.trains.splice(-1, 0, {
-        areaType: 0,
+        areaType: 1,
         type: 1,
         area: {},
         company: {},
@@ -256,13 +259,6 @@ export default {
           );
           return;
         }
-      }
-      if (
-        logistics[logistics.length - 1] &&
-        Number(logistics[logistics.length - 1].loading) <= 0
-      ) {
-        this.$message.error(`运单装货量必须大于0`);
-        return;
       }
       logistics.push({
         loading: 0,

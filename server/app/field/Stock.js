@@ -5,6 +5,7 @@ module.exports = {
     default: 'finish',
     option: {
       ready: '待处理',
+      checked: '已处理',
       finish: '完成',
     }
   },
@@ -47,6 +48,11 @@ module.exports = {
     name: '所属公司',
     type: 'ObjectId',
     ref: 'Company'
+  },
+  order: {
+    name: '所属订单',
+    type: 'ObjectId',
+    ref: 'Order'
   },
   businessTrains: {
     name: '关联的贸易链',

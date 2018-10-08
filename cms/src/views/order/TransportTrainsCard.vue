@@ -1,5 +1,5 @@
 <template>
-  <div style="width:220px">
+  <div :style="{width:width}">
     <el-card class="box-card" shadow="hover">
       <div class="flex ac jb" v-if="title" slot="header" style="font-size:12px">
         {{title}}
@@ -22,7 +22,6 @@
         <div class="marginBottom">
           <my-form-item v-if="Number(data.areaType) === 0" size="mini" text value="根据实际地址自行选择"></my-form-item>
           <my-form-item v-if="Number(data.areaType) === 1" select v-model="data.company" :options="order.handle.businessRelationCompany || []" size="mini" @change="companyChange" label="公司" placeholder="请选择关联公司"></my-form-item>
-          <my-form-item v-if="Number(data.areaType) === 2" select v-model="data.company" :options="getBusinessTrainsArea()" size="mini" @change="companyChange" label="贸易节点" placeholder="请选择贸易节点"></my-form-item>
         </div>
         <el-tooltip key="areaType0" v-if="Number(data.areaType) === 0" effect="dark" :content="areaInfo(data)" placement="top">
           <al-cascader v-model="data.areaArr" size="small" />
@@ -61,6 +60,10 @@ export default {
       default() {
         return {};
       }
+    },
+    width: {
+      type: String,
+      default: "220px"
     }
   },
   data() {

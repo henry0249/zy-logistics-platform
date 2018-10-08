@@ -7,7 +7,7 @@
         <goods-table :order.sync="order"></goods-table>
         <business-trains :order.sync="order" :data.sync="businessTrainsData"></business-trains>
       </div>
-      <div class="flex ac" style="margin-top:30px">
+      <div class="flex ac" style="margin:30px 0">
         <div class="f1"></div>
         <el-button size="small" type="primary" @click="createOrder">创建订单</el-button>
       </div>
@@ -36,9 +36,6 @@ export default {
   },
   methods: {
     async createOrder() {
-      // if (!this.$refs.orderInfo.check()) {
-      //   return;
-      // }
       this.loadingText = "创建中...";
       try {
         if (this.skipTaking) {
@@ -64,12 +61,6 @@ export default {
       } catch (error) {}
       this.loadingText = "";
     }
-  },
-  async mounted() {
-    // await this.$ajax.post("/stock/chart", {
-    //   company: this.company._id,
-    //   type: "month"
-    // });
   }
 };
 </script>

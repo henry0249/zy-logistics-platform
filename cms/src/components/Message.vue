@@ -52,7 +52,7 @@ export default {
       this.show({
         text: text || "成功消息",
         icon: "icon-e2",
-        color: "#4CAF50",
+        color: "#67C23A",
         time: 2000
       });
     },
@@ -60,7 +60,7 @@ export default {
       this.show({
         text: text || "错误消息",
         icon: "icon-edc",
-        color: "#FF5252",
+        color: "#F56C6C",
         time: 2000
       });
     },
@@ -68,7 +68,7 @@ export default {
       this.show({
         text: text || "警告消息",
         icon: "icon-e3",
-        color: "#FFC107",
+        color: "#E6A23C",
         time: 2000
       });
     },
@@ -76,7 +76,7 @@ export default {
       this.show({
         text: text || "警告消息",
         icon: "icon-e3",
-        color: "#FFC107",
+        color: "#E6A23C",
         time: 2000
       });
     },
@@ -84,7 +84,7 @@ export default {
       this.show({
         text: text || "一般消息",
         icon: "icon-ebc",
-        color: "#2196F3",
+        color: "#409EFF",
         time: 2000
       });
     },

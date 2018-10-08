@@ -22,7 +22,7 @@ export default [{
   }, {
     path: 'order/edit/:_id',
     component: DispatchEdit,
-    name: "详情处理",
+    name: "调度处理",
   }, {
     path: 'distribution',
     component: Distribution,
@@ -30,6 +30,6 @@ export default [{
   }, {
     path: 'distribution/edit/:_id',
     component: DistributionEdit,
-    name: "详情处理",
+    name: "配送处理",
   }]
 }]

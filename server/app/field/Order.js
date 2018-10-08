@@ -145,5 +145,15 @@ module.exports = {
   temporaryBrokerBonus: {
     name: '临时经纪人提成',
     type: 'Number',
+  },
+  businessTrains:{
+    name: '贸易链',
+    type: 'ObjectIdArray',
+    ref: 'BusinessTrains'
+  },
+  transportTrains:{
+    name: '物流链',
+    type: 'ObjectIdArray',
+    ref: 'TransportTrains'
   }
 }

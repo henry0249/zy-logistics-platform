@@ -17,6 +17,7 @@
 <script>
 import CenterNav from "../common/CenterNav";
 import { order } from "../common/orderLeftNav.js";
+import router from "./router.js";
 export default {
   components: {
     CenterNav
@@ -31,14 +32,22 @@ export default {
   },
   data() {
     return {
-      nav: [...order]
+      router: router,
+      nav: []
     };
   },
   methods: {
     setNav(val) {
+      let currentParentPath = '/order/';
+      this.nav = [];
+      this.router[0].children.forEach(item => {
+        if (item.meta && item.meta.nav) {
+          this.nav.push(item);
+        }
+      });
       for (const key in val) {
         this.nav.forEach((item, index) => {
-          if (item.state === key) {
+          if (item.path.replace(currentParentPath,'') === key) {
             item.badge = val[key];
           }
           this.$set(this.nav, index, item);
@@ -53,7 +62,7 @@ export default {
 </script>
 
 <style>
-.order-border{
+.order-border {
   margin: 0 auto;
   padding: 2%;
   border: 1px solid #eee;

@@ -57,6 +57,11 @@ module.exports = {
     type: 'Number',
     default: 0
   },
+  lossCompany: {
+    name: '损耗承担方',
+    type: 'Number',
+    default: 0
+  },
   balancePrice: {
     name: '结算价格',
     type: 'Number',
@@ -71,5 +76,15 @@ module.exports = {
     name: '关联的库存单',
     type: 'ObjectId',
     ref: 'Stock'
+  },
+  transportTrains: {
+    name: '关联的物流链',
+    type: 'ObjectId',
+    ref: 'TransportTrains'
+  },
+  logistics: {
+    name: '关联的运单',
+    type: 'ObjectIdArray',
+    ref: 'Logistics'
   }
 }

@@ -6,9 +6,9 @@ module.exports = {
     option: {
       admin: '管理员',
       salesman: '业务专员',
-      beforeDispatchCheck: '调度前审核员',
+      beforeDispatchCheck: '审核员(调度前)',
       dispatcher: '调度专员',
-      beforeSettleCheck: '结算前审核员',
+      beforeSettleCheck: '审核员(结算前)',
       financial: '财务文员',
       documentClerk: '单据文员',
       // normalBroker:'经纪人',
