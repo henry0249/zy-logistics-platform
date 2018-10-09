@@ -2,7 +2,8 @@
   <common-table v-if="show" height="calc(100vh - 50px - 35px - 35px)" style="padding:0 1%" path="stock/find" :option="option" :thead="thead">
     <div slot="header" class="jc js">
       <my-form-item width='200px' label="库存单类型" @change="typeChange" style="margin-right:20px;" size="mini" multiple collapse-tags v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
-      <my-form-item width='200px' label="变化类型" @change="dvChange" style="margin-right:20px;" size="mini" collapse-tags v-model="dvData" :options="dvOption" select></my-form-item>
+      <my-form-item width='200px' v-if="$attrs.state === 'finish'" label="变化类型" @change="dvChange" style="margin-right:20px;" size="mini" collapse-tags v-model="dvData" :options="dvOption" select></my-form-item>
+      <my-form-item width='200px' v-else label="状态" @change="stateChange" style="margin-right:20px;" size="mini" collapse-tags v-model="stateData" :options="stateOption" select></my-form-item>
       <my-form-item type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" label="起始时间" date style="padding-right:10px;" width="44%" size="mini" v-model="dateArr">
       </my-form-item>
     </div>
@@ -11,10 +12,10 @@
       <div v-if="scope.prop === 'createdAt'">{{changeDate(scope.row['createdAt'])}}</div>
       <div v-if="scope.prop === 'state'">{{field.Stock.state.option[scope.row['state']]}}</div>
       <el-tag size="mini" v-if="scope.prop === 'dv'" :type="dvValue(scope.row['dv']).type">{{dvValue(scope.row['dv']).value}}</el-tag>
-      <div class="link" v-if="scope.prop === 'op'&&$attrs.state === 'ready'" @click="toFinish(scope)">标记已完成</div>
+      <div class="link" v-if="scope.prop === 'op'&&$attrs.state === 'ready'" @click="toFinish(scope)">{{`确认${field.Stock.type.option[scope.row['type']]}`}}</div>
       <!-- <div v-if="scope.prop === 'op'&&$attrs.state === 'finish'">
-                                            <remove-check @remove="remove(scope)"></remove-check>
-                                          </div> -->
+          <remove-check @remove="remove(scope)"></remove-check>
+        </div> -->
     </div>
   </common-table>
 </template>
@@ -39,9 +40,14 @@
         endDate: '',
         dateArr: [],
         dvData: '',
+        stateData: '',
         show: true,
         typeData: [],
         option: {},
+        stateOption: {
+          ready: '待处理',
+          checked: '已处理',
+        },
         dvOption: [{
           label: '增加',
           value: 'jia'
@@ -119,8 +125,13 @@
           }
         }
         if (this.$attrs.state === 'finish') {
-          delete thead.op
+          delete thead.op;
+          this.$set(thead, 'dv', {
+            name: "变化类型",
+            slot: true
+          });
         } else {
+          delete thead.dv
           this.$set(thead, 'op', {
             name: '操作',
             slot: true
@@ -153,15 +164,14 @@
       remove(scope) {
         this.$emit('remove', scope);
       },
+      stateChange(val) {
+        if (val) {
+          this.$set(this.option, 'state', val);
+        } else {
+          this.$set(this.option, 'state', 'ready');
+        }
+      },
       dvChange(val) {
-        // if (this.option.$or) {
-        //   this.option.$or.forEach((item, index) => {
-        //     if (item.dv) {
-        //       this.option.$or.splice(index, 1);
-        //     }
-        //   });
-        // }
-        // let obj = {}
         if (val === 'jia') {
           this.$set(this.option, 'dv', {
             $gt: 0

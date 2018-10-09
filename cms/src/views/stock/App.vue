@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="loadingText">
-    <center-nav v-if="!loadingText" :data.sync="nav"></center-nav>
+    <center-nav  :data.sync="nav"></center-nav>
     <div class="body-height">
       <keep-alive>
         <router-view v-if="$route.meta.keepAlive">

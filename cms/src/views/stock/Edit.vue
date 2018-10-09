@@ -30,10 +30,20 @@
         console.log(val);
         try {
           this.loadingText = '修改中';
-          let delStock = await this.$api.curd({
-            model: 'stock',
-            curdType: 'delete',
-            _id: this.$route.query._id
+          // let delStock = await this.$api.curd({
+          //   model: 'stock',
+          //   curdType: 'delete',
+          //   _id: this.$route.query._id
+          // })
+          let updateStock = await this.$api.curd({
+            model:'stock',
+            curdType:'update',
+            find:{
+              _id: this.$route.query._id
+            },
+            update:{
+              state:'checked'
+            }
           })
           let setStock = await this.$api.curd({
             model: 'stock',
@@ -66,6 +76,17 @@
                 path: 'category'
               }, {
                 path: 'brand'
+              }]
+            },{
+              path:'businessTrains',
+              populate:[{
+                path:'order'
+              },{
+                path:'logistics'
+              },{
+                path:'user'
+              },{
+                path:'company'
               }]
             }]
           })

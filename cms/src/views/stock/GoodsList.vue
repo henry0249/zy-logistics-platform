@@ -8,11 +8,11 @@
             <span>总共有<span class="blue">{{allCount}}</span>件商品，</span>
             <span>已选<span class="success">{{count}}</span>件商品</span>
           </div>
-          <div @click="checkAllMethods" v-if="!checkAll" style="margin:0 20px 0 20px;">
+          <div class="pointer" @click="checkAllMethods" v-if="!checkAll" style="margin:0 20px 0 20px;">
             <icon class="warning">icon-panxuan</icon>
             盘点所剩商品
           </div>
-          <div class="success jc js" @click="addCheck = true">
+          <div class="success jc js pointer" @click="addCheck = true">
             <i class="el-icon-plus"></i>
             <div>{{`添加盘点`}}</div>
           </div>
@@ -93,10 +93,9 @@
       goodsData: {
         handler(val, oldVal) {
           let data = val;
+          console.log('oldVal',oldVal);
           data.forEach((item, index) => {
-            if (oldVal[index] && oldVal[index].key) {
-              this.$set(data[index], 'key', oldVal[index].key);
-            } else {
+            if (!val[index] || !val[index].key) {
               this.$set(data[index], 'key', 0);
             }
           });
@@ -276,7 +275,7 @@
             key: 0
           })
         } else {
-          this.$message.warn(`您已盘点所有商品`);
+          this.$message.warn(`最多盘点${this.allCount}商品`);
         }
         this.addCheck = false;
       },

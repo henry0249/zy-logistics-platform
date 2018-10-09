@@ -27,14 +27,17 @@
         </my-form>
         <el-alert style="margin-top:15px" title="待处理状态的库存单不会使库存立即变化,完成状态会立即修改库存" type="warning" :closable="false" center show-icon>
         </el-alert>
+        <el-alert v-if="$route.query._id" style="margin:15px 0 15px 0;" title="贸易链信息" type="info" :closable="false"></el-alert>
+        <stock-business-trains v-if="$route.query._id" :val="val.businessTrains"></stock-business-trains>
       </div>
       <div class="flex ac jb" style="margin-top:30px">
         <slot name="left">
           <el-button size="small" @click="back()">返回</el-button>
+          <el-button size="small" @click="del()">删除该数据</el-button>
         </slot>
         <div class="f1"></div>
         <slot name="right">
-          <el-button type="primary" size="small" @click="submit">{{submitText}}</el-button>
+          <el-button :disabled="subDisabled" type="primary" size="small" @click="submit">{{submitText}}</el-button>
         </slot>
       </div>
     </div>
@@ -43,9 +46,11 @@
 
 <script>
   import GoodsList from './GoodsList.vue';
+  import StockBusinessTrains from './StockBusinessTrains.vue';
   export default {
     components: {
-      GoodsList
+      GoodsList,
+      StockBusinessTrains
     },
     props: {
       goodsId: {
@@ -67,6 +72,7 @@
       return {
         checkAll: false,
         addCheck: false,
+        subDisabled:false,
         goodsData: [],
         goodsObj: {},
         loadingText: "",
@@ -93,7 +99,6 @@
       },
       form: {
         handler: function(val) {
-          this.goodsData = [val.goods];
           this.$emit("update:data", val);
         },
         deep: true
@@ -101,6 +106,11 @@
       "form.type" (val) {
         this.setName();
       },
+      "form.name" (val) {
+        if (this.val.name) {
+          this.$set(this.form, 'name', this.val.name);
+        }
+      }
     },
     computed: {
       isCheck() {
@@ -113,6 +123,20 @@
     methods: {
       add() {
         this.addCheck = true;
+      },
+      async del() {
+        if (this.$route.query._id) {
+          try {
+            this.loadingText = '删除中';
+            let del = await this.$ajax.post('/stock/delete', {
+              _id: this.$route.query._id
+            });
+          } catch (error) {}
+          this.loadingText = '';
+          this.$router.push({
+            path: '/stock/home'
+          });
+        }
       },
       checkAllGoods() {
         this.checkAll = true;
@@ -184,7 +208,10 @@
           this.$set(obj, 'key', this.val.num);
         }
         this.goodsData.push(obj);
-        console.log(this.goodsData, '!!!!');
+        console.log(this.goodsData);
+      }
+      if (this.$route.query._id) {
+        this.subDisabled = true;
       }
     }
   };
