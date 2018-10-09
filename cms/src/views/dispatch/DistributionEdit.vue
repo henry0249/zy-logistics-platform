@@ -52,7 +52,7 @@
     </div>
     <el-alert style="margin:15px 0" title="运单完成后可结算" type="info" center show-icon :closable="false">
     </el-alert>
-    <div class="flex ac">
+    <div class="flex ac" style="margin:15px 0">
       <el-button size="small" type="danger">删除运单</el-button>
       <div class="f1"></div>
       <el-button size="small" @click="back()">返回</el-button>

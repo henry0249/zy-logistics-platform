@@ -42,6 +42,16 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
+  toCompany: {
+    name: '收款公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
+  toUser: {
+    name: '收款人',
+    type: 'ObjectId',
+    ref: 'User'
+  },
   author: {
     name: '操作人',
     type: 'ObjectId',

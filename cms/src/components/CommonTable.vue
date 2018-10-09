@@ -117,7 +117,6 @@ export default {
       this.loadingText = "加载中";
       try {
         this.data = [];
-        console.log(this.preOption);
         let body = {
           limit: Number(this.limit),
           ...option,

@@ -60,7 +60,7 @@ export default [{
       nav: true
     }
   }, {
-    path: 'd/order/istributionFinishCheck/edit/:_id',
+    path: '/order/distributionFinishCheck/edit/:_id',
     component: DistributionFinishCheckEdit,
     name: '配送完成审核'
   }, {

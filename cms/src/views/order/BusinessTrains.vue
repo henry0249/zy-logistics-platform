@@ -15,7 +15,7 @@
           贸易节点<i class="el-icon-plus"></i>
         </div>
       </div>
-      <div v-if="data.length>0" style="height:280px">
+      <div v-if="data.length>0" style="min-height:360px">
         <div class="hor-scroll" style="margin-bottom:10px">
           <div class="hor-scroll-item" style="padding:10px 0" v-for="(item,index) in data" :key="index">
             <div class="flex ac">
@@ -121,6 +121,10 @@ export default {
         this.$message.warn(`商品数量必须大于0`);
         return;
       }
+      if (Number(this.order.sell) <= 0) {
+        this.$message.warn(`商品售价必须大于0`);
+        return;
+      }
       this.pushItem();
     },
     async remove(item, index) {
@@ -136,8 +140,8 @@ export default {
         if (item._id) {
           this.loadingText = "加载中...";
           try {
-            await this.$ajax.post('/businessTrains/delete',{
-              _id:item._id
+            await this.$ajax.post("/businessTrains/delete", {
+              _id: item._id
             });
             this.data.splice(index, 1);
           } catch (error) {}
@@ -151,8 +155,10 @@ export default {
     },
     pushItem() {
       let body = {
-        supplyPrice: this.order.sell,
+        supplyPrice: this.order.factory,
         supplyCount: this.order.count,
+        balancePrice: this.order.sell,
+        balanceCount: this.order.count,
         loss: 0,
         receive: this.order.count,
         remark: "",
@@ -173,7 +179,7 @@ export default {
           ...body,
           type: "customer",
           [this.order.type]: this.order[this.order.type],
-          customerType: this.order.type,
+          customerType: this.order.type
         });
       } else {
         if (!this.data[this.data.length - 1 - 1].company) {
@@ -184,8 +190,10 @@ export default {
           ...body,
           type: "pool",
           company: "",
-          supplyCount: this.data[this.data.length - 1 - 1].supplyCount,
           supplyPrice: this.data[this.data.length - 1 - 1].supplyPrice,
+          supplyCount: this.data[this.data.length - 1 - 1].supplyCount,
+          balancePrice: this.data[this.data.length - 1 - 1].supplyPrice,
+          balanceCount: this.data[this.data.length - 1 - 1].supplyCount
         });
       }
     },

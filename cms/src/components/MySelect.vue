@@ -4,14 +4,16 @@
       <div slot="label">
         {{label}}
       </div>
-      <div style="position:relative">
+      <div style="position:relative" @click="showDialog">
         <div class="disabled-hide" v-if="disabled">
         </div>
-        <el-input style="width:100%" :value="multi?multiText(data):text(data)" v-bind="$attrs" :placeholder="$attrs.placeholder || autoPlaceholder" :size="size||$parent.size" class="input-with-select">
-          <text-dropdown v-if="userCompanyTypeChoose" slot="prepend" v-model="innerType" :options="field.Order.type.option" :color="['#E6A23C','#409EFF']"></text-dropdown>
-          <text-dropdown v-if="truckShipTypeChoose" slot="prepend" v-model="innerType" :options="field.Logistics.transportation.option" :color="['#67C23A','#E6A23C']"></text-dropdown>
+        <el-input readonly style="width:100%" :value="multi?multiText(data):text(data)" v-bind="$attrs" :placeholder="$attrs.placeholder || autoPlaceholder" :size="size||$parent.size" class="input-with-select">
+          <div v-if="userCompanyTypeChoose || truckShipTypeChoose" slot="prepend" @click.stop>
+            <text-dropdown v-if="userCompanyTypeChoose" slot="prepend" v-model="innerType" :options="field.Order.type.option" :color="['#E6A23C','#409EFF']"></text-dropdown>
+            <text-dropdown v-if="truckShipTypeChoose" slot="prepend" v-model="innerType" :options="field.Logistics.transportation.option" :color="['#67C23A','#E6A23C']"></text-dropdown>
+          </div>
         </el-input>
-        <div class="choose-icon ac pointer" @click="dialogVisible = true">
+        <div class="choose-icon ac pointer" @click="showDialog">
           <i class="el-icon-edit blue" :class="{disabled:disabled}"></i>
         </div>
       </div>
@@ -19,7 +21,7 @@
     <el-dialog append-to-body :title="title||autoTitle" :visible.sync="dialogVisible" width="70%" :top="multi?'7vh':'10vh'">
       <div style="height:55vh;overflow:hidden">
         <div v-if="dialogVisible">
-          <common-table :select="data" :selection="multi" :option="searchOption" :path="path" :thead="thead" height="55vh" style="padding:0" @current-change="selectChange" @selection-change="handleSelectionChange"  :currentCompany="currentCompany">
+          <common-table :select="data" :selection="multi" :option="searchOption" :path="path" :thead="thead" height="55vh" style="padding:0" @current-change="selectChange" @selection-change="handleSelectionChange" :currentCompany="currentCompany">
             <my-select-search slot="header" :data.sync="searchOption" :type="selectType"></my-select-search>
             <div slot-scope="scope" v-if="selectType === 'company'">
               <div v-if="scope.prop==='type'">{{companyType2Text(scope.row.type)}}</div>
@@ -182,6 +184,11 @@ export default {
     }
   },
   methods: {
+    showDialog(){
+      if (!this.disabled) {
+        this.dialogVisible = true;
+      }
+    },
     text(data) {
       if (this.is("array", data)) {
         return data;

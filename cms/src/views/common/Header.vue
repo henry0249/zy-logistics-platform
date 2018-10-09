@@ -1,11 +1,13 @@
 <template>
-  <div class="flex ac g-header body-padding" v-if="showGlobalHeader">
+  <div class="flex ac g-header body-padding">
     <img class="logo" :src="logoImg" alt="">
     <div class="flex ac my-nav" style="margin-left:20px">
       <div v-if="!item.hide" @click="navClick(item,index)" v-ripple class="ac nav-item" :class="{active:index === activeNavIndex}" v-for="(item,index) in nav" :key="index">
         <icon style="margin-right:5px" small v-if="item.icon">{{item.icon}}</icon>
-        <div>
+        <div class="flex ac">
           {{item.name}}
+          <el-badge v-if="item.badge!==undefined && item.badge>0" :value="item.badge">
+          </el-badge>
         </div>
       </div>
     </div>
@@ -48,22 +50,12 @@ import { MessageBox } from "element-ui";
 export default {
   data() {
     return {
+      nav: [],
       logoImg:
         "http://bymm.oss-cn-shenzhen.aliyuncs.com/2018-05-16-zyfz_logo.png"
     };
   },
   computed: {
-    showGlobalHeader() {
-      let flag = true;
-      if (
-        this.$route.path.indexOf("login") > -1 ||
-        this.$route.path.indexOf("chooseCompany") > -1 ||
-        this.$route.path.indexOf("notfound") > -1
-      ) {
-        flag = false;
-      }
-      return flag;
-    },
     activeNavIndex() {
       let res = -1;
       this.nav.forEach((item, index) => {
@@ -83,10 +75,41 @@ export default {
         }
       });
       return res;
+    }
+  },
+  watch: {
+    company: {
+      handler(val, old) {
+        if (old && old._id) {
+          this.$message.success(`${val.name}`);
+        }
+      },
+      deep: true
     },
-    nav() {
+    $route() {
+      this.$store.dispatch("getOrderBadge");
+    },
+    orderBadge: {
+      handler: function(val) {
+        this.setHeaderBadge();
+      },
+      deep: true
+    }
+  },
+  methods: {
+    navClick(item, index) {
+      if (!item.path) {
+        this.$message.info(item.name + "即将开放");
+      }
+      this.$router.push(item.path);
+    },
+    handleCommand(index) {
+      this.$store.commit("setCompany", this.roleCompany[index]);
+    },
+    setNav() {
+      this.nav = [];
       if (this.$route.path.indexOf("sys") > -1) {
-        return [
+        this.nav = [
           {
             name: "商品管理",
             path: "/sys/goods",
@@ -114,7 +137,7 @@ export default {
           }
         ];
       } else {
-        return [
+        this.nav = [
           {
             name: "订单管理",
             path: "/order",
@@ -152,30 +175,26 @@ export default {
           }
         ];
       }
-    }
-  },
-  watch: {
-    company: {
-      handler(val,old) {
-        if (old && old._id) {
-          this.$message.success(`${val.name}`);
+    },
+    setHeaderBadge() {
+      this.nav.forEach((item, index) => {
+        if (item.path === "/order") {
+          item.badge =
+            this.orderBadge.taking +
+            this.orderBadge.beforeDispatchCheck +
+            this.orderBadge.distributionFinishCheck +
+            this.orderBadge.beforeSettleCheck;
+          this.$set(this.nav, index, item);
         }
-      },
-      deep: true
-    },
-    $route(){
-      this.$store.dispatch("getOrderBadge");
-    }
-  },
-  methods: {
-    navClick(item, index) {
-      if (!item.path) {
-        this.$message.info(item.name + "即将开放");
-      }
-      this.$router.push(item.path);
-    },
-    handleCommand(index) {
-      this.$store.commit("setCompany", this.roleCompany[index]);
+        if (item.path === "/dispatch") {
+          item.badge = this.orderBadge.dispatch + this.orderBadge.distribution;
+          this.$set(this.nav, index, item);
+        }
+        if (item.path === "/settle") {
+          item.badge =this.orderBadge.financialPretrial + this.orderBadge.accountConfirmation + this.orderBadge.accountSettlement;
+          this.$set(this.nav, index, item);
+        }
+      });
     }
   },
   async created() {
@@ -187,6 +206,8 @@ export default {
       this.$store.commit("globalLoadingToggle", false);
     }
     this.$store.commit("globalLoadingToggle", false);
+    this.setNav();
+    this.setHeaderBadge();
   }
 };
 </script>
@@ -195,7 +216,7 @@ export default {
 .g-header {
   background: #545c64;
   height: 50px;
-  color: #fff
+  color: #fff;
 }
 .logo {
   width: 30px;

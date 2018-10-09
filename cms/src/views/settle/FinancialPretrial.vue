@@ -13,8 +13,8 @@
         </el-tabs>
       </div>
       <div>
-        <div style="height:calc(100vh - 50px - 40px - 15px - 60px)">
-          <my-table ref="table" :thead="thead" :data.sync="data" selection border height="100vh - 50px - 40px - 15px - 60px" size="mini" @selection-change="handleSelectionChange" :loadmore="loadmore">
+        <div style="height:calc(100vh - 50px - 40px - 15px - 60px - 70px)">
+          <my-table ref="table" :thead="thead" :data.sync="data" selection border height="100vh - 50px - 40px - 15px - 60px - 70px" size="mini" @selection-change="handleSelectionChange" :loadmore="loadmore">
             <template slot-scope="scope">
               <div class="link" v-if="scope.prop==='no'" @click="toDetail(scope.row,scope.index)">
                 {{scope.row.no}}

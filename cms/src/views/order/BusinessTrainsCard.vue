@@ -23,7 +23,11 @@
         </my-form-item>
         <my-form-item class="marginBottom" v-model="data.supplyCount" label="供货数量" size="mini" number :min="0">
         </my-form-item>
-        <my-form-item v-model="data.loss" label="承担损耗" size="mini" number :max="last.supplyCount">
+        <my-form-item class="marginBottom" v-model="data.loss" label="承担损耗" size="mini" number :min="0">
+        </my-form-item>
+        <my-form-item class="marginBottom" v-model="data.balancePrice" label="结算价格" size="mini" number :min="0">
+        </my-form-item>
+        <my-form-item v-model="data.balanceCount" label="结算数量" size="mini" number :min="0">
         </my-form-item>
       </div>
       <div v-if="data.type === 'pool'">
@@ -33,7 +37,11 @@
         </my-form-item>
         <my-form-item class="marginBottom" v-model="data.supplyPrice" label="供货单价" size="mini" number :min="0">
         </my-form-item>
-        <my-form-item v-model="data.loss" label="承担损耗" size="mini" number :max="last.supplyCount">
+        <my-form-item class="marginBottom" v-model="data.loss" label="承担损耗" size="mini" number :min="0">
+        </my-form-item>
+        <my-form-item class="marginBottom" v-model="data.balancePrice" label="结算价格" size="mini" number :min="0">
+        </my-form-item>
+        <my-form-item v-model="data.balanceCount" label="结算数量" size="mini" number :min="0">
         </my-form-item>
       </div>
       <div v-if="data.type === 'customer'">
@@ -43,7 +51,11 @@
         </my-form-item>
         <my-form-item class="marginBottom" v-model="data.receive" label="实收数量" size="mini" number :min="0" :max="last.supplyCount">
         </my-form-item>
-        <my-form-item v-model="data.loss" label="承担损耗" size="mini" number :max="last.supplyCount">
+        <my-form-item class="marginBottom" v-model="data.loss" label="承担损耗" size="mini" number :min="0">
+        </my-form-item>
+        <my-form-item class="marginBottom" v-model="data.balancePrice" label="结算价格" size="mini" number :min="0">
+        </my-form-item>
+        <my-form-item v-model="data.balanceCount" label="结算数量" size="mini" number :min="0">
         </my-form-item>
       </div>
     </el-card>

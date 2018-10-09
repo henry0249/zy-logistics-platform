@@ -1,10 +1,10 @@
 module.exports = {
-  type:{
+  type: {
     name: '账户类型',
     type: 'String',
-    option:{
-      user:'个人账户',
-      company:'公司账户'
+    option: {
+      user: '个人账户',
+      company: '公司账户'
     }
   },
   value: {
@@ -24,5 +24,15 @@ module.exports = {
     name: '所属公司',
     type: 'ObjectId',
     ref: 'Company'
+  },
+  relationCompany: {
+    name: '关联公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
+  parent: {
+    name: '父级账户',
+    type: 'ObjectId',
+    ref: 'Account'
   }
 }
