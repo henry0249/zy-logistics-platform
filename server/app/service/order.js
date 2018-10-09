@@ -143,58 +143,51 @@ class OrderService extends Service {
       return order;
     }
   }
-  async setStock(order, businessTrains, updateFlag) {
+  async setStock(order, businessTrains, nextBusinessTrains, updateFlag) {
     const ctx = this.ctx;
     if (businessTrains.type === 'supplier' || businessTrains.type === 'pool') {
+      let date = ctx.helper.formatTime(new Date(), "YYYY年MM月DD日A");
+        date = date.replace("AM", "上午");
+        date = date.replace("PM", "下午");
       let stockBody = {
         type: 'out',
         company: businessTrains.company,
         order: order._id,
         businessTrains: businessTrains._id,
-        name: '贸易链产生出库单',
+        name: '贸易链产生出库单 ' + date,
         goods: order.goods,
         num: businessTrains.supplyCount,
         state: 'ready'
       }
+      if (nextBusinessTrains !== undefined && nextBusinessTrains.type !== 'customer') {
+        stockBody.toCompany = nextBusinessTrains.company;
+      }
       if (updateFlag) {
+        console.log(stockBody);
         await ctx.model.Stock.update({
           type: 'out',
           order: order._id,
           businessTrains: businessTrains._id,
         }, stockBody);
-        if (businessTrains.type === 'pool') {
-          await ctx.model.Stock.update({
-            type: 'in',
-            order: order._id,
-            businessTrains: businessTrains._id,
-          }, {
-            ...stockBody,
-            type: 'in',
-            name: '贸易链产生入库单',
-            num: businessTrains.receive,
-          });
-        }
       } else {
+        console.log(stockBody);
         let outStockModel = new ctx.model.Stock(stockBody);
+        console.log(outStockModel);
         await outStockModel.save();
-        if (businessTrains.type === 'pool') {
-          let inStockModel = new ctx.model.Stock({
-            ...stockBody,
-            type: 'in',
-            name: '贸易链产生入库单',
-            num: businessTrains.receive,
-          });
-          await inStockModel.save();
-        }
       }
-
     }
   }
   async setBusinessTrainsData(order, arr) {
+    const ctx = this.ctx;
     if (!(arr !== undefined && arr instanceof Array && arr.length > 0)) {
       return;
     }
-    const ctx = this.ctx;
+    for (let i = 0; i < arr.length; i++) {
+      const item = arr[i];
+      if (item.type === 'pool' && (JSON.stringify(item.company) === '{}' || !item.company)) {
+        ctx.throw(422, '贸易节点中有联营商尚未选择', item);
+      }
+    }
     let trainsIdArr = [];
     for (let i = 0; i < arr.length; i++) {
       let item = arr[i];
@@ -213,15 +206,12 @@ class OrderService extends Service {
           _id: item._id
         }, update);
         trainsIdArr.push(item._id);
-        await this.setStock(order, update, 'update');
+        await this.setStock(order, update, arr[i + 1], 'update');
       } else {
-        if (JSON.stringify(item.company) === '{}' || !item.company) {
-          ctx.throw(422, '贸易节点中有联营商尚未选择', item);
-        }
         let trains = new ctx.model.BusinessTrains(item);
         await trains.save();
         trainsIdArr.push(trains._id);
-        await this.setStock(order, trains);
+        await this.setStock(order, trains, arr[i + 1]);
       }
     }
     await ctx.model.Order.update({

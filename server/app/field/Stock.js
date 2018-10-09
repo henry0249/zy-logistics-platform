@@ -69,4 +69,9 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'Logistics'
   },
+  toCompany: {
+    name: '去往公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  }
 }

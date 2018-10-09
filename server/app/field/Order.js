@@ -146,12 +146,12 @@ module.exports = {
     name: '临时经纪人提成',
     type: 'Number',
   },
-  businessTrains:{
+  businessTrains: {
     name: '贸易链',
     type: 'ObjectIdArray',
     ref: 'BusinessTrains'
   },
-  transportTrains:{
+  transportTrains: {
     name: '物流链',
     type: 'ObjectIdArray',
     ref: 'TransportTrains'

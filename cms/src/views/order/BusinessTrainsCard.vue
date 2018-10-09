@@ -4,7 +4,7 @@
       <div class="flex ac jb" v-if="title" slot="header" style="font-size:12px">
         {{title}}
         <div v-if="data.type==='pool'">{{index}}</div>
-        <transport-trains-select v-if="data.type!=='supplier'" :businessTrains="data" :logistics="data.logistics" :order="order"></transport-trains-select>
+        <transport-trains-select v-if="data.type!=='customer'" :businessTrains="data" :logistics="data.logistics" :order="order"></transport-trains-select>
         <div class="f1"></div>
         <remove-check @remove="remove" v-if="data.type === 'pool'"></remove-check>
       </div>

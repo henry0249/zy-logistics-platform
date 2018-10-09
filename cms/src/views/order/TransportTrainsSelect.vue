@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <el-tooltip effect="dark" content="点击可关联物流运单,同步显示运输途中商品数量" placement="top">
-      <div class="link" style="margin:0 5px" @click="showDialog">运输中数量：{{totalLoading}}</div>
+  <div class="tf1">
+    <el-tooltip effect="dark" content="点击可关联物流运单,同步显示出库运输途中商品数量" placement="top">
+      <div class="link" style="margin:0 5px" @click="showDialog">出库运输：{{totalLoading}}</div>
     </el-tooltip>
     <el-dialog title="选择关联物流单" :visible.sync="dialogVisible" width="80%" top="10vh">
       <div v-if="dialogVisible">
@@ -246,7 +246,7 @@ export default {
       }
       const loading = this.$loading({
         lock: true,
-        text: "Loading",
+        text: "关联中",
         spinner: "el-icon-loading",
         background: "rgba(0, 0, 0, 0.6)"
       });

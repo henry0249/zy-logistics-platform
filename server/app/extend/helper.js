@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const is = require('is_js');
+const dayjs = require('dayjs');
 
 module.exports = {
   index(param) {
@@ -137,6 +138,13 @@ module.exports = {
       return temp[str.length];
     } else {
       return str.substr(str.length - 2);
+    }
+  },
+  formatTime(val, str = "YYYY-MM-DD HH:mm:ss"){
+    if (val) {
+      return dayjs(val).format(str);
+    } else {
+      return dayjs().format(str);
     }
   }
 };

@@ -87,6 +87,7 @@ export default {
       deep: true
     },
     $route() {
+      this.setNav();
       this.$store.dispatch("getOrderBadge");
     },
     orderBadge: {
