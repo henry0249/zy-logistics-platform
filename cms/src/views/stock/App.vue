@@ -102,7 +102,6 @@
       }
     },
     mounted() {
-      console.log(this.company);
       this.setNav(this.orderBadge);
     },
     created() {

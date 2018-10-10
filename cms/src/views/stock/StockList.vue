@@ -28,6 +28,8 @@
           query: {
             type: scope.row.type,
             _id: scope.row._id,
+            parentPath:this.$route.path,
+            parentName:this.$route.name
           }
         })
       },

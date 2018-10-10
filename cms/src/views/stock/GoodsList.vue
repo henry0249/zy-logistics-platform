@@ -81,7 +81,6 @@
       },
       allGoodsData: {
         handler(val) {
-          console.log(val);
         },
         deep: true
       },
@@ -93,7 +92,6 @@
       goodsData: {
         handler(val, oldVal) {
           let data = val;
-          console.log('oldVal',oldVal);
           data.forEach((item, index) => {
             if (!val[index] || !val[index].key) {
               this.$set(data[index], 'key', 0);
@@ -300,10 +298,8 @@
       }
     },
     created() {
-      console.log(this.data);
       if (this.data.length > 0) {
         this.goodsData = JSON.parse(JSON.stringify(this.data));
-        console.log(this.goodsData);
       }
     }
   };

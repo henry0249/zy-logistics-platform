@@ -13,7 +13,10 @@
         <company-ship v-if="!loadingText&&isLogistics" :startData="startShipObj" :removeObj.sync="shipRemoveObj" :isLogistics="isLogistics" :data.sync="shipObj"></company-ship>
       </div>
       <div class="tr jb" style="margin-top:30px">
-        <el-button size="small" @click="$router.go(-1)">返 回</el-button>
+        <div>
+          <el-button size="small" @click="$router.go(-1)">返 回</el-button>
+          <el-button size="small" @click="goAccount">账户管理</el-button>
+        </div>
         <el-button size="small" type="primary" @click="sub">修 改</el-button>
       </div>
     </div>
@@ -114,6 +117,15 @@
       },
     },
     methods: {
+      goAccount() {
+        let path = '/sys/company/account';
+        this.$router.push({
+          path,
+          query:{
+            company:this.startCompanyArr._id
+          }
+        });
+      },
       myAlert(str) {
         this.$message.warn(str);
       },
@@ -399,16 +411,27 @@
         } else {
           this.$set(this.startShipObj, "ship", []);
         }
+      },
+      async getAccount() {
+        this.accountData = await this.$api.curd({
+          model:'account',
+          curdType:'findOne',
+          company:this.startCompanyArr._id
+        })
       }
     },
     async created() {
-      this.loadingText = "加载中";
-      await this.getCompany();
-      await this.getRole();
-      await this.getTruc();
-      await this.getShip();
-      this.data = JSON.parse(JSON.stringify(this.startShipObj));
-      this.loadingText = "";
+      try {
+        this.loadingText = "加载中";
+        await this.getCompany();
+        await this.getRole();
+        await this.getTruc();
+        await this.getShip();
+        await this.getAccount();
+        this.data = JSON.parse(JSON.stringify(this.startShipObj));
+        this.loadingText = "";
+      } catch (error) {
+      }
     }
   };
 </script>

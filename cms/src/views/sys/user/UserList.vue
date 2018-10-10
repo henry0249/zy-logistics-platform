@@ -39,7 +39,11 @@
       },
       see(val) {
         this.$router.push({
-          path: "/sys/user/edit/" + val.row._id
+          path: "/sys/user/edit/" + val.row._id,
+          query: {
+            parentPath: this.$route.path,
+            parentName: this.$route.name
+          }
         });
       },
       inputChange(val) {

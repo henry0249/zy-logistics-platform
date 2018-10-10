@@ -77,7 +77,11 @@
           data = '/goods/category_edit/'
         }
         this.$router.push({
-          path: data + val.row._id
+          path: data + val.row._id,
+          query:{
+            parentPath:this.$route.path,
+            parentName:this.$route.name
+          }
         });
       },
       categoryCheckChange(val) {

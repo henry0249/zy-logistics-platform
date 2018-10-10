@@ -8,10 +8,10 @@
         </div>
       </div>
       <template slot-scope="scope">
-        <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
-        <el-tag v-if="scope.prop === 'category'" :type="tagType(index,scope.row['category'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['category']" :key="item.id">{{item.name}}</el-tag>
-        <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{setName(scope)}}</div>
-      </template>
+          <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+          <el-tag v-if="scope.prop === 'category'" :type="tagType(index,scope.row['category'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['category']" :key="item.id">{{item.name}}</el-tag>
+          <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{setName(scope)}}</div>
+</template>
    </common-table>
   </div>
 </template>
@@ -90,7 +90,7 @@
       }
     },
     methods: {
-      setName(scope){
+      setName(scope) {
         return scope.row.name || scope.row.nick || scope.row.mobile || scope.row._id;
       },
       tagType(index, arr) {
@@ -107,7 +107,11 @@
           path = '/goods/brand_edit/';
         }
         this.$router.push({
-          path: path + val.row._id
+          path: path + val.row._id,
+          query: {
+            parentPath: this.$route.path,
+            parentName: this.$route.name
+          }
         });
       },
       categoryChange(val) {},

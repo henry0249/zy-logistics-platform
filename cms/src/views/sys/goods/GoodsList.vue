@@ -119,7 +119,7 @@
       },
       see(obj) {
         this.$router.push({
-          path: this.path + "/" + obj.value.row._id
+          path: this.path + "/" + obj.value.row._id + '?parentPath=' + this.$route.path + '&parentName=' + this.$route.name
         });
       },
       tagType(index, arr) {

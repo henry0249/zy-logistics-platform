@@ -2,7 +2,6 @@
   <loading-box>
     <my-table border size="mini" :thead="thead" :data="data">
       <div slot-scope="scope">
-        <!-- <div>{{test(scope)}}</div> -->
         <el-tag size="small" :type="tagType(scope)" v-if="scope.prop === 'type'">{{field.BusinessTrains.type.option[scope.row[scope.prop]]}}</el-tag>
         <div class="blue" v-if="scope.prop === 'order'">{{scope.row[scope.prop].no}}</div>
         <div class="blue" v-if="scope.prop === 'logistics'">{{test(scope)}}</div>
@@ -83,10 +82,6 @@
           customer: 'danger'
         }
         return data[val.row[val.prop]];
-      },
-      test(val) {
-        console.log(val);
-        if (val.prop) {}
       }
     },
     created() {

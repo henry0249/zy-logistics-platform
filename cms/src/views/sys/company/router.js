@@ -2,6 +2,7 @@ import App from './App.vue';
 import List from './CompanyList.vue';
 import Edit from './CompanyEdit.vue';
 import CompanyAdd from './CompanyAdd.vue';
+import CompanyAccount from './CompanyAccount.vue';
 
 export default [{
   path: 'company',
@@ -19,6 +20,10 @@ export default [{
     path:'edit/:_id',
     name:'公司详情',
     component:Edit
+  },{
+    path:'account',
+    name:'账户详情',
+    component:CompanyAccount
   },{
     path:'add',
     name:'添加公司',

@@ -1,5 +1,5 @@
 <template>
-  <common-table v-if="show" height="calc(100vh - 50px - 35px - 35px)" style="padding:0 1%" path="stock/find" :option="option" :thead="thead">
+  <common-table  v-if="show" height="calc(100vh - 50px - 35px - 35px)" style="padding:0 1%" path="stock/find" :option="option" :thead="thead">
     <div slot="header" class="jc js">
       <my-form-item width='200px' label="库存单类型" @change="typeChange" style="margin-right:20px;" size="mini" multiple collapse-tags v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
       <my-form-item width='200px' v-if="$attrs.state === 'finish'" label="变化类型" @change="dvChange" style="margin-right:20px;" size="mini" collapse-tags v-model="dvData" :options="dvOption" select></my-form-item>
@@ -8,14 +8,12 @@
       </my-form-item>
     </div>
     <div slot-scope="scope">
+      <div class="" :class="scope.row['state'] === 'ready'?'link pointer':''" v-if="scope.prop === 'name'" @click="toFinish(scope)">{{scope.row[scope.prop]}}</div>
       <div v-if="scope.prop === 'type'">{{field.Stock.type.option[scope.row['type']]}}</div>
-      <div v-if="scope.prop === 'createdAt'">{{changeDate(scope.row['createdAt'])}}</div>
+      <div v-if="scope.prop === 'createdAt'">{{formatTime(scope.row['createdAt'])}}</div>
       <div v-if="scope.prop === 'state'">{{field.Stock.state.option[scope.row['state']]}}</div>
+      <div v-if="scope.prop === 'num'">{{scope.row[scope.prop]}} {{scope.row.goods.unit}}</div>
       <el-tag size="mini" v-if="scope.prop === 'dv'" :type="dvValue(scope.row['dv']).type">{{dvValue(scope.row['dv']).value}}</el-tag>
-      <div class="link" v-if="scope.prop === 'op'&&$attrs.state === 'ready'" @click="toFinish(scope)">{{`确认${field.Stock.type.option[scope.row['type']]}`}}</div>
-      <!-- <div v-if="scope.prop === 'op'&&$attrs.state === 'finish'">
-          <remove-check @remove="remove(scope)"></remove-check>
-        </div> -->
     </div>
   </common-table>
 </template>
@@ -89,23 +87,26 @@
       thead() {
         let thead = {
           name: {
-            name: '库存单名称'
+            name: '库存单名称',
+            slot: true
           },
           type: {
             name: "库存单类型",
+            width:81,
             slot: true
           },
           num: {
+            width:100,
             name: "数量",
+            slot:true
           },
-          // new: {
-          //   name: "操作后库存",
-          // },
           dv: {
             name: "变化类型",
+            width:50,
             slot: true
           },
           'goods.name': {
+            width:200,
             name: '操作商品',
           },
           remake: {
@@ -113,29 +114,33 @@
           },
           createdAt: {
             name: "操作日期",
+            width:130,
             slot: true
           },
           state: {
             name: '状态',
+            width:60,
             slot: true
           },
-          op: {
-            name: '操作',
-            slot: true
-          }
+          // ops: {
+          //   name: '操作',
+          //   slot: true,
+          //   width:40
+          // }
         }
         if (this.$attrs.state === 'finish') {
-          delete thead.op;
+          // delete thead.op;
           this.$set(thead, 'dv', {
             name: "变化类型",
-            slot: true
+            slot: true,
+            width:69
           });
         } else {
           delete thead.dv
-          this.$set(thead, 'op', {
-            name: '操作',
-            slot: true
-          })
+          // this.$set(thead, 'ops', {
+          //   name: '操作',
+          //   slot: true
+          // })
         }
         return thead;
       }
@@ -159,7 +164,9 @@
         return data;
       },
       toFinish(scope) {
-        this.$emit('sub', scope);
+        if (scope.row['state'] === 'ready') {
+          this.$emit('sub', scope);
+        }
       },
       remove(scope) {
         this.$emit('remove', scope);

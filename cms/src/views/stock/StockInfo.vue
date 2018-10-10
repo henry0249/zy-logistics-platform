@@ -27,8 +27,12 @@
         </my-form>
         <el-alert style="margin-top:15px" title="待处理状态的库存单不会使库存立即变化,完成状态会立即修改库存" type="warning" :closable="false" center show-icon>
         </el-alert>
-        <el-alert v-if="$route.query._id" style="margin:15px 0 15px 0;" title="贸易链信息" type="info" :closable="false"></el-alert>
-        <stock-business-trains v-if="$route.query._id" :val="val.businessTrains"></stock-business-trains>
+        <el-alert v-if="$route.query._id" style="margin:15px 0 15px 0;" title="运单信息" type="info" :closable="false"></el-alert>
+        <stock-logistics v-if="$route.query._id && val.businessTrains" :logisticsTrajectory="logisticsTrajectory" :val="val.businessTrains.logistics || []"></stock-logistics>
+        <span v-else class="jc" style="color:#909399;font-size:13px">暂无数据</span>
+        <el-alert v-if="$route.query._id" style="margin:15px 0 15px 0;" title="物流信息" type="info" :closable="false"></el-alert>
+        <Stock-logistics-trajectory v-if="$route.query._id && val.businessTrains" :logistics="val.businessTrains.logistics || []" :logisticsTrajectory="logisticsTrajectory"></Stock-logistics-trajectory>
+        <div v-else class="jc" style="color:#909399;font-size:13px">暂无数据</div>
       </div>
       <div class="flex ac jb" style="margin-top:30px">
         <slot name="left">
@@ -46,11 +50,13 @@
 
 <script>
   import GoodsList from './GoodsList.vue';
-  import StockBusinessTrains from './StockBusinessTrains.vue';
+  import StockLogistics from './StockLogistics.vue';
+  import StockLogisticsTrajectory from './StockLogisticsTrajectory.vue';
   export default {
     components: {
       GoodsList,
-      StockBusinessTrains
+      StockLogistics,
+      StockLogisticsTrajectory
     },
     props: {
       goodsId: {
@@ -63,6 +69,12 @@
           return {};
         }
       },
+      logisticsTrajectory: {
+        type: Array,
+        default () {
+          return [];
+        }
+      },
       submitText: {
         type: String,
         default: "确认提交"
@@ -72,7 +84,7 @@
       return {
         checkAll: false,
         addCheck: false,
-        subDisabled:false,
+        subDisabled: false,
         goodsData: [],
         goodsObj: {},
         loadingText: "",
@@ -86,9 +98,7 @@
     },
     watch: {
       goodsData: {
-        handler(val) {
-          console.log(val);
-        },
+        handler(val) {},
         deep: true
       },
       company: {
@@ -164,12 +174,10 @@
             this.$set(obj, 'num', item.key);
             data.push(obj);
           });
-          console.log(data);
           this.$emit("submit", data);
         }
       },
       checkMethods() {
-        console.log(this.goodsData);
         let check = true;
         if (this.goodsData.length === 0) {
           this.$message.warn('必须选择商品');
@@ -201,14 +209,13 @@
       }
     },
     created() {
+      console.log(this.val);
       if (this.val && this.val._id) {
         let obj = this.val.goods;
-        console.log(this.val.num);
         if (this.val.num) {
           this.$set(obj, 'key', this.val.num);
         }
         this.goodsData.push(obj);
-        console.log(this.goodsData);
       }
       if (this.$route.query._id) {
         this.subDisabled = true;

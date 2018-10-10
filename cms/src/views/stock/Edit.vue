@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="loadingText" style="padding: 0 1%;margin:0 auto">
-    <stock-info v-if="!loadingText" @submit="submit" :val="data" :submit-text="`确认${field.Stock.type.option[$route.query.type]}`"></stock-info>
+    <stock-info v-if="!loadingText" @submit="submit" :logisticsTrajectory="logisticsTrajectory" :val="data" :submit-text="`确认${field.Stock.type.option[$route.query.type]}`"></stock-info>
   </loading-box>
 </template>
 
@@ -13,7 +13,8 @@
     data() {
       return {
         loadingText: '',
-        data: {}
+        data: {},
+        logisticsTrajectory:[],
       }
     },
     methods: {
@@ -27,7 +28,6 @@
         }).catch(() => {});
       },
       async sub(val) {
-        console.log(val);
         try {
           this.loadingText = '修改中';
           // let delStock = await this.$api.curd({
@@ -36,13 +36,13 @@
           //   _id: this.$route.query._id
           // })
           let updateStock = await this.$api.curd({
-            model:'stock',
-            curdType:'update',
-            find:{
+            model: 'stock',
+            curdType: 'update',
+            find: {
               _id: this.$route.query._id
             },
-            update:{
-              state:'checked'
+            update: {
+              state: 'checked'
             }
           })
           let setStock = await this.$api.curd({
@@ -64,39 +64,61 @@
         this.loadingText = '';
       },
       async getStockById() {
-        try {
-          this.loadingText = '加载中';
-          this.data = await this.$api.curd({
-            model: 'stock',
-            curdType: 'findOne',
-            _id: this.$route.query._id,
+        this.data = await this.$api.curd({
+          model: 'stock',
+          curdType: 'findOne',
+          _id: this.$route.query._id,
+          populate: [{
+            path: 'goods',
             populate: [{
-              path: 'goods',
-              populate: [{
-                path: 'category'
-              }, {
-                path: 'brand'
-              }]
-            },{
-              path:'businessTrains',
-              populate:[{
-                path:'order'
-              },{
-                path:'logistics'
-              },{
-                path:'user'
-              },{
-                path:'company'
-              }]
+              path: 'category'
+            }, {
+              path: 'brand'
             }]
-          })
-          this.$set(this.data, 'state', 'finish');
-        } catch (error) {}
-        this.loadingText = '';
+          }, {
+            path: 'businessTrains',
+            populate: [{
+              path: 'order'
+            }, {
+              path: 'logistics',
+              populate: [{
+                path: 'order'
+              }, {
+                path: 'ship'
+              }, {
+                path: 'truck'
+              }]
+            }, {
+              path: 'user'
+            }, {
+              path: 'company'
+            }]
+          }]
+        })
+        this.$set(this.data, 'state', 'finish');
+      },
+      async getLogisticsTrajectory(){
+        let data = [];
+        this.data.businessTrains.logistics.forEach(item => {
+          data.push(item._id);
+        });
+        this.logisticsTrajectory = await this.$ajax.post('/logisticsTrajectory/find',{
+          logistics:{
+            $in:data
+          },
+          sort:{
+            createdAt:-1
+          }
+        })
       }
     },
-    created() {
-      this.getStockById();
+    async created() {
+      try {
+        this.loadingText = '加载中';
+        await this.getStockById();
+        await this.getLogisticsTrajectory();
+      } catch (error) {}
+      this.loadingText = '';
     }
   }
 </script>
