@@ -30,11 +30,6 @@
       async sub(val) {
         try {
           this.loadingText = '修改中';
-          // let delStock = await this.$api.curd({
-          //   model: 'stock',
-          //   curdType: 'delete',
-          //   _id: this.$route.query._id
-          // })
           let updateStock = await this.$api.curd({
             model: 'stock',
             curdType: 'update',

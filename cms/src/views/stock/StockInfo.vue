@@ -29,10 +29,10 @@
         </el-alert>
         <el-alert v-if="$route.query._id" style="margin:15px 0 15px 0;" title="运单信息" type="info" :closable="false"></el-alert>
         <stock-logistics v-if="$route.query._id && val.businessTrains" :logisticsTrajectory="logisticsTrajectory" :val="val.businessTrains.logistics || []"></stock-logistics>
-        <span v-else class="jc" style="color:#909399;font-size:13px">暂无数据</span>
+        <span v-if="$route.query._id && !val.businessTrains" class="jc" style="color:#909399;font-size:13px">暂无数据</span>
         <el-alert v-if="$route.query._id" style="margin:15px 0 15px 0;" title="物流信息" type="info" :closable="false"></el-alert>
         <Stock-logistics-trajectory v-if="$route.query._id && val.businessTrains" :logistics="val.businessTrains.logistics || []" :logisticsTrajectory="logisticsTrajectory"></Stock-logistics-trajectory>
-        <div v-else class="jc" style="color:#909399;font-size:13px">暂无数据</div>
+        <div  v-if="$route.query._id && !val.businessTrains" class="jc" style="color:#909399;font-size:13px">暂无数据</div>
       </div>
       <div class="flex ac jb" style="margin-top:30px">
         <slot name="left">
@@ -97,6 +97,24 @@
       };
     },
     watch: {
+      val: {
+        handler(val) {
+          let io = false;
+          if (val.businessTrains) {
+            if (val.businessTrains.logistics) {
+              val.businessTrains.logistics.forEach(item => {
+                if (item.state !== 5) {
+                  io = true;
+                }
+              });
+            }
+          }else{
+            io = true;
+          }
+          this.subDisabled = io;
+        },
+        deep: true
+      },
       goodsData: {
         handler(val) {},
         deep: true
