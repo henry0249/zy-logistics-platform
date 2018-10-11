@@ -24,7 +24,7 @@ export default [{
     component: Add
   },{
     path: 'ready_list',
-    name:'未完成库存单',
+    name:'待处理库存单',
     component: StockReadyList
   },{
     path: 'edit',

@@ -186,7 +186,7 @@
           },
           key: {
             readOnly: true,
-            name: this.field.Stock.type.option[this.$attrs.type] + "数量",
+            name: '预计'+this.field.Stock.type.option[this.$attrs.type] + "数量",
             slot: true
           }
         };

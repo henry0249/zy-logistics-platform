@@ -32,7 +32,7 @@
         <span v-if="$route.query._id && !val.businessTrains" class="jc" style="color:#909399;font-size:13px">暂无数据</span>
         <el-alert v-if="$route.query._id" style="margin:15px 0 15px 0;" title="物流信息" type="info" :closable="false"></el-alert>
         <Stock-logistics-trajectory v-if="$route.query._id && val.businessTrains" :logistics="val.businessTrains.logistics || []" :logisticsTrajectory="logisticsTrajectory"></Stock-logistics-trajectory>
-        <div  v-if="$route.query._id && !val.businessTrains" class="jc" style="color:#909399;font-size:13px">暂无数据</div>
+        <div v-if="$route.query._id && !val.businessTrains" class="jc" style="color:#909399;font-size:13px">暂无数据</div>
       </div>
       <div class="flex ac jb" style="margin-top:30px">
         <slot name="left">
@@ -41,6 +41,7 @@
         </slot>
         <div class="f1"></div>
         <slot name="right">
+          <div v-if="$route.query._id && val.businessTrains" style="margin-right:15px;font-size:13px;">实际{{field.Stock.type.option[form.type]}}数量：<span class="blue">{{count || 0}}</span></div>
           <el-button :disabled="subDisabled" type="primary" size="small" @click="submit">{{submitText}}</el-button>
         </slot>
       </div>
@@ -108,7 +109,7 @@
                 }
               });
             }
-          }else{
+          } else {
             io = true;
           }
           this.subDisabled = io;
@@ -141,6 +142,13 @@
       }
     },
     computed: {
+      count() {
+        let count = 0;
+        this.val.businessTrains.logistics.forEach(item => {
+          count += item.loading;
+        });
+        return count;
+      },
       isCheck() {
         return this.form.type === 'check';
       },
@@ -170,7 +178,9 @@
         this.checkAll = true;
       },
       changeKey(key) {
-        this.form.type = key
+        if (!this.$route.query._id) {
+          this.form.type = key;
+        }
       },
       setName() {
         let date = this.formatTime(new Date(), "YYYY年MM月DD日A");
@@ -189,7 +199,11 @@
           this.goodsData.forEach(item => {
             let obj = JSON.parse(JSON.stringify(this.form));
             this.$set(obj, 'goods', item._id);
-            this.$set(obj, 'num', item.key);
+            if (this.$route.query._id && this.val.businessTrains) {
+              this.$set(obj, 'num', this.count);
+            } else {
+              this.$set(obj, 'num', item.key);
+            }
             data.push(obj);
           });
           this.$emit("submit", data);

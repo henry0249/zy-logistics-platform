@@ -4,13 +4,13 @@
       <div style="padding:2vh">
         <div class="flex ac jb" style="height:174px">
           <div style="width:24%" v-for="(val,key) in data" :key="val.id">
-            <stock-card :type="key" :data="val.num" :time="val.createdAt"></stock-card>
+            <stock-card :type="key" :goodsData="goodsData" :goods.sync="goods" :data="val.num" :time="val.createdAt"></stock-card>
           </div>
         </div>
       </div>
       <div class="f1" style="padding:0 2vh;width:100%">
         <div class="chart-card">
-          <stock-chart v-if="!loadingText"></stock-chart>
+          <stock-chart :goods="goods" v-if="!loadingText"></stock-chart>
         </div>
       </div>
     </div>
@@ -27,7 +27,8 @@
     },
     data() {
       return {
-        loadingText: "",
+        loadingText: "加载中...",
+        goods: '',
         data: {}
       };
     },
@@ -37,21 +38,37 @@
           this.getLastStock();
         },
         deep: true
-      }
+      },
+      async goods(val) {
+        await this.getLastStock();
+      },
     },
     methods: {
-      async getLastStock() {
+      async getGoods() {
+        this.goodsData = await this.$ajax.post('/goods/find', {
+          company: this.company
+        })
+      },
+      async getLastStock(val) {
         this.loadingText = "加载中...";
         try {
           this.data = await this.$ajax.post("/stock/simpleStatistics", {
-            company: this.company._id
+            company: this.company._id,
+            goods: this.goods
           });
         } catch (error) {}
         this.loadingText = "";
       }
     },
-    mounted() {
-      this.getLastStock();
+    async mounted() {
+      this.loadingText = "加载中...";
+      try {
+        await this.getGoods();
+        if (this.goodsData.length > 0) {
+          this.goods = this.goodsData[0]._id;
+        }
+      } catch (error) {}
+      this.loadingText = "";
     }
   };
 </script>
@@ -62,6 +79,6 @@
     border-radius: 4px;
     border: 1px solid #ebeef5;
     padding: 2vh;
-    height:100%;
+    height: 100%;
   }
 </style>

@@ -7,14 +7,15 @@
       <my-form-item type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" label="起始时间" date style="padding-right:10px;" width="44%" size="mini" v-model="dateArr">
       </my-form-item>
     </div>
-    <div slot-scope="scope">
+    <template slot-scope="scope">
       <div class="" :class="scope.row['state'] === 'ready'?'link pointer':''" v-if="scope.prop === 'name'" @click="toFinish(scope)">{{scope.row[scope.prop]}}</div>
       <div v-if="scope.prop === 'type'">{{field.Stock.type.option[scope.row['type']]}}</div>
       <div v-if="scope.prop === 'createdAt'">{{formatTime(scope.row['createdAt'])}}</div>
       <div v-if="scope.prop === 'state'">{{field.Stock.state.option[scope.row['state']]}}</div>
+      <div v-if="scope.prop === 'toCompany'">{{ scope.row[scope.prop]?scope.row[scope.prop].nick || scope.row[scope.prop].name:''}}</div>
       <div v-if="scope.prop === 'num'">{{scope.row[scope.prop]}} {{scope.row.goods.unit}}</div>
       <el-tag size="mini" v-if="scope.prop === 'dv'" :type="dvValue(scope.row['dv']).type">{{dvValue(scope.row['dv']).value}}</el-tag>
-    </div>
+    </template>
   </common-table>
 </template>
 
@@ -108,6 +109,11 @@
           'goods.name': {
             width:200,
             name: '操作商品',
+          },
+          toCompany: {
+            name: "目标公司",
+            slot:true,
+            width:100
           },
           remake: {
             name: "备注",
@@ -253,6 +259,8 @@
       }
       this.$set(this.option, 'populate', [{
         path: 'goods'
+      },{
+        path: 'toCompany'
       }])
       this.changetype();
     }
