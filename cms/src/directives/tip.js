@@ -3,6 +3,7 @@ function tip(el, binding) {
   el.addEventListener('mouseover', () => {
     div = createdNode(el, binding);
   });
+  console.log(div);
   el.addEventListener('mouseout', () => {
     if (div) {
       el.removeChild(div)
@@ -11,16 +12,12 @@ function tip(el, binding) {
 }
 
 function createdNode(el, binding) {
-  console.log(binding);
   let value = typeof (binding.value) === 'object' ? binding.value.text : binding.value;
   let div = document.createElement('div');
   let node = document.createTextNode(JSON.stringify(value));
   el.style.position = 'relative';
   el.style.cursor = 'pointer';
   div.style.position = 'absolute';
-  // div.style.left = '100%';
-  // div.style.top = '50%';
-  // div.style.transform = 'translate(20px,-50%)';
   let obj = {
     top: {
       transform: ['-50%', '-20px'],
@@ -55,8 +52,8 @@ function createdNode(el, binding) {
 export default {
   install(Vue) {
     Vue.directive('tip', {
-      inserted: tip,
-      update: tip
+      bind: tip,
+      // update: tip
     })
   }
 }

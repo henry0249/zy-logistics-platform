@@ -1,6 +1,9 @@
 <template>
-  <chart ref="chart" style="width:100%;height:100%" :options="options" @datarangeselected="datarangeselected">
-  </chart>
+  <loading-box class="chartBox">
+    <chart ref="chart" style="width:100%;height:100%" :options="options" @datarangeselected="datarangeselected">
+    </chart>
+    <div v-if="!goods" class="noDataText">无数据</div>
+  </loading-box>
 </template>
 
 <script>
@@ -199,5 +202,17 @@
 </script>
 
 <style scoped>
-
+.chartBox{
+  position: relative;
+  width:100%;
+  height: 100%;
+}
+.noDataText{
+  position: absolute;
+  top:50%;
+  right:50%;
+  transform: translate(-50%,-50%);
+  font-size: 15px;
+  color: #909399;
+}
 </style>

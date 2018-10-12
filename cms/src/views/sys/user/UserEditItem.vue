@@ -62,13 +62,16 @@
           recommendedByUser: {},
           superior: {},
           parent: {},
-          tag: []
+          tag: [],
+          company:{}
         }
       };
     },
     watch: {
       userData: {
         handler(val, oldVal) {
+          console.log(val);
+          console.log(val.company);
           this.disabled = false;
         },
         deep: true
@@ -112,6 +115,9 @@
                 superior: this.userData.superior._id,
                 parent: this.userData.parent._id
               });
+              if (this.userData.comapny && this.userData.comapny._id) {
+                this.$set(op, 'company', this.userData.comapny._id);
+              }
               if (this.userData.area.length > 0) {
                 op.area = [];
                 this.userData.area.forEach(areaItem => {
@@ -131,6 +137,9 @@
                 type: this.userData.type,
                 email: this.userData.email,
                 tag: this.userData.tag,
+              }
+              if (this.userData.company && this.userData.company._id) {
+                this.$set(update, 'company', this.userData.company._id);
               }
               if (this.userData.recommendedByUser) {
                 this.$set(update, 'recommendedByUser', this.userData.recommendedByUser._id);
@@ -162,9 +171,9 @@
             } else {
               path = '/sys/user/list';
             }
-            this.$router.push({
-              path
-            });
+            // this.$router.push({
+            //   path
+            // });
           } catch (error) {
             console.log(error);
           }

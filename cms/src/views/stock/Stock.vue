@@ -84,6 +84,13 @@
         await this.getGoods();
         if (this.goodsData.length > 0) {
           this.goods = this.goodsData[0]._id;
+        } else {
+          this.data = {
+            stock: {},
+            in: {},
+            out: {},
+            check: {},
+          };
         }
       } catch (error) {}
       this.loadingText = "";

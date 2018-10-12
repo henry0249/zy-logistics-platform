@@ -33,6 +33,9 @@ export default {
             },
             {
               path: "parent"
+            },
+            {
+              path: "company"
             }
           ],
           _id: this.$route.params._id

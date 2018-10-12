@@ -113,7 +113,11 @@
     },
     computed: {
       tipData() {
-        return '最后更新时间  ' + this.formatTime(this.time, 'YYYY-MM-DD hh:mm');
+        let data = '最后更新时间 '
+        if (this.type === 'stock') {
+          data += this.formatTime(this.time, 'YYYY-MM-DD hh:mm');
+        }
+        return data;
       },
       typeData() {
         let type = "stock";

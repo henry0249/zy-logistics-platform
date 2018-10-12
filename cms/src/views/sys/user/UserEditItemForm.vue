@@ -16,7 +16,9 @@
       <div style="width:24%">
         <my-select label="父级" :data.sync="userData.parent" user></my-select>
       </div>
-      <div style="width:24%;"></div>
+      <div style="width:24%">
+        <my-select label="关联主公司" :data.sync="userData.company" company></my-select>
+      </div>
     </div>
     <div class="flex jb" style="margin-top:15px;">
       <common-multi-selection label="所在区域" :data.sync="userData.area" border title="所在区域" area size="mini"></common-multi-selection>
@@ -69,7 +71,8 @@
           recommendedByUser: {},
           superior: {},
           parent: {},
-          tag: []
+          tag: [],
+          company:{}
         }
       };
     },
@@ -109,6 +112,8 @@
     created() {
       if (this.type === "edit") {
         this.userData = JSON.parse(JSON.stringify(this.startData));
+        console.log(this.startData);
+        console.log(this.userData);
       }
     }
   };
