@@ -28,10 +28,12 @@
       }
     },
     created() {
-      if (this.logisticsTrajectory[this.logisticsTrajectory.length - 1].type !== 0) {
-        this.logisticsTrajectoryData = JSON.parse(JSON.stringify(this.logisticsTrajectory)).reverse();
-      } else {
-        this.logisticsTrajectoryData = JSON.parse(JSON.stringify(this.logisticsTrajectory));
+      if (this.logisticsTrajectory[this.logisticsTrajectory.length - 1]) {
+        if (this.logisticsTrajectory[this.logisticsTrajectory.length - 1].type !== 0) {
+          this.logisticsTrajectoryData = JSON.parse(JSON.stringify(this.logisticsTrajectory)).reverse();
+        } else {
+          this.logisticsTrajectoryData = JSON.parse(JSON.stringify(this.logisticsTrajectory));
+        }
       }
     }
   }

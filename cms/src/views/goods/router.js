@@ -8,6 +8,7 @@ import CategoryAdd from './CategoryAdd.vue';
 import CategoryEdit from './CategoryEdit.vue';
 import Edit from './Edit.vue';
 import brandAdd from './brandAdd.vue';
+import Test from './Test.vue';
 
 export default [{
   path: '/goods',
@@ -18,6 +19,10 @@ export default [{
     path: 'list',
     name: '商品列表',
     component: GoodsList
+  },{
+    path: 'test',
+    name: 'Test',
+    component: Test
   }, {
     path: 'add',
     name: '添加商品',

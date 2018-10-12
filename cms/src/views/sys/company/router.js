@@ -22,7 +22,7 @@ export default [{
     component:Edit
   },{
     path:'account',
-    name:'账户详情',
+    name:'账户管理',
     component:CompanyAccount
   },{
     path:'add',

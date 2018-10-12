@@ -1,17 +1,20 @@
 <template>
   <el-card>
-    <div class="flex ac jb">
+    <div class="flex ac jc jb">
       <div :class="typeData.className">
         <i class="el-icon-menu el-icon--right"></i> {{typeData.title}}
       </div>
-      <div class="info">
+      <div class="info jc js">
         <div class="jc js" v-if="type === 'stock'">
-          <el-select style="width:150px;" size="mini" v-model="goods_id" placeholder="请选择">
+          <el-select style="width:150px;margin-right:2px;" size="mini" filterable v-model="goods_id" placeholder="请选择商品">
             <el-option v-for="item in goodsData" :key="item._id" :label="item.name" :value="item._id">
             </el-option>
           </el-select>
         </div>
-        <i v-else class="el-icon-time el-icon--right"></i><span v-if="type !== 'stock'" style="color:#ccc">{{time | formatTime('YYYY-MM-DD hh:mm')}}</span>
+        <el-tooltip class="item" effect="dark" :content="tipData" placement="top">
+          <i class="el-icon-time el-icon--right"></i>
+        </el-tooltip>
+        <span v-if="type !== 'stock'" style="color:#ccc;height:28px;display: inline-block;lineHeight:28px;margin-left:2px;">{{time | formatTime('YYYY-MM-DD hh:mm')}}</span>
       </div>
     </div>
     <div class="tc" :class="typeData.className" :style="{fontSize:stockFontSize,height:'90px',lineHeight:'90px'}">
@@ -102,13 +105,16 @@
       };
     },
     watch: {
-      goods_id(val,oldVal){
+      goods_id(val, oldVal) {
         if (oldVal) {
-          this.$emit('update:goods',val);
+          this.$emit('update:goods', val);
         }
       },
     },
     computed: {
+      tipData() {
+        return '最后更新时间  ' + this.formatTime(this.time, 'YYYY-MM-DD hh:mm');
+      },
       typeData() {
         let type = "stock";
         for (const key in this.typeObj) {
@@ -146,7 +152,10 @@
     created() {
       if (this.goods) {
         this.goods_id = this.goods;
+      } else {
+        this.goods_id = '';
       }
+      console.log(this.goods_id);
     }
   };
 </script>

@@ -10,7 +10,7 @@
         <el-alert title="库存单类型" type="info" :closable="false"></el-alert>
         <div class="flex ac jb" style="margin-top:15px">
           <div class="pointer" v-for="(val,key) in field.Stock.type.option" :key="key" @click="changeKey(key)">
-            <el-card :shadow="form.type === key?'always':'hover'" class="info" :class="{activeType:form.type === key}" style="padding:0 20px;font-size:13px">
+            <el-card :shadow="form.type === key?'always':'hover'" class="info" :class="{activeType:form.type === key,cursorNotAllowed:$route.query._id?true:false}" style="padding:0 20px;font-size:13px">
               {{val}}单
             </el-card>
           </div>
@@ -108,6 +108,9 @@
                   io = true;
                 }
               });
+              if (val.businessTrains.logistics.length === 0) {
+                io = true;
+              }
             }
           } else {
             io = true;
@@ -272,5 +275,8 @@
     background-color: #409eff;
     color: #fff;
     font-weight: 500;
+  }
+  .cursorNotAllowed {
+    cursor: not-allowed
   }
 </style>
