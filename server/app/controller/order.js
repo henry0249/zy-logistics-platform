@@ -24,6 +24,8 @@ class OrderController extends Controller {
   async dispatch(){
     this.ctx.body = await this.ctx.service.order.dispatch();
   }
-
+  async mutilUpdate(){
+    this.ctx.body = await this.ctx.service.order.mutilUpdate();
+  } 
 }
 module.exports = OrderController;

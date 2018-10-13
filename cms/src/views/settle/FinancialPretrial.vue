@@ -14,7 +14,7 @@
       </div>
       <div>
         <div style="height:calc(100vh - 50px - 40px - 15px - 60px - 70px)">
-          <my-table ref="table" :thead="thead" :data.sync="data" selection border height="100vh - 50px - 40px - 15px - 60px - 70px" size="mini" @selection-change="handleSelectionChange" :loadmore="loadmore">
+          <my-table v-if="!loadingText" ref="table" :thead="thead" :data.sync="data" selection border height="100vh - 50px - 40px - 15px - 60px - 70px" size="mini" @selection-change="handleSelectionChange" :loadmore="loadmore">
             <template slot-scope="scope">
               <div class="link" v-if="scope.prop==='no'" @click="toDetail(scope.row,scope.index)">
                 {{scope.row.no}}
@@ -34,10 +34,10 @@
                 {{area2name(scope.row.area)}}
               </div>
               <div v-if="scope.prop === 'balancePrice'">
-                <my-form-item v-model="scope.row.businessTrains.balancePrice" size="mini" number :min="0"></my-form-item>
+                <my-form-item v-model="scope.row.balancePrice" size="mini" number :min="0"></my-form-item>
               </div>
               <div v-if="scope.prop === 'balanceCount'">
-                <my-form-item v-model="scope.row.businessTrains.balanceCount" size="mini" number :min="0"></my-form-item>
+                <my-form-item v-model="scope.row.balanceCount" size="mini" number :min="0"></my-form-item>
               </div>
             </template>
           </my-table>
@@ -51,7 +51,7 @@
               <my-form-item v-model="balancePriceMutil" size="mini" label="结算金额" number width="150px" :min="0">
               </my-form-item>
               <el-badge :value="select.length" class="item">
-                <el-button type="warning" size="mini" @click="balancePriceMutilEdit">批量修改</el-button>
+                <el-button type="warning" size="mini" @click="balanceMutilChangeSubmit('balancePrice',balancePriceMutil)">批量修改</el-button>
               </el-badge>
             </div>
             <div style="width:3vw"></div>
@@ -59,7 +59,7 @@
               <my-form-item v-model="balanceCountMutil" size="mini" label="结算数量" number width="150px" :min="0">
               </my-form-item>
               <el-badge :value="select.length" class="item">
-                <el-button type="warning" size="mini" @click="balanceCountMutilEdit">批量修改</el-button>
+                <el-button type="warning" size="mini" @click="balanceMutilChangeSubmit('balanceCount',balanceCountMutil)">批量修改</el-button>
               </el-badge>
             </div>
           </div>
@@ -132,26 +132,50 @@ export default {
     },
     toDetail(item, index) {
       if (item._id) {
-        this.$router.push(`${this.$route.path}/edit/${item._id}?parentPath=${this.$route.path}&parentName=${this.$route.name}`);
+        this.$router.push(
+          `${this.$route.path}/edit/${item._id}?parentPath=${
+            this.$route.path
+          }&parentName=${this.$route.name}`
+        );
       }
     },
     handleSelectionChange(val) {
       this.select = val;
     },
-    balancePriceMutilEdit() {},
-    balanceCountMutilEdit() {},
     balanceMutilChange(type, val) {
       let selectTemp = [...this.select];
       this.select.forEach(selectItem => {
         this.data.forEach((dataItem, index) => {
           if (selectItem._id === dataItem._id) {
             let newItem = JSON.parse(JSON.stringify(dataItem));
-            newItem.businessTrains[type] = val;
+            newItem[type] = val;
             this.$set(this.data, index, newItem);
           }
         });
       });
       this.$refs.table.toggleRowSelection(selectTemp);
+    },
+    async balanceMutilChangeSubmit(type,val) {
+      if (this.select.length === 0) {
+        this.$message.warning("未选择订单");
+        return;
+      }
+      this.loadingText = "修改中";
+      let list = [];
+      this.select.forEach(item => {
+        let body = {
+          _id: item._id
+        }
+        body[type] = val;
+        list.push(body);
+      });
+      try {
+        this.$ajax.post("/order/mutilUpdate", {
+          list: list
+        });
+        this.$message.success('修改成功');
+      } catch (error) {}
+      this.loadingText = "";
     }
   },
   async mounted() {

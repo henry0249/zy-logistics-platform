@@ -34,7 +34,12 @@ module.exports = {
   },
   company: {
     type: 'ObjectId',
-    name: '公司',
+    name: '公司', //当前公司,即是付款公司
+    ref: 'Company'
+  },
+  receivedCompany: {
+    type: 'ObjectId',
+    name: '收款公司', //当前公司付款去向的公司
     ref: 'Company'
   },
   supplyPrice: {
@@ -62,6 +67,11 @@ module.exports = {
     type: 'Number',
     default: 0
   },
+  preBalancePrice: {
+    name: '贸易单价', //预审时填写的是结算价格,贸易链节点填写的是贸易单价,用来做预审结算价格对比
+    type: 'Number',
+    default: 0
+  },
   balancePrice: {
     name: '结算价格',
     type: 'Number',
@@ -69,6 +79,16 @@ module.exports = {
   },
   balanceCount: {
     name: '结算数量',
+    type: 'Number',
+    default: 0
+  },
+  balanceForAccount: {
+    name: '用结算款结算金额',
+    type: 'Number',
+    default: 0
+  },
+  balanceForAccountPrepaid: {
+    name: '用预付款结算金额',
     type: 'Number',
     default: 0
   },
@@ -86,5 +106,10 @@ module.exports = {
     name: '关联的运单',
     type: 'ObjectIdArray',
     ref: 'Logistics'
+  },
+  account: {
+    name: '关联的账户',
+    type: 'ObjectId',
+    ref: 'Account'
   }
 }

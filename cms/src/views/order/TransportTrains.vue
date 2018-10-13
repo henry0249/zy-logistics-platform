@@ -14,11 +14,11 @@
             </transport-trains-card>
             <div class="tc col-flex jb" v-if="index!==trains.length-1" style="width:50px;height:220px">
               <div></div>
-              <i class="el-icon-d-arrow-right success" :style="{color:showIndex === (index+1)?'#67C23A':'#C0C4CC'}"></i>
-              <i class="el-icon-d-arrow-right success" :style="{color:showIndex === (index+1)?'#67C23A':'#C0C4CC'}"></i>
-              <div @click="showIndex = (index+1)" class="tc pointer" style="margin-top:10px">
-                <icon class="to-table" :color="showIndex === (index+1)?'#67C23A':'#C0C4CC'">icon-xiajiang</icon>
-                <div style="font-size:12px" :style="{color:showIndex === (index+1)?'#67C23A':'#C0C4CC'}">运单详情</div>
+              <i class="el-icon-d-arrow-right success" :style="{color:showIndex === index?'#67C23A':'#C0C4CC'}"></i>
+              <i class="el-icon-d-arrow-right success" :style="{color:showIndex === index?'#67C23A':'#C0C4CC'}"></i>
+              <div @click="showIndex = index" class="tc pointer" style="margin-top:10px">
+                <icon class="to-table" :color="showIndex === index?'#67C23A':'#C0C4CC'">icon-xiajiang</icon>
+                <div style="font-size:12px" :style="{color:showIndex === index?'#67C23A':'#C0C4CC'}">运单详情</div>
               </div>
             </div>
           </div>
@@ -27,9 +27,10 @@
       <div v-for="(item,index) in trains" :key="'table'+index">
         <div v-if="showIndex === index">
           <div class="flex ac jb brtl brtr" style="color:#909399;padding-left:25px;background:#f4f4f5;font-size:13px">
-            <div>{{areaInfo(trains[index - 1])}}</div>
-            <i style="margin:0 15px" class="el-icon-d-arrow-right success"></i>
             <div>{{areaInfo(item)}}</div>
+            <!-- <el-input size="mini" v-model="item.areaInfo" :value="areaInfo(item)" placeholder="请输入内容"></el-input> -->
+            <i style="margin:0 15px" class="el-icon-d-arrow-right success"></i>
+            <div>{{areaInfo(trains[index + 1])}}</div>
             <div class="f1"></div>
             <div class="success pointer" style="padding:10px" @click="addLogistics(item.logistics,index)">
               物流单<i class="el-icon-plus"></i>
@@ -45,21 +46,21 @@
                 <div v-else style="color:#ccc">未生成</div>
               </div>
               <div v-if="scope.prop==='transportation'">
-                <my-select truck :type.sync="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]" placeholder="运输工具"></my-select>
+                <my-select truck :type.sync="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]" placeholder="运输工具" @change="transportationChange($event,scope.row)"></my-select>
               </div>
-              <my-form-item v-if="scope.prop==='loading'" v-model="scope.row.loading" size="mini" :min="0">
+              <my-form-item v-if="scope.prop==='loading'" v-model="scope.row.loading" size="mini" type="number" min="0">
               </my-form-item>
-              <my-form-item v-if="scope.prop==='landed'" v-model="scope.row.landed" size="mini" :min="0">
+              <my-form-item v-if="scope.prop==='landed'" v-model="scope.row.landed" size="mini" type="number" min="0">
               </my-form-item>
-              <my-form-item v-if="scope.prop==='price'" v-model="scope.row.price" size="mini" :min="0">
+              <my-form-item v-if="scope.prop==='price'" v-model="scope.row.price" size="mini"  type="number" min="0">
               </my-form-item>
-              <my-form-item v-if="scope.prop==='balanceCount'" v-model="scope.row.balanceCount" size="mini" :min="0">
+              <my-form-item v-if="scope.prop==='balanceCount'" v-model="scope.row.balanceCount" size="mini" type="number" min="0">
               </my-form-item>
               <el-tooltip v-if="scope.prop==='balanceCompany'" effect="dark" content="仅可从本公司关联的公司中选择" placement="top">
                 <my-form-item size="mini" v-model="scope.row.balanceCompany" select :options="companySelectList">
                 </my-form-item>
               </el-tooltip>
-              <my-form-item v-if="scope.prop==='loss'" v-model="scope.row.loss" size="mini" :min="0">
+              <my-form-item v-if="scope.prop==='loss'" v-model="scope.row.loss" size="mini" type="number" min="0">
               </my-form-item>
               <el-tooltip v-if="scope.prop==='lossCompany'" effect="dark" content="仅可从本公司关联的公司中选择" placement="top">
                 <my-form-item size="mini" v-model="scope.row.lossCompany" select :options="companySelectList">
@@ -68,7 +69,7 @@
               <div v-if="scope.prop==='total'">
                 {{Number(scope.row.price) * Number(scope.row.landed)}}
               </div>
-              <my-form-item v-if="scope.prop==='state'" select size="mini" v-model="scope.row.state" :options="field.Logistics.state.option">
+              <my-form-item v-if="scope.prop==='state'" select size="mini" v-model="scope.row.state" :options="field.Logistics.state.option" @change="stateSelectChange($event,scope.row)">
               </my-form-item>
             </div>
           </my-table>
@@ -172,7 +173,7 @@ export default {
       loadingText: "",
       trains: [],
       thead: JSON.parse(JSON.stringify(logistics)),
-      showIndex: 1
+      showIndex: 0
     };
   },
   methods: {
@@ -264,6 +265,10 @@ export default {
         loading: 0,
         landed: 0,
         price: 0,
+        balanceCount: 0,
+        balanceCompany: "",
+        loss: 0,
+        lossCompany: "",
         state: 0,
         transportation: "truck",
         truck: {},
@@ -273,8 +278,15 @@ export default {
     removeLogistics(logistics, index) {
       logistics.splice(index, 1);
     },
-    handleCommand(val, item) {
-      item.transportation = val;
+    transportationChange(val, logisticsItem) {
+      if (logisticsItem.state === 0) {
+        logisticsItem.state = 1;
+      }
+    },
+    stateSelectChange(val, logisticsItem) {
+      if (val === 0) {
+        logisticsItem[logisticsItem.transportation] = {};
+      }
     }
   },
   created() {
@@ -282,7 +294,8 @@ export default {
       this.trains.push({
         type: 0,
         area: this.order.handle && this.order.handle.area,
-        company: this.order.handle
+        company: this.order.handle,
+        logistics: []
       });
       this.trains.push({
         type: 2,

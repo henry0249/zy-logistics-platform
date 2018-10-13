@@ -15,17 +15,18 @@ module.exports = {
       type: 'String',
       name: '商品名称',
       slot: true,
+      width: 100
     },
     goodsCount: {
       type: 'Number',
       name: '商品数量',
       slot: true,
+      width: 100
     },
     area: {
       type: 'String',
       name: '收货地址',
-      slot: true,
-      width: 250
+      slot: true
     },
     remark: {
       type: 'String',
@@ -36,13 +37,13 @@ module.exports = {
       type: 'String',
       name: '结算金额',
       slot: true,
-      width: 100
+      width: 150
     },
     balanceCount: {
       type: 'String',
       name: '结算数量',
       slot: true,
-      width: 100
+      width: 150
     },
   }
 }

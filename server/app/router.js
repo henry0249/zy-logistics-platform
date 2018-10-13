@@ -34,6 +34,7 @@ module.exports = app => {
     .get('/order/info/:_id', checkToken(), 'order.getOrderById') //根据id获取订单信息
     .post('/order/transfer', checkToken(), 'order.transfer') //转单
     .post('/order/dispatch', checkToken(), 'order.dispatch') //订单提交配送
+    .post('/order/mutilUpdate', checkToken(), 'order.mutilUpdate') //批量修改订单信息
     .all('/order/pending/:state', checkToken(), 'order.pending') //获取待处理订单
     //运单接口
     .get('/logistics/company/badge', checkToken(), 'logistics.companyBadge') //公司运单标记

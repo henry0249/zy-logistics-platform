@@ -13,8 +13,6 @@ import DistributionFinishCheckEdit from './DistributionFinishCheckEdit';
 import BeforeSettleCheck from './BeforeSettleCheck';
 import BeforeSettleCheckEdit from './BeforeSettleCheckEdit';
 
-import Edit from './Edit.vue';
-
 export default [{
   path: '/order',
   component: App,
@@ -26,7 +24,7 @@ export default [{
   children: [{
     path: '/order/create',
     component: Create,
-    name: '订单计划',
+    name: '创建订单',
     meta: {
       nav: true,
     }

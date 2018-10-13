@@ -1,11 +1,13 @@
 import App from './App.vue';
 import FinancialPretrial from './FinancialPretrial.vue';
 import FinancialPretrialEdit from './FinancialPretrialEdit.vue';
+import AccountSettlement from './AccountSettlement.vue';
+import AccountConfirmation from './AccountConfirmation.vue';
 
 export default [{
   path: '/settle',
   component: App,
-  name:'财务结算',
+  name: '财务结算',
   redirect: '/settle/financialPretrial',
   meta: {
     keepAlive: true // 需要被缓存
@@ -13,10 +15,18 @@ export default [{
   children: [{
     path: 'financialPretrial',
     component: FinancialPretrial,
-    name:'订单预审',
+    name: '订单预审',
   }, {
     path: 'financialPretrial/edit/:_id',
     component: FinancialPretrialEdit,
-    name:'详情处理',
+    name: '详情处理',
+  }, {
+    path: 'accountSettlement',
+    component: AccountSettlement,
+    name: '账户结算',
+  }, {
+    path: 'accountConfirmation',
+    component: AccountConfirmation,
+    name: '账款确认',
   }]
 }]

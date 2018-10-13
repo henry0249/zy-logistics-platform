@@ -76,9 +76,16 @@ class StockService extends Service {
     if (!body.company) {
       ctx.throw(422, '公司信息必填', body);
     }
+    if (!body.goods) {
+      ctx.throw(422, '商品信息必填', body);
+    }
     let company = await ctx.model.Company.findById(body.company);
     if (!company) {
       ctx.throw(422, '公司不存在', body);
+    }
+    let goods = await ctx.model.Goods.findById(body.goods);
+    if (!goods) {
+      ctx.throw(422, '商品不存在', body);
     }
     let type = body.type || 'week';
     let typeObj = {
@@ -129,6 +136,7 @@ class StockService extends Service {
             $exists: false
           }
         }],
+        goods:goods._id,
         company: company._id,
         createdAt: {
           // $gte: minDate,
@@ -164,9 +172,16 @@ class StockService extends Service {
     if (!body.company) {
       ctx.throw(422, '公司信息必填', body);
     }
+    if (!body.goods) {
+      ctx.throw(422, '商品信息必填', body);
+    }
     let company = await ctx.model.Company.findById(body.company);
     if (!company) {
       ctx.throw(422, '公司不存在', body);
+    }
+    let goods = await ctx.model.Goods.findById(body.goods);
+    if (!goods) {
+      ctx.throw(422, '商品不存在', body);
     }
     let res = {
       stock: {
@@ -183,6 +198,7 @@ class StockService extends Service {
       }
     };
     let lastStock = await ctx.model.Stock.findOne({
+      goods:goods._id,
       company: company._id,
       state: "finish"
     }).sort({
@@ -195,6 +211,7 @@ class StockService extends Service {
     //累计入库
     let stockInData = await ctx.model.Stock.find({
       type: 'in',
+      goods:goods._id,
       company: company._id,
       state: "finish"
     });
@@ -205,6 +222,7 @@ class StockService extends Service {
     //累计出库
     let stockOutData = await ctx.model.Stock.find({
       type: 'out',
+      goods:goods._id,
       company: company._id,
       state: "finish"
     });
@@ -214,11 +232,13 @@ class StockService extends Service {
     });
     res.check.num = await ctx.model.Stock.count({
       type: 'check',
+      goods:goods._id,
       company: company._id,
       state: "finish"
     });
     let lastStockCheck = await ctx.model.Stock.findOne({
       type: 'check',
+      goods:goods._id,
       company: company._id,
       state: "finish",
     }).sort({

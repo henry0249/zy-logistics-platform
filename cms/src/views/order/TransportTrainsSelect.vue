@@ -240,10 +240,10 @@ export default {
       this.dialogVisible = false;
     },
     async submit() {
-      if (this.relationLogistics.length === 0) {
-        this.$message.error("尚未选择物流单");
-        return;
-      }
+      // if (this.relationLogistics.length === 0) {
+      //   this.$message.error("尚未选择物流单");
+      //   return;
+      // }
       const loading = this.$loading({
         lock: true,
         text: "关联中",

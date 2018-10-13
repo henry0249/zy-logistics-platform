@@ -25,6 +25,11 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
+  transportCompany: {
+    name: '归属物流公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
   transportTrains: {
     type: 'ObjectId',
     name: '所属物流链',

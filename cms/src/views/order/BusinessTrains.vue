@@ -181,6 +181,8 @@ export default {
           [this.order.type]: this.order[this.order.type],
           customerType: this.order.type
         });
+        this.order.balancePrice = this.order.sell;
+        this.order.balanceCount = this.order.count;
       } else {
         if (!this.data[this.data.length - 1 - 1].company) {
           this.$message.warn(`请先选择联营商公司`);

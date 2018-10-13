@@ -34,11 +34,11 @@
         <div class="info">
           当前选择：
         </div>
-        <div class="blue">
+        <div class="blue flex ac">
           {{text(data)}}
         </div>
         <div class="f1"></div>
-        <el-button @click="dialogVisible = false" size="mini">关 闭</el-button>
+        <el-button type="danger" @click="$emit('update:data', {});dialogVisible = false" size="mini">取消选择</el-button>
         <el-button type="primary" @click="dialogVisible = false" size="mini">确 定</el-button>
       </div>
       <!-- 多选 -->
@@ -61,7 +61,7 @@
           </div>
         </div>
         <div>
-          <el-button @click="dialogVisible = false" size="mini">关 闭</el-button>
+          <el-button type="danger" @click="$emit('update:data', []);dialogVisible = false" size="mini">取消选择</el-button>
           <div style="height:10px"></div>
           <el-button type="primary" @click="dialogVisible = false" size="mini">确 定</el-button>
         </div>
@@ -184,7 +184,7 @@ export default {
     }
   },
   methods: {
-    showDialog(){
+    showDialog() {
       if (!this.disabled) {
         this.dialogVisible = true;
       }

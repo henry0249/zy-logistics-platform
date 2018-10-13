@@ -25,9 +25,10 @@ module.exports = {
       financialPretrial: '订单预审',
       accountSettlement: '账户结算',
       accountConfirmation: '账款确认',
-      finish: '订单完成',
-      cancel: '已取消',
-      delete: '已删除'
+      settled: '已结算',
+      invoiced: '已开票',
+      cancel: '取消',
+      delete: '删除'
     },
     default: 'taking'
   },
@@ -155,5 +156,16 @@ module.exports = {
     name: '物流链',
     type: 'ObjectIdArray',
     ref: 'TransportTrains'
-  }
+  },
+  balancePrice: {
+    name: '结算价格',
+    type: 'Number',
+    default: 0
+  },
+  balanceCount: {
+    name: '结算数量',
+    type: 'Number',
+    default: 0
+  },
+  // balance 
 }

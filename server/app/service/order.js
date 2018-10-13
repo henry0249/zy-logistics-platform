@@ -111,15 +111,15 @@ class OrderService extends Service {
       }
       if (update.state === 'distributionFinishCheck') {
         if (body.transportTrains instanceof Array && body.transportTrains.length > 0) {
-          body.transportTrains.forEach((item, index) => {
-            if (body.transportTrains instanceof Array && item.logistics.length > 0) {
-              item.logistics.forEach((logisticsItem) => {
-                if (Number(logisticsItem.state) !== 5) {
-                  ctx.throw(422, '存在未完成的运单', info);
-                }
-              });
-            } else {
-              if (index !== 0) {
+          body.transportTrains.forEach((item) => {
+            if (item.logistics) {
+              if (body.transportTrains instanceof Array && item.logistics.length > 0) {
+                item.logistics.forEach((logisticsItem) => {
+                  if (Number(logisticsItem.state) !== 5) {
+                    ctx.throw(422, '存在未完成的运单', info);
+                  }
+                });
+              } else {
                 ctx.throw(422, '存在未添加运单的物流链', info);
               }
             }
@@ -147,8 +147,8 @@ class OrderService extends Service {
     const ctx = this.ctx;
     if (businessTrains.type === 'supplier' || businessTrains.type === 'pool') {
       let date = ctx.helper.formatTime(new Date(), "YYYY年MM月DD日A");
-        date = date.replace("AM", "上午");
-        date = date.replace("PM", "下午");
+      date = date.replace("AM", "上午");
+      date = date.replace("PM", "下午");
       let stockBody = {
         type: 'out',
         company: businessTrains.company,
@@ -158,23 +158,40 @@ class OrderService extends Service {
         goods: order.goods,
         num: businessTrains.supplyCount,
         state: 'ready'
-      }
+      };
       if (nextBusinessTrains !== undefined && nextBusinessTrains.type !== 'customer') {
         stockBody.toCompany = nextBusinessTrains.company;
       }
       if (updateFlag) {
-        console.log(stockBody);
         await ctx.model.Stock.update({
           type: 'out',
           order: order._id,
           businessTrains: businessTrains._id,
         }, stockBody);
       } else {
-        console.log(stockBody);
         let outStockModel = new ctx.model.Stock(stockBody);
-        console.log(outStockModel);
         await outStockModel.save();
       }
+    }
+  }
+  async setAccount(order, businessTrains, nextBusinessTrains, lastBusinessTrains) {
+    const ctx = this.ctx;
+    if (!nextBusinessTrains) {
+      return;
+    }
+    let findOption = {
+      company: businessTrains.company,
+      relationCompany: nextBusinessTrains.company
+    }
+    if (nextBusinessTrains.customerType === 'user') {
+      findOption = {
+        company: businessTrains.company,
+        relationUser: nextBusinessTrains.user
+      };
+    }
+    let account = await ctx.model.Account.findOne(findOption);
+    if (account) {
+      return account;
     }
   }
   async setBusinessTrainsData(order, arr) {
@@ -183,20 +200,31 @@ class OrderService extends Service {
       return;
     }
     for (let i = 0; i < arr.length; i++) {
-      const item = arr[i];
+      let item = arr[i];
       if (item.type === 'pool' && (JSON.stringify(item.company) === '{}' || !item.company)) {
         ctx.throw(422, '贸易节点中有联营商尚未选择', item);
       }
-    }
-    let trainsIdArr = [];
-    for (let i = 0; i < arr.length; i++) {
-      let item = arr[i];
       for (const key in item) {
         if (item[key] && item[key]._id) {
           item[key] = item[key]._id
         }
       }
+    }
+    let trainsIdArr = [];
+    for (let i = 0; i < arr.length; i++) {
+      let item = arr[i];
       item.order = order._id;
+      if (i > 0) {
+        item.receivedCompany = arr[i - 1].company;
+      }
+      if (item.type === 'customer') {
+        item.balancePrice = order.balancePrice;
+        item.balanceCount = order.balanceCount;
+      }
+      let account = await this.setAccount(order, arr[i], arr[i + 1], arr[i - 1]);
+      if (account) {
+        item.account = account._id;
+      }
       if (item._id) {
         let update = JSON.parse(JSON.stringify(item));
         delete update._id;
@@ -315,7 +343,6 @@ class OrderService extends Service {
               contactName: order.contactName,
               contactNumber: order.contactNumber,
               area: order.area._id || order.area,
-              areaInfo: order.address,
               handle: order.handle,
               ...logisticsItem
             });
@@ -614,6 +641,8 @@ class OrderService extends Service {
         }, {
           path: 'ship'
         }]
+      }, {
+        path: 'account'
       }]
     }, {
       path: 'transportTrains',
@@ -646,6 +675,30 @@ class OrderService extends Service {
       }]);
     }
     return res;
+  }
+  async mutilUpdate() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    let newState = body.state;
+    let list = body.list;
+    if (!list) {
+      ctx.throw(422, '未获取到需要修改的订单', body);
+    }
+    for (let i = 0; i < list.length; i++) {
+      let item = list[i];
+      let _id = item._id;
+      if (!_id) {
+        ctx.throw(422, '未获取到需要修改的订单', body);
+      }
+      delete item._id;
+      if (newState) {
+        item.state = newState;
+      }
+      await ctx.model.Order.update({
+        _id
+      }, item);
+    }
+    return 'ok';
   }
 }
 module.exports = OrderService;

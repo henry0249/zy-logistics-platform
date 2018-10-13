@@ -4,21 +4,23 @@ module.exports = {
     name: '类型',
     type: 'String',
     option: {
-      admin: '管理员',
-      salesman: '业务专员',
-      beforeDispatchCheck: '审核员(调度前)',
-      dispatcher: '调度专员',
-      beforeSettleCheck: '审核员(结算前)',
-      financial: '财务文员',
-      documentClerk: '单据文员',
-      // normalBroker:'经纪人',
-      // temporaryBroker:'临时经纪人',
-      truck: '货车司机',
-      ship: '货船船员',
-      sys: '系统管理员',
+      salesman: '业务员', //审核修改订单信息
+      salesmanManager: '业务经理', //审核修改订单信息
+      tradeClerk: '贸易文员', //添加物流链
+      dispatcher: '调度专员', //添加物流链,提交配送,确认配送完成
+      dispatcherManager: '调度经理', //审核物流单
+      logisticsClerk: '物流文员', //审核物流单
+      documentClerk: '单据文员',//编辑贸易链和物流链结算相关
+      documentClerkManager: '单据主管',//审核单据文员操作
+      financial: '财务文员',//财务预审 ,按贸易链关系归集结算
+      financialManager: '财务经理',//打款操作确认
+      companyAdmin: '公司管理员',
+      sysAdmin: '系统管理员',
       sysSalesman: '系统业务员',
       sysDispatcher: '系统调度员',
-      broker: '经纪人'
+      broker: '经纪人',
+      truck: '货车司机',
+      ship: '货船船员',
     }
   },
   user: {

@@ -1,7 +1,7 @@
 module.exports = {
   type: {
     type: 'String',
-    name: '类型',
+    name: '当前节点类型',
     option: {
       0: '起运地',
       1: '中转地',
@@ -37,16 +37,17 @@ module.exports = {
   },
   company: {
     type: 'ObjectId',
-    name: '经过公司',
+    name: '节点公司',
     ref: 'Company'
   },
   user: {
     type: 'ObjectId',
-    name: '收货客户',
+    name: '节点用户',
     ref: 'User'
   },
-  sort: {
-    type: 'Number',
-    name: '排序',
+  to: {
+    type: 'ObjectId',
+    name: '下一个物流节点',
+    ref: 'TransportTrains'
   }
 }

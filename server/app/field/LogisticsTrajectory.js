@@ -44,7 +44,7 @@ module.exports = {
     type: 'String',
     name: '地址详情'
   },
-  address:{
+  address: {
     type: 'String',
     name: '地址详情'
   },
@@ -60,7 +60,6 @@ module.exports = {
     type: 'String',
     name: '智能地址提示'
   },
-  
   lng: {
     type: 'String',
     name: '经度'
@@ -79,3 +78,13 @@ module.exports = {
     ref: 'User'
   }
 }
+
+// this.$ajax('/LogisticsTrajectory/find', {
+//   limit: 0,
+//   logistics: {
+//     $in: [..._idArr]
+//   },
+//   sort: {
+//     createdAt: -1
+//   }
+// })

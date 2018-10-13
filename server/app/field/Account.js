@@ -2,6 +2,7 @@ module.exports = {
   type: {
     name: '账户类型',
     type: 'String',
+    default: 'company',
     option: {
       user: '个人账户',
       company: '公司账户'
@@ -10,6 +11,12 @@ module.exports = {
   value: {
     name: '金额',
     type: 'Number',
+    default: 0
+  },
+  prepaid: {
+    name: '预付款',
+    type: 'Number',
+    default: 0
   },
   name: {
     name: '名称',
@@ -30,9 +37,34 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
+  relationUser: {
+    name: '关联用户',
+    type: 'ObjectId',
+    ref: 'User'
+  },
   parent: {
     name: '父级账户',
     type: 'ObjectId',
     ref: 'Account'
-  }
+  },
+  // pre_payable: {
+  //   name: '预付',
+  //   type: 'Number',
+  //   default: 0
+  // },
+  // payable: {
+  //   name: '应付',
+  //   type: 'Number',
+  //   default: 0
+  // },
+  // pre_receivables: {
+  //   name: '预收',
+  //   type: 'Number',
+  //   default: 0
+  // },
+  // receivables: {
+  //   name: '应收',
+  //   type: 'Number',
+  //   default: 0
+  // }
 }

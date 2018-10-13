@@ -23,11 +23,12 @@ export default {
       this.loadingText = "正在提交";
       try {
         let update = this.$refs.edit.getSubmitData();
-        await this.$ajax.post("/order/dispatch", {
-          order: update.order._id,
-          transportTrains: update.transportTrains
-        });
-        this.back();
+        console.log(update.transportTrains);
+        // await this.$ajax.post("/order/dispatch", {
+        //   order: update.order._id,
+        //   transportTrains: update.transportTrains
+        // });
+        // this.back();
       } catch (error) {}
       this.loadingText = "";
     },

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
-//全局混入 设置网站标题
+//全局混入
 Vue.mixin({
   computed: {
     loginInfo() {
