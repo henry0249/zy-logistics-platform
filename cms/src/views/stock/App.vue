@@ -67,7 +67,6 @@
       // },
       company: {
         async handler(val) {
-          console.log(val);
           await this.setNav(this.orderBadge);
         },
         deep: true

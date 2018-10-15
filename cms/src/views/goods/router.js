@@ -18,8 +18,13 @@ export default [{
   children: [{
     path: 'list',
     name: '商品列表',
-    component: GoodsList
-  },{
+    component: GoodsList,
+    children: [{
+      path: 'edit/:_id',
+      name: '商品详情',
+      component: Edit
+    }]
+  }, {
     path: 'test',
     name: 'Test',
     component: Test
@@ -30,30 +35,28 @@ export default [{
   }, {
     path: 'category',
     name: '分类列表',
-    component: GoodsCategory
+    component: GoodsCategory,
+    children: [{
+      path: 'category_edit/:_id',
+      name: '分类详情',
+      component: CategoryEdit
+    }]
   }, {
     path: 'category_add',
     name: '添加分类',
     component: CategoryAdd
   }, {
-    path: 'category_edit/:_id',
-    name: '分类详情',
-    component: CategoryEdit
-  }, {
     path: 'brand',
     name: '品牌列表',
-    component: GoodsBrand
+    component: GoodsBrand,
+    children: [{
+      path: 'brand_edit/:_id',
+      name: '品牌详情',
+      component: BrandEdit
+    }]
   }, {
     path: 'brand_add',
     name: '添加品牌',
     component: brandAdd
-  }, {
-    path: 'brand_edit/:_id',
-    name: '品牌详情',
-    component: BrandEdit
-  }, {
-    path: 'edit/:_id',
-    name: '商品详情',
-    component: Edit
   }]
 }]

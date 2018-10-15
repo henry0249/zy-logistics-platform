@@ -7,7 +7,7 @@
             <remove-check @remove="remove(scope)"></remove-check>
           </div>
           <div slot-scope="scope">
-            <my-select v-if="scope.prop === 'stockArea'" area :data.sync="changeData[scope.index]['stockArea']" multi size="mini"></my-select>
+            <my-select v-if="scope.prop === 'area'" area :data.sync="scope.row[scope.prop]" multi size="mini"></my-select>
           </div>
         </my-table>
       </el-tab-pane>
@@ -26,7 +26,7 @@
         <div v-if="currentValue.name || currentValue.mobile">{{currentValue.name || currentValue.mobile}}</div>
         <div v-else>未选择</div>
       </div>
-      <common-table v-if="dialogTableVisible" style="padding:0" @current-change="currentChange" path="/user/find" :thead="thead" height="50vh" :option="option">
+      <common-table v-if="dialogTableVisible" style="padding:0" @current-change="currentChange" path="/user/find" :thead="userThead" height="50vh" :option="option">
         <div slot="header">
           <my-form-item placeholder="搜索用户名" size="mini" width="250px" v-model="input" @change="inputChange"></my-form-item>
         </div>
@@ -68,17 +68,20 @@
         input: "",
         option: {},
         dialogTableVisible: false,
-        activeName: "admin",
+        activeName: "companyAdmin",
         newData: [],
         type: {
-          admin: "管理员",
-          salesman: "业务专员",
-          beforeDispatchCheck: "调度前审核员",
-          dispatcher: "调度专员",
-          beforeSettleCheck: "结算前审核员",
-          financial: "财务文员",
-          documentClerk: "单据文员",
-          normalBroker: '经纪人'
+          companyAdmin: '公司管理员',
+          salesman: '业务员', //审核修改订单信息
+          salesmanManager: '业务经理', //审核修改订单信息
+          tradeClerk: '贸易文员', //添加物流链
+          dispatcher: '调度专员', //添加物流链,提交配送,确认配送完成
+          dispatcherManager: '调度经理', //审核物流单
+          logisticsClerk: '物流文员', //审核物流单
+          documentClerk: '单据文员', //编辑贸易链和物流链结算相关
+          documentClerkManager: '单据主管', //审核单据文员操作
+          financial: '财务文员', //财务预审 ,按贸易链关系归集结算
+          financialManager: '财务经理', //打款操作确认
         },
       };
     },
@@ -89,26 +92,6 @@
         },
         deep: true
       },
-      changeData: {
-        handler(val) {
-          if (val.length > 0 && this.activeName !== 'admin') {
-            val.forEach(item => {
-              this.newData.forEach((newDataItem, index) => {
-                if (item.stockId === newDataItem._id) {
-                  let data = [];
-                  if (item.stockArea) {
-                    item.stockArea.forEach(element => {
-                      data.push(element);
-                    });
-                    this.$set(this.newData[index], 'area', data);
-                  }
-                }
-              });
-            });
-          }
-        },
-        deep: true
-      },
       dialogTableVisible(val) {
         if (!val) {
           this.currentValue = {};
@@ -116,21 +99,33 @@
       }
     },
     computed: {
-      thead() {
-        let thead = {
-          name: {
+      userThead() {
+        return {
+          'name': {
             name: "用户名",
             readOnly: true
           },
-          mobile: {
+          'mobile': {
             name: "手机号",
             readOnly: true
           }
         }
-        if (this.activeName === 'admin') {
+      },
+      thead() {
+        let thead = {
+          'user.name': {
+            name: "用户名",
+            readOnly: true
+          },
+          'user.mobile': {
+            name: "手机号",
+            readOnly: true
+          }
+        }
+        if (this.activeName === 'companyAdmin') {
           delete thead.stockArea;
         } else {
-          this.$set(thead, 'stockArea', {
+          this.$set(thead, 'area', {
             name: "地区",
             readOnly: true,
             slot: true
@@ -145,9 +140,7 @@
         let data = [];
         this.newData.forEach(item => {
           if (item.type === this.activeName) {
-            let obj = JSON.parse(JSON.stringify(item.user));
-            obj.stockId = item._id;
-            data.push(obj);
+            data.push(item);
           }
         });
         return data;
@@ -162,11 +155,13 @@
         if (Object.keys(this.currentValue).length > 0) {
           if (this.fastIo) {
             for (const key in this.type) {
-              let obj = {};
-              Object.assign(obj, {
+              let obj = {
                 type: key,
-                user: this.currentValue
-              });
+                user: this.currentValue,
+              };
+              if (key !== 'companyAdmin') {
+                this.$set(obj,'area',[]);
+              }
               this.newData.push(obj);
             }
             for (let index = 0; index < this.newData.length; index++) {
@@ -177,11 +172,11 @@
               }
             }
           } else {
-            let obj = {};
-            Object.assign(obj, {
+            let obj = {
               type: this.activeName,
-              user: this.currentValue
-            });
+              user: this.currentValue,
+              area: []
+            };
             this.newData.push(obj);
           }
         }
@@ -202,6 +197,7 @@
           this.currentValue = {};
         } else {
           this.currentValue = val;
+          this.$set(this.currentValue, 'stockArea', []);
         }
       },
       inputChange(val) {
@@ -228,7 +224,9 @@
       }
     },
     created() {
-      this.newData = JSON.parse(JSON.stringify(this.startData));
+      if (this.startData.length > 0) {
+        this.newData = JSON.parse(JSON.stringify(this.startData));
+      }
     }
   };
 </script>

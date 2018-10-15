@@ -24,12 +24,12 @@
     methods: {
       sub(scope) {
         this.$router.push({
-          path: '/stock/edit',
+          path: '/stock/ready_list/edit',
           query: {
             type: scope.row.type,
             _id: scope.row._id,
-            parentPath:this.$route.path,
-            parentName:this.$route.name
+            // parentPath:this.$route.path,
+            // parentName:this.$route.name
           }
         })
       },

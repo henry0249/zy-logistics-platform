@@ -10,10 +10,11 @@
         </div>
       </div>
       <template slot-scope="scope" v-if="scope.prop === 'tag'||scope.prop === 'name'">
-        <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
-        <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see({type:'read',value:scope})">{{setName(scope)}}</div>
-      </template>
+          <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+          <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see({type:'read',value:scope})">{{setName(scope)}}</div>
+</template>
     </common-table>
+    <router-view v-else></router-view>
   </loading-box>
 </template>
 
@@ -30,7 +31,7 @@
       },
       path: {
         type: String,
-        default: "/sys/goods/edit"
+        default: "/sys/goods/list/edit"
       },
       thead: {
         type: Object,
@@ -83,6 +84,16 @@
       };
     },
     watch: {
+      $route: {
+        handler(val) {
+          if (val.params._id) {
+            this.show = false;
+          } else {
+            this.show = true;
+          }
+        },
+        deep: true
+      },
       loadingText(val) {
         if (val) {
           this.show = false;
@@ -119,7 +130,7 @@
       },
       see(obj) {
         this.$router.push({
-          path: this.path + "/" + obj.value.row._id + '?parentPath=' + this.$route.path + '&parentName=' + this.$route.name
+          path: this.path + "/" + obj.value.row._id
         });
       },
       tagType(index, arr) {
@@ -170,19 +181,24 @@
       }
     },
     async created() {
-      this.loadingText = "加载中";
-      await this.getBrand();
-      await this.getCategory();
-      if (!this.sys) {
-        this.disabled = true;
-        this.companyData = this.company;
-        this.$set(this.op, "company", this.company._id);
+      if (this.$route.params._id) {
         this.show = false;
-        setTimeout(() => {
-          this.show = true;
-        }, 200);
+      } else {
+        this.show = true;
+        this.loadingText = "加载中";
+        await this.getBrand();
+        await this.getCategory();
+        if (!this.sys) {
+          this.disabled = true;
+          this.companyData = this.company;
+          this.$set(this.op, "company", this.company._id);
+          this.show = false;
+          setTimeout(() => {
+            this.show = true;
+          }, 200);
+        }
+        this.loadingText = "";
       }
-      this.loadingText = "";
     }
   };
 </script>

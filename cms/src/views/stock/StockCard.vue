@@ -159,7 +159,6 @@
       } else {
         this.goods_id = '';
       }
-      console.log(this.goods_id);
     }
   };
 </script>

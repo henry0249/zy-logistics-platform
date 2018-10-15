@@ -244,7 +244,6 @@
       }
     },
     created() {
-      console.log(this.val);
       if (this.val && this.val._id) {
         let obj = this.val.goods;
         if (this.val.num) {

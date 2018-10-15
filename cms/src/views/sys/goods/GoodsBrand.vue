@@ -12,7 +12,8 @@
           <el-tag v-if="scope.prop === 'category'" :type="tagType(index,scope.row['category'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['category']" :key="item.id">{{item.name}}</el-tag>
           <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{setName(scope)}}</div>
 </template>
-   </common-table>
+    </common-table>
+    <router-view v-else></router-view>
   </div>
 </template>
 
@@ -69,6 +70,16 @@
       };
     },
     watch: {
+      $route: {
+        handler(val) {
+          if (val.params._id) {
+            this.show = false;
+          } else {
+            this.show = true;
+          }
+        },
+        deep: true
+      },
       companyData: {
         handler(val) {
           this.$set(this.op, 'company', val._id);
@@ -102,16 +113,12 @@
         }
       },
       see(val) {
-        let path = '/sys/goods/brand_edit/';
+        let path = '/sys/goods/brand/brand_edit/';
         if (!this.sys) {
-          path = '/goods/brand_edit/';
+          path = '/goods/brand/brand_edit/';
         }
         this.$router.push({
           path: path + val.row._id,
-          query: {
-            parentPath: this.$route.path,
-            parentName: this.$route.name
-          }
         });
       },
       categoryChange(val) {},
@@ -124,15 +131,19 @@
       }
     },
     created() {
-      if (Object.keys(this.option).length > 0) {
-        for (const key in this.option) {
-          this.$set(this.op, key, this.option[key]);
+      if (this.$route.params._id) {
+        this.show = false;
+      } else {
+        if (Object.keys(this.option).length > 0) {
+          for (const key in this.option) {
+            this.$set(this.op, key, this.option[key]);
+          }
         }
-      }
-      if (!this.sys) {
-        this.companyData = this.company;
-        this.$set(this.op, 'company', this.company._id);
-        this.disabled = true;
+        if (!this.sys) {
+          this.companyData = this.company;
+          this.$set(this.op, 'company', this.company._id);
+          this.disabled = true;
+        }
       }
     }
   };

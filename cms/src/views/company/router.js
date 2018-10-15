@@ -1,5 +1,6 @@
 import App from './App.vue';
 import Edit from './Edit.vue';
+import Account from './Account.vue';
 
 export default [{
   path: '/company',
@@ -10,5 +11,9 @@ export default [{
     path: 'edit',
     name:'公司详情',
     component: Edit
+  },{
+    path: 'account',
+    name:'账户管理',
+    component: Account
   }]
 }]

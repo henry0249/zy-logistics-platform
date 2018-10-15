@@ -1,9 +1,12 @@
 <template>
-  <common-table  v-if="show" height="calc(100vh - 50px - 35px - 35px)" style="padding:0 1%" path="stock/find" :option="option" :thead="thead">
+  <common-table v-if="show" height="calc(100vh - 50px - 35px - 35px)" style="padding:0 1%" path="stock/find" :option="option" :thead="thead">
     <div slot="header" class="jc js">
       <my-form-item width='200px' label="库存单类型" @change="typeChange" style="margin-right:20px;" size="mini" multiple collapse-tags v-model="typeData" :options="field.Stock.type.option" select></my-form-item>
       <my-form-item width='200px' v-if="$attrs.state === 'finish'" label="变化类型" @change="dvChange" style="margin-right:20px;" size="mini" collapse-tags v-model="dvData" :options="dvOption" select></my-form-item>
       <my-form-item width='200px' v-else label="状态" @change="stateChange" style="margin-right:20px;" size="mini" collapse-tags v-model="stateData" :options="stateOption" select></my-form-item>
+      <div style="width:200px;margin-right:20px;">
+        <my-select label="商品" multi :data.sync="goodsData" @change="goodsChange" goods></my-select>
+      </div>
       <my-form-item type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" label="起始时间" date style="padding-right:10px;" width="44%" size="mini" v-model="dateArr">
       </my-form-item>
     </div>
@@ -13,7 +16,7 @@
       <div v-if="scope.prop === 'createdAt'">{{formatTime(scope.row['createdAt'])}}</div>
       <div v-if="scope.prop === 'state'">{{field.Stock.state.option[scope.row['state']]}}</div>
       <div v-if="scope.prop === 'toCompany'">{{ scope.row[scope.prop]?scope.row[scope.prop].nick || scope.row[scope.prop].name:''}}</div>
-      <div v-if="scope.prop === 'num'">{{scope.row[scope.prop]}} {{scope.row.goods.unit}}</div>
+      <div v-if="scope.prop === 'num'">{{scope.row[scope.prop]}} {{scope.row.goods?scope.row.goods.unit:''}}</div>
       <el-tag size="mini" v-if="scope.prop === 'dv'" :type="dvValue(scope.row['dv']).type">{{dvValue(scope.row['dv']).value}}</el-tag>
     </template>
   </common-table>
@@ -40,6 +43,7 @@
         dateArr: [],
         dvData: '',
         stateData: '',
+        goodsData: [],
         show: true,
         typeData: [],
         option: {},
@@ -93,39 +97,39 @@
           },
           type: {
             name: "库存单类型",
-            width:81,
+            width: 81,
             slot: true
           },
           num: {
-            width:100,
+            width: 100,
             name: "数量",
-            slot:true
+            slot: true
           },
           dv: {
             name: "变化类型",
-            width:50,
+            width: 50,
             slot: true
           },
           'goods.name': {
-            width:200,
+            width: 200,
             name: '操作商品',
           },
           toCompany: {
             name: "目标公司",
-            slot:true,
-            width:100
+            slot: true,
+            width: 100
           },
           remake: {
             name: "备注",
           },
           createdAt: {
             name: "操作日期",
-            width:130,
+            width: 130,
             slot: true
           },
           state: {
             name: '状态',
-            width:60,
+            width: 60,
             slot: true
           },
           // ops: {
@@ -139,7 +143,7 @@
           this.$set(thead, 'dv', {
             name: "变化类型",
             slot: true,
-            width:69
+            width: 69
           });
         } else {
           delete thead.dv
@@ -152,6 +156,19 @@
       }
     },
     methods: {
+      goodsChange(val) {
+        if (this.goodsData.length > 0) {
+          let data = []
+          this.goodsData.forEach(item => {
+            data.push(item._id);
+          });
+          this.$set(this.option, 'goods', {
+            $in: data
+          })
+        } else {
+          delete this.option.goods;
+        }
+      },
       dvValue(val) {
         let data = {
           type: '',
@@ -196,14 +213,6 @@
             $lt: 0
           });
         }
-        // data.push(obj);
-        // if (this.option.$or) {
-        //   data.forEach(item => {
-        //     this.option.$or.push(item);
-        //   });
-        // } else {
-        //   this.$set(this.option, '$or', data);
-        // }
       },
       typeChange(val) {
         if (val.length > 0) {
@@ -259,7 +268,7 @@
       }
       this.$set(this.option, 'populate', [{
         path: 'goods'
-      },{
+      }, {
         path: 'toCompany'
       }])
       this.changetype();

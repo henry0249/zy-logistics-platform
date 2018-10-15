@@ -1,5 +1,5 @@
 <template>
-  <common-table stripe path="/company/find" height="calc(100vh - 50px - 35px - 35px)" style="padding:0 1%" :thead="thead" :option="option">
+  <common-table v-if="show" stripe path="/company/find" height="calc(100vh - 50px - 35px - 35px)" style="padding:0 1%" :thead="thead" :option="option">
     <div slot="header" class="jc js">
       <my-form-item size="mini" style="padding-right:10px;" @change="inputChange" input placeholder="请输入公司名称或别称" width="240px" v-model="input"></my-form-item>
       <my-form-item width='300px' label="公司类型" @change="typeChange" style="padding-right:10px;" size="mini" multiple collapse-tags placeholder="选择公司类型" v-model="typeData" :options="field.Company.type.option" select></my-form-item>
@@ -9,12 +9,14 @@
       <div v-if="scope.prop === 'area'">{{areaText(scope.row['area'])}}</div>
     </div>
   </common-table>
+  <router-view v-else></router-view>
 </template>
 
 <script>
   export default {
     data() {
       return {
+        show:true,
         option: {
           populate: [{
             path: 'area',
@@ -57,6 +59,18 @@
             slot: true
           }
         }
+      }
+    },
+    watch: {
+      $route:{
+        handler(val){
+          if (val.params._id) {
+            this.show = false;
+          }else{
+            this.show = true;
+          }
+        },
+        deep:true
       }
     },
     methods: {
@@ -109,7 +123,7 @@
       },
       see(val) {
         this.$router.push({
-          path: '/sys/company/edit/' + val.value.row._id + '?parentPath=' + this.$route.path + '&parentName=' + this.$route.name
+          path: '/sys/company/list/edit/' + val.value.row._id 
         })
       }
     }

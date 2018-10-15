@@ -28,6 +28,10 @@
             name: '公司详情',
             icon: 'icon-xiangqing',
             path: '/company/edit'
+          },{
+            name: '账户管理',
+            icon: 'icon-guanliyuan',
+            path: '/company/account'
           }
         ]
       };
@@ -55,28 +59,6 @@
     mounted() {
       this.setNav(this.orderBadge);
     }
-    // watch: {
-    //   company:{
-    //     handler(val){
-    //       this.$set(this.nav[0],'name',val.name||val.nick);
-    //     },
-    //     deep:true
-    //   }
-    // },
-    // methods: {
-    //   async test() {
-    //     let res0 = await this.$ajax.post("/test/add", {
-    //       value: "测试"
-    //     });
-    //     let res = await this.$ajax.get("/field");
-    //   }
-    // },
-    // mounted() {
-    //   this.path = this.$route.path;
-    // },
-    // created () {
-    //   this.$set(this.nav[0],'name',this.company.name||this.company.nick);
-    // }
   };
 </script>
 

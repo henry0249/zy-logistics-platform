@@ -1,15 +1,16 @@
 <template>
   <div>
-    <common-table path="/category/find" style="padding:0 1%" height="calc(100vh - 50px - 35px - 35px)" :thead="thead" :option="op">
+    <common-table v-if="show" path="/category/find" style="padding:0 1%" height="calc(100vh - 50px - 35px - 35px)" :thead="thead" :option="op">
       <div slot="header" class="jc js">
         <my-form-item size="mini" style="padding-right:10px;" @change="inputChange" input label="分类名" placeholder="请输入分类名" width="250px" v-model="input"></my-form-item>
         <my-form-item @change="categoryCheckChange" label="选择分类类型" style="padding-right:10px;" filterable width="250px" size="mini" placeholder="选择分类类型" v-model="categoryCheck" :options="categoryOption" select></my-form-item>
         <my-form-item :disabled="disabled" @change="categoryChange" label="选择上级分类" style="padding-right:10px;" filterable width="250px" size="mini" placeholder="选择上级分类" v-model="categoryData" :options="categoryArr" select></my-form-item>
       </div>
       <template slot-scope="scope">
-            <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{setName(scope)}}</div>
+          <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see(scope)">{{setName(scope)}}</div>
 </template>
-   </common-table>
+    </common-table>
+    <router-view v-else></router-view>
   </div>
 </template>
 
@@ -23,6 +24,7 @@
     },
     data() {
       return {
+        show: true,
         input: "",
         op: {
           populate: [{
@@ -59,6 +61,18 @@
         }
       };
     },
+    watch: {
+      $route: {
+        handler(val) {
+          if (val.params._id) {
+            this.show = false;
+          } else {
+            this.show = true;
+          }
+        },
+        deep: true
+      },
+    },
     methods: {
       setName(scope) {
         return scope.row.name || scope.row.nick || scope.row.mobile || scope.row._id;
@@ -72,16 +86,12 @@
         }
       },
       see(val) {
-        let data = '/sys/goods/category_edit/';
+        let data = '/sys/goods/category/category_edit/';
         if (!this.sys) {
-          data = '/goods/category_edit/'
+          data = '/goods/category/category_edit/'
         }
         this.$router.push({
           path: data + val.row._id,
-          query:{
-            parentPath:this.$route.path,
-            parentName:this.$route.name
-          }
         });
       },
       categoryCheckChange(val) {
@@ -127,9 +137,13 @@
       }
     },
     async created() {
-      try {
-        await this.getParentCategory();
-      } catch (error) {}
+      if (this.$route.params._id) {
+        this.show = false;
+      } else {
+        try {
+          await this.getParentCategory();
+        } catch (error) {}
+      }
     }
   };
 </script>

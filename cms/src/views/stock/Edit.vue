@@ -114,7 +114,6 @@
         await this.getLogisticsTrajectory();
       } catch (error) {}
       this.loadingText = '';
-      console.log(this.$router);
     }
   }
 </script>
