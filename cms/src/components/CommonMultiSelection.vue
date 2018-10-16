@@ -10,10 +10,10 @@
         <i class="el-icon-plus" :style="{color:'#67C23A',fontSize:fontSize}"></i>
       </div>
     </div>
-    <div class="f1 jc js" :style="{'min-height':'23px',border:'1px solid #DCDFE6','border-radius': '5px','box-sizing':'border-box'}">
-      <div class="f1" ref="body" :style="{fontSize:fontSize,padding:'5px 5px 5px 10px',maxHeight:'60px',overflow:'auto'}">
+    <div class="f1 jc js" :style="{'min-height':'42px',border:'1px solid #DCDFE6','border-radius': '5px','box-sizing':'border-box'}">
+      <div class="f1" ref="body" :style="{fontSize:fontSize,padding:'5px 5px 5px 10px',maxHeight:'82px',overflow:'auto'}">
         <common-multi-selection-tag v-if="startNewData.length > 0 && show" :fontSize="fontSize" :startData="startNewData" :data.sync="newData"></common-multi-selection-tag>
-        <div v-else style="height:18px;line-height:18px;">未选择</div>
+        <div v-else style="height:18px;line-height:18px;color:#c0c4cc;">未选择</div>
       </div>
     </div>
     <el-dialog :title="`添加${getKey().obj.name}`" width="70%" top="15vh" :visible.sync="dialogTableVisible">

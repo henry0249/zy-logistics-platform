@@ -1,6 +1,8 @@
 import App from './App.vue';
 import Edit from './Edit.vue';
 import Account from './Account.vue';
+import CompanyRole from './CompanyRole.vue';
+import CompanyShip from './CompanyShip.vue';
 
 export default [{
   path: '/company',
@@ -15,5 +17,13 @@ export default [{
     path: 'account',
     name:'账户管理',
     component: Account
+  },{
+    path: 'role',
+    name:'角色管理',
+    component: CompanyRole
+  },{
+    path: 'ship',
+    name:'车船管理',
+    component: CompanyShip
   }]
 }]

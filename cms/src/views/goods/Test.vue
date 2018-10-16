@@ -6,6 +6,16 @@
 
 <script>
   export default {
+    methods: {
+      async findUser(){
+        let data = await this.$ajax.post('/role/set',{
+          user:'5af167730974e45869086568',
+          type:'sysAdmin'
+        })
+      }
+    },
+    created () {
+    }
   }
 </script>
 

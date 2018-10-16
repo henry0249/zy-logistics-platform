@@ -153,7 +153,6 @@
       },
       async sub() {
         if (this.confirmation()) {
-          console.log(this.roleArr);
           try {
             let _id = this.sys ? this.$route.params._id : this.company._id;
             this.loadingText = "更新中";
