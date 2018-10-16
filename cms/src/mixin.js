@@ -32,6 +32,9 @@ Vue.mixin({
     },
     orderBadge() {
       return this.$store.state.orderBadge;
+    },
+    role() {
+      return this.$store.state.role;
     }
   },
   directives: {
