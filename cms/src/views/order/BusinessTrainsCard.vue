@@ -1,5 +1,5 @@
 <template>
-  <div :style="{width:width}" style="min-height:270px">
+  <div :style="{width:width}">
     <el-card class="box-card" shadow="hover">
       <div class="flex ac jb" v-if="title" slot="header" style="font-size:12px">
         <el-popover placement="top" trigger="hover">
@@ -10,17 +10,17 @@
             <loading-box v-model="loadingText">
               <div class="flex ac jc">
                 <div v-if="data.type !== 'customer'" style="padding:0 10px">
-                  应收: 
-                  <span v-if="next.type === 'pool'">{{Number(next.balancePrice) * Number(next.balanceCount)}}</span>
-                  <span v-if="next.type === 'customer'">{{Number(order.balancePrice) * Number(order.balanceCount)}}</span>
+                  应收:
+                  <span v-if="next.type === 'pool'">{{Number(next.preBalancePrice) * Number(next.balanceCount)}}</span>
+                  <span v-if="next.type === 'customer'">{{Number(order.preBalancePrice) * Number(order.balanceCount)}}</span>
                 </div>
                 <div v-if="data.account && data.type !== 'customer'" style="padding:0 10px">
                   预收: {{data.account.prepaid}}
                 </div>
                 <div v-if="data.type !== 'supplier'" style="padding:0 10px">
-                  应付: 
-                  <span v-if="data.type === 'pool'">{{Number(data.balancePrice) * Number(data.balanceCount)}}</span>
-                  <span v-if="data.type === 'customer'">{{Number(order.balancePrice) * Number(order.balanceCount)}}</span>
+                  应付:
+                  <span v-if="data.type === 'pool'">{{Number(data.preBalancePrice) * Number(data.balanceCount)}}</span>
+                  <span v-if="data.type === 'customer'">{{Number(order.preBalancePrice) * Number(order.balanceCount)}}</span>
                 </div>
               </div>
             </loading-box>
@@ -33,7 +33,7 @@
         <remove-check @remove="remove" v-if="data.type === 'pool'"></remove-check>
       </div>
       <div class="marginBottom">
-        <my-select v-if="data.type === 'supplier'" :data.sync="data.company" disabled></my-select>
+        <my-select v-if="data.type === 'supplier'" :data.sync="data.company"></my-select>
         <el-tooltip v-if="data.type === 'pool'" effect="dark" content="仅可从本公司关联的贸易公司中选择" placement="top">
           <my-form-item v-if="order.handle" size="mini" v-model="data.company" select :options="order.handle.businessRelationCompany || []">
           </my-form-item>
@@ -47,11 +47,11 @@
         </my-form-item>
         <my-form-item class="marginBottom" v-model="data.supplyCount" label="供货数量" size="mini" number :min="0">
         </my-form-item>
-        <my-form-item v-if="order.state==='financialPretrial'" class="marginBottom" v-model="data.loss" label="承担损耗" size="mini" number :min="0">
+        <my-form-item v-if="settle" class="marginBottom" v-model="data.loss" label="承担损耗" size="mini" number :min="0">
         </my-form-item>
-        <my-form-item v-if="order.state==='financialPretrial'" class="marginBottom" v-model="data.balancePrice" label="结算价格" size="mini" number :min="0">
+        <my-form-item v-if="settle" class="marginBottom" v-model="data.preBalancePrice" label="贸易单价" size="mini" number :min="0">
         </my-form-item>
-        <my-form-item v-if="order.state==='financialPretrial'" v-model="data.balanceCount" label="结算数量" size="mini" number :min="0">
+        <my-form-item v-if="settle" v-model="data.balanceCount" label="结算数量" size="mini" number :min="0">
         </my-form-item>
       </div>
       <div v-if="data.type === 'pool'">
@@ -61,11 +61,11 @@
         </my-form-item>
         <my-form-item class="marginBottom" v-model="data.supplyPrice" label="供货单价" size="mini" number :min="0">
         </my-form-item>
-        <my-form-item v-if="order.state==='financialPretrial'" class="marginBottom" v-model="data.loss" label="承担损耗" size="mini" number :min="0">
+        <my-form-item v-if="settle" class="marginBottom" v-model="data.loss" label="承担损耗" size="mini" number :min="0">
         </my-form-item>
-        <my-form-item v-if="order.state==='financialPretrial'" class="marginBottom" v-model="data.balancePrice" label="结算价格" size="mini" number :min="0">
+        <my-form-item v-if="settle" class="marginBottom" v-model="data.preBalancePrice" label="贸易单价" size="mini" number :min="0">
         </my-form-item>
-        <my-form-item v-if="order.state==='financialPretrial'" v-model="data.balanceCount" label="结算数量" size="mini" number :min="0">
+        <my-form-item v-if="settle" v-model="data.balanceCount" label="结算数量" size="mini" number :min="0">
         </my-form-item>
       </div>
       <div v-if="data.type === 'customer'">
@@ -75,11 +75,11 @@
         </my-form-item>
         <my-form-item class="marginBottom" v-model="data.receive" label="实收数量" size="mini" number :min="0" :max="last.supplyCount">
         </my-form-item>
-        <my-form-item v-if="order.state==='financialPretrial'" class="marginBottom" v-model="data.loss" label="承担损耗" size="mini" number :min="0">
+        <my-form-item v-if="settle" class="marginBottom" v-model="data.loss" label="承担损耗" size="mini" number :min="0">
         </my-form-item>
-        <my-form-item v-if="order.state==='financialPretrial'" class="marginBottom" v-model="order.balancePrice" label="结算价格" size="mini" number :min="0">
+        <my-form-item v-if="settle" class="marginBottom" v-model="data.preBalancePrice" label="贸易单价" size="mini" number :min="0">
         </my-form-item>
-        <my-form-item v-if="order.state==='financialPretrial'" v-model="order.balanceCount" label="结算数量" size="mini" number :min="0">
+        <my-form-item v-if="settle" v-model="data.balanceCount" label="结算数量" size="mini" number :min="0">
         </my-form-item>
       </div>
     </el-card>
@@ -124,6 +124,10 @@ export default {
     width: {
       type: String,
       default: "220px"
+    },
+    settle: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -131,32 +135,6 @@ export default {
       loadingText: "",
       account: {}
     };
-  },
-  watch: {
-    // "data.supplyCount"(val) {
-    //   if (Number(val) < Number(this.next.receive)) {
-    //     this.next.receive = val;
-    //   }
-    // },
-    // "data.receive"(val) {
-    //   if (Number(val) < Number(this.next.receive)) {
-    //     this.next.receive = val;
-    //   }
-    //   if (this.last.type === "supplier") {
-    //     this.last.loss = this.last.supplyCount - val;
-    //   } else {
-    //     this.last.loss = this.last.receive - val;
-    //   }
-    // },
-    // "data.supplyPrice"(val) {
-    //   this.next.supplyPrice = val;
-    // }
-    // "order.balancePrice"(val){
-    //   this.data.balancePrice = val;
-    // },
-    // "order.balanceCount"(val){
-    //   this.data.balanceCount = val;
-    // }
   },
   computed: {
     title() {

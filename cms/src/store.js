@@ -16,6 +16,7 @@ const store = new Vuex.Store({
     field: {},
     orderBadge: {},
     baseUrl: window.location.protocol + '//' + window.location.host,
+    role: {}
   },
   mutations: {
     headerToggle(state, flag) {
@@ -32,9 +33,13 @@ const store = new Vuex.Store({
     },
     setCompany(state, data) {
       state.company = data || {};
+      localStorage.company = data._id;
     },
     setRoleCompany(state, data) {
       state.roleCompany = data || [];
+    },
+    setRole(state, data) {
+      state.role = data || {};
     },
     setOrderBadge(state, data) {
       state.orderBadge = data || {};
@@ -61,7 +66,20 @@ const store = new Vuex.Store({
         let roleCompanyRes = await ajax('/roleCompany');
         context.commit('setRoleCompany', roleCompanyRes);
         if (roleCompanyRes.length > 0) {
-          context.commit('setCompany', roleCompanyRes[0]);
+          let companyInfo = "";
+          roleCompanyRes.forEach(companyItem => {
+            if (companyItem._id === localStorage.company) {
+              companyInfo = companyItem
+            }
+          });
+          if (!companyInfo) {
+            companyInfo = roleCompanyRes[0];
+          }
+          context.commit('setCompany', companyInfo);
+          let roleInfo = await ajax.post('/rolePower',{
+            company:companyInfo._id
+          });
+          context.commit('setRole', roleInfo);
         }
         let orderBadgeRes = await ajax('/order/badge');
         context.commit('setOrderBadge', orderBadgeRes);
@@ -76,6 +94,12 @@ const store = new Vuex.Store({
     async getOrderBadge(context, payload) {
       let res = await ajax.get('/order/badge');
       context.commit('setOrderBadge', res);
+    },
+    async getRole(context, payload) {
+      let res = await ajax.post('/rolePower',{
+        company:payload
+      });
+      context.commit('setRole', res);
     },
     async orderBadgeNotify(context, payload) {
       let oldBadge = JSON.parse(JSON.stringify(context.state.orderBadge));

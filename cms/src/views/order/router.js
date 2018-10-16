@@ -1,76 +1,66 @@
 import App from './App.vue';
 import Create from './Create.vue';
-
-import Taking from './Taking.vue';
-import TakingEdit from './TakingEdit.vue';
-
-import BeforeDispatchCheck from './BeforeDispatchCheck';
-import BeforeDispatchCheckEdit from './BeforeDispatchCheckEdit';
-
-import DistributionFinishCheck from './DistributionFinishCheck';
-import DistributionFinishCheckEdit from './DistributionFinishCheckEdit';
-
-import BeforeSettleCheck from './BeforeSettleCheck';
-import BeforeSettleCheckEdit from './BeforeSettleCheckEdit';
+import Salesman from './Salesman';
+import SalesmanManager from './SalesmanManager';
+import TradeClerk from './TradeClerk';
 
 export default [{
   path: '/order',
   component: App,
   redirect: '/order/create',
-  name: '订单管理',
+  name: '贸易订单管理',
   meta: {
     keepAlive: true // 需要被缓存
   },
   children: [{
-    path: '/order/create',
-    component: Create,
-    name: '创建订单',
-    meta: {
-      nav: true,
+      path: '/order/create',
+      component: Create,
+      name: '创建订单',
+      meta: {
+        nav: true,
+      }
+    }, {
+      path: '/order/salesman',
+      component: Salesman,
+      name: '业务员审核',
+      meta: {
+        nav: true,
+        desc: '客户下单后,业务专员审核基础信息,推送给业务经理进行审核',
+        state: 'salesman'
+      },
+      children:[{
+        path:'/order/salesman/edit/:_id',
+        component: Salesman,
+        name: '业务员审核订单详情'
+      }]
+    }, {
+      path: '/order/salesmanManager',
+      component: SalesmanManager,
+      name: '业务经理审核',
+      meta: {
+        state:'salesmanManager',
+        nav: true,
+        desc: '业务经理再次审核订单基础信息,审核通过后推送给贸易文员进行贸易链的添加'
+      },
+      children:[{
+        path:'/order/salesmanManager/edit/:_id',
+        component: SalesmanManager,
+        name: '业务经理审核订单详情'
+      }]
+    }, {
+      path: '/order/tradeClerk',
+      component: TradeClerk,
+      name: '贸易文员审核',
+      meta: {
+        state:'tradeClerk',
+        nav: true,
+        desc: '贸易文员再次审核订单基础信息,并添加贸易链,审核通过后进入调度环节'
+      },
+      children:[{
+        path:'/order/tradeClerk/edit/:_id',
+        component: TradeClerk,
+        name: '贸易文员审核订单详情'
+      }]
     }
-  }, {
-    path: '/order/taking',
-    component: Taking,
-    name: '待接订单',
-    meta: {
-      nav: true
-    }
-  }, {
-    path: '/order/taking/edit/:_id',
-    component: TakingEdit,
-    name: '接单处理'
-  }, {
-    path: '/order/beforeDispatchCheck',
-    component: BeforeDispatchCheck,
-    name: '待审核订单(调度前)',
-    meta: {
-      nav: true
-    }
-  }, {
-    path: '/order/beforeDispatchCheck/edit/:_id',
-    component: BeforeDispatchCheckEdit,
-    name: '调度前审核'
-  }, {
-    path: '/order/distributionFinishCheck',
-    component: DistributionFinishCheck,
-    name: '待审核订单(配送完成)',
-    meta: {
-      nav: true
-    }
-  }, {
-    path: '/order/distributionFinishCheck/edit/:_id',
-    component: DistributionFinishCheckEdit,
-    name: '配送完成审核'
-  }, {
-    path: '/order/beforeSettleCheck',
-    component: BeforeSettleCheck,
-    name: '待审核订单(结算前)',
-    meta: {
-      nav: true
-    }
-  }, {
-    path: '/order/beforeSettleCheck/edit/:_id',
-    component: BeforeSettleCheckEdit,
-    name: '结算前审核',
-  }]
+  ]
 }]

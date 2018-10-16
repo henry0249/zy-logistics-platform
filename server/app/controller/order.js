@@ -26,6 +26,9 @@ class OrderController extends Controller {
   }
   async mutilUpdate(){
     this.ctx.body = await this.ctx.service.order.mutilUpdate();
-  } 
+  }
+  async checkFail(){
+    this.ctx.body = await this.ctx.service.order.checkFail();
+  }
 }
 module.exports = OrderController;

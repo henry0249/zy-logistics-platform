@@ -1,6 +1,6 @@
 <template>
   <loading-box v-model="loadingText">
-    <div class="flex ac jb" style="color:#909399;padding-left:25px;background:#f4f4f5;font-size:13px;margin:15px 0;border-radius:4px">
+    <div class="flex ac jb" style="color:#909399;padding-left:25px;background:#f4f4f5;font-size:13px;margin-bottom:15px;border-radius:4px">
       <div class="f1" style="margin-right:20px">物流链</div>
       <div @click="add" class="success pointer" style="padding:10px">
         物流节点<i class="el-icon-plus"></i>
@@ -10,7 +10,7 @@
       <div class="hor-scroll" style="margin-bottom:10px">
         <div class="hor-scroll-item" v-for="(item,index) in trains" :key="index">
           <div class="flex">
-            <transport-trains-card :data.sync="item" :order="order" :index="index" @remove="remove($event,index)">
+            <transport-trains-card :settle="settle" :data.sync="item" :order="order" :index="index" @remove="remove($event,index)">
             </transport-trains-card>
             <div class="tc col-flex jb" v-if="index!==trains.length-1" style="width:50px;height:220px">
               <div></div>
@@ -26,12 +26,14 @@
       </div>
       <div v-for="(item,index) in trains" :key="'table'+index">
         <div v-if="showIndex === index">
-          <div class="flex ac jb brtl brtr" style="color:#909399;padding-left:25px;background:#f4f4f5;font-size:13px">
-            <div>{{areaInfo(item)}}</div>
-            <!-- <el-input size="mini" v-model="item.areaInfo" :value="areaInfo(item)" placeholder="请输入内容"></el-input> -->
-            <i style="margin:0 15px" class="el-icon-d-arrow-right success"></i>
-            <div>{{areaInfo(trains[index + 1])}}</div>
-            <div class="f1"></div>
+          <div class="flex ac jb brtl brtr" style="color:#909399;padding-left:10px;background:#f4f4f5;font-size:13px">
+            <!-- <div>{{areaInfo(item)}}</div> -->
+            <!-- <div>{{areaInfo(trains[index + 1])}}</div> -->
+            <div class="f1 ac jb">
+              <el-input size="mini" v-model="item.areaInfo" placeholder="请输入起送地点详情"></el-input>
+              <i style="margin:0 15px" class="el-icon-d-arrow-right success"></i>
+              <el-input size="mini" v-model="trains[index + 1].areaInfo" placeholder="请输入送达地点详情"></el-input>
+            </div>
             <div class="success pointer" style="padding:10px" @click="addLogistics(item.logistics,index)">
               物流单<i class="el-icon-plus"></i>
             </div>
@@ -52,7 +54,7 @@
               </my-form-item>
               <my-form-item v-if="scope.prop==='landed'" v-model="scope.row.landed" size="mini" type="number" min="0">
               </my-form-item>
-              <my-form-item v-if="scope.prop==='price'" v-model="scope.row.price" size="mini"  type="number" min="0">
+              <my-form-item v-if="scope.prop==='price'" v-model="scope.row.price" size="mini" type="number" min="0">
               </my-form-item>
               <my-form-item v-if="scope.prop==='balanceCount'" v-model="scope.row.balanceCount" size="mini" type="number" min="0">
               </my-form-item>
@@ -93,222 +95,268 @@
           </div>
         </div>
       </div>
+      <div class="flex ac" style="margin-top:15px">
+        <div class="info">
+          <i class="el-icon-info"></i> 提交将更新并且保存物流链所有信息,新增的物流单会进入审核流程
+        </div>
+        <div class="f1"></div>
+        <div class="info" style="padding:0 10px">此次新增 <strong><span class="success">{{newLogisticsCount}}</span></strong> 张物流单</div>
+        <el-button size="small" type="success" @click="dispatch">提交物流链信息</el-button>
+      </div>
     </div>
   </loading-box>
 </template>
 
 <script>
-import { logistics } from "./field";
-import TransportTrainsCard from "./TransportTrainsCard";
-export default {
-  components: {
-    TransportTrainsCard
-  },
-  props: {
-    order: {
-      type: Object,
-      default() {
-        return {};
-      }
+  import {
+    logistics
+  } from "./field";
+  import TransportTrainsCard from "./TransportTrainsCard";
+  export default {
+    components: {
+      TransportTrainsCard
     },
-    val: {
-      type: Array,
-      default() {
-        return [];
-      }
-    },
-    alert: {
-      type: String,
-      default: "物流链"
-    },
-    data: {
-      type: Array,
-      default() {
-        return [];
-      }
-    }
-  },
-  computed: {
-    statistics() {
-      let res = {
-        loading: 0,
-        landed: 0,
-        totalPrice: 0,
-        count: 0,
-        average: 0
-      };
-      this.trains.forEach(item => {
-        if (item.logistics) {
-          item.logistics.forEach(logisticsItem => {
-            res.count++;
-            res.loading += Number(logisticsItem.loading) || 0;
-            res.landed += Number(logisticsItem.landed) || 0;
-            res.totalPrice += Number(logisticsItem.price) || 0;
-          });
+    props: {
+      order: {
+        type: Object,
+        default () {
+          return {};
         }
-      });
-      if (res.count > 0) {
-        res.average = (res.totalPrice / res.count).toFixed(1);
-      }
-      return res;
-    },
-    companySelectList() {
-      let transportTrainsRelationCompany =
-        this.order.handle.transportTrainsRelationCompany || [];
-      let businessRelationCompany =
-        this.order.handle.businessRelationCompany || [];
-      return [...transportTrainsRelationCompany, ...businessRelationCompany];
-    }
-  },
-  watch: {
-    trains: {
-      handler: function(val) {
-        this.$emit("update:data", val);
       },
-      deep: true
-    }
-  },
-  data() {
-    return {
-      loadingText: "",
-      trains: [],
-      thead: JSON.parse(JSON.stringify(logistics)),
-      showIndex: 0
-    };
-  },
-  methods: {
-    areaInfo(item) {
-      let res = "请选择地址";
-      if (!item) {
+      val: {
+        type: Array,
+        default () {
+          return [];
+        }
+      },
+      alert: {
+        type: String,
+        default: "物流链"
+      },
+      data: {
+        type: Array,
+        default () {
+          return [];
+        }
+      },
+      settle: {
+        type: Boolean,
+        default: false
+      }
+    },
+    computed: {
+      statistics() {
+        let res = {
+          loading: 0,
+          landed: 0,
+          totalPrice: 0,
+          count: 0,
+          average: 0
+        };
+        this.trains.forEach(item => {
+          if (item.logistics) {
+            item.logistics.forEach(logisticsItem => {
+              res.count++;
+              res.loading += Number(logisticsItem.loading) || 0;
+              res.landed += Number(logisticsItem.landed) || 0;
+              res.totalPrice += Number(logisticsItem.price) || 0;
+            });
+          }
+        });
+        if (res.count > 0) {
+          res.average = (res.totalPrice / res.count).toFixed(1);
+        }
+        return res;
+      },
+      companySelectList() {
+        let transportTrainsRelationCompany =
+          this.order.handle.transportTrainsRelationCompany || [];
+        let businessRelationCompany =
+          this.order.handle.businessRelationCompany || [];
+        return [...transportTrainsRelationCompany, ...businessRelationCompany];
+      },
+      newLogisticsCount() {
+        let res = 0;
+        this.trains.forEach(item => {
+          if (item.logistics) {
+            item.logistics.forEach(logisticsItem => {
+              if (!logisticsItem.no) {
+                res++;
+              }
+            });
+          }
+        });
         return res;
       }
-      if (Number(item.type) === 1) {
-        if (item.areaType === 0) {
-          if (item.areaArr instanceof Array && item.areaArr.length > 0) {
-            let temp = [];
-            item.areaArr.forEach(item => {
-              temp.push(item.name);
-            });
-            res = temp.join("/");
+    },
+    watch: {
+      trains: {
+        handler: function(val) {
+          this.$emit("update:data", val);
+        },
+        deep: true
+      }
+    },
+    data() {
+      return {
+        loadingText: "",
+        trains: [],
+        thead: JSON.parse(JSON.stringify(logistics)),
+        showIndex: 0
+      };
+    },
+    methods: {
+      areaInfo(item) {
+        let res = "请选择地址";
+        if (!item) {
+          return res;
+        }
+        if (Number(item.type) === 1) {
+          if (item.areaType === 0) {
+            if (item.areaArr instanceof Array && item.areaArr.length > 0) {
+              let temp = [];
+              item.areaArr.forEach(item => {
+                temp.push(item.name);
+              });
+              res = temp.join("/");
+            }
+          } else {
+            res = this.area2name(item.area);
           }
         } else {
           res = this.area2name(item.area);
         }
-      } else {
-        res = this.area2name(item.area);
-      }
-      return res;
-    },
-    changeShowIndex(index) {
-      if (index !== 0) {
-        this.showIndex = index;
-      }
-    },
-    add() {
-      let lastItem = this.trains[this.trains.length - 1 - 1];
-      if (Number(lastItem.areaType) === 0) {
-        if (lastItem.areaArr.length === 0) {
-          this.$message.error(
-            `请先选择中转地${this.trains.length - 1 - 1}地址`
-          );
-          return;
+        return res;
+      },
+      changeShowIndex(index) {
+        if (index !== 0) {
+          this.showIndex = index;
         }
-      } else {
-        if (!lastItem.area._id) {
-          this.$message.error(
-            `请先选择中转地${this.trains.length - 1 - 1}地址`
-          );
-          return;
+      },
+      add() {
+        let lastItem = this.trains[this.trains.length - 1 - 1];
+        if (Number(lastItem.areaType) === 0) {
+          if (lastItem.areaArr.length === 0) {
+            this.$message.error(
+              `请先选择中转地${this.trains.length - 1 - 1}地址`
+            );
+            return;
+          }
+        } else {
+          if (!lastItem.area._id) {
+            this.$message.error(
+              `请先选择中转地${this.trains.length - 1 - 1}地址`
+            );
+            return;
+          }
         }
-      }
-      this.trains.splice(-1, 0, {
-        areaType: 1,
-        type: 1,
-        area: {},
-        company: {},
-        logistics: [],
-        areaArr: []
-      });
-    },
-    async remove(item, index) {
-      if (item._id) {
-        this.loadingText = "加载中...";
-        try {
+        this.trains.splice(-1, 0, {
+          areaType: 1,
+          type: 1,
+          area: {},
+          company: {},
+          logistics: [],
+          areaArr: []
+        });
+      },
+      async remove(item, index) {
+        if (item._id) {
+          this.loadingText = "加载中...";
+          try {
+            this.trains.splice(index, 1);
+          } catch (error) {}
+          this.loadingText = "";
+        } else {
           this.trains.splice(index, 1);
+        }
+        if (this.showIndex > 1) {
+          this.showIndex = this.showIndex - 1;
+        }
+      },
+      addLogistics(logistics, index) {
+        let lastItem = this.trains[index];
+        if (Number(lastItem.areaType) === 0) {
+          if (lastItem.areaArr.length === 0) {
+            this.$message.error(
+              `请先选择中转地${this.trains.length - 1 - 1}地址`
+            );
+            return;
+          }
+        } else {
+          if (!lastItem.area._id) {
+            this.$message.error(
+              `请先选择中转地${this.trains.length - 1 - 1}地址`
+            );
+            return;
+          }
+        }
+        logistics.push({
+          loading: 0,
+          landed: 0,
+          price: 0,
+          balanceCount: 0,
+          balanceCompany: "",
+          loss: 0,
+          lossCompany: "",
+          state: 0,
+          transportation: "truck",
+          truck: {},
+          ship: {}
+        });
+      },
+      removeLogistics(logistics, index) {
+        logistics.splice(index, 1);
+      },
+      transportationChange(val, logisticsItem) {
+        if (logisticsItem.state === 0) {
+          logisticsItem.state = 1;
+        }
+      },
+      stateSelectChange(val, logisticsItem) {
+        if (val === 0) {
+          logisticsItem[logisticsItem.transportation] = {};
+        }
+      },
+      async dispatch() {
+        this.loadingText = "物流链信息提交中";
+        try {
+          await this.$ajax.post("/order/dispatch", {
+            order: this.order._id,
+            transportTrains: this.trains
+          });
+          this.$message.success('物流链信息更新成功');
+          this.$emit('reflesh');
         } catch (error) {}
         this.loadingText = "";
+      }
+    },
+    created() {
+      if (this.val.length === 0) {
+        let firstItem = {
+          type: 0,
+          areaType: 1,
+          area: this.order.handle && this.order.handle.area,
+          company: this.order.handle,
+          logistics: [],
+        };
+        firstItem.areaInfo = this.areaInfo(firstItem);
+        this.trains.push(firstItem);
+        let lastItem = {
+          type: 2,
+          areaType: 1,
+          area: this.order.area,
+          logistics: [],
+          [this.order.type]: this.order[this.order.type]
+        };
+        lastItem.areaInfo = this.areaInfo(lastItem);
+        this.trains.push(lastItem);
       } else {
-        this.trains.splice(index, 1);
-      }
-      if (this.showIndex > 1) {
-        this.showIndex = this.showIndex - 1;
-      }
-    },
-    addLogistics(logistics, index) {
-      let lastItem = this.trains[index];
-      if (Number(lastItem.areaType) === 0) {
-        if (lastItem.areaArr.length === 0) {
-          this.$message.error(
-            `请先选择中转地${this.trains.length - 1 - 1}地址`
-          );
-          return;
-        }
-      } else {
-        if (!lastItem.area._id) {
-          this.$message.error(
-            `请先选择中转地${this.trains.length - 1 - 1}地址`
-          );
-          return;
-        }
-      }
-      logistics.push({
-        loading: 0,
-        landed: 0,
-        price: 0,
-        balanceCount: 0,
-        balanceCompany: "",
-        loss: 0,
-        lossCompany: "",
-        state: 0,
-        transportation: "truck",
-        truck: {},
-        ship: {}
-      });
-    },
-    removeLogistics(logistics, index) {
-      logistics.splice(index, 1);
-    },
-    transportationChange(val, logisticsItem) {
-      if (logisticsItem.state === 0) {
-        logisticsItem.state = 1;
-      }
-    },
-    stateSelectChange(val, logisticsItem) {
-      if (val === 0) {
-        logisticsItem[logisticsItem.transportation] = {};
+        this.trains = JSON.parse(JSON.stringify(this.val));
       }
     }
-  },
-  created() {
-    if (this.val.length === 0) {
-      this.trains.push({
-        type: 0,
-        area: this.order.handle && this.order.handle.area,
-        company: this.order.handle,
-        logistics: []
-      });
-      this.trains.push({
-        type: 2,
-        area: this.order.area,
-        logistics: [],
-        [this.order.type]: this.order[this.order.type]
-      });
-    } else {
-      this.trains = JSON.parse(JSON.stringify(this.val));
-    }
-  }
-};
+  };
 </script>
 
 <style scoped>
+
 </style>

@@ -16,21 +16,36 @@ module.exports = {
     type: 'String',
     name: '状态',
     option: {
-      taking: '待接单',
-      beforeDispatchCheck: '调度前审核',
-      dispatch: '待调度',
-      distributionFinishCheck: '配送完成审核',
-      beforeSettleCheck: '结算前审核',
-      //财务结算环节
-      financialPretrial: '订单预审',
-      accountSettlement: '账户结算',
-      accountConfirmation: '账款确认',
+      salesman: '业务员审核', //业务员审核
+      salesmanManager: '业务经理审核', //业务经理审核
+      tradeClerk: '贸易文员审核', //添加贸易链
+      dispatcher: '调度专员调度', //添加物流链,提交配送,确认配送完成
+      dispatcherManager: '调度经理审核', //审核物流单,调度全部结束后进行一次订单审核
+      logisticsClerk: '物流文员审核', //审核物流单,调度全部结束后进行一次订单审核
+      documentClerk: '单据文员审核', //添加贸易链,物流链的结算价格,数量等
+      documentClerkManager: '单据主管审核', //审核单据文员操作,进入结算环节
+      financial: '财务文员预审', //在此状态财务文员能进行批量修改贸易链结算价格,恢复贸易链价格等
       settled: '已结算',
       invoiced: '已开票',
       cancel: '取消',
       delete: '删除'
     },
-    default: 'taking'
+    default: 'salesman'
+  },
+  checkFail: {
+    type: 'String',
+    name: '审核未通过状态',
+    option: {
+      salesman:'业务员审核未通过',
+      salesmanManager: '业务经理审核未通过',
+      tradeClerk: '贸易文员审核未通过',
+      dispatcher: '调度专员调度未通过',
+      dispatcherManager: '调度经理审核未通过',
+      logisticsClerk: '物流文员审核未通过',
+      documentClerk: '单据文员审核未通过',
+      documentClerkManager: '单据主管审核未通过',
+      financial: '财务文员预审未通过'
+    }
   },
   handle: {
     name: '处理公司',
@@ -156,16 +171,5 @@ module.exports = {
     name: '物流链',
     type: 'ObjectIdArray',
     ref: 'TransportTrains'
-  },
-  balancePrice: {
-    name: '结算价格',
-    type: 'Number',
-    default: 0
-  },
-  balanceCount: {
-    name: '结算数量',
-    type: 'Number',
-    default: 0
-  },
-  // balance 
+  }
 }

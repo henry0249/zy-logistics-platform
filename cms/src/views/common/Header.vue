@@ -58,21 +58,13 @@ export default {
   computed: {
     activeNavIndex() {
       let res = -1;
-      this.nav.forEach((item, index) => {
-        let path = item.path;
-        if (this.$route.matched.length > 0) {
-          let matchedPath = this.$route.matched[0].path;
-          if (this.$route.path.indexOf("sys") > -1) {
-            matchedPath = this.$route.matched[1].path;
+      this.$route.matched.forEach(matchedItem => {
+        this.nav.forEach((navItem,navIndex) => {
+          if (navItem.path === matchedItem.path) {
+            this.defaultActive = navItem.path;
+            res = navIndex;
           }
-          if (item.path && item.path.indexOf(matchedPath) > -1) {
-            res = index;
-          }
-        } else {
-          if (item.path === this.$route.path) {
-            res = index;
-          }
-        }
+        });
       });
       return res;
     }
@@ -106,6 +98,7 @@ export default {
     },
     handleCommand(index) {
       this.$store.commit("setCompany", this.roleCompany[index]);
+      this.$store.dispatch('getRole',this.roleCompany[index]._id);
     },
     setNav() {
       this.nav = [];
@@ -140,7 +133,7 @@ export default {
       } else {
         this.nav = [
           {
-            name: "订单管理",
+            name: "贸易订单管理",
             path: "/order",
             icon: "icon-daichulidingdan"
           },
@@ -181,18 +174,24 @@ export default {
       this.nav.forEach((item, index) => {
         if (item.path === "/order") {
           item.badge =
-            this.orderBadge.taking +
-            this.orderBadge.beforeDispatchCheck +
-            this.orderBadge.distributionFinishCheck +
-            this.orderBadge.beforeSettleCheck;
+            this.orderBadge.salesman +
+            this.orderBadge.salesmanManager +
+            this.orderBadge.tradeClerk;
           this.$set(this.nav, index, item);
         }
         if (item.path === "/dispatch") {
-          item.badge = this.orderBadge.dispatch + this.orderBadge.distribution;
+          item.badge =
+            this.orderBadge.dispatcher +
+            this.orderBadge.dispatcherManager +
+            this.orderBadge.logisticsClerk +
+            this.orderBadge.dispatch.dispatcher +
+            this.orderBadge.dispatch.dispatcherManager +
+            this.orderBadge.dispatch.logisticsClerk;
           this.$set(this.nav, index, item);
         }
         if (item.path === "/settle") {
-          item.badge =this.orderBadge.financialPretrial + this.orderBadge.accountConfirmation + this.orderBadge.accountSettlement;
+          item.badge =
+            this.orderBadge.documentClerk + this.orderBadge.financialManager;
           this.$set(this.nav, index, item);
         }
       });

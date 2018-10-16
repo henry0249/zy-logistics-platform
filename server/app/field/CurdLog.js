@@ -1,8 +1,33 @@
 module.exports = {
+  type: {
+    type: 'String',
+    name: '日志类型',
+    option: {
+      default: '默认操作日志',
+      orderCheckFail: '订单审核失败记录',
+      logisticsCheckFail: '物流单审核失败记录'
+    },
+    default: 'default'
+  },
   user: {
-    name: '访问用户',
+    name: '操作人',
     type: 'ObjectId',
     ref: 'User'
+  },
+  company: {
+    name: '操作时公司信息',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
+  order: {
+    name: '关联订单',
+    type: 'ObjectId',
+    ref: 'Order'
+  },
+  logistics: {
+    name: '关联物流单',
+    type: 'ObjectId',
+    ref: 'Logistics'
   },
   ua: {
     name: '设备信息',
@@ -11,16 +36,6 @@ module.exports = {
   sys: {
     name: '访问系统',
     type: 'String',
-  },
-  company: {
-    name: '公司信息',
-    type: 'ObjectId',
-    ref: 'Company'
-  },
-  platform: {
-    name: '平台信息',
-    type: 'ObjectId',
-    ref: 'Platform'
   },
   ip: {
     name: '访问ip',

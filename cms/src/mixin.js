@@ -34,6 +34,24 @@ Vue.mixin({
       return this.$store.state.orderBadge;
     }
   },
+  directives: {
+    getHeight: {
+      inserted(el, binding, vnode) {
+        if (typeof binding.value === 'function') {
+          setTimeout(() => {
+            binding.value(el.clientHeight);
+          }, 200);
+        }
+      },
+      update(el, binding, vnode){
+        if (typeof binding.value === 'function') {
+          setTimeout(() => {
+            binding.value(el.clientHeight);
+          }, 200);
+        }
+      }
+    }
+  },
   methods: {
     back() {
       this.$router.go(-1);

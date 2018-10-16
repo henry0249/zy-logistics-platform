@@ -1,15 +1,25 @@
 <template>
-  <loading-box v-model="loadingText" class="body-padding">
-    <div class="g-order-body" v-if="!bodyLoading">
+  <loading-box v-model="loadingText" class="body-padding body-height">
+    <div class="g-order-body" v-if="!loadingText">
       <div class="my-title">订单<span style="color:#409EFF;font-weight:600">{{order.no}}</span>{{title}}</div>
+      <div style="margin-top:15px" v-if="order.checkFail">
+        <el-alert :title="`${field.Order.checkFail.option[order.checkFail]}：${checkFailLog.remark}`" type="error" show-icon :closable="false">
+        </el-alert>
+      </div>
       <Info :val="order" :data.sync="orderAsync"></Info>
+      <div class="common-margin"></div>
       <goods-table :order="orderAsync"></goods-table>
-      <business-trains :val="order.businessTrains" :order="orderAsync" :data.sync="update.businessTrains"></business-trains>
-      <transport-trains v-if="orderAsync.area && orderAsync.area._id && transport" :val="order.transportTrains" :order="orderAsync" :data.sync="update.transportTrains"></transport-trains>
+      <div v-if="business" class="common-margin"></div>
+      <business-trains v-if="business" :val="order.businessTrains" :order="orderAsync" :data.sync="update.businessTrains" :settle="businessSettle"></business-trains>
+      <div v-if="transport" class="common-margin"></div>
+      <transport-trains v-if="transport && orderAsync.area && orderAsync.area._id && transport" :val="order.transportTrains" :order="orderAsync" :data.sync="update.transportTrains" :settle="transportSettle" @reflesh="reflesh"></transport-trains>
     </div>
     <el-alert v-if="alert" style="margin-top:15px" :title="alert" type="info" center show-icon :closable="false">
     </el-alert>
     <div class="flex ac" style="margin:15px 0">
+      <div style="padding-right:10px" v-if="order.state !== 'salesman'">
+        <el-button type="danger" size="small" @click="checkFail">审核失败</el-button>
+      </div>
       <slot name="toolLeft"></slot>
       <div class="f1"></div>
       <slot name="back">
@@ -41,13 +51,25 @@ export default {
       type: String,
       default: ""
     },
+    submitText: {
+      type: String,
+      default: "审核通过"
+    },
+    business: {
+      type: Boolean,
+      default: false
+    },
     transport: {
       type: Boolean,
       default: false
     },
-    submitText: {
-      type: String,
-      default: "提交"
+    businessSettle: {
+      type: Boolean,
+      default: false
+    },
+    transportSettle: {
+      type: Boolean,
+      default: false
     }
   },
   components: {
@@ -59,32 +81,35 @@ export default {
   data() {
     return {
       loadingText: "加载中",
-      bodyLoading: true,
       orderAsync: {},
       update: {
         businessTrains: [],
         transportTrains: []
       },
       order: {},
-      goods: [],
-      removeTrains: [],
-      removeLogistics: []
+      checkFailLog: {}
     };
   },
   methods: {
+    reflesh(){
+      this.getOrderInfo();
+    },
     async getOrderInfo() {
-      this.bodyLoading = true;
       this.loadingText = "正在获取订单数据";
       try {
         this.order = await this.$ajax("/order/info/" + this.$route.params._id);
-        this.goods = [];
-        this.order.goods.forEach(item => {
-          this.goods.push(item);
-        });
+        if (this.order.checkFail) {
+          this.checkFailLog = await this.$ajax.post("/curdLog/findOne", {
+            type: "orderCheckFail",
+            order: this.order._id,
+            sort: {
+              createdAt: -1
+            }
+          });
+        }
       } catch (error) {}
       setTimeout(() => {
         this.loadingText = "";
-        this.bodyLoading = false;
       }, 200);
     },
     getSubmitData() {
@@ -93,9 +118,7 @@ export default {
         order: this.orderAsync
       };
       for (const key in this.update) {
-        if (this.update[key].length > 0) {
-          data[key] = this.update[key];
-        }
+        data[key] = this.update[key];
       }
       return data;
     },
@@ -104,14 +127,38 @@ export default {
         this.$message.error(`非法的订单状态`);
         return;
       }
+      let update = this.getSubmitData();
+      if (this.business && update.businessTrains.length === 0) {
+        this.$message.error(`必须添加贸易链`);
+        return;
+      }
       this.loadingText = "正在提交";
       try {
-        let update = this.getSubmitData();
         update.state = this.newState;
         await this.$ajax.post("/order/set", update);
         this.back();
       } catch (error) {}
       this.loadingText = "";
+    },
+    checkFail() {
+      this.$prompt("请输入审核失败原因", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputErrorMessage:'失败原因不能为空',
+        inputPattern: /\S/
+      })
+        .then(async ({ value }) => {
+          this.loadingText = "提交中";
+          try {
+            await this.$ajax.post("/order/checkFail", {
+              order: this.order._id,
+              text: value
+            });
+            this.back();
+          } catch (error) {}
+          this.loadingText = "";
+        })
+        .catch(() => {});
     }
   },
   created() {
@@ -125,5 +172,8 @@ export default {
   color: #aaa;
   font-size: 16px;
   padding: 15px 0;
+}
+.common-margin{
+  margin-bottom: 15px;
 }
 </style>

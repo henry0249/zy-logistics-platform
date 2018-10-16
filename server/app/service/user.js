@@ -1,4 +1,5 @@
 const Service = require('egg').Service;
+const roleField = require('../field/Role');
 
 class UserService extends Service {
   async getUserInfo() {
@@ -152,6 +153,30 @@ class UserService extends Service {
     res = [...mySet];
     if (firstCompany) {
       res.unshift(firstCompany);
+    }
+    return res;
+  }
+  async rolePower() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    if (!body.company) {
+      ctx.throw(422, '公司信息不能为空', body);
+    }
+    let res = {};
+    for (const key in roleField.type.option) {
+      let findBody = {
+        type: key,
+        user: ctx.user._id
+      };
+      if (key !== 'sysAdmin' && key !== 'sysSalesman' && key !== 'sysDispatcher') {
+        findBody.company = body.company;
+      }
+      let hasRole = await ctx.model.Role.findOne(findBody);
+      if (hasRole) {
+        res[key] = true;
+      } else {
+        res[key] = false;
+      }
     }
     return res;
   }

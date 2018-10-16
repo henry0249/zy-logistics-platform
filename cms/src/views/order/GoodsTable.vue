@@ -1,6 +1,6 @@
 <template>
   <loading-box style="min-height:20px">
-    <el-alert title="商品信息" type="info" :closable="false" style="margin:15px 0">
+    <el-alert title="商品信息" type="info" :closable="false" style="margin-bottom:15px">
     </el-alert>
     <my-table v-if="order.area && order.area._id" size="small" border :thead="thead" :data.sync="goodsData">
       <div slot-scope="scope">
@@ -95,7 +95,6 @@ export default {
         this.order.sell = price.sell || 0;
         this.order.factory = price.factory || 0;
         this.order.transport = price.transport || 0;
-        this.order.handle = val.company;
         this.$emit("update:data", this.order);
       }
     }

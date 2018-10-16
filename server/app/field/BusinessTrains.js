@@ -27,6 +27,11 @@ module.exports = {
     name: '所属订单',
     ref: 'Order'
   },
+  handle: {
+    name: '处理公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
   user: {
     type: 'ObjectId',
     name: '用户',
@@ -89,6 +94,11 @@ module.exports = {
   },
   balanceForAccountPrepaid: {
     name: '用预付款结算金额',
+    type: 'Number',
+    default: 0
+  },
+  balanced: {
+    name: '已结算金额',
     type: 'Number',
     default: 0
   },

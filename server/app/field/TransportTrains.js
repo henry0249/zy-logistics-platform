@@ -15,7 +15,8 @@ module.exports = {
       0: '普通地址',
       1: '公司地址',
       // 2: '贸易节点'
-    }
+    },
+    default: "1"
   },
   area: {
     type: 'ObjectId',
@@ -45,9 +46,9 @@ module.exports = {
     name: '节点用户',
     ref: 'User'
   },
-  to: {
+  handle: {
+    name: '处理公司',
     type: 'ObjectId',
-    name: '下一个物流节点',
-    ref: 'TransportTrains'
-  }
+    ref: 'Company'
+  },
 }

@@ -42,7 +42,7 @@
       <div class="flex ac" style="margin-top:15px">
         <!-- <el-button size="small" @click="back()">返回</el-button> -->
         <div class="f1"></div>
-        <el-button size="small" type="primary" @click="update()">更新运单信息</el-button>
+        <el-button icon="el-icon-refresh" size="small" type="primary" @click="update">更新物流单信息</el-button>
       </div>
       <el-alert title="物流信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>

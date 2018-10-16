@@ -24,6 +24,7 @@ module.exports = app => {
     .all('/refleshToken', checkToken(), 'user.refleshToken') //刷新token
     .get('/field', checkToken(), 'field.index') //获取数据库字段信息
     .get('/roleCompany', checkToken(), 'user.roleCompany') //获取用户关联的所有公司
+    .post('/rolePower', checkToken(), 'user.rolePower') //获取用户在某个公司的所有角色信息
     //公司接口
     .all('/company/user/cascader', checkToken(), 'company.userCascader') //公司用户级联数据
     //区域接口
@@ -35,6 +36,7 @@ module.exports = app => {
     .post('/order/transfer', checkToken(), 'order.transfer') //转单
     .post('/order/dispatch', checkToken(), 'order.dispatch') //订单提交配送
     .post('/order/mutilUpdate', checkToken(), 'order.mutilUpdate') //批量修改订单信息
+    .post('/order/checkFail', checkToken(), 'order.checkFail') //订单审核失败
     .all('/order/pending/:state', checkToken(), 'order.pending') //获取待处理订单
     //运单接口
     .get('/logistics/company/badge', checkToken(), 'logistics.companyBadge') //公司运单标记

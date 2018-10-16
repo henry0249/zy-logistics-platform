@@ -11,15 +11,18 @@
           <div class="goods-info-padding">规格：{{order.goods.spec}}</div>
           <div class="goods-info-padding">库存：{{order.goods.stock}} {{order.goods.unit}}</div>
         </div>
+        <!-- <div @click="addToStart" class="warning pointer" style="padding:10px">
+          源头供应商<i class="el-icon-plus"></i>
+        </div> -->
         <div @click="add" class="success pointer" style="padding:10px">
           贸易节点<i class="el-icon-plus"></i>
         </div>
       </div>
-      <div v-if="data.length>0" style="min-height:360px">
-        <div class="hor-scroll" style="margin-bottom:10px">
-          <div class="hor-scroll-item" style="padding:10px 0" v-for="(item,index) in data" :key="index">
+      <div v-if="data.length>0" style="min-height:200px" :style="{height:height+'px'}">
+        <div class="hor-scroll" v-getHeight="getHeight">
+          <div class="hor-scroll-item" style="margin-bottom:10px" v-for="(item,index) in data" :key="index">
             <div class="flex ac">
-              <business-trains-card :key="item._id" :order="order" :index="index" :last.sync="index>0?data[index-1]:undefined" :next.sync="data[index+1]?data[index+1]:undefined" :title="businessTrainsTitle(index)" :data.sync="item" @remove="remove($event,index)"></business-trains-card>
+              <business-trains-card :settle="settle" :key="item._id" :order="order" :index="index" :last.sync="index>0?data[index-1]:undefined" :next.sync="data[index+1]?data[index+1]:undefined" :title="businessTrainsTitle(index)" :data.sync="item" @remove="remove($event,index)"></business-trains-card>
               <div class="tc" v-if="index!==data.length-1" style="width:50px">
                 <i class="el-icon-d-arrow-right success"></i>
               </div>
@@ -60,10 +63,15 @@ export default {
     titleTip: {
       type: String,
       default: ""
+    },
+    settle: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
+      height: 0,
       loadingText: "",
       data: [],
       temp: [{}]
@@ -78,6 +86,9 @@ export default {
     }
   },
   methods: {
+    getHeight(val) {
+      this.height = val;
+    },
     businessTrainsTitle(index) {
       if (index === 0) {
         return "供货商";
@@ -107,6 +118,23 @@ export default {
         }
         return 2;
       }
+    },
+    addToStart() {
+      let data0 = this.data[0];
+      data0.type = 'pool';
+      this.$set(this.data,0,data0);
+      this.data.unshift({
+        type: "supplier",
+        company: "",
+        supplyPrice: this.data[0].factory,
+        supplyCount: this.data[0].count,
+        preBalancePrice: this.data[0].sell,
+        balanceCount: this.data[0].count,
+        receive: this.data[0].count,
+        loss: 0,
+        remark: "",
+        logistics: [],
+      });
     },
     add() {
       if (!(this.order[this.order.type] && this.order[this.order.type]._id)) {
@@ -157,7 +185,7 @@ export default {
       let body = {
         supplyPrice: this.order.factory,
         supplyCount: this.order.count,
-        balancePrice: this.order.sell,
+        preBalancePrice: this.order.sell,
         balanceCount: this.order.count,
         loss: 0,
         receive: this.order.count,
@@ -181,7 +209,7 @@ export default {
           [this.order.type]: this.order[this.order.type],
           customerType: this.order.type
         });
-        this.order.balancePrice = this.order.sell;
+        this.order.preBalancePrice = this.order.sell;
         this.order.balanceCount = this.order.count;
       } else {
         if (!this.data[this.data.length - 1 - 1].company) {
@@ -194,7 +222,7 @@ export default {
           company: "",
           supplyPrice: this.data[this.data.length - 1 - 1].supplyPrice,
           supplyCount: this.data[this.data.length - 1 - 1].supplyCount,
-          balancePrice: this.data[this.data.length - 1 - 1].supplyPrice,
+          preBalancePrice: this.data[this.data.length - 1 - 1].supplyPrice,
           balanceCount: this.data[this.data.length - 1 - 1].supplyCount
         });
       }

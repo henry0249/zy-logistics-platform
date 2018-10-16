@@ -15,10 +15,33 @@ module.exports = {
       5: '完成'
     }
   },
+  dispatcherManagerCheck: {
+    type: 'Boolean',
+    name: '调度经理审核通过',
+    default: false
+  },
+  logisticsClerkCheck: {
+    type: 'Boolean',
+    name: '物流文员审核通过',
+    default: false
+  },
+  checkFail: {
+    type: 'String',
+    name: '审核未通过状态',
+    option: {
+      dispatcherManager: '调度经理审核未通过',
+      logisticsClerk: '物流文员审核未通过',
+    }
+  },
   order: {
     type: 'ObjectId',
     name: '所属订单',
     ref: 'Order'
+  },
+  goods: {
+    type: 'ObjectId',
+    name: '商品信息',
+    ref: 'Goods'
   },
   handle: {
     name: '处理公司',
@@ -32,7 +55,7 @@ module.exports = {
   },
   transportTrains: {
     type: 'ObjectId',
-    name: '所属物流链',
+    name: '起送点物流链节点',
     ref: 'TransportTrains'
   },
   transportation: {
@@ -102,17 +125,26 @@ module.exports = {
     name: '收货人联系方式',
     type: 'String',
   },
+  areaType: {
+    type: 'String',
+    name: '收货地址类型',
+    option: {
+      0: '普通地址',
+      1: '公司地址',
+      // 2: '贸易节点'
+    }
+  },
   area: {
     name: '收货地址',
     type: 'ObjectId',
     ref: 'Area'
   },
   areaArr: {
-    name: '收货地址',
+    name: '收货地址', //数组
     type: 'Array',
   },
   areaInfo: {
-    name: '详细地址',
+    name: '收货详细地址', //字符串
     type: 'String',
   },
   startAt: {

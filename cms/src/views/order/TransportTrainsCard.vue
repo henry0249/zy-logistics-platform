@@ -64,6 +64,10 @@ export default {
     width: {
       type: String,
       default: "220px"
+    },
+    settle: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -81,11 +85,17 @@ export default {
   },
   watch: {
     "data.areaType"() {
-      if (Number(this.data.type) === 1) {
-        this.data.company = "";
-        this.data.area = {};
-        this.data.areaArr = [];
-      }
+      this.data.company = "";
+      this.data.area = {};
+      this.data.areaArr = [];
+    },
+    "data.area"() {
+      let areaInfo = this.areaInfo(this.data);
+      this.$set(this.data, "areaInfo", areaInfo);
+    },
+    "data.areaArr"() {
+      let areaInfo = this.areaInfo(this.data);
+      this.$set(this.data, "areaInfo", areaInfo);
     }
   },
   methods: {

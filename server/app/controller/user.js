@@ -35,6 +35,10 @@ class UserController extends Controller {
     const ctx = this.ctx;
     ctx.body = await ctx.service.user.roleCompany();
   }
+  async rolePower() {
+    const ctx = this.ctx;
+    ctx.body = await ctx.service.user.rolePower();
+  }
 }
 
 module.exports = UserController;
