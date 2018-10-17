@@ -10,7 +10,7 @@
         <common-alert style="margin:15px 0">公司角色</common-alert>
         <common-company-role v-if="!loadingText" :startData="roleStartData" :data.sync="roleArr" :removeList.sync="removeList"></common-company-role>
         <common-alert style="margin:15px 0">{{isLogistics?'车船信息':'车船信息 (该公司不是物流公司，无车船信息)'}}</common-alert>
-        <company-ship v-if="!loadingText&&isLogistics" :startData="startShipObj" :removeObj.sync="shipRemoveObj" :isLogistics="isLogistics" :data.sync="shipObj"></company-ship>
+        <company-ship v-if="!loadingText&&isLogistics" :startData="startShipObj" :isLogistics="isLogistics" :data.sync="shipObj"></company-ship>
       </div>
       <div class="tr jb" style="margin-top:30px">
         <div>
@@ -44,7 +44,6 @@
         loadingText: "",
         disabled: true,
         show: true,
-        roleIo: false,
         shipIo: false,
         isLogistics: false,
         companyArr: {},
@@ -52,22 +51,21 @@
         roleArr: [],
         removeList: [],
         startCompanyArr: {},
-        roleStartDate: {},
-        startRoleObj: {
-          admin: [],
-          salesman: [],
-          beforeDispatchCheck: [],
-          dispatcher: [],
-          beforeSettleCheck: [],
-          financial: [],
-          documentClerk: []
-        },
-        haveRole: [],
-        roleObj: {},
         shipObj: {},
         startShipObj: {},
-        removeData: {},
-        shipRemoveObj: {}
+        type: {
+          companyAdmin: '公司管理员',
+          salesman: '业务员', //审核修改订单信息
+          salesmanManager: '业务经理', //审核修改订单信息
+          tradeClerk: '贸易文员', //添加物流链
+          dispatcher: '调度专员', //添加物流链,提交配送,确认配送完成
+          dispatcherManager: '调度经理', //审核物流单
+          logisticsClerk: '物流文员', //审核物流单
+          documentClerk: '单据文员', //编辑贸易链和物流链结算相关
+          documentClerkManager: '单据主管', //审核单据文员操作
+          financial: '财务文员', //财务预审 ,按贸易链关系归集结算
+          financialManager: '财务经理', //打款操作确认
+        },
       };
     },
     watch: {
@@ -121,10 +119,10 @@
         let path = '/sys/company/account';
         this.$router.push({
           path,
-          query:{
-            company:this.startCompanyArr._id,
-            parentPath:this.$route.path,
-            parentName:this.$route.name
+          query: {
+            company: this.startCompanyArr._id,
+            parentPath: this.$route.path,
+            parentName: this.$route.name
           }
         });
       },
@@ -158,7 +156,6 @@
             this.loadingText = "更新中";
             let companyOp = JSON.parse(JSON.stringify(this.companyArr));
             delete companyOp._id;
-            console.log(companyOp);
             if (companyOp.businessRelationCompany.length > 0) {
               let data = [];
               companyOp.businessRelationCompany.forEach(item => {
@@ -189,37 +186,22 @@
                 company: _id
               })
             }
-            for (let index = 0; index < this.roleArr.length; index++) {
-              if (!this.roleArr[index]._id) {
-                let setRole = await this.$api.curd({
-                  model: 'role',
-                  curdType: 'set',
-                  company: _id,
-                  type: this.roleArr[index].type,
-                  user: this.roleArr[index].user._id,
-                  area: this.roleArr[index].area._id
-                })
-              } else {
-                let updateOp = {
-                  model: 'role',
-                  curdType: 'update',
-                  find: {
-                    _id: this.roleArr[index]._id
-                  },
-                  update: {}
-                };
-                if (this.roleArr[index].area.length > 0) {
-                  let areaData = [];
-                  this.roleArr[index].area.forEach(areaItem => {
-                    areaData.push(areaItem._id);
-                  });
-                  this.$set(updateOp, 'update', {
-                    area: areaData
-                  })
-                  let updateRole = await this.$api.curd(updateOp);
-                }
+            let roleData = [];
+            this.roleArr.forEach(item => {
+              let obj = {};
+              let area = [];
+              item.area.forEach(areaItem => {
+                area.push(areaItem._id);
+              });
+              obj = JSON.parse(JSON.stringify(item));
+              this.$set(obj, 'area', area);
+              this.$set(obj, 'user', item.user._id);
+              if (!obj._id) {
+                this.$set(obj, 'company', _id);
               }
-            }
+              roleData.push(obj);
+            });
+            let res = await this.$ajax.post('/role/multi', roleData);
             for (const key in this.shipObj) {
               let updateArr = [];
               let data = JSON.parse(JSON.stringify(this.data[key]));
@@ -311,19 +293,14 @@
               }
             }
             this.$message.success("更新成功！");
-            if (this.sys) {
-              this.$router.push({
-                path: '/sys/company'
-              });
-            } else {
-              this.show = false;
-              await this.getCompany();
-              await this.getRole();
-              await this.getTruc();
-              await this.getShip();
-              this.data = JSON.parse(JSON.stringify(this.startShipObj));
-              this.show = true;
-            }
+            this.show = false;
+            await this.getCompany();
+            await this.getRole();
+            await this.getTruc();
+            await this.getShip();
+            this.data = JSON.parse(JSON.stringify(this.startShipObj));
+            this.show = true;
+            // }
           } catch (error) {}
           this.loadingText = "";
         }
@@ -358,11 +335,20 @@
         });
       },
       async getRole() {
+        let data = [];
+        for (const key in this.type) {
+          if (this.type.hasOwnProperty(key)) {
+            data.push(key);
+          }
+        }
         let _id = this.sys ? this.$route.params._id : this.company._id;
         this.roleStartData = await this.$api.curd({
           model: "role",
           curdType: "find",
           limit: 0,
+          type: {
+            $in: data
+          },
           company: _id,
           populate: [{
             path: "user"
@@ -415,9 +401,9 @@
       },
       async getAccount() {
         this.accountData = await this.$api.curd({
-          model:'account',
-          curdType:'findOne',
-          company:this.startCompanyArr._id
+          model: 'account',
+          curdType: 'findOne',
+          company: this.startCompanyArr._id
         })
       }
     },
@@ -431,8 +417,7 @@
         await this.getAccount();
         this.data = JSON.parse(JSON.stringify(this.startShipObj));
         this.loadingText = "";
-      } catch (error) {
-      }
+      } catch (error) {}
     }
   };
 </script>

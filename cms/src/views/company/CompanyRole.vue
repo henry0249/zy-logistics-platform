@@ -47,19 +47,32 @@
     watch: {
       company: {
         handler(val) {
-          this.getRole();
+          // this.getRole();
+          console.log(val);
+          this.$router.push({
+            path: '/company/edit'
+          })
         },
         deep: true
       }
     },
     methods: {
       async getRole() {
+        let data = [];
+        for (const key in this.type) {
+          if (this.type.hasOwnProperty(key)) {
+            data.push(key);
+          }
+        }
         try {
           this.loadingText = '加载中...';
           this.roleStartData = await this.$api.curd({
             model: "role",
             curdType: "find",
             limit: 0,
+            type: {
+              $in: data
+            },
             company: this.company._id,
             populate: [{
               path: "user"
@@ -81,7 +94,6 @@
         return returnIo;
       },
       async sub() {
-        console.log(this.confirmation());
         if (this.confirmation()) {
           try {
             this.loadingText = '修改中...';
@@ -89,44 +101,29 @@
               let delRole = await this.$api.curd({
                 model: 'role',
                 curdType: 'delete',
-                user: this.removeList[index],
-                company: _id
+                _id: this.removeList[index],
               })
             }
-            for (let index = 0; index < this.roleArr.length; index++) {
-              if (!this.roleArr[index]._id) {
-                let setRole = await this.$api.curd({
-                  model: 'role',
-                  curdType: 'set',
-                  company: _id,
-                  type: this.roleArr[index].type,
-                  user: this.roleArr[index].user._id,
-                  area: this.roleArr[index].area._id
-                })
-              } else {
-                let updateOp = {
-                  model: 'role',
-                  curdType: 'update',
-                  find: {
-                    _id: this.roleArr[index]._id
-                  },
-                  update: {}
-                };
-                if (this.roleArr[index].area.length > 0) {
-                  let areaData = [];
-                  this.roleArr[index].area.forEach(areaItem => {
-                    areaData.push(areaItem._id);
-                  });
-                  this.$set(updateOp, 'update', {
-                    area: areaData
-                  })
-                  let updateRole = await this.$api.curd(updateOp);
-                }
+            let data = [];
+            this.roleArr.forEach(item => {
+              let obj = {};
+              let area = [];
+              item.area.forEach(areaItem => {
+                area.push(areaItem._id);
+              });
+              obj = JSON.parse(JSON.stringify(item));
+              this.$set(obj, 'area', area);
+              this.$set(obj, 'user', item.user._id);
+              if (!obj._id) {
+                this.$set(obj, 'company', this.company._id);
               }
-            }
+              data.push(obj);
+            });
+            let res = await this.$ajax.post('/role/multi', data);
           } catch (error) {}
           this.loadingText = '';
         }
+        await this.getRole();
       }
     },
     created() {

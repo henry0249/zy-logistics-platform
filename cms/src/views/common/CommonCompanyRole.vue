@@ -208,8 +208,9 @@
         }]);
       },
       remove(scope) {
+        console.log(scope);
         this.newData.forEach((item, index) => {
-          if (item.type === this.activeName && item.user._id === scope.row._id) {
+          if (item.type === this.activeName && item._id === scope.row._id) {
             this.newData.splice(index, 1);
           }
         });

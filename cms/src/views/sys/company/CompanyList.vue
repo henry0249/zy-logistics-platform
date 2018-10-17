@@ -126,6 +126,11 @@
           path: '/sys/company/list/edit/' + val.value.row._id 
         })
       }
+    },
+    created () {
+      if (this.$route.params._id) {
+        this.show = false;
+      }
     }
   }
 </script>

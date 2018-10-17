@@ -22,11 +22,12 @@
     },
     data() {
       return {
-        show:true,
+        show: true,
         loadingText: '',
         path: "/goods/list",
         activeIndex: 0,
-        nav: [{
+        nav: [],
+        initNav: [{
             name: "公司详情",
             icon: "icon-xiangqing",
             path: "/company/edit"
@@ -62,12 +63,12 @@
       company: {
         handler(val) {
           this.show = false;
-          if (this.isShowShip() === true) {
-            this.changeNav();
-          } else {
-            this.changeNav(this.isShowShip());
-          }
-          this.show = true;
+          this.judgeRole();
+          this.isLogisticsCompany();
+          this.$router.push({path:'/company/edit'})
+          this.$nextTick(() => {
+            this.show = true;
+          })
         },
         deep: true
       }
@@ -83,91 +84,50 @@
           });
         }
       },
-      async getRoleByUser(arr) {
-        let data = [];
-        try {
-          data = await this.$ajax.post("/role/find", {
-            user: this.user._id,
-            type: {
-              $in: arr
-            },
-            company: this.company._id
-          });
-        } catch (error) {}
-        return data;
-      },
-      async getSysAdmin(item) {
-        let data = [];
-        try {
-          data = await this.$ajax.post("/role/find", {
-            user: this.user._id,
-            type: "sysAdmin",
-          });
-        } catch (error) {}
-        if (data.length === 0) {
-          let arr = [];
-          if (item.role) {
-            item.role.forEach(roleItem => {
-              if (roleItem !== 'sysAdmin') {
-                arr.push(roleItem);
+      judgeRole() {
+        if (!this.role.sysAdmin) {
+          let data = JSON.parse(JSON.stringify(this.initNav));
+          data.forEach((item, index) => {
+            let io = false;
+            if (item.role) {
+              item.role.forEach(roleItem => {
+                if (this.role[roleItem]) {
+                  io = true;
+                }
+              });
+              if (!io) {
+                data.splice(index, 1);
               }
-            });
-          }
-          return await this.getRoleByUser(arr);
+            }
+          });
+          this.nav = JSON.parse(JSON.stringify(data));
         } else {
-          return data;
+          this.nav = JSON.parse(JSON.stringify(this.initNav));
         }
       },
-      async changeNav(val) {
-        let data = val ? val : JSON.parse(JSON.stringify(this.initData));
-        console.log(val, data);
-        for (let index = 0; index < data.length; index++) {
-          if (data[index].role) {
-            let arr = await this.getSysAdmin(data[index]);
-            if (arr.length === 0) {
-              data.splice(index, 1);
-            }
-          }
-        }
-        this.nav = JSON.parse(JSON.stringify(data));
-      },
-      isShowShip() {
-        let data = JSON.parse(JSON.stringify(this.initData));
+      isLogisticsCompany() {
         let io = false;
-        data.forEach((item, index) => {
-          if (item.name === '车船管理') {
-            this.company.type.forEach(companyItem => {
-              if (companyItem === 'logistics') {
-                io = true;
-              }
-            });
-            if (!io) {
-              data.splice(index, 1);
-            }
+        this.company.type.forEach(item => {
+          if (item === 'logistics') {
+            io = true;
           }
         });
-        if (io) {
-          return io;
-        } else {
-          return data;
+        if (!io) {
+          this.nav.forEach((navItem, index) => {
+            if (navItem.name === '车船管理') {
+              this.nav.splice(index, 1);
+            }
+          });
         }
       }
     },
-    async mounted() {
-      this.setNav(this.orderBadge);
-      if (this.isShowShip() === true) {
-        this.changeNav();
-      } else {
-        this.changeNav(this.isShowShip());
-      }
+    mounted() {
+      this.judgeRole();
+      this.isLogisticsCompany();
     },
     created() {
-      this.initData = JSON.parse(JSON.stringify(this.nav));
-      if (this.isShowShip() === true) {
-        this.changeNav();
-      } else {
-        this.changeNav(this.isShowShip());
-      }
+      this.judgeRole();
+      this.isLogisticsCompany();
     }
   };
 </script>
