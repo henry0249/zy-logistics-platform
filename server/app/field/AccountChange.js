@@ -73,5 +73,15 @@ module.exports = {
     name: '审核人',
     type: 'ObjectIdArray',
     ref: 'User'
+  },
+  accountChange: {
+    name: '关联的流水单',
+    type: 'ObjectId',
+    ref: 'AccountChange'
+  },
+  businessTrains: {
+    name: '关联的贸易链', //贸易链中包含了付款方和收款方信息
+    type: 'ObjectIdArray',
+    ref: 'BusinessTrains'
   }
 }

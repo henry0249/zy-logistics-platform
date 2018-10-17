@@ -2,6 +2,49 @@ const Service = require('egg').Service;
 const logisticsField = require('../field/Logistics');
 
 class LogisticsService extends Service {
+  async find() {
+    const ctx = this.ctx;
+    let body = ctx.request.body || ctx.request.query;
+    let roleList = ['sysDispatcher', 'dispatcher', 'logisticsClerk', 'dispatcherManager'];
+    if (!body.role || roleList.indexOf(body.role) < 0) {
+      // ctx.throw(422, "权限信息获取失败", body);
+      return [];
+    }
+    if (!body.handle) {
+      // ctx.throw(422, "当前公司信息获取失败", body);
+      return [];
+    }
+    let hasRole = await ctx.model.Role.findOne({
+      type: body.role,
+      company: body.handle
+    });
+    if (!hasRole) {
+      // ctx.throw(422, "无查看权限", body);
+      return [];
+    }
+    let limit = Number(body.limit) || 10;
+    let skip = Number(body.skip) || 0;
+    let populate = body.populate || [];
+    delete body.role;
+    delete body.limit;
+    delete body.skip;
+    delete body.populate;
+    let res = [];
+    if (body.limit === 0) {
+      res = await ctx.model.Logistics.find({
+        ...body
+      }).populate(populate).sort({
+        updatedAt: -1
+      })
+    } else {
+      res = await ctx.model.Logistics.find({
+        ...body
+      }).populate(populate).sort({
+        updatedAt: -1
+      }).limit(limit).skip(skip);
+    }
+    return res;
+  }
   async update() {
     const ctx = this.ctx;
     let body = ctx.request.body;
@@ -14,7 +57,7 @@ class LogisticsService extends Service {
     }
     if (logistics.order) {
       let order = await ctx.model.Order.findById(logistics.order);
-      await ctx.service.check.role(['dispatcher', 'sysDispatcher'], order.handle);
+      await ctx.service.check.role(['sysDispatcher', 'dispatcher', 'logisticsClerk', 'dispatcherManager'], order.handle);
     }
     if (body.transportation === 'truck') {
       delete body.ship;
@@ -37,53 +80,55 @@ class LogisticsService extends Service {
   async companyBadge() {
     const ctx = this.ctx;
     let body = ctx.request.body;
+    let roleList = ['sysDispatcher', 'dispatcher', 'logisticsClerk', 'dispatcherManager'];
+    if (!body.role || roleList.indexOf(body.role) < 0) {
+      ctx.throw(422, "权限信息获取失败", body);
+    }
     let res = [];
-    let sysDispatcherRole = await ctx.model.Role.findOne({
-      type: 'sysDispatcher',
+    let companylist = [];
+    let dispatcherRole = await ctx.model.Role.find({
+      type: body.role,
       user: ctx.user._id
     });
-    let companylist = [];
-    if (sysDispatcherRole) {
-      let aggregateCompany = await ctx.model.Logistics.aggregate([{
-        $group: {
-          _id: "$handle",
-          // data: {
-          //   $push: "$$ROOT"
-          // }
-        },
-      }]);
-      aggregateCompany.forEach(item => {
-        companylist.push(item._id);
-      });
-      companylist.push(body.handle);
-    }else{
-      let dispatcherRole = await ctx.model.Role.find({
-        type: 'dispatcher',
-        user: ctx.user._id
-      });
-      let mySet = new Set();
-      for (let i = 0; i < dispatcherRole.length; i++) {
-        let item = dispatcherRole[i];
-        if (item.company) {
-          mySet.add(item.company.toString());
-        }
+    let mySet = new Set();
+    for (let i = 0; i < dispatcherRole.length; i++) {
+      let item = dispatcherRole[i];
+      if (item.company) {
+        mySet.add(item.company.toString());
       }
-      companylist.add(body.handle);
-      companylist = [...mySet];
     }
+    mySet.add(body.handle);
+    companylist = [...mySet];
     let companyData = await ctx.model.Company.find({
-      _id:{
-        $in:companylist
+      _id: {
+        $in: companylist
       }
     });
     for (let i = 0; i < companyData.length; i++) {
-      let item =  JSON.parse(JSON.stringify(companyData[i]));
-      item.badge = await ctx.model.Logistics.count({
-        state: {
-          $nin: [5]
-        },
-        handle: item._id
+      let item = JSON.parse(JSON.stringify(companyData[i]));
+      let hasRole = await ctx.model.Role.findOne({
+        company: item._id,
+        type: body.role,
+        user: ctx.user._id
       });
+      if (hasRole) {
+        let findBody = {
+          state: {
+            $nin: [5]
+          },
+          handle: item._id,
+        };
+        if (body.dispatcherManagerCheck !== undefined) {
+          findBody.dispatcherManagerCheck = body.dispatcherManagerCheck;
+        }
+        if (body.logisticsClerkCheck !== undefined) {
+          findBody.logisticsClerkCheck = body.logisticsClerkCheck;
+        }
+        if (body.checkFail) {
+          findBody.checkFail = body.checkFail;
+        }
+        item.badge = await ctx.model.Logistics.count(findBody);
+      }
       res.push(item);
     }
     return res;

@@ -63,7 +63,7 @@
         <div>
           <el-button type="danger" @click="$emit('update:data', []);dialogVisible = false" size="mini">取消选择</el-button>
           <div style="height:10px"></div>
-          <el-button type="primary" @click="dialogVisible = false" size="mini">确 定</el-button>
+          <el-button type="primary" @click="dialogVisible = false" size="mini">确定选择</el-button>
         </div>
       </div>
     </el-dialog>

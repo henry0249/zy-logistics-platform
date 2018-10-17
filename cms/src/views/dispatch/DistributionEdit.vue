@@ -1,7 +1,12 @@
 <template>
   <loading-box v-model="loadingText" class="body-padding">
     <div class="g-order-body">
-      <div class="my-title">运单{{logistics.no}}详情</div>
+      <div class="my-title">运单<span class="warning" style="font-weight:600">{{logistics.no}}</span>详情</div>
+      <div style="margin-top:15px" v-if="logistics.checkFail">
+        <el-alert :title="`${field.Logistics.checkFail.option[logistics.checkFail]}：${checkFailLog.remark}`" type="error" show-icon :closable="false">
+        </el-alert>
+      </div>
+      <div style="margin-top:15px"></div>
       <goods-table :order="order" :edit="false"></goods-table>
       <el-alert title="运单信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
@@ -41,8 +46,11 @@
       </my-form>
       <div class="flex ac" style="margin-top:15px">
         <!-- <el-button size="small" @click="back()">返回</el-button> -->
+        <div class="info">
+          <i class="el-icon-info"></i> 更新物流单信息将清除该物流单的审核失败状态,即进行新一轮的审核
+        </div>
         <div class="f1"></div>
-        <el-button icon="el-icon-refresh" size="small" type="primary" @click="update">更新物流单信息</el-button>
+        <el-button icon="el-icon-refresh" size="small" type="primary" @click="update" :disabled="!(logistics.dispatcherManagerCheck && logistics.logisticsClerkCheck)">更新物流单信息</el-button>
       </div>
       <el-alert title="物流信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
@@ -53,10 +61,14 @@
     <el-alert style="margin:15px 0" title="运单完成后可结算" type="info" center show-icon :closable="false">
     </el-alert>
     <div class="flex ac" style="margin:15px 0">
-      <el-button size="small" type="danger">删除运单</el-button>
+      <el-button size="small" v-if="logistics.dispatcherManagerCheck && logistics.logisticsClerkCheck" type="danger">删除运单</el-button>
+      <div style="padding-right:10px" v-else>
+        <el-button type="danger" size="small" @click="checkFail">审核失败</el-button>
+      </div>
       <div class="f1"></div>
       <el-button size="small" @click="back()">返回</el-button>
-      <el-button size="small" type="success" @click="finish()">运单完成</el-button>
+      <el-button v-if="logistics.dispatcherManagerCheck && logistics.logisticsClerkCheck" size="small" type="success" @click="finish()">运单完成</el-button>
+      <el-button v-else size="small" type="primary" @click="check">审核通过</el-button>
     </div>
   </loading-box>
 </template>
@@ -91,7 +103,8 @@ export default {
         areaInfo: "",
         remark: ""
       },
-      order: {}
+      order: {},
+      checkFailLog: {}
     };
   },
   methods: {
@@ -134,6 +147,15 @@ export default {
         this.order = await this.$ajax(
           "/order/info/" + this.logistics.order._id
         );
+        if (this.logistics.checkFail) {
+          this.checkFailLog = await this.$ajax.post("/curdLog/findOne", {
+            type: "logisticsCheckFail",
+            logistics: this.logistics._id,
+            sort: {
+              createdAt: -1
+            }
+          });
+        }
       } catch (error) {}
       setTimeout(() => {
         this.loadingText = "";
@@ -160,6 +182,10 @@ export default {
         this.back();
       } catch (error) {}
       this.loadingText = "";
+    },
+    async check() {},
+    async checkFail() {
+      
     }
   },
   created() {

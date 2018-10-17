@@ -10,7 +10,7 @@ class CurdService extends Service {
     } = ctx;
     let acceptObj = {
       'GET': ['find', 'findOne', 'findById'],
-      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete', 'aggregate', 'chart', 'count'],
+      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete', 'aggregate', 'chart', 'count', 'multi'],
       'PUT': ['update'],
       'DELETE': ['delete']
     }
@@ -232,11 +232,7 @@ class CurdService extends Service {
   async delete(model, param) {
     let multi = param.multi || false;
     delete param.multi;
-    // let data = await model.find(param);
     let ctx = this.ctx;
-    // if (data.length === 0) {
-    //   ctx.throw(404, '未找到要删除的数据', param);
-    // }
     function p() {
       return new Promise((res, rej) => {
         model.remove(param, function (err, docs) {
@@ -255,6 +251,10 @@ class CurdService extends Service {
   }
 
   async chart(model, param) {
+    return 'ok';
+  }
+
+  async multi(model, param) {
     return 'ok';
   }
 

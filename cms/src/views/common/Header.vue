@@ -184,9 +184,9 @@ export default {
             this.orderBadge.dispatcher +
             this.orderBadge.dispatcherManager +
             this.orderBadge.logisticsClerk +
-            this.orderBadge.dispatch.dispatcher +
-            this.orderBadge.dispatch.dispatcherManager +
-            this.orderBadge.dispatch.logisticsClerk;
+            this.orderBadge.logistics.dispatcher +
+            this.orderBadge.logistics.dispatcherManager +
+            this.orderBadge.logistics.logisticsClerk;
           this.$set(this.nav, index, item);
         }
         if (item.path === "/settle") {

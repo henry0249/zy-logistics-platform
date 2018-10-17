@@ -13,29 +13,11 @@
     >
       <div slot="header">
         <el-tabs type="card" v-model="logisticsListState">
-          <el-tab-pane name="check">
+          <el-tab-pane :name="key" v-for="(val,key) in roleTabs" :key="key">
             <div slot="label">
-              已审核物流单
-            </div>
-          </el-tab-pane>
-          <el-tab-pane name="dispatcherManagerCheck">
-            <div slot="label">
-              调度经理审核
-            </div>
-          </el-tab-pane>
-          <el-tab-pane name="logisticsClerkCheck">
-            <div slot="label">
-              物流文员审核
-            </div>
-          </el-tab-pane>
-          <el-tab-pane name="dispatcherManagerCheckFail">
-            <div slot="label">
-              未通过调度经理审核的物流单
-            </div>
-          </el-tab-pane>
-          <el-tab-pane name="logisticsClerkCheckFail">
-            <div slot="label">
-              未通过物流文员审核的物流单
+              {{val}}
+              <el-badge :value="orderBadge.logistics[key]" v-if="orderBadge.logistics !== undefined && orderBadge.logistics[key]!==undefined && orderBadge.logistics[key]>0">
+              </el-badge>
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -96,7 +78,14 @@ export default {
   data() {
     return {
       loadingText: "",
-      logisticsListState: "check",
+      logisticsListState: "dispatcherManager",
+      roleTabs: {
+        dispatcherManager: "调度经理审核",
+        logisticsClerk: "物流文员审核",
+        dispatcher: "已审核物流单",
+        dispatcherManagerCheckFail: "未通过调度经理审核的物流单",
+        logisticsClerkCheckFail: "未通过物流文员审核的物流单"
+      },
       companyList: [],
       activeCompany: "",
       tableHeight: 0,
@@ -140,17 +129,6 @@ export default {
     }
   },
   methods: {
-    async getCompanyList() {
-      this.loadingText = "加载中";
-      try {
-        this.companyList = [];
-        this.companyList = await this.$ajax.post("/order/company/badge", {
-          state: this.state,
-          handle: this.activeCompany
-        });
-      } catch (error) {}
-      this.loadingText = "";
-    },
     setFindBody() {
       let body = {
         limit: this.limit,
@@ -158,35 +136,45 @@ export default {
         ...this.searchOption
       };
       let logisticsListState = this.logisticsListState;
-      if (logisticsListState === "check") {
+      if (logisticsListState === "dispatcher") {
         body.dispatcherManagerCheck = true;
         body.logisticsClerkCheck = true;
+        body.role = "dispatcher";
       }
-      if (logisticsListState === "dispatcherManagerCheck") {
+      if (logisticsListState === "dispatcherManager") {
         body.dispatcherManagerCheck = false;
         body.logisticsClerkCheck = false;
+        body.role = "dispatcherManager";
       }
-      if (logisticsListState === "logisticsClerkCheck") {
+      if (logisticsListState === "logisticsClerk") {
         body.dispatcherManagerCheck = true;
         body.logisticsClerkCheck = false;
+        body.role = "logisticsClerk";
       }
       if (logisticsListState === "dispatcherManagerCheckFail") {
         body.dispatcherManagerCheck = false;
         body.logisticsClerkCheck = false;
         body.checkFail = "dispatcherManager";
+        body.role = "dispatcher";
       }
       if (logisticsListState === "logisticsClerkCheckFail") {
         body.dispatcherManagerCheck = true;
         body.logisticsClerkCheck = false;
         body.checkFail = "logisticsClerk";
+        body.role = "dispatcher";
       }
       return body;
     },
     async getData() {
       this.loadingText = "加载中";
       try {
-        this.data = [];
         let body = this.setFindBody();
+        this.data = [];
+        this.companyList = [];
+        this.companyList = await this.$ajax.post(
+          "/logistics/company/badge",
+          body
+        );
         this.data = await this.$ajax.post(`/logistics/find`, body);
       } catch (error) {}
       this.loadingText = "";
@@ -208,7 +196,6 @@ export default {
   },
   async mounted() {
     this.activeCompany = this.handle || this.company._id;
-    await this.getCompanyList();
     await this.getData();
   }
 };

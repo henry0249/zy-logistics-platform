@@ -45,7 +45,6 @@ export default {
       });
       for (const key in val) {
         this.nav.forEach((item, index) => {
-          console.log(item);
           if (item.meta && item.meta.state === key) {
             item.badge = val[key];
           }

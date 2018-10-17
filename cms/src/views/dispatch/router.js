@@ -61,7 +61,7 @@ export default [{
     meta: {
       nav: true,
       desc: '',
-      state: 'Logistics'
+      state: 'logistics'
     },
     children: [{
       path: '/dispatch/logistics/edit/:_id',

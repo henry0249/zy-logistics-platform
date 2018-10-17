@@ -28,7 +28,7 @@
             </loading-box>
           </div>
         </my-form-item>
-        <my-form-item input v-model="order.contactNumber" label="联系电话">
+        <my-form-item input v-model="order.contactNumber" label="联系电话" type="number">
         </my-form-item>
         <div style="width:24%">
           <my-select area :data.sync="order.area" label="送货地址" @change="areaChange"></my-select>

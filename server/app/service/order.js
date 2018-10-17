@@ -491,18 +491,17 @@ class OrderService extends Service {
         state: key,
       });
     }
-    let dispatchRole = {
+    let logisticsRole = {
       dispatcher: '调度专员', //添加物流链,提交配送,确认配送完成
       dispatcherManager: '调度经理', //审核物流单
       logisticsClerk: '物流文员', //审核物流单
     };
-    res.dispatch = {};
-    for (const key in dispatchRole) {
+    res.logistics = {};
+    for (const key in logisticsRole) {
       let roleList = await ctx.model.Role.find({
         type: key,
         user: ctx.user._id
       });
-  
       let mySet = new Set();
       for (let i = 0; i < roleList.length; i++) {
         let item = roleList[i];
@@ -511,7 +510,7 @@ class OrderService extends Service {
         }
       }
       let companyArr = [...mySet];
-      res.dispatch[key] = 0;
+      res.logistics[key] = 0;
       for (let i = 0; i < companyArr.length; i++) {
         let findBody = {
           state: {
@@ -531,7 +530,7 @@ class OrderService extends Service {
           findBody.logisticsClerkCheck = false;
         }
         let count = await ctx.model.Logistics.count(findBody);
-        res.dispatch[key] += count;
+        res.logistics[key] += count;
       }
     }
     return res;

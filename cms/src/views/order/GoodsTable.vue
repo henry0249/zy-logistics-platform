@@ -16,16 +16,16 @@
           {{order.goods.unit || '-'}}
         </div>
         <div v-if="scope.prop === 'count'">
-          <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="order.count"></my-form-item>
+          <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="order.count" type="number"></my-form-item>
         </div>
         <div v-if="scope.prop === 'factoryPrice'">
-          <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="order.factory"></my-form-item>
+          <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="order.factory" type="number"></my-form-item>
         </div>
         <div v-if="scope.prop === 'unitPrice'">
-          <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="order.sell"></my-form-item>
+          <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="order.sell" type="number"></my-form-item>
         </div>
         <div v-if="scope.prop === 'transportPrice'">
-          <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="order.transport"></my-form-item>
+          <my-form-item :disabled="thead[scope.prop].disabled" size="mini" v-model="order.transport" type="number"></my-form-item>
         </div>
         <div v-if="scope.prop === 'totalPrice'">
           {{goodsTotalPrice}}
