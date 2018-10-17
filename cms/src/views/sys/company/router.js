@@ -19,7 +19,8 @@ export default [{
     children: [{
       path: 'edit/:_id',
       name: '公司详情',
-      component: Edit
+      component: Edit,
+      children:[]
     }, ]
   }, {
     path: 'account',

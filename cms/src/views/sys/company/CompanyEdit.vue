@@ -121,8 +121,6 @@
           path,
           query: {
             company: this.startCompanyArr._id,
-            parentPath: this.$route.path,
-            parentName: this.$route.name
           }
         });
       },

@@ -18,7 +18,7 @@
 </template>
 
 <script>
-  import Ship from '../sys/company/COmpanyShip.vue';
+  import Ship from '../sys/company/CompanyShip.vue';
   export default {
     components: {
       Ship
@@ -33,7 +33,6 @@
     },
     methods: {
       async sub() {
-        console.log(this.shipObj);
         try {
           this.loadingText = '修改中...';
           for (const key in this.shipObj) {

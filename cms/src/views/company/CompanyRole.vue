@@ -87,8 +87,8 @@
         let returnIo = true;
         this.roleArr.forEach(item => {
           if (item.type !== 'companyAdmin' && item.area.length === 0 && this.type[item.type]) {
-            this.$message.warn(this.type[item.type] + '地区不能为空');
-            returnIo = false;
+            this.$message.warn('地区不能为空');
+            return returnIo = false;
           }
         });
         return returnIo;
@@ -122,8 +122,8 @@
             let res = await this.$ajax.post('/role/multi', data);
           } catch (error) {}
           this.loadingText = '';
+          await this.getRole();
         }
-        await this.getRole();
       }
     },
     created() {

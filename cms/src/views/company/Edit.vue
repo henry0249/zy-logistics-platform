@@ -45,19 +45,19 @@
         let returnIo = true;
         if (!this.data.name) {
           this.$message.warn("公司名称不能为空");
-          returnIo = false;
+          return returnIo = false;
         } else if (!this.data.nick) {
           this.$message.warn("公司别称不能为空");
-          returnIo = false;
+          return returnIo = false;
         } else if (!this.data.area._id) {
           this.$message.warn("公司地区不能为空");
-          returnIo = false;
+          return returnIo = false;
         } else if (!(/^1[34578]\d{9}$/.test(this.data.mobile))) {
           this.$message.warn("手机号码格式不正确！");
-          returnIo = false;
+          return returnIo = false;
         } else if (!/^(\(\d{3,4}\)|\d{3,4}-|\s)?\d{7,14}$/.test(this.data.tel)) {
           this.$message.warn("公司固话格式不正确！");
-          returnIo = false;
+          return returnIo = false;
         }
         return returnIo;
       },
