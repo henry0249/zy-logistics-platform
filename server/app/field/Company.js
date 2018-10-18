@@ -65,5 +65,10 @@ module.exports = {
     name: '物流链关联公司',
     type: 'ObjectIdArray',
     ref: 'Company'
+  },
+  accountRelationCompany: {
+    name: '账户关联公司',
+    type: 'ObjectIdArray',
+    ref: 'Company'
   }
 }

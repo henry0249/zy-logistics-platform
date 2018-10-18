@@ -177,6 +177,9 @@ export default {
           "/logistics/company/badge",
           body
         );
+        body.state = {
+          $nin: [5]
+        };
         this.data = await this.$ajax.post(`/logistics/find`, body);
       } catch (error) {}
       this.loadingText = "";
@@ -184,6 +187,9 @@ export default {
     async loadmore() {
       let body = this.setFindBody();
       body.skip = this.data.length;
+      body.state = {
+        $nin: [5]
+      };
       return await this.$ajax.post(`/logistics/find`, body);
     },
     toDetail(item, index) {

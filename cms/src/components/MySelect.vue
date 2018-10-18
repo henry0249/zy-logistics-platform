@@ -21,7 +21,7 @@
     <el-dialog append-to-body :title="title||autoTitle" :visible.sync="dialogVisible" width="70%" :top="multi?'7vh':'10vh'">
       <div style="height:55vh;overflow:hidden">
         <div v-if="dialogVisible">
-          <common-table :select="data" :selection="multi" :option="searchOption" :path="path" :thead="thead" height="55vh" style="padding:0" @current-change="selectChange" @selection-change="handleSelectionChange" :currentCompany="currentCompany">
+          <common-table :select="data" :selection="multi" :option="searchOption" :path="path" :thead="thead" height="55vh" style="padding:0" @current-change="selectChange" @selection-change="handleSelectionChange" :currentCompany="currentCompany" :preOption="preOption">
             <my-select-search slot="header" :data.sync="searchOption" :type="selectType"></my-select-search>
             <div slot-scope="scope" v-if="selectType === 'company'">
               <div v-if="scope.prop==='type'">{{companyType2Text(scope.row.type)}}</div>
@@ -106,7 +106,7 @@ export default {
       type: Boolean,
       default: false
     },
-    preSearch: {
+    preOption: {
       type: [Object],
       default() {
         return {};

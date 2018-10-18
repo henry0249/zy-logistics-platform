@@ -574,11 +574,13 @@ class OrderService extends Service {
         }
         if (key === 'dispatcherManager') {
           findBody.dispatcherManagerCheck = false;
+          findBody.logisticsClerkCheck = false;
         }
         if (key === 'logisticsClerk') {
           findBody.dispatcherManagerCheck = true;
           findBody.logisticsClerkCheck = false;
         }
+        console.log(findBody);
         let count = await ctx.model.Logistics.count(findBody);
         res.logistics[key] += count;
       }
