@@ -25,12 +25,20 @@
             </my-form-item>
             <my-form-item select v-model="goods.saleState" filterable label="售卖状态" :options="field.Goods.saleState.option">
             </my-form-item>
+            <div style="width:24%">
+              <my-select label="生产厂商" :preOption="preOption" :data.sync="goods.manufacturer" company></my-select>
+            </div>
+          </div>
+          <div class="jb" style="margin-top:20px;">
+            <my-form-item select v-model="goods.packingType" filterable label="包装类型" :options="field.Goods.packingType.option"></my-form-item>
             <div style="width:24%" class="jb">
-              <my-form-item width="50%" switch v-model="goods.selfDeliverySupport" label="支持自提">
+              <my-form-item width="49%" switch v-model="goods.selfDeliverySupport" label="支持自提">
               </my-form-item>
-              <my-form-item class="flex" style="justify-content: flex-end;" width="50%" switch v-model="goods.freeDelivery" label="包配送费">
+              <my-form-item width="49%" switch v-model="goods.freeDelivery" label="包配送费">
               </my-form-item>
             </div>
+            <div style="width:24%"></div>
+            <div style="width:24%"></div>
           </div>
           <div class="jb" style="margin-top:20px;">
             <div class="flex edit-tag" style="width:24%">
@@ -89,6 +97,11 @@
         disabled: true,
         value: "",
         tableList: [],
+        preOption:{
+          type:{
+            $in:['manufacturer']
+          }
+        },
         thead: {
           area: {
             name: "地区",
@@ -118,6 +131,8 @@
           category: "",
           brand: "",
           saleState: 1,
+          manufacturer: {},
+          packingType:'bag',
           selfDeliverySupport: false,
           freeDelivery: false,
           tag: [],

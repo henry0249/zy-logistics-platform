@@ -18,19 +18,27 @@
             </my-form-item>
           </div>
           <div class="jb" style="margin-top:20px;">
+            <div style="width:24%">
+              <my-select :disabled="!sys" label="所属公司" :data.sync="goods.company" company></my-select>
+            </div>
             <my-form-item select v-model="goods.brand" filterable label="品牌" :options="brandArr">
             </my-form-item>
             <my-form-item select v-model="goods.saleState" filterable label="售卖状态" :options="field.Goods.saleState.option">
             </my-form-item>
             <div style="width:24%">
-              <my-select :disabled="companyDisabled" label="所属公司" :data.sync="goods.company" company></my-select>
+              <my-select label="生产厂商" :preOption="preOption" :data.sync="goods.manufacturer" company></my-select>
             </div>
+          </div>
+          <div class="jb" style="margin-top:20px;">
+            <my-form-item select v-model="goods.packingType" filterable label="包装类型" :options="field.Goods.packingType.option"></my-form-item>
             <div style="width:24%" class="jb">
               <my-form-item width="49%" switch v-model="goods.selfDeliverySupport" label="支持自提">
               </my-form-item>
               <my-form-item width="49%" switch v-model="goods.freeDelivery" label="包配送费">
               </my-form-item>
             </div>
+            <div style="width:24%"></div>
+            <div style="width:24%"></div>
           </div>
           <div class="jb" style="margin-top:20px;">
             <div class="flex edit-tag">
@@ -56,14 +64,14 @@
         </common-alert>
         <my-table size="mini" edit :thead="thead" :data.sync="tableList" index border op opWidth="50px">
           <div slot="op" slot-scope="scope" class="tc" style="width:100%;color:#F56C6C">
-            <i v-if="tableList.length>0" title="删除该地区" class="pointer" @click="delAdr(scope['index'])">
-                                    <icon size="16px">icon-ec1</icon>
-                                  </i>
+            <div v-if="tableList.length>0" title="删除该地区" class="pointer" @click="delAdr(scope['index'])">
+              <icon size="16px">icon-ec1</icon>
+            </div>
           </div>
           <template slot-scope="scope">
-            <my-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" company></my-select>
-            <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
-          </template>
+                <my-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" company></my-select>
+                <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
+</template>
         </my-table>
       </div>
       <div class="tr" style="margin-top:30px">
@@ -87,6 +95,11 @@
         companyDisabled: false,
         disabled: true,
         tableList: [],
+        preOption: {
+          type: {
+            $in: ['manufacturer']
+          }
+        },
         thead: {
           area: {
             name: "地区",
@@ -116,7 +129,9 @@
           spec: "",
           category: "",
           brand: "",
-          saleState: "",
+          saleState: 1,
+          manufacturer: {},
+          packingType: 'bag',
           selfDeliverySupport: false,
           freeDelivery: false,
           tag: [],
@@ -184,6 +199,7 @@
         this.tableList.push(obj);
       },
       async sub() {
+        console.log(!this.goods.manufacturer || !this.goods.manufacturer._id);
         try {
           this.value = "更新中";
           let io = true;
@@ -199,8 +215,14 @@
               freeDelivery: this.goods.freeDelivery,
               tag: this.goods.tag,
               company: this.goods.company._id,
-              detail: this.goods.detail
+              detail: this.goods.detail,
+              packingType: this.goods.packingType,
             };
+            if (!this.goods.manufacturer || !this.goods.manufacturer._id) {
+              delete update.manufacturer;
+            }else{
+              this.$set(update,'manufacturer',this.goods.manufacturer._id);
+            }
             let goods = await this.$api.curd({
               model: "goods",
               curdType: "update",
@@ -236,7 +258,9 @@
               path: "/goods/list"
             });
           }
-        } catch (error) {}
+        } catch (error) {
+          console.log(error);
+        }
         this.value = "";
       },
       tagType(index, arr) {
@@ -296,6 +320,8 @@
             _id: this.$route.params._id,
             populate: [{
               path: "company"
+            },{
+              path: "manufacturer"
             }]
           });
           let goods = {};

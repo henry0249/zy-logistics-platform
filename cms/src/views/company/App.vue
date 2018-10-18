@@ -28,7 +28,7 @@
         activeIndex: 0,
         nav: [],
         initNav: [{
-            name: "公司详情",
+            name: "公司信息",
             icon: "icon-xiangqing",
             path: "/company/edit"
           },

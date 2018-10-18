@@ -3,9 +3,9 @@
     <div class="g-order-create">
       <div class="g-order">
         <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
-          <strong>公司详情</strong>
+          <strong>公司信息</strong>
         </div>
-        <common-alert style="margin:15px 0">公司信息</common-alert>
+        <!-- <common-alert style="margin:15px 0">公司信息</common-alert> -->
         <company-edit v-if="!loadingText" :data.sync="data" :startData="initData"></company-edit>
       </div>
       <div class="tr jb" style="margin-top:30px">

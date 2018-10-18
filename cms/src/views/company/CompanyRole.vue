@@ -34,6 +34,7 @@
           salesman: '业务员', //审核修改订单信息
           salesmanManager: '业务经理', //审核修改订单信息
           tradeClerk: '贸易文员', //添加物流链
+          settle: '结算专员', //打款操作
           dispatcher: '调度专员', //添加物流链,提交配送,确认配送完成
           dispatcherManager: '调度经理', //审核物流单
           logisticsClerk: '物流文员', //审核物流单
