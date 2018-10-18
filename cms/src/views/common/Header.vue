@@ -46,7 +46,6 @@
 </template>
 
 <script>
-import { MessageBox } from "element-ui";
 export default {
   data() {
     return {
@@ -191,7 +190,7 @@ export default {
         }
         if (item.path === "/settle") {
           item.badge =
-            this.orderBadge.documentClerk + this.orderBadge.financialManager;
+            this.orderBadge.documentClerk + this.orderBadge.documentClerkManager || 0;
           this.$set(this.nav, index, item);
         }
       });

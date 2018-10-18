@@ -9,6 +9,15 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Category'
   },
+  packingType: {
+    name: '包装类型',
+    type: 'String',
+    option: {
+      bag: '袋装',
+      bulk: '散装'
+    },
+    default: 'bag'
+  },
   stock: {
     name: '库存',
     type: 'Number',
@@ -54,6 +63,11 @@ module.exports = {
   },
   company: {
     name: '所属公司',
+    type: 'ObjectId',
+    ref: 'Company',
+  },
+  manufacturer: {
+    name: '生产厂商',
     type: 'ObjectId',
     ref: 'Company',
   },

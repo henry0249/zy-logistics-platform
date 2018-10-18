@@ -35,11 +35,11 @@ class OrderService extends Service {
       dispatcher: ['tradeClerk'], //添加物流链,提交配送,确认配送完成
       dispatcherManager: ['dispatcher'], //审核物流单,调度全部结束后进行一次订单审核
       logisticsClerk: ['dispatcherManager'], //审核物流单,调度全部结束后进行一次订单审核
-      documentClerk: ['documentClerk'], //添加贸易链,物流链的结算价格,数量等
-      documentClerkManager: ['documentClerkManager'], //审核单据文员操作,进入结算环节
+      documentClerk: ['logisticsClerk'], //添加贸易链,物流链的结算价格,数量等
+      documentClerkManager: ['documentClerk'], //审核单据文员操作,进入结算环节
       financial: ['documentClerkManager'], //在此状态财务文员能进行批量修改贸易链结算价格,恢复贸易链价格等
     };
-    return await ctx.service.check.role(statePower[order.state], order.handle, msg);
+    return await ctx.service.check.role(statePower[order.state], order.handle, msg, 400);
   }
   async setOrderInfo(payload) {
     const ctx = this.ctx;
@@ -105,18 +105,52 @@ class OrderService extends Service {
           ctx.throw(422, '贸易链未添加', info);
         }
       }
-      if (update.state === 'documentClerk') {
+      if (update.state === 'dispatcherManager') {
         if (body.transportTrains instanceof Array && body.transportTrains.length > 0) {
           body.transportTrains.forEach((item) => {
             if (Number(item.type) !== 2) {
               if (body.transportTrains instanceof Array && item.logistics.length > 0) {
                 item.logistics.forEach((logisticsItem) => {
+                  if (logisticsItem.checkFail) {
+                    ctx.throw(422, '有物流单未通过审核', info);
+                  }
                   if (Number(logisticsItem.state) !== 5) {
-                    ctx.throw(422, '存在未完成的运单', info);
+                    ctx.throw(422, '存在未完成的物流单', info);
                   }
                 });
               } else {
-                ctx.throw(422, '存在未添加运单的物流链节点', info);
+                ctx.throw(422, '物流单未全部完成,或有物流链节点未添加物流单', info);
+              }
+            }
+          });
+        } else {
+          ctx.throw(422, '物流链未添加', info);
+        }
+      }
+      if (update.state === 'documentClerkManager') {
+        if (body.transportTrains instanceof Array && body.transportTrains.length > 0) {
+          body.transportTrains.forEach((item) => {
+            if (Number(item.type) !== 2) {
+              if (body.transportTrains instanceof Array && item.logistics.length > 0) {
+                item.logistics.forEach((logisticsItem) => {
+                  if (Number(logisticsItem.balancePrice) <= 0) {
+                    ctx.throw(422, '物流单结算价格必须大于0', info);
+                  }
+                  if (Number(logisticsItem.balanceCount) <= 0) {
+                    ctx.throw(422, '物流单结算数量必须大于0', info);
+                  }
+                  if (Number(logisticsItem.loss) > Number(logisticsItem.landed)) {
+                    ctx.throw(422, '物流单损耗数量不能大于卸货数量', info);
+                  }
+                  if (Number(logisticsItem.loss) > 0 && !logisticsItem.lossCompany) {
+                    ctx.throw(422, '损耗数量大于0时,损耗承担方必填', info);
+                  }
+                  if (!logisticsItem.balanceCompany) {
+                    ctx.throw(422, '运费承担方必填', info);
+                  }
+                });
+              } else {
+                ctx.throw(422, '物流单未全部完成,或有物流链节点未添加物流单', info);
               }
             }
           });
@@ -261,6 +295,19 @@ class OrderService extends Service {
           ctx.throw(422, '存在未填写 车/船 信息的运单', logisticsItem);
         }
       }
+
+      if (Number(logisticsItem.state) > 1 && Number(logisticsItem.loading) <= 0) {
+        ctx.throw(422, '装货量必须大于0', logisticsItem);
+      }
+
+      if (Number(logisticsItem.state) > 1 && Number(logisticsItem.landed) <= 0) {
+        ctx.throw(422, '卸货量必须大于0', logisticsItem);
+      }
+
+      if (Number(logisticsItem.state) > 1 && Number(logisticsItem.price) <= 0) {
+        ctx.throw(422, '运费单价必须大于0', logisticsItem);
+      }
+
       if (!transportTrains._id) {
         ctx.throw(422, '物流链信息设置错误');
       }
@@ -291,7 +338,7 @@ class OrderService extends Service {
         delete logisticsItem.updatedAt;
         delete logisticsItem._id;
         delete logisticsItem.no;
-        logisticsItem.checkFail = "";
+        // logisticsItem.checkFail = "";
         await ctx.model.Logistics.update({
           _id: logistics_id
         }, logisticsItem);
@@ -447,7 +494,9 @@ class OrderService extends Service {
       ctx.throw(422, '当前订单无法进行审核失败操作');
     }
     let hasRolePower = await ctx.model.Role.findOne({
-      type: order.state
+      type: order.state,
+      user: ctx.user._id,
+      company: order.handle
     });
     if (!hasRolePower) {
       ctx.throw(422, '您无权限审核');
@@ -516,7 +565,8 @@ class OrderService extends Service {
           state: {
             $nin: [5]
           },
-          handle: companyArr[i]
+          handle: companyArr[i],
+          checkFail: ''
         }
         if (key === 'dispatcher') {
           findBody.dispatcherManagerCheck = true;
@@ -719,6 +769,10 @@ class OrderService extends Service {
         path: 'truck'
       }, {
         path: 'ship'
+      }, {
+        path: 'balanceCompany'
+      }, {
+        path: 'lossCompany'
       }]);
     }
     return res;

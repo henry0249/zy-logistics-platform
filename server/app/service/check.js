@@ -47,7 +47,8 @@ class CheckService extends Service {
     }
     let role = await ctx.model.Role.findOne(findOption);
     if (!role) {
-      ctx.throw(code, `您无权限操作,需要${roleField.type.option[type]}权限`);
+      // 需要${roleField.type.option[type]}权限
+      ctx.throw(code, `您无权限操作`);
     }
     return true;
   }

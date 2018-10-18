@@ -12,7 +12,7 @@
       :loadmore="loadmore"
     >
       <div slot="header">
-        <el-tabs type="card" v-model="logisticsListState">
+        <el-tabs type="card" v-model="logisticsListRole">
           <el-tab-pane :name="key" v-for="(val,key) in roleTabs" :key="key">
             <div slot="label">
               {{val}}
@@ -78,7 +78,7 @@ export default {
   data() {
     return {
       loadingText: "",
-      logisticsListState: "dispatcherManager",
+      logisticsListRole: "dispatcherManager",
       roleTabs: {
         dispatcherManager: "调度经理审核",
         logisticsClerk: "物流文员审核",
@@ -107,8 +107,9 @@ export default {
       },
       deep: true
     },
-    logisticsListState(val) {
-      this.getData();
+    async logisticsListRole(val) {
+      await this.$store.dispatch("getOrderBadge");
+      await this.getData();
     }
   },
   computed: {
@@ -133,31 +134,32 @@ export default {
       let body = {
         limit: this.limit,
         handle: this.activeCompany,
-        ...this.searchOption
+        ...this.searchOption,
+        checkFail: ""
       };
-      let logisticsListState = this.logisticsListState;
-      if (logisticsListState === "dispatcher") {
+      let logisticsListRole = this.logisticsListRole;
+      if (logisticsListRole === "dispatcher") {
         body.dispatcherManagerCheck = true;
         body.logisticsClerkCheck = true;
         body.role = "dispatcher";
       }
-      if (logisticsListState === "dispatcherManager") {
+      if (logisticsListRole === "dispatcherManager") {
         body.dispatcherManagerCheck = false;
         body.logisticsClerkCheck = false;
         body.role = "dispatcherManager";
       }
-      if (logisticsListState === "logisticsClerk") {
+      if (logisticsListRole === "logisticsClerk") {
         body.dispatcherManagerCheck = true;
         body.logisticsClerkCheck = false;
         body.role = "logisticsClerk";
       }
-      if (logisticsListState === "dispatcherManagerCheckFail") {
+      if (logisticsListRole === "dispatcherManagerCheckFail") {
         body.dispatcherManagerCheck = false;
         body.logisticsClerkCheck = false;
         body.checkFail = "dispatcherManager";
         body.role = "dispatcher";
       }
-      if (logisticsListState === "logisticsClerkCheckFail") {
+      if (logisticsListRole === "logisticsClerkCheckFail") {
         body.dispatcherManagerCheck = true;
         body.logisticsClerkCheck = false;
         body.checkFail = "logisticsClerk";
@@ -186,11 +188,9 @@ export default {
     },
     toDetail(item, index) {
       if (item._id) {
-        if (this.path) {
-          this.$router.push(`/${this.path}/${item._id}`);
-        } else {
-          this.$router.push(`${this.$route.path}/edit/${item._id}`);
-        }
+        this.$router.push(
+          `${this.$route.path}/edit/${item._id}?role=${this.logisticsListRole}`
+        );
       }
     }
   },

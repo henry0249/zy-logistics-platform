@@ -30,7 +30,7 @@
         <div v-if="data.type==='pool'">{{index}}</div>
         <transport-trains-select v-if="data.type!=='customer'" :businessTrains="data" :logistics="data.logistics" :order="order"></transport-trains-select>
         <div class="f1"></div>
-        <remove-check @remove="remove" v-if="data.type === 'pool'"></remove-check>
+        <remove-check @remove="remove" v-if="data.type !== 'customer'"></remove-check>
       </div>
       <div class="marginBottom">
         <my-select v-if="data.type === 'supplier'" :data.sync="data.company"></my-select>

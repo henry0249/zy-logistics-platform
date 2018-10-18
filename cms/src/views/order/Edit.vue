@@ -1,9 +1,9 @@
 <template>
-  <loading-box v-model="loadingText" class="body-padding body-height">
-    <div class="g-order-body" v-if="!loadingText">
+  <loading-box v-model="loadingText" class="body-padding">
+    <div class="g-order-body" v-if="show">
       <div class="my-title">订单<span style="color:#409EFF;font-weight:600">{{order.no}}</span>{{title}}</div>
       <div style="margin-top:15px" v-if="order.checkFail">
-        <el-alert :title="`${field.Order.checkFail.option[order.checkFail]}：${checkFailLog.remark}`" type="error" show-icon :closable="false">
+        <el-alert :title="`${formatTime(checkFailLog.createdAt)} ${field.Order.checkFail.option[order.checkFail]}：${checkFailLog.remark}`" type="error" show-icon :closable="false">
         </el-alert>
       </div>
       <Info :val="order" :data.sync="orderAsync"></Info>
@@ -81,6 +81,7 @@ export default {
   data() {
     return {
       loadingText: "加载中",
+      show: false,
       orderAsync: {},
       update: {
         businessTrains: [],
@@ -110,6 +111,7 @@ export default {
       } catch (error) {}
       setTimeout(() => {
         this.loadingText = "";
+        this.show = true;
       }, 200);
     },
     getSubmitData() {

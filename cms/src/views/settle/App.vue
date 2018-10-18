@@ -16,7 +16,7 @@
 
 <script>
 import CenterNav from "../common/CenterNav";
-import { settle } from "../common/orderLeftNav.js";
+import router from "./router.js";
 export default {
   components: {
     CenterNav
@@ -31,14 +31,21 @@ export default {
   },
   data() {
     return {
-      nav: [...settle]
+      router: router,
+      nav: []
     };
   },
   methods: {
     setNav(val) {
+      this.nav = [];
+      this.router[0].children.forEach(item => {
+        if (item.meta && item.meta.nav) {
+          this.nav.push(item);
+        }
+      });
       for (const key in val) {
         this.nav.forEach((item, index) => {
-          if (item.state === key) {
+          if (item.meta && item.meta.state === key) {
             item.badge = val[key];
           }
           this.$set(this.nav, index, item);
@@ -53,9 +60,9 @@ export default {
 </script>
 
 <style>
-.order-border{
+.order-border {
   margin: 0 auto;
-  padding: 30px;
+  padding: 2%;
   border: 1px solid #eee;
   border-radius: 4px;
 }

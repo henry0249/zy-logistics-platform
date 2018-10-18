@@ -4,7 +4,7 @@ module.exports = {
     type: 'Array',
     option: {
       common: '客户',
-      shipper: '发货厂商',
+      manufacturer: '生产厂商', //发货厂商
       logistics: '物流公司',
       pool: '联营商',
       transfer: '中转库',

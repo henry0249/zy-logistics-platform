@@ -31,7 +31,8 @@ module.exports = {
     option: {
       dispatcherManager: '调度经理审核未通过',
       logisticsClerk: '物流文员审核未通过',
-    }
+    },
+    default: ""
   },
   order: {
     type: 'ObjectId',
@@ -79,19 +80,28 @@ module.exports = {
   loading: {
     name: '装货数量',
     type: 'Number',
+    default: 0
   },
   landed: {
     name: '卸货数量',
     type: 'Number',
+    default: 0
   },
   price: {
     name: '运费单价',
     type: 'Number',
     require: true,
+    default: 0
+  },
+  balancePrice: {
+    name: '结算价格',
+    type: 'Number',
+    default: 0
   },
   balanceCount: {
     name: '结算数量',
     type: 'Number',
+    default: 0
   },
   balanceCompany: {
     name: '运费承担公司',
@@ -101,6 +111,7 @@ module.exports = {
   loss: {
     name: '损耗数量',
     type: 'Number',
+    default: 0
   },
   lossCompany: {
     name: '损耗承担公司',

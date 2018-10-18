@@ -1,32 +1,67 @@
 import App from './App.vue';
-import FinancialPretrial from './FinancialPretrial.vue';
-import FinancialPretrialEdit from './FinancialPretrialEdit.vue';
-import AccountSettlement from './AccountSettlement.vue';
-import AccountConfirmation from './AccountConfirmation.vue';
+import DocumentClerk from './DocumentClerk.vue';
+import DocumentClerkManager from './DocumentClerkManager.vue';
+import Financial from './Financial.vue';
+import Settle from './Settle.vue';
+import FinancialManager from './FinancialManager.vue';
 
 export default [{
   path: '/settle',
   component: App,
   name: '财务结算',
-  redirect: '/settle/financialPretrial',
+  redirect: '/settle/documentClerk',
   meta: {
     keepAlive: true // 需要被缓存
   },
   children: [{
-    path: 'financialPretrial',
-    component: FinancialPretrial,
-    name: '订单预审',
+    path: '/settle/documentClerk',
+    component: DocumentClerk,
+    name: '单据文员审核',
+    meta: {
+      state: 'documentClerk',
+      nav: true
+    },
+    children: [{
+      path: '/settle/documentClerk/edit/:_id',
+      component: DocumentClerk,
+      name: '单据文员审核订单详情'
+    }]
   }, {
-    path: 'financialPretrial/edit/:_id',
-    component: FinancialPretrialEdit,
-    name: '详情处理',
+    path: '/settle/documentClerkManager',
+    component: DocumentClerkManager,
+    name: '单据主管审核',
+    meta: {
+      state: 'documentClerkManager',
+      nav: true
+    },
+    children: [{
+      path: '/settle/documentClerkManager/edit/:_id',
+      component: DocumentClerkManager,
+      name: '单据主管审核订单详情'
+    }]
   }, {
-    path: 'accountSettlement',
-    component: AccountSettlement,
-    name: '账户结算',
+    path: '/settle/financial',
+    component: Financial,
+    name: '财务文员预审',
+    meta: {
+      state: 'financial',
+      nav: true
+    }
   }, {
-    path: 'accountConfirmation',
-    component: AccountConfirmation,
-    name: '账款确认',
+    path: '/settle/settle',
+    component: Settle,
+    name: '结算专员结算',
+    meta: {
+      state: 'settle',
+      nav: true
+    }
+  }, {
+    path: '/settle/financialManager',
+    component: FinancialManager,
+    name: '财务经理审核',
+    meta: {
+      state: 'dinancialManager',
+      nav: true
+    }
   }]
 }]

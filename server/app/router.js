@@ -38,9 +38,11 @@ module.exports = app => {
     .post('/order/mutilUpdate', checkToken(), 'order.mutilUpdate') //批量修改订单信息
     .post('/order/checkFail', checkToken(), 'order.checkFail') //订单审核失败
     .all('/order/pending/:state', checkToken(), 'order.pending') //获取待处理订单
-    //运单接口
+    //物流单接口
     .get('/logistics/company/badge', checkToken(), 'logistics.companyBadge') //公司运单标记
     .post('/logistics/company/badge', checkToken(), 'logistics.companyBadge') //公司运单标记
+    .post('/logistics/check', checkToken(), 'logistics.check') //物流单审核
+    .post('/logistics/checkFail', checkToken(), 'logistics.checkFail') //物流单审核失败
     //库存接口
     .post('/stock/multi', checkToken(), 'stock.multi') //批量添加库存单
     .post('/stock/simpleStatistics', checkToken(), 'stock.simpleStatistics') //简单的库存统计

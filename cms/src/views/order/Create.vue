@@ -4,6 +4,7 @@
       <div class="order-border">
         <div class="my-title">销售订单</div>
         <Info ref="orderInfo" selectType :data.sync="order"></Info>
+        <div style="margin-top:15px"></div>
         <goods-table :order.sync="order"></goods-table>
       </div>
       <div class="flex ac" style="margin:30px 0">

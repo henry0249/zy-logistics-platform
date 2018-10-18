@@ -1,9 +1,9 @@
 <template>
   <loading-box v-model="loadingText" class="body-padding">
     <div class="g-order-body">
-      <div class="my-title">运单<span class="warning" style="font-weight:600">{{logistics.no}}</span>详情</div>
+      <div class="my-title">物流单<span class="warning" style="font-weight:600">{{logistics.no}}</span>详情</div>
       <div style="margin-top:15px" v-if="logistics.checkFail">
-        <el-alert :title="`${field.Logistics.checkFail.option[logistics.checkFail]}：${checkFailLog.remark}`" type="error" show-icon :closable="false">
+        <el-alert :title="`${formatTime(checkFailLog.createdAt)} ${field.Logistics.checkFail.option[logistics.checkFail]}：${checkFailLog.remark}`" type="error" show-icon :closable="false">
         </el-alert>
       </div>
       <div style="margin-top:15px"></div>
@@ -15,17 +15,17 @@
           <div style="width:24%">
             <my-select label="运输工具" truck :type.sync="logisticsForm.transportation" :data.sync="logisticsForm[logisticsForm.transportation]" placeholder="运输工具"></my-select>
           </div>
-          <my-form-item label="装货数量" v-model="logisticsForm.loading">
+          <my-form-item label="装货数量" v-model="logisticsForm.loading" type="number">
           </my-form-item>
-          <my-form-item label="卸货数量" v-model="logisticsForm.landed">
+          <my-form-item label="卸货数量" v-model="logisticsForm.landed" type="number">
           </my-form-item>
-          <my-form-item label="运费单价" v-model="logisticsForm.price">
+          <my-form-item label="运费单价" v-model="logisticsForm.price" type="number">
           </my-form-item>
         </div>
         <div class="flex ac jb" style="margin-top:15px">
           <my-form-item label="收货人" v-model="logisticsForm.contactName">
           </my-form-item>
-          <my-form-item label="联系电话" v-model="logisticsForm.contactNumber">
+          <my-form-item label="联系电话" v-model="logisticsForm.contactNumber" type="number">
           </my-form-item>
           <my-form-item label="配送时间" datetime size="mini" v-model="logisticsForm.startAt">
           </my-form-item>
@@ -47,10 +47,11 @@
       <div class="flex ac" style="margin-top:15px">
         <!-- <el-button size="small" @click="back()">返回</el-button> -->
         <div class="info">
-          <i class="el-icon-info"></i> 更新物流单信息将清除该物流单的审核失败状态,即进行新一轮的审核
+          <i class="el-icon-info"></i>
+          如果物流单出于审核失败状态,更新信息可重新进行审核流程
         </div>
         <div class="f1"></div>
-        <el-button icon="el-icon-refresh" size="small" type="primary" @click="update" :disabled="!(logistics.dispatcherManagerCheck && logistics.logisticsClerkCheck)">更新物流单信息</el-button>
+        <el-button icon="el-icon-refresh" size="small" type="primary" @click="update" :disabled="$route.query.role === 'dispatcherManager'">更新物流单信息</el-button>
       </div>
       <el-alert title="物流信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
@@ -63,12 +64,12 @@
     <div class="flex ac" style="margin:15px 0">
       <el-button size="small" v-if="logistics.dispatcherManagerCheck && logistics.logisticsClerkCheck" type="danger">删除运单</el-button>
       <div style="padding-right:10px" v-else>
-        <el-button type="danger" size="small" @click="checkFail">审核失败</el-button>
+        <el-button type="danger" size="small" @click="checkFail"  :disabled="!($route.query.role === 'dispatcherManager' || $route.query.role === 'logisticsClerk')">审核失败</el-button>
       </div>
       <div class="f1"></div>
       <el-button size="small" @click="back()">返回</el-button>
       <el-button v-if="logistics.dispatcherManagerCheck && logistics.logisticsClerkCheck" size="small" type="success" @click="finish()">运单完成</el-button>
-      <el-button v-else size="small" type="primary" @click="check">审核通过</el-button>
+      <el-button v-else size="small" type="primary" @click="check" :disabled="!($route.query.role === 'dispatcherManager' || $route.query.role === 'logisticsClerk')">审核通过</el-button>
     </div>
   </loading-box>
 </template>
@@ -78,6 +79,12 @@ import Info from "../order/Info.vue";
 import GoodsTable from "../order/GoodsTable.vue";
 import DistributionMap from "./DistributionMap.vue";
 export default {
+  props: {
+    currentRole: {
+      type: String,
+      default: ""
+    }
+  },
   components: {
     Info,
     GoodsTable,
@@ -169,11 +176,13 @@ export default {
           ...this.logisticsForm
         });
         await this.getOrderInfo();
+        this.$message.success("修改成功");
       } catch (error) {}
       this.loadingText = "";
     },
     async finish() {
       this.logisticsForm.state = 5;
+      this.loadingText = "正在修改";
       try {
         let res = await this.$ajax.post("/logistics/update", {
           _id: this.$route.params._id,
@@ -183,9 +192,38 @@ export default {
       } catch (error) {}
       this.loadingText = "";
     },
-    async check() {},
+    async check() {
+      this.loadingText = "正在修改";
+      try {
+        await this.$ajax.post("/logistics/check", {
+          logistics: this.$route.params._id,
+          role: this.$route.query.role
+        });
+        this.$message.success("审核成功");
+        this.back();
+      } catch (error) {}
+      this.loadingText = "";
+    },
     async checkFail() {
-      
+      this.$prompt("请输入审核失败原因", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputErrorMessage: "失败原因不能为空",
+        inputPattern: /\S/
+      })
+        .then(async ({ value }) => {
+          this.loadingText = "提交中";
+          try {
+            await this.$ajax.post("/logistics/checkFail", {
+              logistics: this.$route.params._id,
+              role: this.$route.query.role,
+              text: value
+            });
+            this.back();
+          } catch (error) {}
+          this.loadingText = "";
+        })
+        .catch(() => {});
     }
   },
   created() {

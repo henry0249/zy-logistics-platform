@@ -1,11 +1,25 @@
 const Service = require('egg').Service;
 const logisticsField = require('../field/Logistics');
+const roleList = ['sysDispatcher', 'dispatcher', 'logisticsClerk', 'dispatcherManager'];
 
 class LogisticsService extends Service {
+  obj2id(obj) {
+    for (const key in obj) {
+      if (JSON.stringify(obj[key]) === '{}') {
+        delete obj[key];
+      }
+      if (obj[key] === '' || obj[key] === null) {
+        delete obj[key];
+      }
+      if (obj[key] && obj[key]._id) {
+        obj[key] = obj[key]._id;
+      }
+    }
+    return obj;
+  }
   async find() {
     const ctx = this.ctx;
     let body = ctx.request.body || ctx.request.query;
-    let roleList = ['sysDispatcher', 'dispatcher', 'logisticsClerk', 'dispatcherManager'];
     if (!body.role || roleList.indexOf(body.role) < 0) {
       // ctx.throw(422, "权限信息获取失败", body);
       return [];
@@ -24,7 +38,17 @@ class LogisticsService extends Service {
     }
     let limit = Number(body.limit) || 10;
     let skip = Number(body.skip) || 0;
-    let populate = body.populate || [];
+    let populate = body.populate || [{
+      path: 'ship'
+    }, {
+      path: 'truck'
+    }, {
+      path: 'truck'
+    }, {
+      path: 'balanceCompany'
+    }, {
+      path: 'lossCompany'
+    }];
     delete body.role;
     delete body.limit;
     delete body.skip;
@@ -55,10 +79,6 @@ class LogisticsService extends Service {
     if (!logistics) {
       ctx.throw(404, "运单不存在", body);
     }
-    if (logistics.order) {
-      let order = await ctx.model.Order.findById(logistics.order);
-      await ctx.service.check.role(['sysDispatcher', 'dispatcher', 'logisticsClerk', 'dispatcherManager'], order.handle);
-    }
     if (body.transportation === 'truck') {
       delete body.ship;
     }
@@ -74,13 +94,14 @@ class LogisticsService extends Service {
     delete body._id;
     delete body.updatedAt;
     delete body.createdAt;
+    this.obj2id(body);
+    body.checkFail = '';
     await logistics.update(body);
     return 'ok';
   }
   async companyBadge() {
     const ctx = this.ctx;
     let body = ctx.request.body;
-    let roleList = ['sysDispatcher', 'dispatcher', 'logisticsClerk', 'dispatcherManager'];
     if (!body.role || roleList.indexOf(body.role) < 0) {
       ctx.throw(422, "权限信息获取失败", body);
     }
@@ -117,6 +138,7 @@ class LogisticsService extends Service {
             $nin: [5]
           },
           handle: item._id,
+          checkFail: ''
         };
         if (body.dispatcherManagerCheck !== undefined) {
           findBody.dispatcherManagerCheck = body.dispatcherManagerCheck;
@@ -132,6 +154,91 @@ class LogisticsService extends Service {
       res.push(item);
     }
     return res;
+  }
+  async check() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    if (!body.logistics) {
+      ctx.throw(422, "物流单信息未找到", body);
+    }
+    if (!body.role || roleList.indexOf(body.role) < 0) {
+      ctx.throw(422, "无操作权限", body);
+    }
+    let logistics = await ctx.model.Logistics.findById(body.logistics);
+    if (!logistics) {
+      ctx.throw(404, "物流单信息未找到", body);
+    }
+    let role = "";
+    if (body.role === 'dispatcherManager' || body.role === 'logisticsClerk') {
+      role = await ctx.model.Role.findOne({
+        type: body.role,
+        user: ctx.user._id
+      });
+    } else {
+      ctx.throw(422, "无操作权限", body);
+    }
+    if (!role) {
+      ctx.throw(422, "无操作权限", body);
+    }
+    if (role.type === 'dispatcherManager') {
+      if (logistics.dispatcherManagerCheck) {
+        ctx.throw(422, "该物流单已经被审核,请勿重复审核", body);
+      }
+      await logistics.update({
+        dispatcherManagerCheck: true,
+        logisticsClerkCheck: false,
+        checkFail: ''
+      });
+    }
+    if (role.type === 'logisticsClerk') {
+      if (logistics.logisticsClerkCheck) {
+        ctx.throw(422, "该物流单已经被审核,请勿重复审核", body);
+      }
+      await logistics.update({
+        dispatcherManagerCheck: true,
+        logisticsClerkCheck: true,
+        checkFail: ''
+      });
+    }
+    return 'ok';
+  }
+  async checkFail() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    if (!body.logistics) {
+      ctx.throw(422, '物流单信息未找到');
+    }
+    if (!body.role || ['dispatcherManager', 'logisticsClerk'].indexOf(body.role) < 0) {
+      ctx.throw(422, "无操作权限", body);
+    }
+    let logistics = await ctx.model.Logistics.findById(body.logistics);
+    if (!logistics) {
+      ctx.throw(404, '物流单信息未找到');
+    }
+    let hasRolePower = await ctx.model.Role.findOne({
+      type: body.role,
+      user: ctx.user._id,
+      company: logistics.handle
+    });
+    if (!hasRolePower) {
+      ctx.throw(422, '您无权限审核');
+    }
+    if (!body.text) {
+      ctx.throw(422, '审核失败原因必填');
+    }
+    await logistics.update({
+      [body.role]: false,
+      checkFail: body.role
+    });
+    let curdLog = new ctx.model.CurdLog({
+      type: 'logisticsCheckFail',
+      user: ctx.user._id,
+      company: logistics.handle,
+      logistics: logistics._id,
+      remark: body.text
+    });
+    await curdLog.save();
+    return 'ok';
   }
 }
 module.exports = LogisticsService;
