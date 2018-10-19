@@ -65,16 +65,18 @@
               </my-form-item>
               <my-form-item v-if="scope.prop==='balanceCount'" v-model="scope.row.balanceCount" size="mini" type="number" min="0">
               </my-form-item>
-              <el-tooltip v-if="scope.prop==='balanceCompany'" effect="dark" content="仅可从本公司关联的公司中选择" placement="top">
+              <relation-company v-if="scope.prop==='balanceCompany' && order._id" :order="order" :data.sync="scope.row.balanceCompany" business tranport :append="scope.row[scope.row.transportation] && scope.row[scope.row.transportation].company"></relation-company>
+              <!-- <el-tooltip v-if="scope.prop==='balanceCompany'" effect="dark" content="仅可从本公司关联的公司中选择" placement="top">
                 <my-form-item size="mini" v-model="scope.row.balanceCompany" select :options="companySelectList">
                 </my-form-item>
-              </el-tooltip>
+              </el-tooltip> -->
               <my-form-item v-if="scope.prop==='loss'" v-model="scope.row.loss" size="mini" type="number" min="0">
               </my-form-item>
-              <el-tooltip v-if="scope.prop==='lossCompany'" effect="dark" content="仅可从本公司关联的公司中选择" placement="top">
+              <!-- <el-tooltip v-if="scope.prop==='lossCompany'" effect="dark" content="仅可从本公司关联的公司中选择" placement="top">
                 <my-form-item size="mini" v-model="scope.row.lossCompany" select :options="companySelectList">
                 </my-form-item>
-              </el-tooltip>
+              </el-tooltip> -->
+              <relation-company v-if="scope.prop==='lossCompany' && order._id" :order="order" :data.sync="scope.row.lossCompany" business tranport :append="scope.row[scope.row.transportation] && scope.row[scope.row.transportation].company"></relation-company>
               <my-form-item v-if="scope.prop==='startAt'" v-model="scope.row.startAt" size="mini" datetime>
               </my-form-item>
               <my-form-item v-if="scope.prop==='finishAt'" v-model="scope.row.finishAt" size="mini" datetime>
@@ -121,9 +123,11 @@
 <script>
 import { logistics, logisticsTable } from "../dispatch/field";
 import TransportTrainsCard from "./TransportTrainsCard";
+import RelationCompany from "./RelationCompany";
 export default {
   components: {
-    TransportTrainsCard
+    TransportTrainsCard,
+    RelationCompany
   },
   props: {
     order: {
@@ -263,10 +267,10 @@ export default {
         areaType: 1,
         type: 1,
         area: {},
-        company: {},
+        company: "",
         logistics: [],
         areaArr: [],
-        template_id: new Date()
+        template_id: new Date().getTime()
       });
     },
     async remove(item, index) {
@@ -366,7 +370,7 @@ export default {
         area: this.order.handle && this.order.handle.area,
         company: this.order.handle,
         logistics: [],
-        template_id: new Date()
+        template_id: new Date().getTime()
       };
       firstItem.areaInfo = this.areaInfo(firstItem);
       this.trains.push(firstItem);
@@ -376,7 +380,7 @@ export default {
         area: this.order.area,
         logistics: [],
         [this.order.type]: this.order[this.order.type],
-        template_id: new Date()
+        template_id: new Date().getTime() + 1
       };
       lastItem.areaInfo = this.areaInfo(lastItem);
       this.trains.push(lastItem);

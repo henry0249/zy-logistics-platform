@@ -4,6 +4,7 @@ module.exports = {
     name: '类型',
     type: 'String',
     option: {
+      broker: '经纪人', //公司经纪人,区域划分,有提成信息
       salesman: '业务员', //审核修改订单信息
       salesmanManager: '业务经理', //审核修改订单信息
       tradeClerk: '贸易文员', //添加物流链
@@ -19,7 +20,6 @@ module.exports = {
       sysAdmin: '系统管理员',
       sysSalesman: '系统业务员',
       sysDispatcher: '系统调度员',
-      broker: '经纪人',
       truck: '货车司机',
       ship: '货船船员',
     }
@@ -54,4 +54,8 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'Area'
   },
+  bonus: {
+    name: '经纪人提成',
+    type: 'Number', // 0 - 100,代表百分比
+  }
 }

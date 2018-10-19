@@ -31,7 +31,7 @@
             <div class="hide-baidu">
               <div class="flex ac" style="padding:10px 0">
                 <div class="f1"></div>
-                <el-button size="mini" type="primary" icon="el-icon-refresh" @click="setPoint">刷新</el-button>
+                <!-- <el-button size="mini" type="primary" icon="el-icon-refresh" @click="setPoint">刷新</el-button> -->
               </div>
             </div>
           </baidu-map>

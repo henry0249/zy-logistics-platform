@@ -35,3 +35,4 @@ module.exports = {
     require: true,
   }
 }
+//修改后保存记录,做价格曲线

@@ -36,7 +36,7 @@ module.exports = {
     type: 'String',
     name: '审核未通过状态',
     option: {
-      salesman:'业务员审核未通过',
+      salesman: '业务员审核未通过',
       salesmanManager: '业务经理审核未通过',
       tradeClerk: '贸易文员审核未通过',
       dispatcher: '调度专员调度未通过',
@@ -154,14 +154,15 @@ module.exports = {
     name: '运输单单价',
     type: 'Number',
   },
-  brokerTemporary: {
-    name: '临时经纪人',
+  broker: {
+    name: '经纪人',
+    type: 'ObjectId',
+    ref: 'Broker'
+  },
+  recommender: { //原临时经纪人
+    name: '推荐人',
     type: 'ObjectId',
     ref: 'User'
-  },
-  temporaryBrokerBonus: {
-    name: '临时经纪人提成',
-    type: 'Number',
   },
   businessTrains: {
     name: '贸易链',

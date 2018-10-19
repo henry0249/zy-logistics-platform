@@ -21,7 +21,8 @@
       <div v-if="Number(data.type)===1">
         <div class="marginBottom">
           <my-form-item v-if="Number(data.areaType) === 0" size="mini" text value="根据实际地址自行选择"></my-form-item>
-          <my-form-item v-if="Number(data.areaType) === 1" select v-model="data.company" :options="order.handle.businessRelationCompany || []" size="mini" @change="companyChange" label="公司" placeholder="请选择关联公司"></my-form-item>
+          <relation-company v-if="Number(data.areaType) === 1 && order._id" :order="order" :data.sync="data.company" @change="companyChange" label="公司" transport></relation-company>
+          <!-- <my-form-item v-if="Number(data.areaType) === 1" select v-model="data.company" :options="order.handle.businessRelationCompany || []" size="mini" @change="companyChange" label="公司" placeholder="请选择关联公司"></my-form-item> -->
         </div>
         <el-tooltip key="areaType0" v-if="Number(data.areaType) === 0" effect="dark" :content="areaInfo(data)" placement="top">
           <al-cascader v-model="data.areaArr" size="small" />
@@ -43,7 +44,11 @@
 </template>
 
 <script>
+import RelationCompany from "./RelationCompany";
 export default {
+  components: {
+    RelationCompany
+  },
   props: {
     index: {
       type: Number,
@@ -125,24 +130,7 @@ export default {
       this.data.areaType = val;
     },
     companyChange(val) {
-      let res = {};
-      if (this.data.areaType === 1) {
-        this.order.handle.businessRelationCompany.forEach(item => {
-          if (item._id === val) {
-            res = item;
-          }
-        });
-      }
-      if (this.data.areaType === 2) {
-        this.order.businessTrains.forEach(item => {
-          if (item.type === "pool") {
-            if (item.company._id === val) {
-              res = item.company;
-            }
-          }
-        });
-      }
-      this.data.area = res.area;
+      this.data.area = val.area;
     },
     remove() {
       this.$emit("remove", this.data);

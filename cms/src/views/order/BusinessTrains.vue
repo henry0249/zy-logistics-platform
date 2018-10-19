@@ -35,6 +35,7 @@
 </template>
 
 <script>
+//贸易链主导公司颜色标识
 import { businessTrains } from "./field";
 import BusinessTrainsCard from "./BusinessTrainsCard";
 export default {
@@ -120,7 +121,11 @@ export default {
       }
     },
     addToStart() {
-      if (!this.data[0].company) {
+      if (this.data.length === 0) {
+        this.$message.warn(`物流链尚未添加`);
+        return;
+      }
+      if (!this.data[0].company || !this.data[1].company) {
         this.$message.warn(`节点中有公司未选择`);
         return;
       }
@@ -138,7 +143,7 @@ export default {
         loss: 0,
         remark: "",
         logistics: [],
-        template_id: new Date()
+        template_id: new Date().getTime()
       });
     },
     add() {
@@ -204,12 +209,12 @@ export default {
         receive: this.order.count,
         remark: "",
         logistics: [],
-        template_id: new Date()
       };
       if (this.data.length === 0) {
         this.data.push({
           ...body,
           type: "supplier",
+          template_id: new Date().getTime(),
           company: this.order.goods.company
         });
         // this.data.push({
@@ -219,11 +224,16 @@ export default {
         // });
         this.data.push({
           ...body,
+          template_id: new Date().getTime()+1,
           type: "customer",
           [this.order.type]: this.order[this.order.type],
           customerType: this.order.type
         });
       } else {
+        if (!this.data[0].company) {
+          this.$message.warn(`节点中有公司未选择`);
+          return;
+        }
         if (!this.data[this.data.length - 1 - 1].company) {
           this.$message.warn(`节点中有公司未选择`);
           return;
@@ -235,7 +245,8 @@ export default {
           supplyPrice: this.data[this.data.length - 1 - 1].supplyPrice,
           supplyCount: this.data[this.data.length - 1 - 1].supplyCount,
           preBalancePrice: this.data[this.data.length - 1 - 1].supplyPrice,
-          balanceCount: this.data[this.data.length - 1 - 1].supplyCount
+          balanceCount: this.data[this.data.length - 1 - 1].supplyCount,
+          template_id: new Date().getTime()
         });
       }
     },

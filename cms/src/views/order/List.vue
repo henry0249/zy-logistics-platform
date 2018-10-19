@@ -151,7 +151,6 @@ export default {
         if (this.path) {
           this.$router.push(`/${this.path}/${item._id}`);
         } else {
-          console.log(`${this.$route.path}/edit/${item._id}`);
           this.$router.push(`${this.$route.path}/edit/${item._id}`);
         }
       }

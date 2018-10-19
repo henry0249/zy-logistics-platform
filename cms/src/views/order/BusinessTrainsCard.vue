@@ -33,11 +33,7 @@
         <remove-check @remove="remove" v-if="data.type !== 'customer'"></remove-check>
       </div>
       <div class="marginBottom">
-        <my-select v-if="data.type === 'supplier'" :data.sync="data.company"></my-select>
-        <el-tooltip v-if="data.type === 'pool'" effect="dark" content="仅可从本公司关联的贸易公司中选择" placement="top">
-          <my-form-item v-if="order.handle" size="mini" v-model="data.company" select :options="order.handle.businessRelationCompany || []">
-          </my-form-item>
-        </el-tooltip>
+        <relation-company v-if="order._id && data.type !== 'customer'" business :order="order" :data.sync="data.company"></relation-company>
         <my-select v-if="data.type === 'customer'" :data.sync="data[data.customerType]" disabled></my-select>
       </div>
       <div v-if="data.type === 'supplier'">
@@ -88,9 +84,11 @@
 
 <script>
 import TransportTrainsSelect from "./TransportTrainsSelect";
+import RelationCompany from "./RelationCompany";
 export default {
   components: {
-    TransportTrainsSelect
+    TransportTrainsSelect,
+    RelationCompany
   },
   props: {
     index: {

@@ -78,5 +78,10 @@ module.exports = {
   detail: {
     name: '详情',
     type: 'String'
+  },
+  recommenderBonus: {
+    name: '推荐人提成',
+    type: 'Number',
+    default: 0 // 0 - 100,代表百分比
   }
 }

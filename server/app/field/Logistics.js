@@ -181,3 +181,5 @@ module.exports = {
     ref: 'BusinessTrains'
   }
 }
+
+//进入审核条件 运输工具和运输单价都填完整,审核后不能修改

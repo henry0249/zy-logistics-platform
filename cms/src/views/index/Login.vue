@@ -6,13 +6,13 @@
           <img :src="boxImg" alt="">
           <div style="margin:6px 5px">
             <div style="padding-top:10px;font-size:20px">
-              中源物流
+              中源西江
             </div>
             <div style="margin:10px 0;width:20px;height:1px;background:#fff">
             </div>
           </div>
           <div style="padding-top:5px">
-            <button v-ripple class="my-index-btn">一站式物流平台</button>
+            <button v-ripple class="my-index-btn">一站式供应链平台</button>
           </div>
         </div>
         <div class="col-flex" style="min-width:280px">

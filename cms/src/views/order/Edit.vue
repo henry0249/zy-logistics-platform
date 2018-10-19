@@ -18,7 +18,7 @@
     </el-alert>
     <div class="flex ac" style="margin:15px 0">
       <div style="padding-right:10px" v-if="order.state !== 'salesman'">
-        <el-button type="danger" size="small" @click="checkFail">审核失败</el-button>
+        <el-button type="danger" size="small" @click="checkFail">回退修改</el-button>
       </div>
       <slot name="toolLeft"></slot>
       <div class="f1"></div>
@@ -143,10 +143,10 @@ export default {
       this.loadingText = "";
     },
     checkFail() {
-      this.$prompt("请输入审核失败原因", "提示", {
+      this.$prompt("请输入回退原因", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        inputErrorMessage:'失败原因不能为空',
+        inputErrorMessage:'原因不能为空',
         inputPattern: /\S/
       })
         .then(async ({ value }) => {

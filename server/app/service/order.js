@@ -718,7 +718,17 @@ class OrderService extends Service {
       populate: [{
         path: 'brand'
       }, {
-        path: 'company'
+        path: 'company',
+        populate: [{
+          path: 'area',
+          populate: areaPopulate
+        }]
+      }, {
+        path: 'manufacturer',
+        populate: [{
+          path: 'area',
+          populate: areaPopulate
+        }]
       }]
     }, {
       path: 'area',
@@ -768,9 +778,15 @@ class OrderService extends Service {
       item.logistics = await ctx.model.Logistics.find({
         transportTrains: item._id
       }).populate([{
-        path: 'truck'
+        path: 'truck',
+        populate: [{
+          path:'company'
+        }]
       }, {
-        path: 'ship'
+        path: 'ship',
+        populate: [{
+          path:'company'
+        }]
       }, {
         path: 'balanceCompany'
       }, {

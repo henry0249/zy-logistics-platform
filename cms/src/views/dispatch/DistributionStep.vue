@@ -45,7 +45,7 @@
     <div class="flex ac" style="padding:10px 0">
       <el-button :disabled="stepData.length===0" @click="edit=!edit" size="mini" type="primary" :icon="edit?'el-icon-back':'el-icon-edit'">{{edit?'退出编辑':'编辑'}}</el-button>
       <div class="f1"></div>
-      <el-button :disabled="stepData.length===0" @click="save" size="mini" type="success" icon="el-icon-refresh">更新物流</el-button>
+      <el-button :disabled="stepData.length===0" @click="save" size="mini" type="success" icon="el-icon-refresh">保存运输状态信息</el-button>
     </div>
   </loading-box>
 </template>
