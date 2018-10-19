@@ -566,7 +566,19 @@ class OrderService extends Service {
             $nin: [5]
           },
           handle: companyArr[i],
-          checkFail: ''
+          checkFail: '',
+          price: {
+            $gt: 0
+          },
+          $or: [{
+            ship: {
+              $exists: true
+            }
+          }, {
+            truck: {
+              $exists: true
+            }
+          }]
         }
         if (key === 'dispatcher') {
           findBody.dispatcherManagerCheck = true;
@@ -580,7 +592,6 @@ class OrderService extends Service {
           findBody.dispatcherManagerCheck = true;
           findBody.logisticsClerkCheck = false;
         }
-        console.log(findBody);
         let count = await ctx.model.Logistics.count(findBody);
         res.logistics[key] += count;
       }
@@ -780,12 +791,12 @@ class OrderService extends Service {
       }).populate([{
         path: 'truck',
         populate: [{
-          path:'company'
+          path: 'company'
         }]
       }, {
         path: 'ship',
         populate: [{
-          path:'company'
+          path: 'company'
         }]
       }, {
         path: 'balanceCompany'

@@ -53,13 +53,13 @@
                 <div v-else style="color:#ccc">未生成</div>
               </div>
               <div v-if="scope.prop==='transportation'">
-                <my-select truck :type.sync="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]" placeholder="运输工具" @change="transportationChange($event,scope.row)"></my-select>
+                <my-select truck :type.sync="scope.row.transportation" :data.sync="scope.row[scope.row.transportation]" placeholder="运输工具" @change="transportationChange($event,scope.row)" :disabled="scope.row.dispatcherManagerCheck"></my-select>
               </div>
               <my-form-item v-if="scope.prop==='loading'" v-model="scope.row.loading" size="mini" type="number" min="0">
               </my-form-item>
               <my-form-item v-if="scope.prop==='landed'" v-model="scope.row.landed" size="mini" type="number" min="0">
               </my-form-item>
-              <my-form-item v-if="scope.prop==='price'" v-model="scope.row.price" size="mini" type="number" min="0">
+              <my-form-item v-if="scope.prop==='price'" v-model="scope.row.price" size="mini" type="number" min="0" :disabled="scope.row.dispatcherManagerCheck">
               </my-form-item>
               <my-form-item v-if="scope.prop==='balancePrice'" v-model="scope.row.balancePrice" size="mini" type="number" min="0">
               </my-form-item>

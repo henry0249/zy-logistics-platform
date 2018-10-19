@@ -8,9 +8,9 @@ module.exports = appInfo => {
   config.jwtKey = 'bymm_jwt';
 
   //登录有效时长
-  config.loginExp = 24 * 60 * 60 * 1000;
+  config.loginExp = 24 * 60 * 60 * 1000; //24个小时
   //token有效时长
-  config.tokenExp = 2 * 60 * 60 * 1000;
+  config.tokenExp = 2 * 60 * 60 * 1000; //2个小时
 
   // 中间件配置
   config.middleware = ['errorHandler'];

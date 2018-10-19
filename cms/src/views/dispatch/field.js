@@ -96,7 +96,7 @@ module.exports = {
       slot: true,
     },
     price: {
-      name: '运费单价',
+      name: '运输单价',
       type: 'Number',
       slot: true,
     },

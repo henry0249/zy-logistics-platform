@@ -138,7 +138,19 @@ class LogisticsService extends Service {
             $nin: [5]
           },
           handle: item._id,
-          checkFail: ''
+          checkFail: '',
+          price: {
+            $gt: 0
+          },
+          $or: [{
+            ship: {
+              $exists: true
+            }
+          }, {
+            truck: {
+              $exists: true
+            }
+          }]
         };
         if (body.dispatcherManagerCheck !== undefined) {
           findBody.dispatcherManagerCheck = body.dispatcherManagerCheck;

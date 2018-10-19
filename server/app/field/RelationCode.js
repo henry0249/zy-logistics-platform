@@ -17,13 +17,19 @@ module.exports = {
     name: '代码值',
     type: 'String'
   },
-  expirationAt: {
-    name: '有效期至',
-    type: 'Date'
+  expiration: {
+    name: '有效时长',
+    type: 'Number',
+    default: 7 * 24 * 60 * 60 * 1000 //7天
   },
   company: {
-    name: '关联公司',
+    name: '生成关联代码的公司',
     type: 'ObjectId',
+    ref: 'Company'
+  },
+  relation: {
+    name: '使用此代码的公司',
+    type: 'ObjectIdArray',
     ref: 'Company'
   }
 }

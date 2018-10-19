@@ -52,6 +52,18 @@
         <div v-if="scope.prop==='landed'">
           {{scope.row.landed}}
         </div>
+        <div v-if="scope.prop==='price'">
+          {{scope.row.price}}
+        </div>
+        <div v-if="scope.prop==='startAt'">
+          {{scope.row.startAt?  formatTime(scope.row.startAt) : '-'}}
+        </div>
+        <div v-if="scope.prop==='finishAt'">
+          {{scope.row.finishAt?  formatTime(scope.row.finishAt) : '-'}}
+        </div>
+        <div v-if="scope.prop==='total'">
+          {{Number(scope.row.price) * Number(scope.row.landed)}}
+        </div>
         <div v-if="scope.prop==='state'">
           {{field.Logistics.state.option[scope.row.state]}}
         </div>
@@ -135,7 +147,22 @@ export default {
         limit: this.limit,
         handle: this.activeCompany,
         ...this.searchOption,
-        checkFail: ""
+        checkFail: "",
+        price: {
+          $gt: 0
+        },
+        $or: [
+          {
+            ship: {
+              $exists: true
+            }
+          },
+          {
+            truck: {
+              $exists: true
+            }
+          }
+        ]
       };
       let logisticsListRole = this.logisticsListRole;
       if (logisticsListRole === "dispatcher") {
