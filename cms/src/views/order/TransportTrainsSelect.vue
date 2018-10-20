@@ -12,7 +12,7 @@
           <div class="hor-scroll-item" v-for="(item,index) in transportTrainsArr" :key="index">
             <div class="flex ac">
               <div :class="{'select-item':index!==0,active:item._id === currentTransportTrains}" @click="changeTransportTrains(item,index)">
-                {{areaInfo(item)}}
+                {{item.areaInfo}}
               </div>
               <div v-if="index!==transportTrainsArr.length-1" class="tc" style="width:40px">
                 <i class="el-icon-d-arrow-right success"></i>

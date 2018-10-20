@@ -307,7 +307,7 @@ export default {
       logistics.push({
         loading: 0,
         landed: 0,
-        price: 0,
+        price: this.order.transport || 0,
         balancePrice: 0,
         balanceCount: 0,
         balanceCompany: "",

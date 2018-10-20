@@ -4,6 +4,7 @@ const companyField = require('../field/Company');
 class CompanyService extends Service {
   async checkRelationCode(body, type) {
     const ctx = this.ctx;
+    
     if (!body[type]) {
       return;
     }
@@ -24,6 +25,16 @@ class CompanyService extends Service {
     let relationCode = await ctx.model.RelationCode.findOne({
       value: body.relationCode
     });
+    let relationCodeTypeRelation = {
+      business:'businessRelationCompany',
+      transport:'transportTrainsRelationCompany',
+      account:'accountRelationCompany'
+    };
+    if ( relationCode.type !== undefined && relationCode.type !== 'common') {
+      if (relationCodeTypeRelation[relationCode.type] !== type) {
+        ctx.throw(422, "关联代码不适用于此次关联类型", body);
+      }
+    }
     if (!relationCode) {
       ctx.throw(422, "无效的关联代码", body);
     }

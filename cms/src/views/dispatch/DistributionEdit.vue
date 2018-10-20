@@ -7,8 +7,51 @@
         </el-alert>
       </div>
       <div style="margin-top:15px"></div>
-      <goods-table :order="order" :edit="false"></goods-table>
-      <el-alert title="运单信息" type="info" :closable="false" style="margin:15px 0">
+      <el-alert title="商品信息" type="info" :closable="false" style="margin:15px 0">
+      </el-alert>
+      <my-form size="mini" width="19%">
+        <div class="flex ac jb" v-if="order.goods">
+          <my-form-item label="名称" v-model="order.goods.name" disabled>
+          </my-form-item>
+          <my-form-item label="品牌" v-model="order.goods.brand.name" disabled>
+          </my-form-item>
+          <my-form-item label="规格" v-model="order.goods.spec" disabled>
+          </my-form-item>
+          <my-form-item label="库存" :value="order.goods.stock+' '+order.goods.unit" disabled>
+          </my-form-item>
+          <my-form-item label="下单数量" v-model="order.count" disabled>
+          </my-form-item>
+        </div>
+      </my-form>
+      <el-alert title="贸易链" type="info" :closable="false" style="margin:15px 0">
+      </el-alert>
+      <div class="hor-scroll" style="font-size:13px;margin-bottom:10px" >
+        <div class="hor-scroll-item" v-for="(item,index) in order.businessTrains" :key="index">
+          <div class="flex ac">
+            <el-card class="black" style="margin:10px 5px" :body-style="{ padding: '10px' }">
+              {{item.company.name}}
+            </el-card>
+            <div v-if="index!==order.businessTrains.length-1" class="tc" style="width:40px">
+              <i class="el-icon-d-arrow-right success"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <el-alert title="物流链" type="info" :closable="false" style="margin:15px 0">
+      </el-alert>
+      <div class="hor-scroll" style="font-size:13px;margin-bottom:10px" >
+        <div class="hor-scroll-item" v-for="(item,index) in order.transportTrains" :key="index">
+          <div class="flex ac">
+            <el-card class="black"  style="margin:10px 5px" :body-style="{ padding: '10px' }" :style="{background:item._id === logistics.transportTrains ? '#409eff':'',color:item._id === logistics.transportTrains ? '#fff':''}">
+              {{item.areaInfo}}
+            </el-card>
+            <div v-if="index!==order.transportTrains.length-1" class="tc" style="width:40px">
+              <i class="el-icon-d-arrow-right success"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <el-alert title="物流单信息" type="info" :closable="false" style="margin:15px 0">
       </el-alert>
       <my-form size="mini" width="24%">
         <div class="flex ac jb">
@@ -19,7 +62,7 @@
           </my-form-item>
           <my-form-item label="卸货数量" v-model="logisticsForm.landed" type="number">
           </my-form-item>
-          <my-form-item label="运费单价" v-model="logisticsForm.price" type="number">
+          <my-form-item label="运输单价" v-model="logisticsForm.price" type="number">
           </my-form-item>
         </div>
         <div class="flex ac jb" style="margin-top:15px">
@@ -47,8 +90,7 @@
       <div class="flex ac" style="margin-top:15px">
         <!-- <el-button size="small" @click="back()">返回</el-button> -->
         <div class="info">
-          <i class="el-icon-info"></i>
-          如果物流单出于审核失败状态,更新信息可重新进行审核流程
+          <i class="el-icon-info"></i> 如果物流单出于审核失败状态,更新信息可重新进行审核流程
         </div>
         <div class="f1"></div>
         <el-button icon="el-icon-refresh" size="small" type="primary" @click="update" :disabled="$route.query.role === 'dispatcherManager'">更新物流单信息</el-button>
@@ -64,7 +106,7 @@
     <div class="flex ac" style="margin:15px 0">
       <el-button size="small" v-if="logistics.dispatcherManagerCheck && logistics.logisticsClerkCheck" type="danger">删除运单</el-button>
       <div style="padding-right:10px" v-else>
-        <el-button type="danger" size="small" @click="checkFail"  :disabled="!($route.query.role === 'dispatcherManager' || $route.query.role === 'logisticsClerk')">审核失败</el-button>
+        <el-button type="danger" size="small" @click="checkFail" :disabled="!($route.query.role === 'dispatcherManager' || $route.query.role === 'logisticsClerk')">审核失败</el-button>
       </div>
       <div class="f1"></div>
       <el-button size="small" @click="back()">返回</el-button>
@@ -76,18 +118,10 @@
 
 <script>
 import Info from "../order/Info.vue";
-import GoodsTable from "../order/GoodsTable.vue";
 import DistributionMap from "./DistributionMap.vue";
 export default {
-  props: {
-    currentRole: {
-      type: String,
-      default: ""
-    }
-  },
   components: {
     Info,
-    GoodsTable,
     DistributionMap
   },
   data() {

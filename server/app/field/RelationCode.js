@@ -7,7 +7,8 @@ module.exports = {
       business: '贸易关联',
       transport: '物流关联',
       account: '账户关联'
-    }
+    },
+    default: 'common'
   },
   name: {
     name: '关联代码',
