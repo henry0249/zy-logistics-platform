@@ -8,6 +8,7 @@
           </div>
           <div slot-scope="scope">
             <my-select v-if="scope.prop === 'area'" area :data.sync="scope.row[scope.prop]" multi size="mini"></my-select>
+            <my-form-item number v-if="scope.prop === 'bonus'" :min="0" :max="100" v-model="scope.row[scope.prop]" size="mini"></my-form-item>
           </div>
         </my-table>
       </el-tab-pane>
@@ -72,6 +73,7 @@
         newData: [],
         type: {
           companyAdmin: '公司管理员',
+          broker: '经纪人',
           salesman: '业务员', //审核修改订单信息
           salesmanManager: '业务经理', //审核修改订单信息
           tradeClerk: '贸易文员', //添加物流链
@@ -124,13 +126,22 @@
           }
         }
         if (this.activeName === 'companyAdmin') {
-          delete thead.stockArea;
+          delete thead.area;
         } else {
           this.$set(thead, 'area', {
             name: "地区",
             readOnly: true,
             slot: true
-          })
+          });
+          if (this.activeName === 'broker') {
+            this.$set(thead, 'bonus', {
+              name: "提成",
+              readOnly: true,
+              slot: true
+            });
+          } else {
+            delete thead.bonus;
+          }
         }
         return thead;
       },
@@ -161,7 +172,7 @@
                 user: this.currentValue,
               };
               if (key !== 'companyAdmin') {
-                this.$set(obj,'area',[]);
+                this.$set(obj, 'area', []);
               }
               this.newData.push(obj);
             }
@@ -178,6 +189,9 @@
               user: this.currentValue,
               area: []
             };
+            if (this.activeName === 'broker') {
+              this.$set(obj,'bonus',0);
+            }
             this.newData.push(obj);
           }
         }

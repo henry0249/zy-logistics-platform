@@ -8,7 +8,7 @@
         <my-form width="24%" size="mini">
           <div class="jc jb">
             <my-form-item label="类型" @change="typeChange" select v-model="accountChangData.type" :options="field.AccountChange.type.option"></my-form-item>
-            <my-form-item label="金额" number v-model="accountChangData.num"></my-form-item>
+            <my-form-item label="金额" number v-model="accountChangData.num" :min="0"></my-form-item>
             <my-form-item label="税率" number v-model="accountChangData.taxRate"></my-form-item>
             <my-form-item @change="toCompanyChange" label="付款公司" select v-model="accountChangData.toCompany" :options="companyArr"></my-form-item>
           </div>
@@ -30,7 +30,7 @@
         <div>
           <el-button size="small" @click="$router.go(-1)">返 回</el-button>
         </div>
-        <el-button size="small" type="primary" @click="sub">修 改</el-button>
+        <el-button size="small" type="primary" @click="sub">添 加</el-button>
       </div>
     </div>
   </loading-box>

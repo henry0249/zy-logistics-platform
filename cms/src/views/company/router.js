@@ -4,6 +4,7 @@ import Account from './Account.vue';
 import CompanyRole from './CompanyRole.vue';
 import CompanyShip from './CompanyShip.vue';
 import AccountChangeType from './AccountChangeType.vue';
+import RelationCode from './RelationCode.vue';
 
 export default [{
   path: '/company',
@@ -27,6 +28,10 @@ export default [{
     path: 'role',
     name:'角色管理',
     component: CompanyRole
+  },{
+    path: 'code',
+    name:'关联代码',
+    component: RelationCode
   },{
     path: 'ship',
     name:'车船管理',

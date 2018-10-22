@@ -33,6 +33,12 @@
             path: "/company/edit"
           },
           {
+            name: "关联代码",
+            icon: "icon-guanliyuan",
+            path: "/company/code",
+            role: ["companySys", "sysAdmin"]
+          },
+          {
             name: "账户管理",
             icon: "icon-guanliyuan",
             path: "/company/account",

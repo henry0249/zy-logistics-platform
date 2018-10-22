@@ -34,10 +34,10 @@
             <div style="width:24%" class="jb">
               <my-form-item width="49%" switch v-model="goods.selfDeliverySupport" label="支持自提">
               </my-form-item>
-              <my-form-item width="49%" switch v-model="goods.freeDelivery" label="包配送费">
-              </my-form-item>
+              <my-form-item width="49%" switch v-model="goods.freeDelivery" label="包配送费"></my-form-item>
             </div>
-            <div style="width:24%"></div>
+              <my-form-item width="24%" number size="mini" v-model="goods.recommenderBonus" :min="0" :max="100" label="推荐人提成"></my-form-item>
+            <!-- <div style="width:24%"></div> -->
             <div style="width:24%"></div>
           </div>
           <div class="jb" style="margin-top:20px;">
@@ -69,9 +69,9 @@
             </div>
           </div>
           <template slot-scope="scope">
-                <my-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" company></my-select>
-                <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
-</template>
+            <my-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" company></my-select>
+            <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
+          </template>
         </my-table>
       </div>
       <div class="tr" style="margin-top:30px">
@@ -136,7 +136,8 @@
           freeDelivery: false,
           tag: [],
           company: {},
-          detail: ""
+          detail: "",
+          recommenderBonus:0
         },
         inputVisible: false,
         inputValue: "",
@@ -217,11 +218,12 @@
               company: this.goods.company._id,
               detail: this.goods.detail,
               packingType: this.goods.packingType,
+              recommenderBonus: this.goods.recommenderBonus,
             };
             if (!this.goods.manufacturer || !this.goods.manufacturer._id) {
               delete update.manufacturer;
-            }else{
-              this.$set(update,'manufacturer',this.goods.manufacturer._id);
+            } else {
+              this.$set(update, 'manufacturer', this.goods.manufacturer._id);
             }
             let goods = await this.$api.curd({
               model: "goods",
@@ -320,7 +322,7 @@
             _id: this.$route.params._id,
             populate: [{
               path: "company"
-            },{
+            }, {
               path: "manufacturer"
             }]
           });

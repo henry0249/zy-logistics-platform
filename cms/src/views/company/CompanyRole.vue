@@ -31,6 +31,7 @@
         roleStartData: [],
         type: {
           companyAdmin: '公司管理员',
+          broker: '经纪人',
           salesman: '业务员', //审核修改订单信息
           salesmanManager: '业务经理', //审核修改订单信息
           tradeClerk: '贸易文员', //添加物流链
