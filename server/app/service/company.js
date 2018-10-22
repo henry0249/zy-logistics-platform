@@ -4,7 +4,7 @@ const companyField = require('../field/Company');
 class CompanyService extends Service {
   async checkRelationCode(body, type) {
     const ctx = this.ctx;
-    
+
     if (!body[type]) {
       return;
     }
@@ -26,11 +26,11 @@ class CompanyService extends Service {
       value: body.relationCode
     });
     let relationCodeTypeRelation = {
-      business:'businessRelationCompany',
-      transport:'transportTrainsRelationCompany',
-      account:'accountRelationCompany'
+      business: 'businessRelationCompany',
+      transport: 'transportTrainsRelationCompany',
+      account: 'accountRelationCompany'
     };
-    if ( relationCode.type !== undefined && relationCode.type !== 'common') {
+    if (relationCode.type !== undefined && relationCode.type !== 'common') {
       if (relationCodeTypeRelation[relationCode.type] !== type) {
         ctx.throw(422, "关联代码不适用于此次关联类型", body);
       }
@@ -153,6 +153,61 @@ class CompanyService extends Service {
         });
         res.push(item);
       }
+    }
+    return res;
+  }
+  async receivables() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    if (!body.company) {
+      ctx.throw(422, '公司信息必填', body);
+    }
+    let company = await ctx.model.Company.findById(body.company);
+    if (!company) {
+      ctx.throw(404, '公司信息未找到', body);
+    }
+    let businessTrainsData = await ctx.model.BusinessTrains.find({
+      receivedCompany: company._id
+    });
+    let payIdSet = new Set();
+    businessTrainsData.forEach((item) => {
+      let addType = 'company';
+      if (item.type === 'customer') {
+        addType = item.customerType;
+      }
+      payIdSet.add({
+        type: addType,
+        _id: item[addType]
+      });
+    });
+    let payIdArr = [...payIdSet];
+    let res = {
+      businessTrains: [],
+      logistics: []
+    };
+    for (let i = 0; i < payIdArr.length; i++) {
+      let payItem = payIdArr[i];
+      let payData;
+      if (payItem.type === 'company') {
+        payData = await ctx.model.Company.findById(payItem._id);
+      }
+      if (payItem.type === 'user') {
+        payData = await ctx.model.User.findById(payItem._id);
+      }
+      let pushItem = JSON.parse(JSON.stringify(payData));
+      pushItem.orderPaylist = await await ctx.model.BusinessTrains.find({
+        receivedCompany: company._id,
+        [payItem.type]: payItem._id
+      }).populate([{
+        path: 'order',
+        populate: [{
+          path: 'goods',
+          populate: [{
+            path: 'brand'
+          }]
+        }]
+      }]);
+      res.businessTrains.push(pushItem);
     }
     return res;
   }

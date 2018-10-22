@@ -6,7 +6,7 @@
     <el-alert v-if="alert" title="订单信息" type="info" :closable="false" style="margin:15px 0">
       <span>&nbsp;&nbsp;({{order.type==='company'?'公司订单':'个人订单'}})</span>
     </el-alert>
-    <my-form v-show="!hideForm" size="mini" width="24%" :edit="edit">
+    <my-form size="mini" width="24%" :edit="edit" v-if="!loadingText">
       <div class="flex ac jb">
         <div style="width:24%">
           <my-select :type.sync="order.type" :data.sync="customer" label="下单客户" placeholder="请选择客户" @change="customerChange"></my-select>
@@ -99,7 +99,6 @@ export default {
         transport: 0
       },
       loadingText: "",
-      hideForm: false,
       companyUserCascaderLoaidng: "加载中...",
       companyUserCascader: []
     };

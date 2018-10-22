@@ -39,7 +39,7 @@ module.exports = {
     balanceCompany: {
       name: '运费承担方',
       slot: true,
-      width: 150
+      width: 145
     },
     loss: {
       name: '损耗数量',
@@ -48,7 +48,7 @@ module.exports = {
     lossCompany: {
       name: '损耗承担方',
       slot: true,
-      width: 150
+      width: 145
     },
     // total: {
     //   name: '运费合计',
@@ -83,7 +83,7 @@ module.exports = {
       name: '运输工具(车/船)',
       slot: true,
       readOnly: true,
-      width: '200'
+      width: '190'
     },
     loading: {
       name: '装货量',

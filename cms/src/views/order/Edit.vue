@@ -96,6 +96,7 @@ export default {
       this.getOrderInfo();
     },
     async getOrderInfo() {
+      this.show = false;
       this.loadingText = "正在获取订单数据";
       try {
         this.order = await this.$ajax("/order/info/" + this.$route.params._id);

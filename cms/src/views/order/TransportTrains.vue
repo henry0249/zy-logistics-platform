@@ -27,8 +27,6 @@
       <div v-for="(item,index) in trains" :key="'table'+index">
         <div v-if="showIndex === index">
           <div class="flex ac jb brtl brtr" style="color:#909399;padding-left:10px;background:#f4f4f5;font-size:13px">
-            <!-- <div>{{areaInfo(item)}}</div> -->
-            <!-- <div>{{areaInfo(trains[index + 1])}}</div> -->
             <div class="f1 ac jb">
               <el-input size="mini" v-model="item.areaInfo" placeholder="请输入起送地点详情"></el-input>
               <i style="margin:0 15px" class="el-icon-d-arrow-right success"></i>
@@ -38,7 +36,7 @@
               物流单<i class="el-icon-plus"></i>
             </div>
           </div>
-          <my-table max-height="300" opWidth="45" size="mini" index border :thead="thead" :data.sync="item.logistics">
+          <my-table max-height="300" :op="!settle" opWidth="45" size="mini" index border :thead="thead" :data.sync="item.logistics">
             <div class="tc" slot="op" slot-scope="scope">
               <remove-check @remove="removeLogistics(item.logistics,scope.index)"></remove-check>
             </div>
@@ -66,16 +64,8 @@
               <my-form-item v-if="scope.prop==='balanceCount'" v-model="scope.row.balanceCount" size="mini" type="number" min="0">
               </my-form-item>
               <relation-company v-if="scope.prop==='balanceCompany' && order._id" :order="order" :data.sync="scope.row.balanceCompany" business tranport :append="scope.row[scope.row.transportation] && scope.row[scope.row.transportation].company"></relation-company>
-              <!-- <el-tooltip v-if="scope.prop==='balanceCompany'" effect="dark" content="仅可从本公司关联的公司中选择" placement="top">
-                <my-form-item size="mini" v-model="scope.row.balanceCompany" select :options="companySelectList">
-                </my-form-item>
-              </el-tooltip> -->
               <my-form-item v-if="scope.prop==='loss'" v-model="scope.row.loss" size="mini" type="number" min="0">
               </my-form-item>
-              <!-- <el-tooltip v-if="scope.prop==='lossCompany'" effect="dark" content="仅可从本公司关联的公司中选择" placement="top">
-                <my-form-item size="mini" v-model="scope.row.lossCompany" select :options="companySelectList">
-                </my-form-item>
-              </el-tooltip> -->
               <relation-company v-if="scope.prop==='lossCompany' && order._id" :order="order" :data.sync="scope.row.lossCompany" business tranport :append="scope.row[scope.row.transportation] && scope.row[scope.row.transportation].company"></relation-company>
               <my-form-item v-if="scope.prop==='startAt'" v-model="scope.row.startAt" size="mini" datetime>
               </my-form-item>
@@ -155,7 +145,7 @@ export default {
     settle: {
       type: Boolean,
       default: false
-    }
+    },
   },
   computed: {
     statistics() {
@@ -277,13 +267,16 @@ export default {
       if (item._id) {
         this.loadingText = "加载中...";
         try {
+          await this.$ajax.post("/transportTrains/delete", {
+            _id: item._id
+          });
           this.trains.splice(index, 1);
         } catch (error) {}
         this.loadingText = "";
       } else {
         this.trains.splice(index, 1);
       }
-      if (this.showIndex > 1) {
+      if (this.showIndex > 0) {
         this.showIndex = this.showIndex - 1;
       }
     },
@@ -319,8 +312,21 @@ export default {
         ship: {}
       });
     },
-    removeLogistics(logistics, index) {
-      logistics.splice(index, 1);
+    async removeLogistics(logistics, index) {
+      let item = logistics[index];
+      if (item._id) {
+        this.loadingText = "正在删除...";
+        try {
+          await this.$ajax.post("/logistics/delete", {
+            _id: item._id
+          });
+          logistics.splice(index, 1);
+        } catch (error) {
+        }
+        this.loadingText = "";
+      } else {
+        logistics.splice(index, 1);
+      }
     },
     transportationChange(val, logisticsItem) {
       if (logisticsItem.state === 0) {

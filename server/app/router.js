@@ -11,7 +11,7 @@ module.exports = app => {
   } = app;
   const checkToken = middleware.jwtVerify;
   router
-    //lib
+    //第三方接口集成
     .post('/sms/send', 'lib.smsSend') //发送验证码
     .post('/sms/validate', 'lib.smsValidate') //验证验证码
     .post('/map/geocoder', 'lib.geocoder') //百度地图经纬度转地址信息
@@ -26,7 +26,8 @@ module.exports = app => {
     .get('/roleCompany', checkToken(), 'user.roleCompany') //获取用户关联的所有公司
     .post('/rolePower', checkToken(), 'user.rolePower') //获取用户在某个公司的所有角色信息
     //公司接口
-    .all('/company/user/cascader', checkToken(), 'company.userCascader') //公司用户级联数据
+    .post('/company/user/cascader', checkToken(), 'company.userCascader') //公司用户级联数据
+    .post('/company/receivables', checkToken(), 'company.receivables') //公司收款列表
     //区域接口
     //商品接口
     //订单接口

@@ -22,6 +22,11 @@ module.exports = {
     name: '审核标识',
     default: false
   },
+  goods: {
+    type: 'ObjectId',
+    name: '商品信息',
+    ref: 'Goods'
+  },
   order: {
     type: 'ObjectId',
     name: '所属订单',
@@ -101,6 +106,11 @@ module.exports = {
     name: '已结算金额',
     type: 'Number',
     default: 0
+  },
+  balancedFinish: {
+    name: '结算完成',
+    type: 'Boolean',
+    default: false
   },
   stock: {
     name: '关联的库存单',

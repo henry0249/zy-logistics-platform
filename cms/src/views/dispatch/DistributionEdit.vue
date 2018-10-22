@@ -29,7 +29,12 @@
         <div class="hor-scroll-item" v-for="(item,index) in order.businessTrains" :key="index">
           <div class="flex ac">
             <el-card class="black" style="margin:10px 5px" :body-style="{ padding: '10px' }">
-              {{item.company.name}}
+              <div v-if="item.customerType === 'company'">
+                {{item.company && item.company.name}}
+              </div>
+              <div v-if="item.customerType === 'user'">
+                {{(item.user && item.user.name ) + '(个人)'}}
+              </div>
             </el-card>
             <div v-if="index!==order.businessTrains.length-1" class="tc" style="width:40px">
               <i class="el-icon-d-arrow-right success"></i>

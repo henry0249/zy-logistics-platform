@@ -1,14 +1,14 @@
 <template>
   <div>
-    <settlement-edit></settlement-edit>
+    <settlement-order-edit></settlement-order-edit>
   </div>
 </template>
 
 <script>
-import SettlementEdit from "./SettlementEdit";
+import SettlementOrderEdit from "./SettlementOrderEdit";
 export default {
   components: {
-    SettlementEdit
+    SettlementOrderEdit
   }
 };
 </script>

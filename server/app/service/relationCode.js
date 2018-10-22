@@ -1,4 +1,5 @@
 const Service = require('egg').Service;
+const RelationCodeField = require('../field/RelationCode');
 
 class RelationCodeService extends Service {
   async multi() {
@@ -38,6 +39,9 @@ class RelationCodeService extends Service {
       };
       if (Number(body.expiration) > 0) {
         modelBody.expiration = Number(body.expiration);
+      }
+      if (RelationCodeField.type.option[body.type]) {
+        modelBody.type = body.type;
       }
       let codeModel = new ctx.model.RelationCode(modelBody);
       await codeModel.save();

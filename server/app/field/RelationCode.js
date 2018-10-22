@@ -4,9 +4,9 @@ module.exports = {
     type: 'String',
     option: {
       common: '通用',
-      business: '贸易关联',
-      transport: '物流关联',
-      account: '账户关联'
+      business: '贸易链关联',
+      transport: '物流链关联',
+      // account: '账户关联'
     },
     default: 'common'
   },

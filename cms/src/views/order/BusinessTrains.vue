@@ -125,7 +125,11 @@ export default {
         this.$message.warn(`物流链尚未添加`);
         return;
       }
-      if (!this.data[0].company || !this.data[1].company) {
+      if (!this.data[0].company) {
+        this.$message.warn(`节点中有公司未选择`);
+        return;
+      }
+      if (!this.data[this.data.length - 1 - 1].company) {
         this.$message.warn(`节点中有公司未选择`);
         return;
       }
@@ -166,6 +170,12 @@ export default {
       this.pushItem();
     },
     async remove(item, index) {
+      let handle_id = this.order.handle._id || this.order.handle;
+      let current_id = item.company._id || item.company;
+      if (handle_id === current_id) {
+        this.$message.warn(`不能删除主导公司`);
+        return;
+      }
       if (this.data.length > 2) {
         if (item.type === "customer") {
           this.$message.warn(`不能删除客户`);
@@ -177,9 +187,6 @@ export default {
             await this.$ajax.post("/businessTrains/delete", {
               _id: item._id
             });
-            if (condition) {
-            }
-
             this.data.splice(index, 1);
             if (this.data[0]._id) {
               await this.$ajax.post("/businessTrains/update", {
@@ -208,7 +215,7 @@ export default {
         loss: 0,
         receive: this.order.count,
         remark: "",
-        logistics: [],
+        logistics: []
       };
       if (this.data.length === 0) {
         this.data.push({
@@ -224,7 +231,7 @@ export default {
         // });
         this.data.push({
           ...body,
-          template_id: new Date().getTime()+1,
+          template_id: new Date().getTime() + 1,
           type: "customer",
           [this.order.type]: this.order[this.order.type],
           customerType: this.order.type

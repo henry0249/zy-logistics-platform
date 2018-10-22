@@ -20,7 +20,7 @@ const baseState = {
   logisticsClerk: '物流文员审核', //审核物流单,调度全部结束后进行一次订单审核
   documentClerk: '单据文员审核', //添加贸易链,物流链的结算价格,数量等
   documentClerkManager: '单据主管审核', //审核单据文员操作,进入结算环节
-  financial: '财务文员预审', //在此状态财务文员能进行批量修改贸易链结算价格,恢复贸易链价格等
+  // financial: '财务文员预审', //在此状态财务文员能进行批量修改贸易链结算价格,恢复贸易链价格等
 };
 
 class OrderService extends Service {
@@ -242,6 +242,7 @@ class OrderService extends Service {
       let item = arr[i];
       item.order = order._id;
       item.handle = order.handle;
+      item.goods = order.goods;
       if (i > 0) {
         item.receivedCompany = arr[i - 1].company;
       }
@@ -332,6 +333,7 @@ class OrderService extends Service {
       logisticsItem.order = order._id;
       logisticsItem.contactName = order.contactName;
       logisticsItem.contactNumber = order.contactNumber;
+      logisticsItem.goods = order.goods;
       if (logisticsItem._id) {
         let logistics_id = logisticsItem._id;
         delete logisticsItem.createdAt;

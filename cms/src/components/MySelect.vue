@@ -8,9 +8,9 @@
         <div class="disabled-hide" v-if="disabled">
         </div>
         <el-input readonly style="width:100%" :value="multi?multiText(data):text(data)" v-bind="$attrs" :placeholder="$attrs.placeholder || autoPlaceholder" :size="size||$parent.size" class="input-with-select">
-          <div v-if="userCompanyTypeChoose || truckShipTypeChoose" slot="prepend" @click.stop>
-            <text-dropdown v-if="userCompanyTypeChoose" slot="prepend" v-model="innerType" :options="field.Order.type.option" :color="['#E6A23C','#409EFF']"></text-dropdown>
-            <text-dropdown v-if="truckShipTypeChoose" slot="prepend" v-model="innerType" :options="field.Logistics.transportation.option" :color="['#67C23A','#E6A23C']"></text-dropdown>
+          <div v-if="type" slot="prepend" @click.stop>
+            <text-dropdown v-if="type === 'user' || type === 'company'" slot="prepend" v-model="innerType" :options="field.Order.type.option" :color="['#E6A23C','#409EFF']"></text-dropdown>
+            <text-dropdown v-if="type === 'ship' || type === 'truck'" v-model="innerType" :options="field.Logistics.transportation.option" :color="['#67C23A','#E6A23C']"></text-dropdown>
           </div>
         </el-input>
         <div class="choose-icon ac pointer" @click="showDialog">
@@ -123,6 +123,7 @@ export default {
   },
   data() {
     return {
+      // selectType: "company",
       options: options,
       innerType: "",
       dialogVisible: false,
@@ -155,7 +156,7 @@ export default {
         }
       }
       if (this.type) {
-        res = this.type;
+        this.innerType = this.type;
       }
       return res;
     },
@@ -240,11 +241,6 @@ export default {
       } else {
         this.$emit("update:data", {});
       }
-    }
-  },
-  created() {
-    if (this.userCompanyTypeChoose || this.truckShipTypeChoose) {
-      this.innerType = this.type;
     }
   }
 };
