@@ -1,9 +1,9 @@
 <template>
-  <div :style="{fontSize}">
+  <div :style="{fontSize,width:$attrs.width || '100%'}">
     <div class="jc jb" style="margin-bottom:5px;">
       <div class="jc js" style="width:50%;">
         <div v-if="$attrs.label" class="tf1" :title="$attrs.label">
-          <span class="tf1" :style="{display:'block',width:labelWidth,fontSize}">{{$attrs.label}}</span>
+          <span class="" :style="{display:'block',fontSize}">{{$attrs.label}}</span>
         </div>
         <div :style="{fontSize}" style="margin-left:5px;flex:0 0 150px">/共选
           <span class="success">{{this.checkData.length}}</span> 家公司
@@ -18,7 +18,7 @@
       <div v-if="checkData.length > 0" class="jc js" style="flex-wrap: wrap">
         <div class="tag-box" :style="{fontSize:fontSize}" v-for="(item,index) in checkData" :key="index">
           <span>{{item.no || item.name || item.nick || item.mobile}}</span>
-          <i class="el-icon-error pointer del" :title="title" @click="delTag(index)"></i>
+          <i class="el-icon-error pointer del" title="删除该公司" @click="delTag(index)"></i>
         </div>
       </div>
       <div v-else style="height:32px;line-height:32px;color:#c0c4cc;">未选择</div>
@@ -34,8 +34,8 @@
             <div :style="{fontSize:fontSize}" v-if="checkData.length <= 0">未选择</div>
           </div>
         </div>
-        <div style="height:calc(50vh - 50px)">
-          <my-table v-if="!loadingText" selection border stripe size="mini" height="50vh - 50px" @selection-change="selectionChange" :thead="thead" :data="tableData">
+        <div v-if="dialogTableVisible" style="height:calc(50vh - 50px)">
+          <my-table v-if="!loadingText" border stripe size="mini" height="50vh - 50px" @current-change="handleCurrentChange" :thead="thead" :data="tableData">
             <div slot="header" class="jc jb" style="margin:10px 0">
               <my-form-item size="mini" width="250px" v-model="input" @change="inputChange" placeholder="输入公司关联代码"></my-form-item>
               <el-button size="mini" type="primary" @click="search">搜 索</el-button>
@@ -110,6 +110,18 @@
         }
       }
     },
+    watch: {
+      dialogTableVisible(val) {
+        this.tableData = [];
+        this.input = '';
+      },
+      checkData:{
+        handler(val){
+          this.$emit('update:data',val);
+        },
+        deep:true
+      }
+    },
     computed: {
       fontSize() {
         let option = {
@@ -126,40 +138,52 @@
       }
     },
     methods: {
+      handleClose(tag, index) {
+        this.checkData.splice(index, 1);
+      },
       async search() {
-        this.tableData = [];
-        try {
-          this.loadingText = '搜索中...';
-          let res = await this.$ajax.post('/relationCode/findOne', {
-            value: this.input,
-            populate: [{
-              path: 'company'
-            }]
-          });
-          this.tableData.push(res.company);
-          this.duplication(this.tableData);
-        } catch (error) {}
-        this.loadingText = '';
+        if (this.input) {
+          this.tableData = [];
+          try {
+            this.loadingText = '搜索中...';
+            let res = await this.$ajax.post('/relationCode/findOne', {
+              value: this.input,
+              populate: [{
+                path: 'company'
+              }]
+            });
+            this.tableData.push(res.company);
+            this.duplication(this.tableData);
+          } catch (error) {}
+          this.loadingText = '';
+        }
       },
       delTag(index) {
         this.checkData.splice(index, 1);
       },
-      selectionChange(val) {
+      handleCurrentChange(val) {
         console.log(val);
+        this.checkData.push(val);
+        this.checkData = this.duplication(this.checkData);
       },
       inputChange(val) {
         console.log(val);
       },
       duplication(val) {
-        for (let index = 0; index < val.length; index++) {
-          for (let i = index + 1; i < val.length; i++) {
-            if (val[index] === val[i]) {
-              val.splice(i, 1);
+        let data = val;
+        for (let index = 0; index < data.length; index++) {
+          for (let i = index + 1; i < data.length; i++) {
+            if (JSON.stringify(data[index]) === JSON.stringify(data[i])) {
+              data.splice(i, 1);
+              this.$message.warn('已选择该公司');
             }
           }
         }
+        return data;
       },
-      go() {}
+      go() {
+        this.dialogTableVisible = false;
+      }
     },
     created() {
       if (Object.keys(this.option).length > 0) {
@@ -190,5 +214,12 @@
     margin-top: 10px;
     padding: 0px;
     width: 100%;
+  }
+  .del {
+    color: #c0c4cc;
+    margin-left: 5px;
+  }
+  .del:hover {
+    color: #909399;
   }
 </style>
