@@ -61,13 +61,14 @@
         return returnIo;
       },
       async sub() {
+        console.log(this.data);
         if (this.confirmation()) {
           try {
             this.loadingText = '修改中...';
             let update = {
               name: this.data.name,
               areaInfo: this.data.areaInfo,
-              area: this.data.area,
+              area: this.data.area._id,
               code: this.data.code,
               mobile: this.data.mobile,
               nick: this.data.nick,

@@ -189,6 +189,9 @@
       if (Object.keys(this.option).length > 0) {
         this.op = JSON.parse(JSON.stringify(this.option));
       }
+      if (this.data.length > 0) {
+        this.checkData = JSON.parse(JSON.stringify(this.data));
+      }
     }
   }
 </script>
