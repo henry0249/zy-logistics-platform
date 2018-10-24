@@ -18,10 +18,10 @@
       <my-form-item input width="100%" v-model="companyData.areaInfo" ref="addressInput" filterable label="详细地址"></my-form-item>
     </div>
     <div class="flex jb" style="margin-top:15px;">
-      <common-select-by-code label="贸易链关联公司" :data.sync="companyData.businessRelationCompany" title="贸易链关联公司选择" company size="mini"></common-select-by-code>
+      <common-select-by-code label="贸易链关联公司" type="businessRelationCompany" :data.sync="business.businessRelationCompany" title="贸易链关联公司选择" company size="mini"></common-select-by-code>
     </div>
     <div class="flex jb" style="margin-top:15px;">
-      <common-select-by-code label="物流链关联公司" border :data.sync="companyData.transportTrainsRelationCompany" title="物流链关联公司选择" company size="mini"></common-select-by-code>
+      <common-select-by-code label="物流链关联公司" border type="transportTrainsRelationCompany" :data.sync="transport.transportTrainsRelationCompany" title="物流链关联公司选择" company size="mini"></common-select-by-code>
     </div>
   </my-form>
 </template>
@@ -52,11 +52,37 @@
         default () {
           return {};
         }
-      }
+      },
+      businessRelation: {
+        type: Object,
+        default () {
+          return {
+            businessRelationCompany: [],
+            relationCode: '',
+          };
+        }
+      },
+      transportTrainsRelation: {
+        type: Object,
+        default () {
+          return {
+            transportTrainsRelationCompany: [],
+            relationCode: '',
+          };
+        }
+      },
     },
     data() {
       return {
         roleDate: {},
+        business: {
+          businessRelationCompany: [],
+          relationCode: '',
+        },
+        transport: {
+          transportTrainsRelationCompany: [],
+          relationCode: '',
+        },
         companyData: {
           name: "",
           nick: "",
@@ -67,18 +93,33 @@
           self: false,
           areaInfo: "",
           area: {},
-          businessRelationCompany: [],
-          transportTrainsRelationCompany:[]
+          transportTrainsRelation: {
+            transportTrainsRelationCompany: [],
+            relationCode: ''
+          }
         }
       };
     },
     watch: {
+      business: {
+        handler(val) {
+          this.$emit('update:businessRelation', val);
+        },
+        deep: true
+      },
+      transport: {
+        handler(val) {
+          this.$emit('update:transportTrainsRelation', val);
+        },
+        deep: true
+      },
       'companyData.area' (val) {
         let areaInfo = val.province.name + val.city.name + val.county.name + val.name
         this.$set(this.companyData, 'areaInfo', areaInfo)
       },
       companyData: {
         handler: function(val, oldVal) {
+          console.log(val);
           this.$emit("update:data", val);
         },
         deep: true
@@ -121,6 +162,8 @@
         this.roleDate = JSON.parse(JSON.stringify(roleDate));
         this.companyData = JSON.parse(JSON.stringify(companyData));
       }
+      this.business = JSON.parse(JSON.stringify(this.businessRelation));
+      this.transport = JSON.parse(JSON.stringify(this.transportTrainsRelation));
     }
   };
 </script>

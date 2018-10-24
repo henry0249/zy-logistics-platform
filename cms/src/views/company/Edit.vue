@@ -5,7 +5,7 @@
         <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
           <strong>公司信息</strong>
         </div>
-        <company-edit v-if="!loadingText" :data.sync="data" :startData="initData"></company-edit>
+        <company-edit v-if="!loadingText" :data.sync="data" :startData="initData" :business-relation.sync="businessRelation" :transport-trains-relation.sync="transportTrainsRelation"></company-edit>
       </div>
       <div class="tr jb" style="margin-top:30px">
         <div>
@@ -28,7 +28,11 @@
         loadingText: '',
         show: true,
         data: {},
-        initData: {}
+        initData: {},
+        transportTrainsRelation: {},
+        businessRelation: {},
+        transportRemove: [],
+        businessRemove: []
       }
     },
     watch: {
@@ -61,7 +65,6 @@
         return returnIo;
       },
       async sub() {
-        console.log(this.data);
         if (this.confirmation()) {
           try {
             this.loadingText = '修改中...';
@@ -76,32 +79,26 @@
               tel: this.data.tel,
               type: this.data.type,
             }
-            if (this.data.transportTrainsRelationCompany.length > 0) {
-              let data = [];
-              this.data.transportTrainsRelationCompany.forEach(item => {
-                data.push(item._id);
-              });
-              this.$set(update, 'transportTrainsRelationCompany', data);
-            } else {
-              this.$set(update, 'transportTrainsRelationCompany', []);
-            }
-            if (this.data.businessRelationCompany.length > 0) {
-              let data = [];
-              this.data.businessRelationCompany.forEach(item => {
-                data.push(item._id);
-              });
-              this.$set(update, 'businessRelationCompany', data);
-            } else {
-              this.$set(update, 'businessRelationCompany', []);
-            }
+            let transportData = [];
+            let businessData = [];
+            this.transportTrainsRelation.transportTrainsRelationCompany.forEach(item => {
+              transportData.push(item._id);
+            });
+            this.businessRelation.businessRelationCompany.forEach(item => {
+              businessData.push(item._id);
+            });
+            this.$set(update, 'transportTrainsRelationCompany', transportData);
+            this.$set(update, 'businessRelationCompany', businessData);
             let updateCompany = await this.$ajax.post('/company/update', {
               find: {
                 _id: this.company._id
               },
               update
             })
-            await this.getCompany()
-          } catch (error) {}
+            await this.getCompany();
+          } catch (error) {
+            console.log(error);
+          }
           this.loadingText = '';
         }
       },
@@ -126,9 +123,18 @@
               },
               {
                 path: "businessRelationCompany"
+              },
+              {
+                path: "transportTrainsRelationCompany"
               }
             ]
           });
+          this.$set(this.transportTrainsRelation, 'relationCode', '');
+          this.$set(this.transportTrainsRelation, 'transportTrainsRelationCompany', this.initData.transportTrainsRelationCompany);
+          this.$set(this.businessRelation, 'relationCode', '');
+          this.$set(this.businessRelation, 'businessRelationCompany', this.initData.businessRelationCompany);
+          console.log(this.businessRelation);
+          console.log(this.transportTrainsRelation);
         } catch (error) {}
         this.loadingText = '';
       }

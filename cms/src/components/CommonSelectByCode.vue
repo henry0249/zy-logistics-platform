@@ -60,6 +60,10 @@
 <script>
   export default {
     props: {
+      type: {
+        type: String,
+        default: ''
+      },
       labelSize: {
         type: String,
         default: ""
@@ -83,10 +87,15 @@
         default () {
           return {};
         }
+      },
+      code: {
+        type: String,
+        default: ''
       }
     },
     data() {
       return {
+        ischange: false,
         checkData: [],
         loadingText: '',
         dialogTableVisible: false,
@@ -107,6 +116,14 @@
             slot: true,
             name: '公司类型'
           }
+        },
+        key: {
+          transportTrainsRelationCompany: {
+            name: 'transportTrainsRelationCompany'
+          },
+          businessRelationCompany: {
+            name: "businessRelationCompany"
+          }
         }
       }
     },
@@ -115,11 +132,11 @@
         this.tableData = [];
         this.input = '';
       },
-      checkData:{
-        handler(val){
-          this.$emit('update:data',val);
+      checkData: {
+        handler(val) {
+          this.ischange = true;
         },
-        deep:true
+        deep: true
       }
     },
     computed: {
@@ -160,6 +177,7 @@
       },
       delTag(index) {
         this.checkData.splice(index, 1);
+        this.$emit('update:data',this.checkData);
       },
       handleCurrentChange(val) {
         console.log(val);
@@ -181,7 +199,33 @@
         }
         return data;
       },
-      go() {
+      async go() {
+        if (this.ischange) {
+          try {
+            this.loadingText = '更新中...';
+            let update = {
+              _id: this.company._id,
+              relationCode: this.input
+            }
+            let data = [];
+            this.checkData.forEach(item => {
+              data.push(item._id);
+            });
+            for (const key in this.key) {
+              if (this.key.hasOwnProperty(key)) {
+                console.log(this.type === key);
+                if (this.type === key) {
+                  this.$set(update, key, data);
+                }
+              }
+            }
+            await this.$ajax.post('/company/update', update);
+            this.$emit('update:data', this.checkData);
+          } catch (error) {
+            console.log(error);
+          }
+          this.loadingText = '';
+        }
         this.dialogTableVisible = false;
       }
     },
