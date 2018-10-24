@@ -15,7 +15,7 @@
     </el-tabs>
     <div class="jc" style="height:40px;position: absolute;top:0;right:0">
       <el-tooltip class="item" effect="dark" content="快速添加所有管理人员" placement="top">
-        <el-button style="padding:5px" type="warning" icon="el-icon-info" size="mini" @click="fastAdd">快速初始化</el-button>
+        <el-button style="padding:5px" type="warning" icon="el-icon-info" size="mini" @click="fastAdd"></el-button>
       </el-tooltip>
       <el-tooltip class="item" effect="dark" :content="`添加${btmText}`" placement="top">
         <el-button style="padding:5px" type="success" icon="el-icon-plus" size="mini" @click="addUser"></el-button>
@@ -32,6 +32,13 @@
           <my-form-item placeholder="搜索用户名" size="mini" width="250px" v-model="input" @change="inputChange"></my-form-item>
         </div>
       </common-table>
+      <el-dialog width="30%" title="添加地区" :visible.sync="innerVisible" append-to-body>
+        <my-select :data.sync="area" multi area></my-select>
+        <div slot="footer" class="dialog-footer">
+          <el-button size="mini" @click="cancel">取 消</el-button>
+          <el-button type="primary" size="mini" @click="resArea">确 定</el-button>
+        </div>
+      </el-dialog>
       <div slot="footer" class="dialog-footer">
         <el-button size="mini" @click="dialogTableVisible = false">取 消</el-button>
         <el-button type="primary" size="mini" @click="res">确 定</el-button>
@@ -68,7 +75,9 @@
         currentValue: {},
         input: "",
         option: {},
+        area: [],
         dialogTableVisible: false,
+        innerVisible: false,
         activeName: "companyAdmin",
         newData: [],
         type: {
@@ -89,6 +98,11 @@
       };
     },
     watch: {
+      innerVisible(val) {
+        if (!val) {
+          this.area = [];
+        }
+      },
       newData: {
         handler(val) {
           this.$emit("update:data", val);
@@ -159,9 +173,33 @@
       }
     },
     methods: {
+      cancel() {
+        this.innerVisible = false;
+        this.area = [];
+      },
+      resArea() {
+        this.newData.forEach((newDataItem,index) => {
+          if (newDataItem.type !== 'companyAdmin' && newDataItem.area.length === 0 || !newDataItem.area) {
+            this.$set(this.newData[index], 'area', this.area);
+          }
+        });
+        this.innerVisible = false;
+        this.dialogTableVisible = false;
+      },
       fastAdd() {
         this.dialogTableVisible = true;
         this.fastIo = true;
+      },
+      repeat(val) {
+        let data = val;
+        for (let index = 0; index < data.length; index++) {
+          for (let i = index + 1; i < data.length; i++) {
+            if (data[index].type === data[i].type && data[index].user._id === data[i].user._id) {
+              data.splice(i, 1);
+            }
+          }
+        }
+        return data;
       },
       res() {
         if (Object.keys(this.currentValue).length > 0) {
@@ -175,13 +213,7 @@
                 this.$set(obj, 'area', []);
               }
               this.newData.push(obj);
-            }
-            for (let index = 0; index < this.newData.length; index++) {
-              for (let i = index + 1; i < this.newData.length; i++) {
-                if (this.newData[index].type === this.newData[i].type && this.newData[index].user._id === this.newData[i].user._id) {
-                  this.newData.splice(i, 1);
-                }
-              }
+              this.innerVisible = true;
             }
           } else {
             let obj = {
@@ -190,12 +222,12 @@
               area: []
             };
             if (this.activeName === 'broker') {
-              this.$set(obj,'bonus',0);
+              this.$set(obj, 'bonus', 0);
             }
             this.newData.push(obj);
           }
         }
-        this.dialogTableVisible = false;
+        this.newData = this.repeat(this.newData);
         this.fastIo = false;
       },
       currentChange(val) {
@@ -223,7 +255,6 @@
         }]);
       },
       remove(scope) {
-        console.log(scope);
         this.newData.forEach((item, index) => {
           if (item.type === this.activeName && item._id === scope.row._id) {
             this.newData.splice(index, 1);
