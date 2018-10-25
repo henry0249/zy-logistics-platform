@@ -17,9 +17,9 @@ module.exports = {
       customer: '客户'
     }
   },
-  check: {
+  financial: {
     type: 'Boolean',
-    name: '审核标识',
+    name: '财务预审标识',
     default: false
   },
   goods: {
@@ -69,11 +69,6 @@ module.exports = {
   },
   loss: {
     name: '损耗数量',
-    type: 'Number',
-    default: 0
-  },
-  lossCompany: {
-    name: '损耗承担方',
     type: 'Number',
     default: 0
   },

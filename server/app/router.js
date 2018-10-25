@@ -26,8 +26,9 @@ module.exports = app => {
     .get('/roleCompany', checkToken(), 'user.roleCompany') //获取用户关联的所有公司
     .post('/rolePower', checkToken(), 'user.rolePower') //获取用户在某个公司的所有角色信息
     //公司接口
-    .post('/company/user/cascader', checkToken(), 'company.userCascader') //公司用户级联数据
-    .post('/company/receivables', checkToken(), 'company.receivables') //公司收款列表
+    .all('/company/user/cascader', checkToken(), 'company.userCascader') //公司用户级联数据
+    .post('/company/receivablesTab', checkToken(), 'company.receivablesTab') //公司收款tab列表
+    .post('/company/receivables', checkToken(), 'company.receivables') //公司收款详细数据
     //区域接口
     //商品接口
     //订单接口
@@ -47,6 +48,9 @@ module.exports = app => {
     //库存接口
     .post('/stock/multi', checkToken(), 'stock.multi') //批量添加库存单
     .post('/stock/simpleStatistics', checkToken(), 'stock.simpleStatistics') //简单的库存统计
+    //物流链接口
+    .post('/businessTrains/financial', checkToken(), 'businessTrains.financial') //财务文员预审
+    .post('/businessTrains/settle', checkToken(), 'businessTrains.settle') //结算专员结算
     //页面接口
     .get('/', 'static.views') //根路径匹配
     .get(/views/, 'static.views') //根views页面

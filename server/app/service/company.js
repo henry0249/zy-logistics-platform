@@ -13,10 +13,18 @@ class CompanyService extends Service {
     }
     let findBody = {
       _id: body._id
+    };
+    findBody[type] = {
+      $in: body[type]
+    };
+    // let arr = body[type]; //用数组判断不行.疑惑
+    // arr.indexOf(body._id.toString());
+    let mySet = new Set(body[type]);
+    if (mySet.has(body._id.toString())) {
+      ctx.throw(422, "自己无法作为关联公司", body);
     }
-    findBody[type] = body[type];
-    let relationCheck = await ctx.model.Company.findOne(findBody);
-    if (relationCheck) {
+    let sameRelationCompany = await ctx.model.Company.findOne(findBody);
+    if (sameRelationCompany) {
       return;
     }
     if (!body.relationCode) {
@@ -38,7 +46,7 @@ class CompanyService extends Service {
     if (!relationCode) {
       ctx.throw(422, "无效的关联代码", body);
     }
-    if ((new Date(relationCode.createdAt).getTime() + relationCode.expiration) > new Date().getTime()) {
+    if (new Date().getTime() - (new Date(relationCode.createdAt).getTime()) >= Number(relationCode.expiration)) {
       await ctx.service.curd.delete(ctx.model.RelationCode, {
         _id: relationCode._id
       });
@@ -156,7 +164,7 @@ class CompanyService extends Service {
     }
     return res;
   }
-  async receivables() {
+  async receivablesTab() {
     const ctx = this.ctx;
     let body = ctx.request.body;
     if (!body.company) {
@@ -165,6 +173,16 @@ class CompanyService extends Service {
     let company = await ctx.model.Company.findById(body.company);
     if (!company) {
       ctx.throw(404, '公司信息未找到', body);
+    }
+    let hasRole = await ctx.model.Role.findOne({
+      user: ctx.user._id,
+      company: company._id,
+      type: {
+        $in: ['financial', 'settle']
+      }
+    });
+    if (!hasRole) {
+      ctx.throw(400, '您无操作权限', body);
     }
     let businessTrainsData = await ctx.model.BusinessTrains.find({
       receivedCompany: company._id
@@ -180,11 +198,8 @@ class CompanyService extends Service {
         _id: item[addType]
       });
     });
+    let res = [];
     let payIdArr = [...payIdSet];
-    let res = {
-      businessTrains: [],
-      logistics: []
-    };
     for (let i = 0; i < payIdArr.length; i++) {
       let payItem = payIdArr[i];
       let payData;
@@ -195,20 +210,70 @@ class CompanyService extends Service {
         payData = await ctx.model.User.findById(payItem._id);
       }
       let pushItem = JSON.parse(JSON.stringify(payData));
-      pushItem.orderPaylist = await await ctx.model.BusinessTrains.find({
-        receivedCompany: company._id,
-        [payItem.type]: payItem._id
-      }).populate([{
-        path: 'order',
-        populate: [{
-          path: 'goods',
-          populate: [{
-            path: 'brand'
-          }]
-        }]
-      }]);
-      res.businessTrains.push(pushItem);
+      if (payItem.type === 'user') {
+        pushItem.isUser = true;
+      }
+      res.push(pushItem);
     }
+    return res;
+  }
+  async receivables() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    if (!body.company) {
+      ctx.throw(422, '公司信息必填', body);
+    }
+    let company = await ctx.model.Company.findById(body.company);
+    if (!company) {
+      ctx.throw(404, '公司信息未找到', body);
+    }
+    let hasRole = await ctx.model.Role.findOne({
+      user: ctx.user._id,
+      company: company._id,
+      type: {
+        $in: ['financial', 'settle']
+      }
+    });
+    if (!hasRole) {
+      return [];
+      // ctx.throw(400, '您无操作权限', body);
+    }
+    let findBody = {
+      receivedCompany: company._id,
+      financial: body.financial || false,
+      user: "",
+      company: ""
+    };
+    if (body.payCompany) {
+      findBody.company = body.payCompany;
+      delete findBody.user;
+      if (!findBody.company) {
+        ctx.throw(422, '参数错误', body);
+      }
+    }
+    if (body.payUser) {
+      findBody.user = body.payUser;
+      delete findBody.company;
+      if (!findBody.user) {
+        ctx.throw(422, '参数错误', body);
+      }
+    }
+    let modelNameObj = {
+      'businessTrains': 'BusinessTrains',
+      'logistics': 'Logistics'
+    };
+    let modelName = modelNameObj.businessTrains;
+    if (body.type === 'businessTrains' || body.type === 'logistics') {
+      modelName = modelNameObj[body.type];
+    }
+    let res = await ctx.model[modelName].find(findBody).populate([{
+      path: 'order'
+    }, {
+      path: 'goods',
+      populate: [{
+        path: 'brand'
+      }]
+    }]);
     return res;
   }
 }

@@ -11,16 +11,15 @@
               <div class="flex ac jc">
                 <div v-if="data.type !== 'customer'" style="padding:0 10px">
                   应收:
-                  <span v-if="next.type === 'pool'">{{Number(next.preBalancePrice) * Number(next.balanceCount)}}</span>
-                  <span v-if="next.type === 'customer'">{{Number(order.preBalancePrice) * Number(order.balanceCount)}}</span>
+                  {{Number(next.preBalancePrice) * Number(next.balanceCount)}}
                 </div>
                 <div v-if="data.account && data.type !== 'customer'" style="padding:0 10px">
-                  预收: {{data.account.prepaid}}
+                  预收: 
+                  {{data.account.prepaid}}
                 </div>
                 <div v-if="data.type !== 'supplier'" style="padding:0 10px">
                   应付:
-                  <span v-if="data.type === 'pool'">{{Number(data.preBalancePrice) * Number(data.balanceCount)}}</span>
-                  <span v-if="data.type === 'customer'">{{Number(order.preBalancePrice) * Number(order.balanceCount)}}</span>
+                  {{Number(data.preBalancePrice) * Number(data.balanceCount)}}
                 </div>
               </div>
             </loading-box>
@@ -148,6 +147,9 @@ export default {
     remove() {
       this.$emit("remove", this.data);
     }
+  },
+  mounted(){
+    console.log(this.data);
   }
 };
 </script>

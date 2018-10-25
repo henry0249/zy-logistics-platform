@@ -17,5 +17,45 @@ class BusinessTrainsService extends Service {
     });
     return 'ok';
   }
+  async financial() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    if (!body.company) {
+      ctx.throw(422, '公司信息必填', body);
+    }
+    let company = await ctx.model.Company.findById(body.company);
+    if (!company) {
+      ctx.throw(422, '公司信息未找到', body);
+    }
+    let hasRole = await ctx.model.Role.findOne({
+      user: ctx.user._id,
+      company: company._id,
+      type: 'financial'
+    });
+    if (!hasRole) {
+      return [];
+      // ctx.throw(400, '您无操作权限', body);
+    }
+    let businessTrains = body.businessTrains || [];
+    if (businessTrains.length === 0) {
+      ctx.throw(422, '预审数量不能为0', body);
+    }
+    for (let i = 0; i < businessTrains.length; i++) {
+      const item = businessTrains[i];
+      await ctx.model.BusinessTrains.update({
+        _id: {
+          $in: item._id
+        }
+      }, {
+        financial: true,
+        balancePrice: Number(item.balancePrice)
+      });
+    }
+
+    return 'ok';
+  }
+  async settle() {
+    return 'ok';
+  }
 }
 module.exports = BusinessTrainsService;

@@ -88,7 +88,7 @@ module.exports = {
     default: 0
   },
   price: {
-    name: '运费单价',
+    name: '运输单价',
     type: 'Number',
     require: true,
     default: 0

@@ -79,22 +79,52 @@ class LogisticsService extends Service {
     if (!logistics) {
       ctx.throw(404, "运单不存在", body);
     }
+    let hasRole = await ctx.model.Role.findOne({
+      type: {
+        $in: ['dispatcher', 'dispatcherManager', 'logisticsClerk']
+      }
+    });
+    if (!hasRole) {
+      ctx.throw(400, "您无权限操作", body);
+    }
+    this.obj2id(body);
     if (body.transportation === 'truck') {
       delete body.ship;
     }
     if (body.transportation === 'ship') {
       delete body.truck;
     }
-    if (body.state > 0 && !body[body.transportation]._id) {
-      ctx.throw(422, `运单${logisticsField.state.option[body.state]}前必须填写车船信息`, body);
+    if (Number(body.state) === 5) {
+      if (!(!logistics.checkFail && logistics.dispatcherManagerCheck && logistics.logisticsClerkCheck)) {
+        ctx.throw(400, "该物流单尚未审核完成", body);
+      }
     }
-    if (body[body.transportation]) {
-      body[body.transportation] = body[body.transportation]._id || body[body.transportation];
+    if (Number(body.landed) > Number(body.loading)) {
+      ctx.throw(422, '卸货量不能大于装货量', body);
+    }
+    if (Number(body.loss) > Number(body.loading)) {
+      ctx.throw(422, '损耗数量不能大于装货量', body);
+    }
+    if (Number(body.balanceCount) > Number(body.loading)) {
+      ctx.throw(422, '结算数量不能大于装货量', body);
+    }
+    if (Number(body.state) > 0) {
+      if (!body[body.transportation]) {
+        ctx.throw(422, '车/船 信息未完善', body);
+      }
+    }
+    if (Number(body.state) > 1 && Number(body.loading) <= 0) {
+      ctx.throw(422, '装货量必须大于0', body);
+    }
+    if (Number(body.state) > 1 && Number(body.landed) <= 0) {
+      ctx.throw(422, '卸货量必须大于0', body);
+    }
+    if (Number(body.state) > 1 && Number(body.price) <= 0) {
+      ctx.throw(422, '运费单价必须大于0', body);
     }
     delete body._id;
     delete body.updatedAt;
     delete body.createdAt;
-    this.obj2id(body);
     body.checkFail = '';
     await logistics.update(body);
     return 'ok';
@@ -191,6 +221,12 @@ class LogisticsService extends Service {
     }
     if (!role) {
       ctx.throw(422, "无操作权限", body);
+    }
+    if (!logistics[logistics.transportation]) {
+      ctx.throw(422, "车 / 船信息尚未完善", body);
+    }
+    if (Number(logistics.price) <= 0) {
+      ctx.throw(422, "运费单价必须大于0", body);
     }
     if (role.type === 'dispatcherManager') {
       if (logistics.dispatcherManagerCheck) {

@@ -83,7 +83,7 @@ module.exports = {
       name: '运输工具(车/船)',
       slot: true,
       readOnly: true,
-      width: '190'
+      width: '180'
     },
     loading: {
       name: '装货量',
@@ -104,13 +104,13 @@ module.exports = {
       name: '出发时间',
       type: 'Date',
       slot: true,
-      width: "200"
+      // width: "150"
     },
     finishAt: {
       name: '送达时间',
       type: 'Date',
       slot: true,
-      width: "200"
+      // width: "150"
     },
     total: {
       name: '运费合计',

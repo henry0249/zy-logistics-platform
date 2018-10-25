@@ -111,7 +111,7 @@
     <div class="flex ac" style="margin:15px 0">
       <el-button size="small" v-if="logistics.dispatcherManagerCheck && logistics.logisticsClerkCheck" type="danger">删除运单</el-button>
       <div style="padding-right:10px" v-else>
-        <el-button type="danger" size="small" @click="checkFail" :disabled="!($route.query.role === 'dispatcherManager' || $route.query.role === 'logisticsClerk')">审核失败</el-button>
+        <el-button type="danger" size="small" @click="checkFail" :disabled="!($route.query.role === 'dispatcherManager' || $route.query.role === 'logisticsClerk')">回退修改</el-button>
       </div>
       <div class="f1"></div>
       <el-button size="small" @click="back()">返回</el-button>
@@ -244,10 +244,10 @@ export default {
       this.loadingText = "";
     },
     async checkFail() {
-      this.$prompt("请输入审核失败原因", "提示", {
+      this.$prompt("请输入回退修改原因", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        inputErrorMessage: "失败原因不能为空",
+        inputErrorMessage: "原因不能为空",
         inputPattern: /\S/
       })
         .then(async ({ value }) => {
