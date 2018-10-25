@@ -37,10 +37,15 @@
             </el-table-column>
             <el-table-column :prop="key" :label="val" v-for="(val,key) in thead" :key="key">
             </el-table-column>
+            <el-table-column label="结算总价">
+              <div slot-scope="scope" class="warning"> 
+                {{Number(scope.row.balancePrice) * Number(scope.row.balanceCount)}}
+              </div>
+            </el-table-column>
             <el-table-column prop="balanceForAccount" label="使用结算款" :width="200">
               <div slot-scope="scope" class="flex ac">
-                <el-checkbox v-model="useAccount" @change="useAccountChange($event,scope)"></el-checkbox>
-                <div class="f1" style="padding:0 10px" v-if="useAccount">
+                <el-checkbox v-model="scope.row.useAccount" @change="useAccountChange($event,scope)"></el-checkbox>
+                <div class="f1" style="padding:0 10px" v-if="scope.row.useAccount">
                   <my-form-item size="mini" number v-model="scope.row.balanceForAccount" :min="0">
                   </my-form-item>
                 </div>
@@ -48,8 +53,8 @@
             </el-table-column>
             <el-table-column prop="balanceForAccountPrepaid" label="使用预付款" :width="200">
               <div slot-scope="scope" class="flex ac">
-                <el-checkbox v-model="usePrepaid" @change="usePrepaidChange($event,scope)"></el-checkbox>
-                <div class="f1" style="padding:0 10px" v-if="usePrepaid">
+                <el-checkbox v-model="scope.row.usePrepaid" @change="usePrepaidChange($event,scope)"></el-checkbox>
+                <div class="f1" style="padding:0 10px" v-if="scope.row.usePrepaid">
                   <my-form-item size="mini" number v-model="scope.row.balanceForAccountPrepaid" :min="0">
                   </my-form-item>
                 </div>
@@ -60,8 +65,8 @@
       </el-tabs>
       <div>
         <div class="flex ac" style="padding:15px 0">
-          <el-button size="mini" type="success">使用结算款</el-button>
-          <el-button size="mini" type="warning" style="margin-left:15px">使用预付款</el-button>
+          <el-button size="mini" type="success" @click="mutilUserAccount">一键分配结算款</el-button>
+          <el-button size="mini" type="warning" style="margin-left:15px" @click="mutilUsePrepaid">一键分配预付款</el-button>
           <div class="f1">
           </div>
           <div class="info" style="padding:0 15px">
@@ -96,8 +101,6 @@ export default {
       receivables: [],
       select: [],
       mutilBalancePrice: 0,
-      useAccount: true,
-      usePrepaid: false,
       account: {}
     };
   },
@@ -131,14 +134,16 @@ export default {
     useAccountChange(val, scope) {
       if (val === false) {
         scope.row.balanceForAccount = 0;
-        this.$set(this.receivables, scope.$index, scope.row);
       }
+      scope.row.useAccount = val;
+      this.$set(this.receivables, scope.$index, scope.row);
     },
     usePrepaidChange(val, scope) {
       if (val === false) {
         scope.row.balanceForAccountPrepaid = 0;
-        this.$set(this.receivables, scope.$index, scope.row);
       }
+      scope.row.usePrepaid = val;
+      this.$set(this.receivables, scope.$index, scope.row);
     },
     async getReceivables(payCompanyOrUser, isUser) {
       if (!payCompanyOrUser) {
@@ -160,6 +165,11 @@ export default {
           "/company/receivables",
           findBody
         );
+        this.receivables.forEach((item, index) => {
+          item.useAccount = true;
+          item.usePrepaid = false;
+          this.$set(this.receivables, index, item);
+        });
         this.setBalancePrice();
       } catch (error) {}
       this.tableLoadingText = "";
@@ -250,8 +260,58 @@ export default {
       try {
         this.account = await this.$ajax.post("/account/set", body);
       } catch (error) {}
-      this.useAccount = true;
-      this.usePrepaid = false;
+    },
+    mutilUserAccount() {
+      if (this.select.length === 0) {
+        this.$message.warning("尚未选择");
+        return;
+      }
+      let account = this.account.value;
+      this.select.forEach((item) => {
+        if (account > 0 && item.useAccount) {
+          let balanceTotal = item.balancePrice * item.balanceCount;
+          if (item.balanceForAccountPrepaid < balanceTotal) {
+            if (account > (balanceTotal - item.balanceForAccountPrepaid)) {
+              item.balanceForAccount = balanceTotal - item.balanceForAccountPrepaid;
+              account -= balanceTotal;
+            } else {
+              item.balanceForAccount = account;
+              account -= account;
+            }
+          }
+          this.receivables.forEach((receivablesItem,index)=>{
+            if (receivablesItem._id === item._id) {
+              this.$set(this.receivables, index, item);
+            }
+          });
+        }
+      });
+    },
+    mutilUsePrepaid() {
+      if (this.select.length === 0) {
+        this.$message.warning("尚未选择");
+        return;
+      }
+      let account = this.account.prepaid;
+      this.select.forEach((item) => {
+        if (account > 0 && item.usePrepaid) {
+          let balanceTotal = item.balancePrice * item.balanceCount;
+          if (item.balanceForAccount < balanceTotal) {
+            if (account > (balanceTotal - item.balanceForAccount)) {
+              item.balanceForAccountPrepaid = balanceTotal - item.balanceForAccount;
+              account -= balanceTotal;
+            } else {
+              item.balanceForAccountPrepaid = account;
+              account -= account;
+            }
+          }
+          this.receivables.forEach((receivablesItem,index)=>{
+            if (receivablesItem._id === item._id) {
+              this.$set(this.receivables, index, item);
+            }
+          });
+        }
+      });
     }
   },
   mounted() {

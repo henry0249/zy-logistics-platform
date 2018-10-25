@@ -19,7 +19,10 @@ class CompanyService extends Service {
     if (!body.company) {
       ctx.throw('422', '公司信息必填');
     }
-    if (!body.relationUser && !body.relationCompany) {
+    if (body.type === 'user' && !body.relationUser) {
+      ctx.throw('422', '关联信息错误');
+    }
+    if (body.type === 'company' && !body.relationCompany) {
       ctx.throw('422', '关联信息错误');
     }
     if (body.relationUser && body.relationCompany) {

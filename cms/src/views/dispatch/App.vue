@@ -46,12 +46,12 @@ export default {
       for (const key in val) {
         this.nav.forEach((item, index) => {
           if (item.meta && item.meta.state === key) {
-            if (this.is('object',val[key])) {
+            if (this.is("object", val[key])) {
               item.badge = 0;
               for (const valKey in val[key]) {
                 item.badge += val[key][valKey];
               }
-            }else{
+            } else {
               item.badge = val[key];
             }
           }

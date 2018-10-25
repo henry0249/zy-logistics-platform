@@ -123,7 +123,7 @@ module.exports = {
     let goods_str = this.objectid2random(goods_id);
     let user_str = this.objectid2random(user_id);
     let timestrap = new Date().getTime().toString().substr(13 - 2);
-    let random = this.randomNum(1000,9999);
+    let random = this.randomNum(1000, 9999);
     let res = goods_str + user_str + timestrap + random.toString();
     return pre.toString() + res;
   },
@@ -140,11 +140,16 @@ module.exports = {
       return str.substr(str.length - 2);
     }
   },
-  formatTime(val, str = "YYYY-MM-DD HH:mm:ss"){
+  formatTime(val, str = "YYYY-MM-DD HH:mm:ss") {
     if (val) {
       return dayjs(val).format(str);
     } else {
       return dayjs().format(str);
     }
+  },
+  unique(arr, key) {
+    if (!(arr instanceof Array)) return [];
+    const res = new Map();
+    return arr.filter((a) => !res.has(a[key]) && res.set(a[key], 1));
   }
 };

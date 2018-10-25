@@ -22,7 +22,7 @@
           </div>
         </el-tab-pane>
         <loading-box v-model="tableLoadingText">
-          <el-table size="small" :data="receivables" :height="tableHeight" style="width: 100%" @selection-change="handleSelectionChange" show-summary>
+          <el-table size="small" :data="receivables" :height="tableHeight" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55">
             </el-table-column>
             <el-table-column v-if="key !== 'balancePrice'" :prop="key" :label="val" v-for="(val,key) in thead" :key="key">
@@ -30,6 +30,11 @@
             <el-table-column prop="balancePrice" label="结算价格">
               <my-form-item number size="mini" slot-scope="scope" v-model="scope.row.balancePrice" :min="0">
               </my-form-item>
+            </el-table-column>
+            <el-table-column label="结算总价">
+              <div slot-scope="scope" class="warning"> 
+                {{Number(scope.row.balancePrice) * Number(scope.row.balanceCount)}}
+              </div>
             </el-table-column>
           </el-table>
         </loading-box>
@@ -62,10 +67,10 @@ export default {
       thead: {
         "order.no": "订单号",
         "goods.name": "商品",
-        preBalancePrice: "贸易单价",
         receive: "实收数量",
         loss: "损耗数量",
         balanceCount: "结算数量",
+        preBalancePrice: "贸易单价",
         balancePrice: "结算价格"
       },
       tableHeight:

@@ -61,13 +61,13 @@
       <my-form size="mini" width="24%">
         <div class="flex ac jb">
           <div style="width:24%">
-            <my-select label="运输工具" truck :type.sync="logisticsForm.transportation" :data.sync="logisticsForm[logisticsForm.transportation]" placeholder="运输工具"></my-select>
+            <my-select label="运输工具" truck :type.sync="logisticsForm.transportation" :data.sync="logisticsForm[logisticsForm.transportation]" placeholder="运输工具" :disabled="logistics.dispatcherManagerCheck || logistics.logisticsClerkCheck"></my-select>
           </div>
-          <my-form-item label="装货数量" v-model="logisticsForm.loading" type="number">
+          <my-form-item label="装货数量" v-model="logisticsForm.loading" type="number" :min="0">
           </my-form-item>
-          <my-form-item label="卸货数量" v-model="logisticsForm.landed" type="number">
+          <my-form-item label="卸货数量" v-model="logisticsForm.landed" type="number" :min="0">
           </my-form-item>
-          <my-form-item label="运输单价" v-model="logisticsForm.price" type="number">
+          <my-form-item label="运输单价" v-model="logisticsForm.price" type="number" :min="0" :disabled="logistics.dispatcherManagerCheck || logistics.logisticsClerkCheck">
           </my-form-item>
         </div>
         <div class="flex ac jb" style="margin-top:15px">

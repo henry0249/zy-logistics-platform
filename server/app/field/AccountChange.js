@@ -83,5 +83,13 @@ module.exports = {
     name: '关联的贸易链', //贸易链中包含了付款方和收款方信息
     type: 'ObjectIdArray',
     ref: 'BusinessTrains'
+  },
+  remittanceTime: {
+    name: '汇款时间', //贸易链中包含了付款方和收款方信息
+    type: 'String'
+  },
+  accountingTime: {
+    name: '到账时间', //贸易链中包含了付款方和收款方信息
+    type: 'String'
   }
 }

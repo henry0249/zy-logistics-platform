@@ -19,9 +19,12 @@ class LibController extends Controller {
     const ctx = this.ctx
     ctx.body = await ctx.service.yixiuSms.validate(ctx.request.body)
   }
-  async geocoder(){
+  async geocoder() {
     const ctx = this.ctx;
     ctx.body = await ctx.service.baiduMap.geocoder();
+  }
+  async bankcardinfo() {
+    this.ctx.body = await this.ctx.service.lib.bankcardinfo();
   }
 }
 

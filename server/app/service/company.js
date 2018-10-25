@@ -187,19 +187,20 @@ class CompanyService extends Service {
     let businessTrainsData = await ctx.model.BusinessTrains.find({
       receivedCompany: company._id
     });
-    let payIdSet = new Set();
+    let payIdArr = [];
     businessTrainsData.forEach((item) => {
       let addType = 'company';
       if (item.type === 'customer') {
         addType = item.customerType;
       }
-      payIdSet.add({
+      let pushItem = {
         type: addType,
-        _id: item[addType]
-      });
+        _id: item[addType].toString()
+      };
+      payIdArr.push(pushItem);
     });
+    payIdArr = ctx.helper.unique(payIdArr, '_id');
     let res = [];
-    let payIdArr = [...payIdSet];
     for (let i = 0; i < payIdArr.length; i++) {
       let payItem = payIdArr[i];
       let payData;
