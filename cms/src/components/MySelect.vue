@@ -157,6 +157,7 @@ export default {
       }
       if (this.type) {
         this.innerType = this.type;
+        res = this.type;
       }
       return res;
     },
