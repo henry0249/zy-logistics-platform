@@ -1,12 +1,12 @@
 <template>
   <div :style="{fontSize,width:$attrs.width || '100%'}">
-    <div class="jc jb" style="margin-bottom:5px;">
+    <div v-if="isArray" class="jc jb" style="margin-bottom:5px;">
       <div class="jc js" style="width:50%;">
         <div v-if="$attrs.label" class="tf1" :title="$attrs.label">
           <span class="" :style="{display:'block',fontSize}">{{$attrs.label}}</span>
         </div>
         <div :style="{fontSize}" style="margin-left:5px;flex:0 0 150px">/共选
-          <span class="success">{{this.checkData.length}}</span> 家公司
+          <span class="success">{{checkData.length}}</span> 家公司
         </div>
       </div>
       <div class="jc pointer" @click="dialogTableVisible = true">
@@ -14,7 +14,7 @@
         <i class="el-icon-plus success"></i>
       </div>
     </div>
-    <div class="bottom-box">
+    <div v-if="isArray" class="bottom-box">
       <div v-if="checkData.length > 0" class="jc js" style="flex-wrap: wrap">
         <div class="tag-box" :style="{fontSize:fontSize}" v-for="(item,index) in checkData" :key="index">
           <span>{{item.no || item.name || item.nick || item.mobile}}</span>
@@ -22,6 +22,18 @@
         </div>
       </div>
       <div v-else style="height:32px;line-height:32px;color:#c0c4cc;">未选择</div>
+    </div>
+    <div v-if="!isArray">
+      <my-form-item :label="$attrs.label" :size="size||$parent.size">
+        <div slot="label">
+          {{$attrs.label}}
+        </div>
+        <div style="position:relative" @click="dialogTableVisible = true">
+          <el-input readonly style="width:100%" :value="text" v-bind="$attrs" :placeholder="$attrs.placeholder" :size="size||$parent.size" class="input-with-select blue">
+            <i slot="suffix" class="el-input__icon el-icon-edit blue"></i>
+          </el-input>
+        </div>
+      </my-form-item>
     </div>
     <el-dialog :title="`添加公司`" width="70%" top="15vh" :visible.sync="dialogTableVisible">
       <loading-box v-model="loadingText">
@@ -77,7 +89,7 @@
         default: "60px"
       },
       data: {
-        type: Array,
+        type: [Array, Object],
         default () {
           return [];
         }
@@ -140,6 +152,21 @@
       }
     },
     computed: {
+      text() {
+        if (this.checkData.length > 0) {
+          console.log('this.checkData[this.checkData - 1]', this.checkData[this.checkData.length - 1]);
+          return this.checkData[this.checkData.length - 1].name;
+        } else {
+          return '未选择'
+        }
+      },
+      isArray() {
+        if (this.is('array', this.data)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
       fontSize() {
         let option = {
           large: "15px",
@@ -177,12 +204,25 @@
       },
       delTag(index) {
         this.checkData.splice(index, 1);
-        this.$emit('update:data',this.checkData);
+        this.$emit('update:data', this.checkData);
       },
       handleCurrentChange(val) {
-        console.log(val);
-        this.checkData.push(val);
-        this.checkData = this.duplication(this.checkData);
+        let io = true;
+        this.checkData.forEach(item => {
+          if (val._id === item._id) {
+            this.$message.warn('已选择该商品');
+            io = false;
+          }
+        });
+        if (io) {
+          if (this.isArray) {
+            this.checkData.push(val);
+            this.checkData = this.duplication(this.checkData);
+          } else {
+            this.checkData = [];
+            this.checkData.push(val);
+          }
+        }
       },
       inputChange(val) {
         console.log(val);
@@ -201,30 +241,34 @@
       },
       async go() {
         if (this.ischange) {
-          try {
-            this.loadingText = '更新中...';
-            let update = {
-              _id: this.company._id,
-              relationCode: this.input
-            }
-            let data = [];
-            this.checkData.forEach(item => {
-              data.push(item._id);
-            });
-            for (const key in this.key) {
-              if (this.key.hasOwnProperty(key)) {
-                console.log(this.type === key);
-                if (this.type === key) {
-                  this.$set(update, key, data);
+          if (this.isArray) {
+            try {
+              this.loadingText = '更新中...';
+              let update = {
+                _id: this.company._id,
+                relationCode: this.input
+              }
+              let data = [];
+              this.checkData.forEach(item => {
+                data.push(item._id);
+              });
+              for (const key in this.key) {
+                if (this.key.hasOwnProperty(key)) {
+                  console.log(this.type === key);
+                  if (this.type === key) {
+                    this.$set(update, key, data);
+                  }
                 }
               }
+              await this.$ajax.post('/company/update', update);
+              this.$emit('update:data', this.checkData);
+            } catch (error) {
+              console.log(error);
             }
-            await this.$ajax.post('/company/update', update);
-            this.$emit('update:data', this.checkData);
-          } catch (error) {
-            console.log(error);
+            this.loadingText = '';
+          } else {
+            this.$emit('update:data', this.checkData[this.checkData.length - 1]);
           }
-          this.loadingText = '';
         }
         this.dialogTableVisible = false;
       }
@@ -233,8 +277,16 @@
       if (Object.keys(this.option).length > 0) {
         this.op = JSON.parse(JSON.stringify(this.option));
       }
-      if (this.data.length > 0) {
-        this.checkData = JSON.parse(JSON.stringify(this.data));
+      console.log(this.data);
+      if (this.isArray) {
+        if (this.data.length > 0) {
+          this.checkData = JSON.parse(JSON.stringify(this.data));
+        }
+      } else {
+        if (Object.keys(this.data).length > 0) {
+          this.checkData = [];
+          this.checkData.push(this.data);
+        }
       }
     }
   }

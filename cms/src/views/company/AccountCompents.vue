@@ -7,7 +7,7 @@
         </div>
         <div class="tab-box">
           <el-tabs v-model="activeName" type="border-card">
-            <el-tab-pane v-for="item in accountData" :name="item._id" :key="item.id" :label="item.relationCompany.name">
+            <el-tab-pane v-for="item in accountData" :name="item._id" :key="item.id" :label="item.relationCompany?item.relationCompany.name : item.relationUser.name + '(个人)'">
               <div class="col-flex tab-height">
                 <div class="tab-top">
                   <span>金额：<span class="blue">{{item.value}}</span> 预付款：<span class="danger">{{item.prepaid}}</span></span>
@@ -85,6 +85,8 @@
           company: _id,
           populate: [{
             path: 'relationCompany'
+          },{
+            path: 'relationUser'
           }]
         })
         if (this.accountData.length > 0) {
