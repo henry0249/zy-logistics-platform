@@ -13,20 +13,8 @@
             <common-select-by-code width="24%" :data.sync="accountChangData.toCompany" size="mini" label="付款公司"></common-select-by-code>
           </div>
           <div class="jc jb" style="margin-top:15px;">
-            <brank-cart :data.sync="data" style="width:100%"></brank-cart>
+            <brank-cart :data.sync="data" :initData="initData" style="width:100%"></brank-cart>
           </div>
-          <!-- <div class="jc jb" style="margin-top:15px;">
-                  <my-form-item label="付款方账户" input v-model="accountChangData.from.account"></my-form-item>
-                  <my-form-item label="付款方账号" input v-model="accountChangData.from.number"></my-form-item>
-                  <my-form-item label="开户行" input v-model="accountChangData.from.bank"></my-form-item>
-                  <div style="width:24%"></div>
-                </div>
-                <div class="jc jb" style="margin-top:15px;">
-                  <my-form-item label="收款方账户" input v-model="accountChangData.to.account"></my-form-item>
-                  <my-form-item label="收款方账号" input v-model="accountChangData.to.number"></my-form-item>
-                  <my-form-item label="开户行" input v-model="accountChangData.to.bank"></my-form-item>
-                  <div style="width:24%"></div>
-                </div> -->
         </my-form>
       </div>
       <div class="tr jb" style="margin-top:30px">
@@ -53,7 +41,8 @@
       return {
         loadingText: '',
         clickName: 0,
-        data: [{
+        data:[],
+        initData: [{
           title: '付款方',
           name: 'A公司',
           account: '',
@@ -93,6 +82,9 @@
       };
     },
     watch: {
+      'accountChangData.num'(val){
+        this.$set(this.initData[0],'num',val)
+      },
       data:{
         handler(val){
           console.log(val);
@@ -152,8 +144,8 @@
         number: '',
         bank: ''
       })
-      this.$set(this.data[0],'name',this.accountChangData.toCompany.name);
-      this.$set(this.data[1],'name',this.company.name);
+      this.$set(this.initData[0],'name',this.accountChangData.toCompany.name);
+      this.$set(this.initData[1],'name',this.company.name);
     }
   };
 </script>

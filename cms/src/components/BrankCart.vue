@@ -75,6 +75,12 @@
       data: {
         type: Array,
         default () {
+          return [];
+        }
+      },
+      initData: {
+        type: Array,
+        default () {
           return [{
             title: '付款方',
             name: 'A公司',
@@ -101,7 +107,6 @@
         loadingText: '',
         remitterData: {},
         payerData: {},
-        initData: [],
         pickerOptions: {
           disabledDate(time) {
             return time.getTime() > Date.now();
@@ -110,11 +115,16 @@
       };
     },
     watch: {
+      initData: {
+        handler(val) {
+          this.payerData = val[0];
+          this.remitterData = val[1];
+        },
+        deep: true
+      },
       payerData: {
         handler(val) {
-          console.log(val);
-          console.log(this.data);
-          let data = JSON.parse(JSON.stringify(this.data));
+          let data = JSON.parse(JSON.stringify(this.initData));
           data.splice(0, 1, val);
           this.$emit('update:data', data);
         },
@@ -122,7 +132,7 @@
       },
       remitterData: {
         handler(val) {
-          let data = JSON.parse(JSON.stringify(this.data));
+          let data = JSON.parse(JSON.stringify(this.initData));
           data.splice(1, 1, val);
           this.$emit('update:data', data);
         },
@@ -138,7 +148,7 @@
           let res = await this.getBank(val);
           if (res.validated) {
             this.$set(this.payerData, 'bank', res.bankName);
-            let data = JSON.parse(JSON.stringify(this.data));
+            let data = JSON.parse(JSON.stringify(this.initData));
             data.splice(0, 1, this.payerData);
             this.$emit('update:data', data);
           }
@@ -149,7 +159,7 @@
           let res = await this.getBank(val);
           if (res.validated) {
             this.$set(this.remitterData, 'bank', res.bankName);
-            let data = JSON.parse(JSON.stringify(this.data));
+            let data = JSON.parse(JSON.stringify(this.initData));
             data.splice(1, 1, this.payerData);
             this.$emit('update:data', data);
           }
@@ -249,10 +259,8 @@
       }
     },
     async created() {
-      this.payerData = this.data[0];
-      this.remitterData = this.data[1];
-      console.log('this.remitterData', this.remitterData);
-      console.log('name', this.remitterData.name);
+      this.payerData = this.initData[0];
+      this.remitterData = this.initData[1];
     }
   };
 </script>
