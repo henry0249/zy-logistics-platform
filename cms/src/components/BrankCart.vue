@@ -1,12 +1,15 @@
 <template>
   <loading-box class="js" v-model="loadingText">
-    <el-card class="f1" v-bind="$attrs">
+    <el-card class="f1" v-bind="$attrs" :style="$attrs.cardStyle">
       <div slot="header">
         <slot name="header">
           <div class="jb">
-            <div>
-              <span>{{payerData.title}}</span>
+            <div class="jc js">
+              <span style="width:60px;">{{payerData.title}}</span>
               <span class="danger">{{payerData.name}}</span>
+            </div>
+            <div class="jc js">
+              <my-form-item :disabled="payerData.disabled" width="200px" number :min="0" size="mini" label="付款金额" v-model="payerData.num" placeholder="请输入付款金额"></my-form-item>
             </div>
           </div>
         </slot>
@@ -18,19 +21,29 @@
         <div class="jb" style="margin-top:15px;">
           <my-form-item readonly width="300px" size="mini" label="所属银行：" v-model="payerData.bank" placeholder="请先输入银行卡号"></my-form-item>
         </div>
+        <div class="jb" style="margin-top:15px;">
+          <my-form-item width="300px" size="mini" label="银行全称：" v-model="payerData.bankName" placeholder="比如 中国建设银行(桂平支行)"></my-form-item>
+        </div>
+        <div class="jb" style="margin-top:15px;">
+          <my-form-item size="mini" width="300px" label="付款日期" date v-model="payerData.remittanceTime" type="date" placeholder="选择日期" :picker-options="pickerOptions">
+          </my-form-item>
+        </div>
       </slot>
     </el-card>
     <div class="jc icon-right">
       <icon>icon-jiantou</icon>
       <icon>icon-jiantou</icon>
     </div>
-    <el-card class="f1" v-bind="$attrs">
+    <el-card class="f1" v-bind="$attrs" :style="$attrs.cardStyle">
       <div slot="header">
         <slot name="header">
           <div class="jb">
-            <div>
-              <span>{{remitterData.title}}</span>
+            <div class="jc js">
+              <span style="width:60px;">{{remitterData.title}}</span>
               <span class="danger">{{remitterData.name}}</span>
+            </div>
+            <div class="jc js">
+              <my-form-item width="200px" readonly label="收款金额" size="mini" v-model="remitterData.num" placeholder="请输入付款金额"></my-form-item>
             </div>
           </div>
         </slot>
@@ -40,7 +53,14 @@
           <my-form-item size="mini" width="300px" v-model="remitterData.account" label="账户：" @change="remitterAccountChange" placeholder="请输入银行卡号"></my-form-item>
         </div>
         <div class="jb" style="margin-top:15px;">
-          <my-form-item readonly width="300px" size="mini" label="账户：" v-model="remitterData.bank" placeholder="请输入银行卡号"></my-form-item>
+          <my-form-item readonly width="300px" size="mini" label="所属银行：" v-model="remitterData.bank" placeholder="请先输入银行卡号"></my-form-item>
+        </div>
+        <div class="jb" style="margin-top:15px;">
+          <my-form-item width="300px" size="mini" label="银行全称：" v-model="remitterData.bankName" placeholder="比如 中国建设银行(桂平支行)"></my-form-item>
+        </div>
+        <div class="jb" style="margin-top:15px;">
+          <my-form-item size="mini" width="300px" label="到账日期" date v-model="remitterData.accountingTime" type="date" placeholder="选择日期" :picker-options="pickerOptions">
+          </my-form-item>
         </div>
       </slot>
     </el-card>
@@ -48,13 +68,31 @@
 </template>
 
 <script>
-  // bodyStyle 设置 body 的样式
+  // bodyStyle 设置 el-card里面 匿名slot 的样式
+  // cardStyle 设置 el-card 的样式
   export default {
     props: {
       data: {
         type: Array,
         default () {
-          return [];
+          return [{
+            title: '付款方',
+            name: 'A公司',
+            account: '',
+            bank: '',
+            bankName: '',
+            num: 0,
+            // disabled:true,  
+            remittanceTime: '2018-10-22'
+          }, {
+            title: '收款方',
+            name: 'B公司',
+            account: '',
+            bank: '',
+            bankName: '',
+            num: 0,
+            accountingTime: '2018-10-26'
+          }];
         }
       }
     },
@@ -64,18 +102,36 @@
         remitterData: {},
         payerData: {},
         initData: [],
+        pickerOptions: {
+          disabledDate(time) {
+            return time.getTime() > Date.now();
+          }
+        }
       };
     },
     watch: {
-      async 'payerData.account' (val) {
-        // console.log(val);
-        if (val) {}
+      payerData: {
+        handler(val) {
+          console.log(val);
+          console.log(this.data);
+          let data = JSON.parse(JSON.stringify(this.data));
+          data.splice(0, 1, val);
+          this.$emit('update:data', data);
+        },
+        deep: true
       },
-      'remitterData.account' (val) {
-        console.log(val);
+      remitterData: {
+        handler(val) {
+          let data = JSON.parse(JSON.stringify(this.data));
+          data.splice(1, 1, val);
+          this.$emit('update:data', data);
+        },
+        deep: true
+      },
+      'payerData.num' (val) {
+        this.$set(this.remitterData, 'num', val);
       }
     },
-    computed: {},
     methods: {
       async accountChange(val) {
         if (this.CheckBankNo(val)) {
@@ -195,6 +251,8 @@
     async created() {
       this.payerData = this.data[0];
       this.remitterData = this.data[1];
+      console.log('this.remitterData', this.remitterData);
+      console.log('name', this.remitterData.name);
     }
   };
 </script>

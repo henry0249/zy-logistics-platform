@@ -3,7 +3,7 @@
     <div class="g-order-create">
       <div class="g-order">
         <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
-          <strong>付款单</strong>
+          <strong>{{field.AccountChange.type.option[accountChangData.type] || '收款'}}单</strong>
         </div>
         <my-form width="24%" size="mini">
           <div class="jc jb">
@@ -13,17 +13,20 @@
             <common-select-by-code width="24%" :data.sync="accountChangData.toCompany" size="mini" label="付款公司"></common-select-by-code>
           </div>
           <div class="jc jb" style="margin-top:15px;">
-            <my-form-item label="付款方账户" input v-model="accountChangData.from.account"></my-form-item>
-            <my-form-item label="付款方账号" input v-model="accountChangData.from.number"></my-form-item>
-            <my-form-item label="开户行" input v-model="accountChangData.from.bank"></my-form-item>
-            <div style="width:24%"></div>
+            <brank-cart :data.sync="data" style="width:100%"></brank-cart>
           </div>
-          <div class="jc jb" style="margin-top:15px;">
-            <my-form-item label="收款方账户" input v-model="accountChangData.to.account"></my-form-item>
-            <my-form-item label="收款方账号" input v-model="accountChangData.to.number"></my-form-item>
-            <my-form-item label="开户行" input v-model="accountChangData.to.bank"></my-form-item>
-            <div style="width:24%"></div>
-          </div>
+          <!-- <div class="jc jb" style="margin-top:15px;">
+                  <my-form-item label="付款方账户" input v-model="accountChangData.from.account"></my-form-item>
+                  <my-form-item label="付款方账号" input v-model="accountChangData.from.number"></my-form-item>
+                  <my-form-item label="开户行" input v-model="accountChangData.from.bank"></my-form-item>
+                  <div style="width:24%"></div>
+                </div>
+                <div class="jc jb" style="margin-top:15px;">
+                  <my-form-item label="收款方账户" input v-model="accountChangData.to.account"></my-form-item>
+                  <my-form-item label="收款方账号" input v-model="accountChangData.to.number"></my-form-item>
+                  <my-form-item label="开户行" input v-model="accountChangData.to.bank"></my-form-item>
+                  <div style="width:24%"></div>
+                </div> -->
         </my-form>
       </div>
       <div class="tr jb" style="margin-top:30px">
@@ -50,6 +53,24 @@
       return {
         loadingText: '',
         clickName: 0,
+        data: [{
+          title: '付款方',
+          name: 'A公司',
+          account: '',
+          bank: '',
+          bankName:'',
+          num:0,
+          // disabled:true,
+          remittanceTime:'2018-10-22'
+        }, {
+          title: '收款方',
+          name: 'B公司',
+          account: '',
+          bank: '',
+          bankName:'',
+          num:0,
+          accountingTime:'2018-10-26'
+        }],
         accountChangData: {
           type: 0,
           num: 0,
@@ -72,9 +93,15 @@
       };
     },
     watch: {
+      data:{
+        handler(val){
+          console.log(val);
+        },
+        deep:true
+      },
       'accountChangData.toCompany': {
         handler(val) {
-          this.$set(this.accountChangData.from,'account',val.name);
+          this.$set(this.accountChangData.from, 'account', val.name);
         },
         deep: true
       }
@@ -125,6 +152,8 @@
         number: '',
         bank: ''
       })
+      this.$set(this.data[0],'name',this.accountChangData.toCompany.name);
+      this.$set(this.data[1],'name',this.company.name);
     }
   };
 </script>
