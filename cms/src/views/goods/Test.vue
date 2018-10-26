@@ -6,7 +6,7 @@
           <input type="button" name="anniu2" @click='copyUrl' value="复制URL地址"> -->
     <!-- <i v-copy="'hahahhaa'">hahahhaa</i> -->
     <!-- <common-select-by-code size="mini" label="啦啦啦啦啦啦啦啦啦啦"></common-select-by-code> -->
-    <brank-cart :data="data" style="width:50%"></brank-cart>
+    <brank-cart :data="data" style="width:100%"></brank-cart>
   </div>
 </template>
 
@@ -17,10 +17,13 @@
         data: [{
           title: '付款方',
           name: 'A公司',
-          account:''
+          account:'',
+          bank:''
         }, {
           title: '收款方',
-          name: 'B公司'
+          name: 'B公司',
+          account:'',
+          bank:''
         }]
       }
     },
