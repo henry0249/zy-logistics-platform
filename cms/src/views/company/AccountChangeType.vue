@@ -10,7 +10,7 @@
             <my-form-item label="类型" @change="typeChange" select v-model="accountChangData.type" :options="field.AccountChange.type.option"></my-form-item>
             <my-form-item label="金额" number v-model="accountChangData.num" :min="0"></my-form-item>
             <my-form-item label="税率" number v-model="accountChangData.taxRate"></my-form-item>
-            <common-select-by-code width="24%" :data.sync="accountChangData.toCompany" size="mini" label="付款公司"></common-select-by-code>
+            <common-select-by-code width="24%" user check :data.sync="accountChangData.toCompany" size="mini" label="付款公司"></common-select-by-code>
           </div>
           <div class="jc jb" style="margin-top:15px;">
             <brank-cart :data.sync="data" :initData="initData" style="width:100%"></brank-cart>

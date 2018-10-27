@@ -6,7 +6,8 @@
           <div class="jb">
             <div class="jc js">
               <span style="width:60px;">{{payerData.title}}</span>
-              <span class="danger">{{payerData.name}}</span>
+              <span class="blue">{{payerData.name}}</span>
+              
             </div>
             <div class="jc js">
               <my-form-item :disabled="payerData.disabled" width="200px" number :min="0" size="mini" label="付款金额" v-model="payerData.num" placeholder="请输入付款金额"></my-form-item>
@@ -16,15 +17,18 @@
       </div>
       <slot>
         <div class="jb">
-          <my-form-item size="mini" width="300px" v-model.lazy="payerData.account" label="账户：" placeholder="请输入银行卡号" @change="accountChange"></my-form-item>
+          <my-form-item size="mini" width="300px" v-model.lazy="payerData.account" label="账户：" placeholder="请输入银行卡号"></my-form-item>
         </div>
-        <div class="jb" style="margin-top:15px;">
+        <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;">{{payerCheck}}</span>
+        <div class="jb">
           <my-form-item readonly width="300px" size="mini" label="所属银行：" v-model="payerData.bank" placeholder="请先输入银行卡号"></my-form-item>
         </div>
-        <div class="jb" style="margin-top:15px;">
+        <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
+        <div class="jb">
           <my-form-item width="300px" size="mini" label="银行全称：" v-model="payerData.bankName" placeholder="比如 中国建设银行(桂平支行)"></my-form-item>
         </div>
-        <div class="jb" style="margin-top:15px;">
+        <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
+        <div class="jb">
           <my-form-item size="mini" width="300px" label="付款日期" date v-model="payerData.remittanceTime" type="date" placeholder="选择日期" :picker-options="pickerOptions">
           </my-form-item>
         </div>
@@ -40,7 +44,7 @@
           <div class="jb">
             <div class="jc js">
               <span style="width:60px;">{{remitterData.title}}</span>
-              <span class="danger">{{remitterData.name}}</span>
+              <span class="blue">{{remitterData.name}}</span>
             </div>
             <div class="jc js">
               <my-form-item width="200px" readonly label="收款金额" size="mini" v-model="remitterData.num" placeholder="请输入付款金额"></my-form-item>
@@ -50,15 +54,18 @@
       </div>
       <slot>
         <div class="jb">
-          <my-form-item size="mini" width="300px" v-model="remitterData.account" label="账户：" @change="remitterAccountChange" placeholder="请输入银行卡号"></my-form-item>
+          <my-form-item size="mini" width="300px" v-model="remitterData.account" label="账户：" placeholder="请输入银行卡号"></my-form-item>
         </div>
-        <div class="jb" style="margin-top:15px;">
+        <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;">{{remitterCheck}}</span>
+        <div class="jb">
           <my-form-item readonly width="300px" size="mini" label="所属银行：" v-model="remitterData.bank" placeholder="请先输入银行卡号"></my-form-item>
         </div>
-        <div class="jb" style="margin-top:15px;">
+        <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
+        <div class="jb">
           <my-form-item width="300px" size="mini" label="银行全称：" v-model="remitterData.bankName" placeholder="比如 中国建设银行(桂平支行)"></my-form-item>
         </div>
-        <div class="jb" style="margin-top:15px;">
+        <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
+        <div class="jb">
           <my-form-item size="mini" width="300px" label="到账日期" date v-model="remitterData.accountingTime" type="date" placeholder="选择日期" :picker-options="pickerOptions">
           </my-form-item>
         </div>
@@ -105,6 +112,8 @@
     data() {
       return {
         loadingText: '',
+        payerCheck: '',
+        remitterCheck: '',
         remitterData: {},
         payerData: {},
         pickerOptions: {
@@ -115,6 +124,42 @@
       };
     },
     watch: {
+      async 'payerData.account' (val) {
+        if (val) {
+          this.payerCheck = '';
+          let res = this.CheckBankNo(val);
+          if (!res.isBank) {
+            this.payerCheck = res.str;
+            this.$set(this.payerData, 'bank', '');
+          } else {
+            let res = await this.getBank(val);
+            if (res.validated) {
+              this.$set(this.payerData, 'bank', res.bankName);
+              let data = JSON.parse(JSON.stringify(this.initData));
+              data.splice(0, 1, this.payerData);
+              this.$emit('update:data', data);
+            }
+          }
+        }
+      },
+      async 'remitterData.account' (val) {
+        if (val) {
+          this.remitterCheck = '';
+          let res = this.CheckBankNo(val);
+          if (!res.isBank) {
+            this.remitterCheck = res.str;
+            this.$set(this.remitterData, 'bank', '');
+          } else {
+            let res = await this.getBank(val);
+            if (res.validated) {
+              this.$set(this.remitterData, 'bank', res.bankName);
+              let data = JSON.parse(JSON.stringify(this.initData));
+              data.splice(0, 1, this.remitterData);
+              this.$emit('update:data', data);
+            }
+          }
+        }
+      },
       initData: {
         handler(val) {
           this.payerData = val[0];
@@ -143,28 +188,6 @@
       }
     },
     methods: {
-      async accountChange(val) {
-        if (this.CheckBankNo(val)) {
-          let res = await this.getBank(val);
-          if (res.validated) {
-            this.$set(this.payerData, 'bank', res.bankName);
-            let data = JSON.parse(JSON.stringify(this.initData));
-            data.splice(0, 1, this.payerData);
-            this.$emit('update:data', data);
-          }
-        }
-      },
-      async remitterAccountChange(val) {
-        if (this.CheckBankNo(val)) {
-          let res = await this.getBank(val);
-          if (res.validated) {
-            this.$set(this.remitterData, 'bank', res.bankName);
-            let data = JSON.parse(JSON.stringify(this.initData));
-            data.splice(1, 1, this.payerData);
-            this.$emit('update:data', data);
-          }
-        }
-      },
       async getBank(val) {
         let res = {};
         try {
@@ -222,40 +245,58 @@
         var k = parseInt(sumTotal) % 10 == 0 ? 10 : parseInt(sumTotal) % 10;
         var luhn = 10 - k;
         if (lastNum == luhn) {
-          console.log("验证通过");
           return true;
         } else {
-          this.$message.warn("银行卡号必须符合luhn校验");
           return false;
         }
       },
       //检查银行卡号
       CheckBankNo(bankno) {
+        let str = '';
+        let isBank = true;
         var bankno = bankno.replace(/\s/g, '');
         if (bankno == "") {
-          this.$message.warn("请填写银行卡号");
-          return false;
+          str = '请填写银行卡号';
+          return {
+            str,
+            isBank: false
+          };
         }
         if (bankno.length < 16 || bankno.length > 19) {
-          this.$message.warn("银行卡号长度必须在16到19之间");
-          return false;
+          str = '银行卡号长度必须在16到19之间';
+          return {
+            str,
+            isBank: false
+          };
         }
         var num = /^\d*$/; //全数字
         if (!num.exec(bankno)) {
-          this.$message.warn("银行卡号必须全为数字");
-          return false;
+          str = '银行卡号必须全为数字';
+          return {
+            str,
+            isBank: false
+          };
         }
         //开头6位
         var strBin = "10,18,30,35,37,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,58,60,62,65,68,69,84,87,88,94,95,98,99";
         if (strBin.indexOf(bankno.substring(0, 2)) == -1) {
-          this.$message.warn("银行卡号开头6位不符合规范");
-          return false;
+          str = '银行卡号开头6位不符合规范';
+          return {
+            str,
+            isBank: false
+          };
         }
         //Luhn校验
         if (!this.luhnCheck(bankno)) {
-          return false;
+          return {
+            str: '银行卡号必须符合luhn校验',
+            isBank: false
+          };
         }
-        return true;
+        return {
+          str: '',
+          isBank: true
+        }
       }
     },
     async created() {

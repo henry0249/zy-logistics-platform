@@ -28,14 +28,19 @@
         <div slot="label">
           {{$attrs.label}}
         </div>
-        <div style="position:relative" @click="dialogTableVisible = true">
-          <el-input readonly style="width:100%" :value="text" v-bind="$attrs" :placeholder="$attrs.placeholder" :size="size||$parent.size" class="input-with-select blue">
-            <i slot="suffix" class="el-input__icon el-icon-edit blue"></i>
-          </el-input>
+        <div class="jc js">
+          <div v-if="check">
+            <text-dropdown v-model="value" :color="['#E6A23C','#409EFF']" :options="checkOption"></text-dropdown>
+          </div>
+          <div style="position:relative" @click="dialogTableVisible = true">
+            <el-input readonly style="width:100%" :value="text" v-bind="$attrs" :placeholder="$attrs.placeholder" :size="size||$parent.size" class="input-with-select blue">
+              <i slot="suffix" class="el-input__icon el-icon-edit blue"></i>
+            </el-input>
+          </div>
         </div>
       </my-form-item>
     </div>
-    <el-dialog :title="`添加公司`" width="70%" top="15vh" :visible.sync="dialogTableVisible">
+    <el-dialog :title="`添加${commonData.name[typeStr]}`" width="70%" top="15vh" :visible.sync="dialogTableVisible">
       <loading-box v-model="loadingText">
         <div class="as js" ref="tag">
           <div :style="{fontSize:fontSize,flex:'0 0 80px'}">已选择：</div>
@@ -47,9 +52,10 @@
           </div>
         </div>
         <div v-if="dialogTableVisible" style="height:calc(50vh - 50px)">
-          <my-table v-if="!loadingText" border stripe size="mini" height="50vh - 50px" @current-change="handleCurrentChange" :thead="thead" :data="tableData">
+          <my-table v-if="dialogTableVisible" border stripe size="mini" height="50vh - 50px" @current-change="handleCurrentChange" :thead="thead" :data="tableData">
             <div slot="header" class="jc jb" style="margin:10px 0">
-              <my-form-item size="mini" width="250px" v-model="input" @change="inputChange" placeholder="输入公司关联代码"></my-form-item>
+              <my-form-item v-if="typeStr === 'company'" size="mini" width="250px" v-model="input" @change="inputChange" placeholder="输入公司关联代码"></my-form-item>
+              <my-form-item v-if="typeStr === 'user'" size="mini" width="250px" v-model="mobile" @change="mobileChange" placeholder="输入手机号"></my-form-item>
               <el-button size="mini" type="primary" @click="search">搜 索</el-button>
             </div>
             <div slot-scope="scope" v-if="scope.prop === 'type'">
@@ -70,6 +76,7 @@
 </template>
 
 <script>
+  import commonData from './CommonSelectByCode.js';
   export default {
     props: {
       type: {
@@ -100,6 +107,10 @@
           return {};
         }
       },
+      check: {
+        type: Boolean,
+        default: false
+      },
       code: {
         type: String,
         default: ''
@@ -107,27 +118,21 @@
     },
     data() {
       return {
+        commonData,
         ischange: false,
+        value: 'company',
+        mobile: '',
+        typeStr: '',
         checkData: [],
         loadingText: '',
         dialogTableVisible: false,
         input: '',
         op: {},
+        thead: {},
         tableData: [],
-        thead: {
-          name: {
-            readOnly: true,
-            name: '公司名称'
-          },
-          nick: {
-            readOnly: true,
-            name: '公司别称'
-          },
-          type: {
-            readOnly: true,
-            slot: true,
-            name: '公司类型'
-          }
+        checkOption: {
+          user: '用户',
+          company: '公司'
         },
         key: {
           transportTrainsRelationCompany: {
@@ -143,12 +148,21 @@
       dialogTableVisible(val) {
         this.tableData = [];
         this.input = '';
+        this.mobile = '';
       },
       checkData: {
         handler(val) {
           this.ischange = true;
         },
         deep: true
+      },
+      value(val) {
+        this.typeStr = val;
+        this.checkData = [];
+      },
+      typeStr(val) {
+        console.log(val);
+        this.thead = this.commonData.thead[val];
       }
     },
     computed: {
@@ -186,17 +200,27 @@
         this.checkData.splice(index, 1);
       },
       async search() {
-        if (this.input) {
+        if (this.input || this.mobile) {
           this.tableData = [];
           try {
             this.loadingText = '搜索中...';
-            let res = await this.$ajax.post('/relationCode/findOne', {
-              value: this.input,
-              populate: [{
-                path: 'company'
-              }]
-            });
-            this.tableData.push(res.company);
+            if (this.typeStr === 'company') {
+              let res = await this.$ajax.post('/relationCode/findOne', {
+                value: this.input,
+                populate: [{
+                  path: 'company'
+                }]
+              });
+              this.tableData.push(res.company);
+            } else if (this.typeStr === 'user') {
+              let res = await this.$ajax.post('/user/findOne', {
+                mobile: this.mobile,
+                populate: [{
+                  path: 'company'
+                }]
+              });
+              this.tableData.push(res);
+            }
             this.duplication(this.tableData);
           } catch (error) {}
           this.loadingText = '';
@@ -227,13 +251,14 @@
       inputChange(val) {
         console.log(val);
       },
+      mobileChange(val) {},
       duplication(val) {
         let data = val;
         for (let index = 0; index < data.length; index++) {
           for (let i = index + 1; i < data.length; i++) {
             if (JSON.stringify(data[index]) === JSON.stringify(data[i])) {
               data.splice(i, 1);
-              this.$message.warn('已选择该公司');
+              this.$message.warn(`已选择该${this.commonData.name}`);
             }
           }
         }
@@ -242,32 +267,35 @@
       async go() {
         if (this.ischange) {
           if (this.isArray) {
-            try {
-              this.loadingText = '更新中...';
-              let update = {
-                _id: this.company._id,
-                relationCode: this.input
-              }
-              let data = [];
-              this.checkData.forEach(item => {
-                data.push(item._id);
-              });
-              for (const key in this.key) {
-                if (this.key.hasOwnProperty(key)) {
-                  console.log(this.type === key);
-                  if (this.type === key) {
-                    this.$set(update, key, data);
+            if (this.type) {
+              try {
+                this.loadingText = '更新中...';
+                let update = {
+                  _id: this.company._id,
+                  relationCode: this.input
+                }
+                let data = [];
+                this.checkData.forEach(item => {
+                  data.push(item._id);
+                });
+                for (const key in this.key) {
+                  if (this.key.hasOwnProperty(key)) {
+                    if (this.type === key) {
+                      this.$set(update, key, data);
+                    }
                   }
                 }
-              }
-              await this.$ajax.post('/company/update', update);
-              this.$emit('update:data', this.checkData);
-            } catch (error) {
-              console.log(error);
+                await this.$ajax.post('/company/update', update);
+              } catch (error) {}
+              this.loadingText = '';
             }
-            this.loadingText = '';
+            this.$emit('update:data', this.checkData);
           } else {
-            this.$emit('update:data', this.checkData[this.checkData.length - 1]);
+            if (this.checkData > 0) {
+              this.$emit('update:data', this.checkData[this.checkData.length - 1]);
+            } else {
+              this.$emit('update:data', {});
+            }
           }
         }
         this.dialogTableVisible = false;
@@ -277,7 +305,6 @@
       if (Object.keys(this.option).length > 0) {
         this.op = JSON.parse(JSON.stringify(this.option));
       }
-      console.log(this.data);
       if (this.isArray) {
         if (this.data.length > 0) {
           this.checkData = JSON.parse(JSON.stringify(this.data));
@@ -288,6 +315,16 @@
           this.checkData.push(this.data);
         }
       }
+      for (const key in this.$attrs) {
+        if (key === 'user') {
+          this.typeStr = key;
+        }
+        if (key === 'company') {
+          this.typeStr = key;
+        }
+      };
+      this.value = this.typeStr;
+      this.thead = this.commonData.thead[this.typeStr];
     }
   }
 </script>

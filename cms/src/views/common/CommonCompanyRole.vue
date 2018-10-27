@@ -178,7 +178,7 @@
         this.area = [];
       },
       resArea() {
-        this.newData.forEach((newDataItem,index) => {
+        this.newData.forEach((newDataItem, index) => {
           if (newDataItem.type !== 'companyAdmin' && newDataItem.area.length === 0 || !newDataItem.area) {
             this.$set(this.newData[index], 'area', this.area);
           }
@@ -225,6 +225,7 @@
               this.$set(obj, 'bonus', 0);
             }
             this.newData.push(obj);
+            this.dialogTableVisible = false;
           }
         }
         this.newData = this.repeat(this.newData);

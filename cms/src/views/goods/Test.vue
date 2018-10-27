@@ -5,8 +5,9 @@
           </div>
           <input type="button" name="anniu2" @click='copyUrl' value="复制URL地址"> -->
     <!-- <i v-copy="'hahahhaa'">hahahhaa</i> -->
-    <!-- <common-select-by-code size="mini" label="啦啦啦啦啦啦啦啦啦啦"></common-select-by-code> -->
-    <brank-cart :data="data" style="width:100%"></brank-cart>
+    <common-select-by-code check size="mini" label="啦啦啦啦啦啦啦啦啦啦"></common-select-by-code>
+    <!-- <brank-cart :data="data" style="width:100%"></brank-cart> -->
+    <text-dropdown v-model="value" :color="['#E6A23C','#409EFF']" :options="option"></text-dropdown>
   </div>
 </template>
 
@@ -24,7 +25,12 @@
           name: 'B公司',
           account:'',
           bank:''
-        }]
+        }],
+        value:0,
+        option:{
+          0:'用户',
+          1:'公司'
+        }
       }
     },
     methods: {
