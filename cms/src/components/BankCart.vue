@@ -10,8 +10,6 @@
 </template>
 
 <script>
-  // bodyStyle 设置 el-card里面 匿名slot 的样式
-  // cardStyle 设置 el-card 的样式
   export default {
     props: {
       data: {

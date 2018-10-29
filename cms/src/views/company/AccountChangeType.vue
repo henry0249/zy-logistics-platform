@@ -40,12 +40,14 @@
           from: {
             bank: '',
             bankName: '',
-            account: ''
+            account: '',
+            type: ''
           },
           to: {
             bank: '',
             bankName: '',
-            account: ''
+            account: '',
+            type: ''
           },
           remittanceTime: '',
           accountingTime: '2018-10-21',
@@ -58,11 +60,51 @@
         },
       };
     },
-    watch: {},
-    methods: {
-      async sub() {}
+    watch: {
+      data: {
+        handler(val) {
+          console.log(val);
+        },
+        deep: true
+      }
     },
-    created() {}
+    methods: {
+      async sub() {
+        try {
+          this.loadingText = '添加中';
+          let setOption = {
+            value: this.data.value,
+            from: this.data.from,
+            to: this.data.to,
+            payUserType: this.data.from.type,
+            type:Number(this.$route.query.type),
+            remittanceTime:this.formatTime(this.data.remittanceTime,'YYYY-MM-DD'),
+            accountingTime:this.formatTime(this.data.accountingTime,'YYYY-MM-DD'),
+          }
+          if (this.$route.query.type === '5') {
+            this.$set(setOption, 'toCompany', this.data.toCompany._id);
+            if (typeof(this.data.company) === 'string') {
+              this.$set(setOption, 'mobile', this.data.company);
+            }
+          } else {
+            this.$set(setOption, 'company', this.data.company._id);
+            if (typeof(this.data.toCompany) === 'string') {
+              this.$set(setOption, 'mobile', this.data.toCompany);
+            }
+          }
+          console.log(setOption);
+          await this.$ajax.post('/accountChange/set', setOption);
+        } catch (error) {}
+        this.loadingText = '';
+      }
+    },
+    created() {
+      if (this.$route.query.type === '5') {
+        this.$set(this.initData, 'toCompany', this.company);
+      } else {
+        this.$set(this.initData, 'company', this.company);
+      }
+    }
   };
 </script>
 

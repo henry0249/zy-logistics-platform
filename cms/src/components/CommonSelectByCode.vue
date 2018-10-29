@@ -29,13 +29,14 @@
           {{$attrs.label}}
         </div>
         <div class="jc js">
-          <div v-if="check">
-            <text-dropdown v-model="value" :color="['#E6A23C','#409EFF']" :options="checkOption"></text-dropdown>
+          <div v-if="check" class="f1">
+            <text-dropdown v-model="value" :color="['#E6A23C','#409EFF','#67C23A']" :options="checkOption"></text-dropdown>
           </div>
-          <div style="position:relative" @click="dialogTableVisible = true">
-            <el-input readonly style="width:100%" :value="text" v-bind="$attrs" :placeholder="$attrs.placeholder" :size="size||$parent.size" class="input-with-select blue">
+          <div style="position:relative" @click="clickInputt">
+            <el-input v-if="show" :readonly="readonly" style="width:100%" :value="text" v-bind="$attrs" :placeholder="$attrs.placeholder" :size="size||$parent.size" class="input-with-select blue">
               <i slot="suffix" class="el-input__icon el-icon-edit blue"></i>
             </el-input>
+            <el-input v-else ref="input" style="width:100%" v-model="inputValue" v-bind="$attrs" :placeholder="$attrs.placeholder" :size="size||$parent.size" class="input-with-select blue"></el-input>
           </div>
         </div>
       </my-form-item>
@@ -79,6 +80,10 @@
   import commonData from './CommonSelectByCode.js';
   export default {
     props: {
+      userTtype: {
+        type: String,
+        default: ''
+      },
       type: {
         type: String,
         default: ''
@@ -96,7 +101,7 @@
         default: "60px"
       },
       data: {
-        type: [Array, Object],
+        type: [Array, Object, String],
         default () {
           return [];
         }
@@ -120,6 +125,9 @@
       return {
         commonData,
         ischange: false,
+        readonly: false,
+        show: true,
+        inputValue: '',
         value: 'company',
         mobile: '',
         typeStr: '',
@@ -132,7 +140,8 @@
         tableData: [],
         checkOption: {
           user: '用户',
-          company: '公司'
+          company: '公司',
+          mobile: '手机'
         },
         key: {
           transportTrainsRelationCompany: {
@@ -145,6 +154,11 @@
       }
     },
     watch: {
+      inputValue(val) {
+        if (this.show === false) {
+          this.$emit('update:data', val);
+        }
+      },
       dialogTableVisible(val) {
         this.tableData = [];
         this.input = '';
@@ -157,11 +171,17 @@
         deep: true
       },
       value(val) {
+        this.$emit('update:userType', val);
         this.typeStr = val;
         this.checkData = [];
+        this.inputValue = '';
+        if (val !== 'mobile') {
+          this.show = true;
+        } else {
+          this.show = false;
+        }
       },
       typeStr(val) {
-        console.log(val);
         this.thead = this.commonData.thead[val];
       }
     },
@@ -196,6 +216,11 @@
       }
     },
     methods: {
+      clickInputt() {
+        if (this.value !== 'mobile') {
+          this.dialogTableVisible = true;
+        }
+      },
       handleClose(tag, index) {
         this.checkData.splice(index, 1);
       },
@@ -324,6 +349,7 @@
         }
       };
       this.value = this.typeStr;
+      this.$emit('update:userType', this.typeStr);
       this.thead = this.commonData.thead[this.typeStr];
     }
   }

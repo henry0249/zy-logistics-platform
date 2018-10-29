@@ -5,11 +5,11 @@
         <slot name="header">
           <div class="jb">
             <div class="jc js">
-              <common-select-by-code v-if="isFrom" width="300px" company check :data.sync="data.company" size="mini" label="付款方"></common-select-by-code>
-              <common-select-by-code v-else width="300px" company check :data.sync="data.toCompany" size="mini" label="收款方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom" :userType.sync="userType" width="300px" company check :data.sync="data.company" placeholder="未注册公司或用户" size="mini" label="付款方"></common-select-by-code>
+              <common-select-by-code v-else width="300px" :userType.sync="userType" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收款方"></common-select-by-code>
             </div>
             <div class="jc js">
-              <my-form-item :disabled="isFrom?false:true" width="200px" number :min="0" size="mini" label="付款金额" v-model="data.value" placeholder="请输入付款金额"></my-form-item>
+              <my-form-item :readonly="isFrom?false:true" width="200px" size="mini" label="付款金额" v-model="data.value" placeholder="请输入付款金额"></my-form-item>
             </div>
           </div>
         </slot>
@@ -31,7 +31,7 @@
         </div>
         <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
         <div class="jb">
-          <my-form-item v-if="isFrom" size="mini" label="付款日期" date v-model="data.remittanceTime" type="date" placeholder="选择日期" :picker-options="pickerOptions">
+          <my-form-item v-if="isFrom" size="mini" label="转账日期" date v-model="data.remittanceTime" type="date" placeholder="选择日期" :picker-options="pickerOptions">
           </my-form-item>
           <my-form-item v-else size="mini" label="到账日期" date v-model="data.accountingTime" type="date" placeholder="选择日期" :picker-options="pickerOptions">
           </my-form-item>
@@ -54,8 +54,8 @@
     data() {
       return {
         check: '',
+        userType: '',
         loadingText: '',
-        initData: {},
         pickerOptions: {
           disabledDate(time) {
             return time.getTime() > Date.now();
@@ -64,6 +64,15 @@
       }
     },
     watch: {
+      userType(val) {
+        let data = JSON.parse(JSON.stringify(this.data));
+        if (this.isFrom) {
+          this.$set(data.from, 'type', val);
+        } else {
+          this.$set(data.to, 'type', val);
+        }
+        this.$emit('update:data', data);
+      },
       'data.from.account' (val) {
         if (val) {
           if (this.isFrom) {
@@ -228,9 +237,7 @@
       }
     },
     created() {
-      if (Object.keys(this.data).length > 0) {
-        // this.initData = JSON.parse(JSON.stringify(this.data));
-      }
+      if (Object.keys(this.data).length > 0) {}
     }
   }
 </script>
