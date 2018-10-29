@@ -35,18 +35,28 @@
           <el-table size="small" :data="receivables" :height="tableHeight" style="width: 100%" @selection-change="handleSelectionChange" show-summary>
             <el-table-column type="selection" width="55">
             </el-table-column>
+            <el-table-column label="订单号">
+              <div slot-scope="scope" class="blue"> 
+                {{scope.row.order.no}}
+              </div>
+            </el-table-column>
             <el-table-column :prop="key" :label="val" v-for="(val,key) in thead" :key="key">
             </el-table-column>
-            <el-table-column label="结算总价">
+            <el-table-column label="待结算总额">
               <div slot-scope="scope" class="warning"> 
-                {{Number(scope.row.balancePrice) * Number(scope.row.balanceCount)}}
+                ¥ {{Number(scope.row.balancePrice) * Number(scope.row.balanceCount)}}
+              </div>
+            </el-table-column>
+            <el-table-column label="已结算金额">
+              <div slot-scope="scope" class="danger"> 
+                ¥ {{scope.row.balanced}}
               </div>
             </el-table-column>
             <el-table-column prop="balanceForAccount" label="使用结算款" :width="200">
               <div slot-scope="scope" class="flex ac">
                 <el-checkbox v-model="scope.row.useAccount" @change="useAccountChange($event,scope)"></el-checkbox>
                 <div class="f1" style="padding:0 10px" v-if="scope.row.useAccount">
-                  <my-form-item size="mini" number v-model="scope.row.balanceForAccount" :min="0">
+                  <my-form-item size="mini" number v-model="scope.row.balanceForAccount" :min="0" :max="getItemMax(scope.row)">
                   </my-form-item>
                 </div>
               </div>
@@ -55,9 +65,14 @@
               <div slot-scope="scope" class="flex ac">
                 <el-checkbox v-model="scope.row.usePrepaid" @change="usePrepaidChange($event,scope)"></el-checkbox>
                 <div class="f1" style="padding:0 10px" v-if="scope.row.usePrepaid">
-                  <my-form-item size="mini" number v-model="scope.row.balanceForAccountPrepaid" :min="0">
+                  <my-form-item size="mini" number v-model="scope.row.balanceForAccountPrepaid" :min="0" :max="getItemMax(scope.row,1)">
                   </my-form-item>
                 </div>
+              </div>
+            </el-table-column>
+            <el-table-column label="结算总额">
+              <div slot-scope="scope" class="warning"> 
+                ¥ {{scope.row.balanceForAccountPrepaid + scope.row.balanceForAccount}}
               </div>
             </el-table-column>
           </el-table>
@@ -72,7 +87,7 @@
           <div class="info" style="padding:0 15px">
             已选 <span class="blue">{{select.length}}</span> 条
           </div>
-          <el-button size="mini" type="primary" @click="submit">确认收款</el-button>
+          <el-button size="mini" type="primary" @click="submit">确认结算</el-button>
         </div>
       </div>
     </div>
@@ -87,11 +102,8 @@ export default {
       tableLoadingText: "",
       activeTab: "",
       thead: {
-        "order.no": "订单号",
         "goods.name": "商品",
         preBalancePrice: "贸易单价",
-        receive: "实收数量",
-        loss: "损耗数量",
         balanceCount: "结算数量",
         balancePrice: "结算价格"
       },
@@ -122,7 +134,7 @@ export default {
       try {
         let res = await this.$ajax.post("/company/receivablesTab", {
           company: this.company._id,
-          type: this.radio
+          role: "settle"
         });
         this.tab = res;
         if (res.length > 0) {
@@ -154,7 +166,8 @@ export default {
         this.receivables = [];
         let findBody = {
           company: this.company._id,
-          financial: true
+          financial: true,
+          role: "settle"
         };
         if (isUser) {
           findBody.payUser = payCompanyOrUser;
@@ -221,23 +234,35 @@ export default {
       };
       for (let i = 0; i < this.select.length; i++) {
         const item = this.select[i];
-        if ((Number(item.balancePrice) || 0) == 0) {
-          this.$message.warning("结算价格不能为0");
+        let balanceTotal =
+          item.balancePrice * item.balanceCount - item.balanced;
+        if (
+          item.balanceForAccount + item.balanceForAccountPrepaid >
+          balanceTotal
+        ) {
+          this.$message.danger("总结算金额不能大于待结算金额");
           return;
         }
         postData.businessTrains.push({
           _id: item._id,
-          balancePrice: Number(item.balancePrice) || 0
+          balanceForAccount: Number(item.balanceForAccount) || 0,
+          balanceForAccountPrepaid: Number(item.balanceForAccountPrepaid) || 0
         });
       }
-      this.loadingText = "正在审核";
+      this.loadingText = "正在结算";
       try {
-        // await this.$ajax.post("/businessTrains/financial", postData);
-        this.$message.success("收款成功");
-        let item = this.getTabItem(this.activeTab);
-        if (item) {
-          await this.getReceivables(item._id, item.isUser);
-        }
+        await this.$ajax.post("/businessTrains/settle", postData);
+        this.$store.commit("setSettlelist", {
+          type: "businessTrainsSettlelist",
+          list: this.select
+        });
+        this.$router.push({
+          path: "/settle/account",
+          query: {
+            parentPath: this.$route.path,
+            parentName: this.$route.name
+          }
+        });
       } catch (error) {}
       this.loadingText = "";
     },
@@ -267,19 +292,21 @@ export default {
         return;
       }
       let account = this.account.value;
-      this.select.forEach((item) => {
+      this.select.forEach(item => {
         if (account > 0 && item.useAccount) {
-          let balanceTotal = item.balancePrice * item.balanceCount;
+          let balanceTotal =
+            item.balancePrice * item.balanceCount - item.balanced;
           if (item.balanceForAccountPrepaid < balanceTotal) {
-            if (account > (balanceTotal - item.balanceForAccountPrepaid)) {
-              item.balanceForAccount = balanceTotal - item.balanceForAccountPrepaid;
+            if (account > balanceTotal - item.balanceForAccountPrepaid) {
+              item.balanceForAccount =
+                balanceTotal - item.balanceForAccountPrepaid;
               account -= balanceTotal;
             } else {
               item.balanceForAccount = account;
               account -= account;
             }
           }
-          this.receivables.forEach((receivablesItem,index)=>{
+          this.receivables.forEach((receivablesItem, index) => {
             if (receivablesItem._id === item._id) {
               this.$set(this.receivables, index, item);
             }
@@ -293,25 +320,38 @@ export default {
         return;
       }
       let account = this.account.prepaid;
-      this.select.forEach((item) => {
+      this.select.forEach(item => {
         if (account > 0 && item.usePrepaid) {
-          let balanceTotal = item.balancePrice * item.balanceCount;
+          let balanceTotal =
+            item.balancePrice * item.balanceCount - item.balanced;
           if (item.balanceForAccount < balanceTotal) {
-            if (account > (balanceTotal - item.balanceForAccount)) {
-              item.balanceForAccountPrepaid = balanceTotal - item.balanceForAccount;
+            if (account > balanceTotal - item.balanceForAccount) {
+              item.balanceForAccountPrepaid =
+                balanceTotal - item.balanceForAccount;
               account -= balanceTotal;
             } else {
               item.balanceForAccountPrepaid = account;
               account -= account;
             }
           }
-          this.receivables.forEach((receivablesItem,index)=>{
+          this.receivables.forEach((receivablesItem, index) => {
             if (receivablesItem._id === item._id) {
               this.$set(this.receivables, index, item);
             }
           });
         }
       });
+    },
+    getItemMax(item, type = 0) {
+      let typeObj = {
+        0: "balanceForAccountPrepaid",
+        1: "balanceForAccount"
+      };
+      return (
+        item.balancePrice * item.balanceCount -
+        item.balanced -
+        item[typeObj[type]]
+      );
     }
   },
   mounted() {

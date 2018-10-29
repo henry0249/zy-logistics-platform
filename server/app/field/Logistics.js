@@ -108,6 +108,25 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
+  balanceForAccount: {
+    name: '用结算款结算金额',
+    type: 'Number',
+    default: 0
+  },
+  balanceForAccountPrepaid: {
+    name: '用预付款结算金额',
+    type: 'Number',
+    default: 0
+  },
+  balanced: {
+    name: '已结算金额',
+    type: 'Number',
+    default: 0
+  },
+  balancedObj: {
+    name: '已结算金额对象', //一个accountChange的_id对应一个金额,因为一次结算,不一定付完
+    type: 'Object'
+  },
   loss: {
     name: '损耗数量',
     type: 'Number',

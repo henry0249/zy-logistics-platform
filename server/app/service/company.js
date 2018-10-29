@@ -170,6 +170,9 @@ class CompanyService extends Service {
     if (!body.company) {
       ctx.throw(422, '公司信息必填', body);
     }
+    if (!body.role) {
+      ctx.throw(422, '权限信息获取失败', body);
+    }
     let company = await ctx.model.Company.findById(body.company);
     if (!company) {
       ctx.throw(404, '公司信息未找到', body);
@@ -177,12 +180,11 @@ class CompanyService extends Service {
     let hasRole = await ctx.model.Role.findOne({
       user: ctx.user._id,
       company: company._id,
-      type: {
-        $in: ['financial', 'settle']
-      }
+      type: body.role
     });
     if (!hasRole) {
-      ctx.throw(400, '您无操作权限', body);
+      // ctx.throw(400, '您无操作权限', body);
+      return [];
     }
     let businessTrainsData = await ctx.model.BusinessTrains.find({
       receivedCompany: company._id
@@ -224,6 +226,9 @@ class CompanyService extends Service {
     if (!body.company) {
       ctx.throw(422, '公司信息必填', body);
     }
+    if (!body.role) {
+      ctx.throw(422, '权限信息获取失败', body);
+    }
     let company = await ctx.model.Company.findById(body.company);
     if (!company) {
       ctx.throw(404, '公司信息未找到', body);
@@ -231,13 +236,10 @@ class CompanyService extends Service {
     let hasRole = await ctx.model.Role.findOne({
       user: ctx.user._id,
       company: company._id,
-      type: {
-        $in: ['financial', 'settle']
-      }
+      type: body.role
     });
     if (!hasRole) {
       return [];
-      // ctx.throw(400, '您无操作权限', body);
     }
     let findBody = {
       receivedCompany: company._id,
@@ -267,7 +269,7 @@ class CompanyService extends Service {
     if (body.type === 'businessTrains' || body.type === 'logistics') {
       modelName = modelNameObj[body.type];
     }
-    let res = await ctx.model[modelName].find(findBody).populate([{
+    let data = await ctx.model[modelName].find(findBody).populate([{
       path: 'order'
     }, {
       path: 'goods',
@@ -275,6 +277,12 @@ class CompanyService extends Service {
         path: 'brand'
       }]
     }]);
+    let res = [];
+    data.forEach((item) => {
+      if (item.balancePrice * item.balanceCount - item.balanced > 0) {
+        res.push(item);
+      }
+    });
     return res;
   }
 }

@@ -189,8 +189,13 @@ class OrderService extends Service {
         num: businessTrains.supplyCount,
         state: 'ready'
       };
-      if (nextBusinessTrains !== undefined && nextBusinessTrains.type !== 'customer') {
-        stockBody.toCompany = nextBusinessTrains.company;
+      if (nextBusinessTrains !== undefined) {
+        if (nextBusinessTrains.customerType === 'company') {
+          stockBody.toCompany = nextBusinessTrains.company;
+        }
+        if (nextBusinessTrains.customerType === 'user') {
+          stockBody.toUser = nextBusinessTrains.user;
+        }
       }
       let hasStock = await ctx.model.Stock.findOne({
         type: 'out',

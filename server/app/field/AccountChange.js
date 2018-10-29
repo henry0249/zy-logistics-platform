@@ -8,6 +8,15 @@ module.exports = {
     name: '金额',
     type: 'Number'
   },
+  payUserType: {
+    name: '付款用户类型',
+    type: 'String',
+    option: {
+      user: '个人',
+      company: '公司',
+      mobile: '手机号' //未注册用户
+    }
+  },
   type: {
     name: '类型',
     type: 'Number',
@@ -33,14 +42,18 @@ module.exports = {
     ref: 'Account'
   },
   user: {
-    name: '所属用户',
+    name: '付款用户',
     type: 'ObjectId',
     ref: 'User'
   },
   company: {
-    name: '所属公司',
+    name: '付款公司',
     type: 'ObjectId',
     ref: 'Company'
+  },
+  mobile: {
+    name: '付款方手机号', //未注册用户或公司作为关联账单的标识
+    type: 'String',
   },
   toCompany: {
     name: '收款公司',
@@ -57,17 +70,15 @@ module.exports = {
     type: 'ObjectId',
     ref: 'User'
   },
-  invoiceType: {
-    type: 'Number',
-    name: '发票类型',
-    option: {
-      0: '增值专票',
-      1: '增值普票'
-    }
+  handle: {
+    name: '操作公司',
+    type: 'ObjectId',
+    ref: 'Company'
   },
-  taxRate: {
-    type: 'Number',
-    name: '税率'
+  invoice: {
+    type: 'ObjectId',
+    name: '发票',
+    ref: 'Invoice'
   },
   auditor: {
     name: '审核人',
@@ -84,12 +95,17 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'BusinessTrains'
   },
+  logistics: {
+    name: '关联的物流单', //物流单付款方为运费承担方,收款方为司机关联的物流公司或司机自己
+    type: 'ObjectIdArray',
+    ref: 'Logistics'
+  },
   remittanceTime: {
-    name: '汇款时间', //贸易链中包含了付款方和收款方信息
+    name: '汇款时间',
     type: 'String'
   },
   accountingTime: {
-    name: '到账时间', //贸易链中包含了付款方和收款方信息
+    name: '到账时间',
     type: 'String'
   }
 }

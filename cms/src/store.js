@@ -16,7 +16,9 @@ const store = new Vuex.Store({
     field: {},
     orderBadge: {},
     baseUrl: window.location.protocol + '//' + window.location.host,
-    role: {}
+    role: {},
+    businessTrainsSettlelist:[],
+    logisticsSettlelist: []
   },
   mutations: {
     headerToggle(state, flag) {
@@ -54,6 +56,11 @@ const store = new Vuex.Store({
     logout(state) {
       localStorage.removeItem('token');
       router.replace('/');
+    },
+    setSettlelist(state, data) {
+      if (data.type && state[data.type]) {
+        state[data.type] = data.list;
+      }
     }
   },
   actions: {
@@ -76,8 +83,8 @@ const store = new Vuex.Store({
             companyInfo = roleCompanyRes[0];
           }
           context.commit('setCompany', companyInfo);
-          let roleInfo = await ajax.post('/rolePower',{
-            company:companyInfo._id
+          let roleInfo = await ajax.post('/rolePower', {
+            company: companyInfo._id
           });
           context.commit('setRole', roleInfo);
         }
@@ -96,8 +103,8 @@ const store = new Vuex.Store({
       context.commit('setOrderBadge', res);
     },
     async getRole(context, payload) {
-      let res = await ajax.post('/rolePower',{
-        company:payload
+      let res = await ajax.post('/rolePower', {
+        company: payload
       });
       context.commit('setRole', res);
     },

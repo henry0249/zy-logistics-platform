@@ -73,5 +73,10 @@ module.exports = {
     name: '去往公司',
     type: 'ObjectId',
     ref: 'Company'
+  },
+  toUser: {
+    name: '去往用户',
+    type: 'ObjectId',
+    ref: 'User'
   }
 }

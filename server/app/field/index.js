@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
+
 module.exports = function (name) {
   if (name != 'ALL') {
     const typeObj = {

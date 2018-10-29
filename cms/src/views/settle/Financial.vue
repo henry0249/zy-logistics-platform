@@ -31,7 +31,7 @@
               <my-form-item number size="mini" slot-scope="scope" v-model="scope.row.balancePrice" :min="0">
               </my-form-item>
             </el-table-column>
-            <el-table-column label="结算总价">
+            <el-table-column label="待结算总额">
               <div slot-scope="scope" class="warning"> 
                 {{Number(scope.row.balancePrice) * Number(scope.row.balanceCount)}}
               </div>
@@ -106,7 +106,7 @@ export default {
       try {
         let res = await this.$ajax.post("/company/receivablesTab", {
           company: this.company._id,
-          type: this.radio
+          role: 'financial'
         });
         this.tab = res;
         if (res.length > 0) {
@@ -123,7 +123,8 @@ export default {
       try {
         this.receivables = [];
         let findBody = {
-          company: this.company._id
+          company: this.company._id,
+          role: "financial"
         };
         if (isUser) {
           findBody.payUser = payCompanyOrUser;

@@ -33,8 +33,7 @@ class BusinessTrainsService extends Service {
       type: 'financial'
     });
     if (!hasRole) {
-      return [];
-      // ctx.throw(400, '您无操作权限', body);
+      ctx.throw(400, '您无操作权限', body);
     }
     let businessTrains = body.businessTrains || [];
     if (businessTrains.length === 0) {
@@ -51,10 +50,43 @@ class BusinessTrainsService extends Service {
         balancePrice: Number(item.balancePrice)
       });
     }
-
     return 'ok';
   }
   async settle() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    if (!body.company) {
+      ctx.throw(422, '公司信息必填', body);
+    }
+    let company = await ctx.model.Company.findById(body.company);
+    if (!company) {
+      ctx.throw(422, '公司信息未找到', body);
+    }
+    let hasRole = await ctx.model.Role.findOne({
+      user: ctx.user._id,
+      company: company._id,
+      type: 'settle'
+    });
+    if (!hasRole) {
+      ctx.throw(400, '您无操作权限', body);
+    }
+    let businessTrains = body.businessTrains || [];
+    if (businessTrains.length === 0) {
+      ctx.throw(422, '结算数量不能为0', body);
+    }
+    for (let i = 0; i < businessTrains.length; i++) {
+      const item = businessTrains[i];
+      if (item.balanceForAccount !== undefined && item.balanceForAccountPrepaid !== undefined) {
+        await ctx.model.BusinessTrains.update({
+          _id: {
+            $in: item._id
+          }
+        }, {
+          balanceForAccount: item.balanceForAccount,
+          balanceForAccountPrepaid: item.balanceForAccountPrepaid,
+        });
+      }
+    }
     return 'ok';
   }
 }

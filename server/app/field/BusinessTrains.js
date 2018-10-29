@@ -102,6 +102,10 @@ module.exports = {
     type: 'Number',
     default: 0
   },
+  balancedArr: {
+    name: '已结算金额数组', //一个accountChange的_id对应一个金额,因为一次结算,不一定付完
+    type: 'Object'
+  },
   balancedFinish: {
     name: '结算完成',
     type: 'Boolean',

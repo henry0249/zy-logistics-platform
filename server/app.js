@@ -16,7 +16,6 @@ module.exports = app => {
   app.on('response', ctx => {
     // ctx.starttime is set by framework
     const used = Date.now() - ctx.starttime;
-    ctx.helper.ua()
     console.log(`${ctx.method} ${ctx.path} - ${used}ms`);
   });
 };

@@ -47,5 +47,16 @@ class CompanyService extends Service {
     res = await ctx.model.Account.findById(model._id);
     return res;
   }
+  async collect() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    let type = body.type;
+    if (type === 'businessTrains' || type === 'logistics') {
+      if (body[type] instanceof Array && body[type].length>0) {
+      
+      }
+    }
+    return 'ok';
+  }
 }
 module.exports = CompanyService;
