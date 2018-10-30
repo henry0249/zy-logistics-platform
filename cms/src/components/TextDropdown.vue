@@ -5,7 +5,7 @@
       <i class="el-icon-caret-bottom info"></i>
     </div>
     <el-dropdown-menu slot="dropdown">
-      <el-dropdown-item v-for="dropdownItem in json2arr(options)" :key="dropdownItem._id||dropdownItem.value || dropdownItem.id" :command="JSON.stringify(dropdownItem)">
+      <el-dropdown-item v-for="dropdownItem in json2arr(options)" :key="dropdownItem._id||dropdownItem.value || dropdownItem.id" :command="JSON.stringify(dropdownItem)" :disabled="dropdownItem.disabled">
         <span :style="{color:label(dropdownItem.value).color}">{{label(dropdownItem.value).text}}</span>
       </el-dropdown-item>
     </el-dropdown-menu>
