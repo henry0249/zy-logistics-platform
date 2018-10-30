@@ -34,9 +34,9 @@
           </div>
           <div style="position:relative" @click="clickInputt">
             <el-input v-if="show" :readonly="readonly" style="width:100%" :value="text" v-bind="$attrs" :placeholder="$attrs.placeholder" :size="size||$parent.size" class="input-with-select blue">
-              <i slot="suffix" class="el-input__icon el-icon-edit blue"></i>
+              <i slot="suffix" class="el-input__icon el-icon-edit" :class="$attrs.disabled?'info':'blue'"></i>
             </el-input>
-            <el-input v-else ref="input" style="width:100%" v-model="inputValue" v-bind="$attrs" :placeholder="$attrs.placeholder" :size="size||$parent.size" class="input-with-select blue"></el-input>
+            <el-input v-else ref="input" :readonly="$attrs.disabled" style="width:100%" v-model="inputValue" v-bind="$attrs" :placeholder="$attrs.placeholder" :size="size||$parent.size" class="input-with-select blue"></el-input>
           </div>
         </div>
       </my-form-item>
@@ -217,7 +217,7 @@
     },
     methods: {
       clickInputt() {
-        if (this.value !== 'mobile') {
+        if (this.value !== 'mobile' && !this.$attrs.disabled) {
           this.dialogTableVisible = true;
         }
       },

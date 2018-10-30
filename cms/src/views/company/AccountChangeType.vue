@@ -50,27 +50,14 @@
             type: ''
           },
           remittanceTime: '',
-          accountingTime: '2018-10-21',
-          toCompany: {
-            name: 'B'
-          },
-          company: {
-            name: "A"
-          }
+          accountingTime: '',
+          toCompany: {},
+          company: {}
         },
       };
     },
-    watch: {
-      data: {
-        handler(val) {
-          console.log(val);
-        },
-        deep: true
-      }
-    },
     methods: {
       async sub() {
-        console.log(this.data);
         try {
           this.loadingText = '添加中';
           let setOption = {
@@ -98,27 +85,24 @@
               this.$set(setOption, 'toCompany', this.data.toCompany._id);
             }
           }
-          console.log(setOption);
           await this.$ajax.post('/accountChange/set', setOption);
           this.$message.success('添加成功');
           this.$router.push({
             path: '/company/account'
           });
-        } catch (error) {
-          console.log(error);
-        }
+        } catch (error) {}
         this.loadingText = '';
       }
     },
     created() {
-      console.log(this.$route.query.type);
       if (this.$route.query.type === '5') {
         this.$set(this.initData, 'toCompany', this.company);
         this.$set(this.initData, 'ompany', {});
-        console.log(this.initData.toCompany);
+        this.$set(this.initData.to, 'disabled', true);
       } else {
         this.$set(this.initData, 'company', this.company);
         this.$set(this.initData, 'toCompany', {});
+        this.$set(this.initData.from, 'disabled', true);
       }
     }
   };

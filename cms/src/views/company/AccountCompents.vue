@@ -10,7 +10,7 @@
             <el-tab-pane v-for="item in accountData" :name="item.type === 'company'?item.relationCompany._id : item.relationUser._id" :key="item.id" :label="item.type === 'company'?item.relationCompany.name : item.relationUser.name + '(个人)'">
               <div class="col-flex tab-height">
                 <div class="tab-top">
-                  <span>金额：<span class="blue">{{item.value}}</span> 预付款：<span class="danger">{{item.prepaid}}</span></span>
+                  <span>结算款：<span class="blue">{{item.value}}</span> 预付款：<span class="danger">{{item.prepaid}}</span></span>
                 </div>
                 <el-tabs v-model="payName" @tab-click="payTabClick" type="card">
                   <el-tab-pane v-for="(v,i) in payArr" :name="v.key" :label="v.label" :key="`${i}pay`">
@@ -20,7 +20,7 @@
                         <div v-if="scope.prop === 'payUser'">{{payUser(scope.row).user}}
                           <el-tag size="mini" :type="payUser(scope.row).type">{{field.AccountChange.payUserType.option[scope.row.payUserType]}}</el-tag>
                         </div>
-                        <div v-if="scope.prop === 'value'" class="blue">{{scope.row[scope.prop]}}</div>
+                        <div v-if="scope.prop === 'value'" class="link" title="点击查看详情">{{scope.row[scope.prop]}}</div>
                       </div>
                     </my-table>
                   </el-tab-pane>
@@ -64,10 +64,10 @@
         accountChangeData: [],
         payArr: [{
           key: 'pay',
-          label: '付款'
+          label: '付款流水'
         }, {
           key: 'get',
-          label: '收款'
+          label: '收款记录'
         }]
       };
     },
@@ -86,17 +86,17 @@
     computed: {
       thead() {
         let thead = {
+          value: {
+            name: '金额',
+            readOnly: true,
+            slot: true
+          },
           type: {
             name: '类型',
             slot: true
           },
           payUser: {
-            name: '付款人',
-            slot: true
-          },
-          value: {
-            name: '金额',
-            readOnly: true,
+            name: '付款方',
             slot: true
           },
           'from.account': {
@@ -105,6 +105,14 @@
           },
           'to.account': {
             name: '付款卡号',
+            readOnly: true
+          },
+          remittanceTime: {
+            name: '转账日期',
+            readOnly: true
+          },
+          accountingTime: {
+            name: '到账日期',
             readOnly: true
           }
         };
@@ -158,8 +166,7 @@
           }
           this.accountChangeData = [];
           this.accountChangeData = await this.getAccountChange(this.activeName, this.str, this.io);
-        } catch (error) {
-        }
+        } catch (error) {}
         this.loadingText = '';
       },
       async tabClick(val) {
