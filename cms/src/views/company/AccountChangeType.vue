@@ -7,7 +7,7 @@
         </div>
         <my-form width="24%" size="mini">
           <div class="jc jb" style="margin-top:15px;">
-            <bank-cart :data.sync="data" :initData="initData" style="width:100%"></bank-cart>
+            <bank-cart :data.sync="data" :initData="newData" style="width:100%"></bank-cart>
           </div>
         </my-form>
       </div>
@@ -29,13 +29,23 @@
         default () {
           return [];
         }
+      },
+      edmit: {
+        type: Boolean,
+        default: false
+      },
+      initData: {
+        type: Object,
+        default () {
+          return {}
+        }
       }
     },
     data() {
       return {
         loadingText: '',
         data: {},
-        initData: {
+        newData: {
           value: 0,
           from: {
             bank: '',
@@ -58,6 +68,40 @@
     },
     methods: {
       async sub() {
+        if (this.edmit) {
+          this.edmitAccountChange();
+        } else {
+          this.setAccountChange();
+        }
+      },
+      async edmitAccountChange() {
+        try {
+          this.loadingText = '添加中';
+          let find = {
+            _id: this.$route.params._id
+          };
+          let update = {
+            value: this.data.value,
+            from: this.data.from,
+            to: this.data.to,
+            payUserType: this.data.from.type,
+            type: Number(this.$route.query.type),
+            remittanceTime: this.formatTime(this.data.remittanceTime, 'YYYY-MM-DD'),
+            accountingTime: this.formatTime(this.data.accountingTime, 'YYYY-MM-DD'),
+          }
+          this.$set(update, 'company', this.data.company._id);
+          if (typeof(this.data.toCompany) === 'string') {
+            this.$set(update, 'mobile', this.data.toCompany);
+          } else {
+            this.$set(update, 'toCompany', this.data.toCompany._id);
+          }
+          await this.$ajax.post('/accountChange/update', {
+            find,
+            update
+          });
+        } catch (error) {}
+      },
+      async setAccountChange() {
         try {
           this.loadingText = '添加中';
           let setOption = {
@@ -68,10 +112,13 @@
             type: Number(this.$route.query.type),
             remittanceTime: this.formatTime(this.data.remittanceTime, 'YYYY-MM-DD'),
             accountingTime: this.formatTime(this.data.accountingTime, 'YYYY-MM-DD'),
+            handle: this.company._id
           }
+          console.log('this.$route.query.type',this.$route.query.type);
           if (this.$route.query.type === '5') {
             this.$set(setOption, 'type', 1);
             this.$set(setOption, 'toCompany', this.data.toCompany._id);
+            console.log('typeof(this.data.company) === string',typeof(this.data.company) === 'string');
             if (typeof(this.data.company) === 'string') {
               this.$set(setOption, 'mobile', this.data.company);
             } else {
@@ -95,14 +142,23 @@
       }
     },
     created() {
-      if (this.$route.query.type === '5') {
-        this.$set(this.initData, 'toCompany', this.company);
-        this.$set(this.initData, 'ompany', {});
-        this.$set(this.initData.to, 'disabled', true);
+      console.log('initData', this.initData);
+      if (Object.keys(this.initData).length > 0) {
+        this.newData = JSON.parse(JSON.stringify(this.initData));
+      }
+      if (!this.edmit) {
+        if (this.$route.query.type === '5') {
+          this.$set(this.newData, 'toCompany', this.company);
+          this.$set(this.newData, 'ompany', {});
+          this.$set(this.newData.to, 'disabled', true);
+        } else {
+          this.$set(this.newData, 'company', this.company);
+          this.$set(this.newData, 'toCompany', {});
+          this.$set(this.newData.from, 'disabled', true);
+        }
       } else {
-        this.$set(this.initData, 'company', this.company);
-        this.$set(this.initData, 'toCompany', {});
-        this.$set(this.initData.from, 'disabled', true);
+        this.$set(this.newData.to, 'disabled', true);
+        this.$set(this.newData.from, 'disabled', true);
       }
     }
   };

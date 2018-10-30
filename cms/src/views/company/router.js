@@ -5,6 +5,7 @@ import CompanyRole from './CompanyRole.vue';
 import CompanyShip from './CompanyShip.vue';
 import AccountChangeType from './AccountChangeType.vue';
 import RelationCode from './RelationCode.vue';
+import AccountEdmit from './AccountEdmit.vue';
 
 export default [{
   path: '/company',
@@ -23,6 +24,10 @@ export default [{
       path:'account_change_type',
       name:'付款单',
       component:AccountChangeType
+    },{
+      path:'account_edmit/:_id',
+      name:'流水详情',
+      component:AccountEdmit
     }]
   },{
     path: 'role',

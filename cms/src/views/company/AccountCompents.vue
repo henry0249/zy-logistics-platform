@@ -20,7 +20,8 @@
                         <div v-if="scope.prop === 'payUser'">{{payUser(scope.row).user}}
                           <el-tag size="mini" :type="payUser(scope.row).type">{{field.AccountChange.payUserType.option[scope.row.payUserType]}}</el-tag>
                         </div>
-                        <div v-if="scope.prop === 'value'" class="link" title="点击查看详情">{{scope.row[scope.prop]}}</div>
+                        <div v-if="scope.prop === 'value'" class="link" title="点击查看详情" @click="res(scope)">{{scope.row[scope.prop]}}</div>
+                        <div v-if="scope.prop === 'check'" :class="scope.row[scope.prop]?'blue':'link'" title="点击进行审核" @click="check(scope)">{{scope.row[scope.prop]?'已审核':'待审核'}}</div>
                       </div>
                     </my-table>
                   </el-tab-pane>
@@ -114,6 +115,10 @@
           accountingTime: {
             name: '到账日期',
             readOnly: true
+          },
+          check: {
+            name: '审核',
+            slot: true
           }
         };
         return thead;
@@ -127,6 +132,29 @@
       }
     },
     methods: {
+      check(scope) {
+        console.log(scope.row.check);
+        console.log(this.role.financialManager, this.role.settle);
+        if (scope.row.check) {
+          if (this.role.financialManager) {
+            this.res(scope, true);
+          }
+        } else {
+          if (this.role.financialManager || this.role.settle) {
+            this.res(scope, true);
+          }
+        }
+      },
+      res(scope, check) {
+        this.show = false;
+        this.$router.push({
+          path: '/company/account/account_edmit/' + scope.row._id,
+          query: {
+            type: scope.row.type,
+            check: check ? true : false
+          }
+        })
+      },
       async loadmore() {
         return await this.getAccountChange(this.activeName, this.str, this.io);
       },
