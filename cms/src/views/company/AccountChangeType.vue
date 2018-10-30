@@ -70,6 +70,7 @@
     },
     methods: {
       async sub() {
+        console.log(this.data);
         try {
           this.loadingText = '添加中';
           let setOption = {
@@ -77,32 +78,47 @@
             from: this.data.from,
             to: this.data.to,
             payUserType: this.data.from.type,
-            type:Number(this.$route.query.type),
-            remittanceTime:this.formatTime(this.data.remittanceTime,'YYYY-MM-DD'),
-            accountingTime:this.formatTime(this.data.accountingTime,'YYYY-MM-DD'),
+            type: Number(this.$route.query.type),
+            remittanceTime: this.formatTime(this.data.remittanceTime, 'YYYY-MM-DD'),
+            accountingTime: this.formatTime(this.data.accountingTime, 'YYYY-MM-DD'),
           }
           if (this.$route.query.type === '5') {
+            this.$set(setOption, 'type', 1);
             this.$set(setOption, 'toCompany', this.data.toCompany._id);
             if (typeof(this.data.company) === 'string') {
               this.$set(setOption, 'mobile', this.data.company);
+            } else {
+              this.$set(setOption, 'company', this.data.company._id);
             }
           } else {
             this.$set(setOption, 'company', this.data.company._id);
             if (typeof(this.data.toCompany) === 'string') {
               this.$set(setOption, 'mobile', this.data.toCompany);
+            } else {
+              this.$set(setOption, 'toCompany', this.data.toCompany._id);
             }
           }
           console.log(setOption);
           await this.$ajax.post('/accountChange/set', setOption);
-        } catch (error) {}
+          this.$message.success('添加成功');
+          this.$router.push({
+            path: '/company/account'
+          });
+        } catch (error) {
+          console.log(error);
+        }
         this.loadingText = '';
       }
     },
     created() {
+      console.log(this.$route.query.type);
       if (this.$route.query.type === '5') {
         this.$set(this.initData, 'toCompany', this.company);
+        this.$set(this.initData, 'ompany', {});
+        console.log(this.initData.toCompany);
       } else {
         this.$set(this.initData, 'company', this.company);
+        this.$set(this.initData, 'toCompany', {});
       }
     }
   };

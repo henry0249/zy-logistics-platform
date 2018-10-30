@@ -64,6 +64,12 @@
       }
     },
     watch: {
+      'data.company' (val) {
+        console.log('company',val);
+      },
+      'data.toCompany' (val) {
+        console.log('toCompany',val);
+      },
       userType(val) {
         let data = JSON.parse(JSON.stringify(this.data));
         if (this.isFrom) {

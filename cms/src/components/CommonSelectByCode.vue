@@ -316,7 +316,7 @@
             }
             this.$emit('update:data', this.checkData);
           } else {
-            if (this.checkData > 0) {
+            if (this.checkData.length > 0) {
               this.$emit('update:data', this.checkData[this.checkData.length - 1]);
             } else {
               this.$emit('update:data', {});

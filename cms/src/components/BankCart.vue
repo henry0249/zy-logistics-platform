@@ -34,6 +34,7 @@
     watch: {
       form: {
         handler(val) {
+          console.log(val);
           let data = JSON.parse(JSON.stringify(val));
           if (!this.$refs.item1.CheckBankNo(data.from.account).isBank) {
             this.$set(data.from, 'account', '');
