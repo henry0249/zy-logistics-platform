@@ -138,11 +138,16 @@
         op: {},
         thead: {},
         tableData: [],
-        checkOption: {
-          user: '用户',
-          company: '公司',
-          mobile: '手机'
-        },
+        checkOption: [{
+          label: '用户',
+          value: 'user'
+        }, {
+          label: '公司',
+          value: 'company'
+        }, {
+          label: '手机',
+          value: 'mobile'
+        }],
         key: {
           transportTrainsRelationCompany: {
             name: 'transportTrainsRelationCompany'
@@ -171,6 +176,7 @@
         deep: true
       },
       value(val) {
+        console.log(val);
         this.$emit('update:userType', val);
         this.typeStr = val;
         this.checkData = [];
@@ -351,6 +357,15 @@
       this.value = this.typeStr;
       this.$emit('update:userType', this.typeStr);
       this.thead = this.commonData.thead[this.typeStr];
+      if (this.$attrs.disabled) {
+        let checkOptionData = [];
+        this.checkOption.forEach(item => {
+          let obj = item;
+          this.$set(obj, 'disabled', true);
+          checkOptionData.push(obj);
+        });
+        this.checkOption = checkOptionData;
+      }
     }
   }
 </script>
