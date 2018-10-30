@@ -5,8 +5,8 @@
         <slot name="header">
           <div class="jb">
             <div class="jc js">
-              <common-select-by-code v-if="isFrom" :userType.sync="userType" width="300px" company check :data.sync="data.company" placeholder="未注册公司或用户" size="mini" label="付款方"></common-select-by-code>
-              <common-select-by-code v-else width="300px" :userType.sync="userType" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收款方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom" :userType.sync="userType" width="300px" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未选择" label="付款方"></common-select-by-code>
+              <common-select-by-code v-else width="300px" :userType.sync="userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收款方"></common-select-by-code>
             </div>
             <div class="jc js">
               <my-form-item :readonly="isFrom?false:true" width="200px" size="mini" label="付款金额" v-model="data.value" placeholder="请输入付款金额"></my-form-item>
