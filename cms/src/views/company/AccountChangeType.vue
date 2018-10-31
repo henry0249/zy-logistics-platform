@@ -15,7 +15,7 @@
         <div>
           <el-button size="small" @click="$router.go(-1)">返 回</el-button>
         </div>
-        <el-button size="small" type="primary" @click="sub">添 加</el-button>
+        <el-button size="small" type="primary" @click="sub">{{subText}}</el-button>
       </div>
     </div>
   </loading-box>
@@ -66,40 +66,59 @@
         },
       };
     },
+    computed: {
+      subText() {
+        let data = '添加';
+        if (this.edmit) {
+          if (this.$route.query.check) {
+            data = '审核';
+          } else {
+            data = '修改';
+          }
+        }
+        return data;
+      }
+    },
     methods: {
       async sub() {
-        if (this.edmit) {
-          this.edmitAccountChange();
+        if (this.$route.query.check) {
+          this.edmitAccountChange('check');
         } else {
-          this.setAccountChange();
+          if (this.edmit) {
+            this.edmitAccountChange();
+          } else {
+            this.setAccountChange();
+          }
         }
       },
-      async edmitAccountChange() {
+      async edmitAccountChange(check) {
         try {
           this.loadingText = '添加中';
           let find = {
             _id: this.$route.params._id
           };
-          let update = {
-            value: this.data.value,
-            from: this.data.from,
-            to: this.data.to,
-            payUserType: this.data.from.type,
-            type: Number(this.$route.query.type),
-            remittanceTime: this.formatTime(this.data.remittanceTime, 'YYYY-MM-DD'),
-            accountingTime: this.formatTime(this.data.accountingTime, 'YYYY-MM-DD'),
-          }
+          let update = JSON.parse(JSON.stringify(this.newData));
           this.$set(update, 'company', this.data.company._id);
           if (typeof(this.data.toCompany) === 'string') {
             this.$set(update, 'mobile', this.data.toCompany);
           } else {
             this.$set(update, 'toCompany', this.data.toCompany._id);
           }
-          await this.$ajax.post('/accountChange/update', {
-            find,
-            update
-          });
+          if (check) {
+            this.$set(update, 'check', true);
+          }
+          let path = check ? '/accountChange/check' : '/accountChange/update';
+          await this.$ajax.post(path, update);
+          let data = check ? '已审核' : '修改成功';
+          this.$message.success(data);
+          this.$router.push({
+            path: '/company/account',
+            query: {
+              show: false
+            }
+          })
         } catch (error) {}
+        this.loadingText = '';
       },
       async setAccountChange() {
         try {
@@ -114,11 +133,10 @@
             accountingTime: this.formatTime(this.data.accountingTime, 'YYYY-MM-DD'),
             handle: this.company._id
           }
-          console.log('this.$route.query.type',this.$route.query.type);
           if (this.$route.query.type === '5') {
             this.$set(setOption, 'type', 1);
             this.$set(setOption, 'toCompany', this.data.toCompany._id);
-            console.log('typeof(this.data.company) === string',typeof(this.data.company) === 'string');
+            console.log('typeof(this.data.company) === string', typeof(this.data.company) === 'string');
             if (typeof(this.data.company) === 'string') {
               this.$set(setOption, 'mobile', this.data.company);
             } else {
@@ -135,14 +153,16 @@
           await this.$ajax.post('/accountChange/set', setOption);
           this.$message.success('添加成功');
           this.$router.push({
-            path: '/company/account'
+            path: '/company/account',
+            query: {
+              show: false
+            }
           });
         } catch (error) {}
         this.loadingText = '';
       }
     },
     created() {
-      console.log('initData', this.initData);
       if (Object.keys(this.initData).length > 0) {
         this.newData = JSON.parse(JSON.stringify(this.initData));
       }

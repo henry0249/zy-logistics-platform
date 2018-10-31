@@ -1,5 +1,5 @@
 <template>
-  <loading-box v-if="show" v-model="loadingText">
+  <loading-box v-if="!routeShow" v-model="loadingText">
     <div class="g-order-create">
       <div class="g-order">
         <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
@@ -21,7 +21,7 @@
                           <el-tag size="mini" :type="payUser(scope.row).type">{{field.AccountChange.payUserType.option[scope.row.payUserType]}}</el-tag>
                         </div>
                         <div v-if="scope.prop === 'value'" class="link" title="点击查看详情" @click="res(scope)">{{scope.row[scope.prop]}}</div>
-                        <div v-if="scope.prop === 'check'" :class="scope.row[scope.prop]?'blue':'link'" title="点击进行审核" @click="check(scope)">{{scope.row[scope.prop]?'已审核':'待审核'}}</div>
+                        <div v-if="scope.prop === 'check'" :class="scope.row[scope.prop]?'blue':'link'" :title="scope.row[scope.prop]?'':'点击进行审核'" @click="check(scope)">{{scope.row[scope.prop]?'已审核':'待审核'}}</div>
                       </div>
                     </my-table>
                   </el-tab-pane>
@@ -73,18 +73,16 @@
       };
     },
     watch: {
-      $route: {
-        handler(val) {
-          if (val.query.type) {
-            this.show = false;
-          } else {
-            this.show = true;
-          }
-        },
-        deep: true
+      async routeShow(val) {
+        if (!val) {
+          await this.getData();
+        }
       }
     },
     computed: {
+      routeShow() {
+        return this.$route.query.show;
+      },
       thead() {
         let thead = {
           value: {
@@ -117,7 +115,7 @@
             readOnly: true
           },
           check: {
-            name: '审核',
+            name: '是否已审核',
             slot: true
           }
         };
@@ -133,27 +131,32 @@
     },
     methods: {
       check(scope) {
-        console.log(scope.row.check);
-        console.log(this.role.financialManager, this.role.settle);
-        if (scope.row.check) {
+        if (!scope.row.check) {
           if (this.role.financialManager) {
-            this.res(scope, true);
-          }
-        } else {
-          if (this.role.financialManager || this.role.settle) {
-            this.res(scope, true);
+            this.resMethods(scope, true);
           }
         }
       },
-      res(scope, check) {
-        this.show = false;
+      resMethods(scope, check) {
         this.$router.push({
           path: '/company/account/account_edmit/' + scope.row._id,
           query: {
-            type: scope.row.type,
-            check: check ? true : false
+            type: this.payName === 'get' ? '5' : scope.row.type,
+            check: check ? true : false,
+            show: true
           }
         })
+      },
+      res(scope, check) {
+        if (scope.row.check) {
+          if (this.role.financialManager) {
+            this.resMethods(scope);
+          }
+        } else {
+          if (this.role.financialManager || this.role.settle) {
+            this.resMethods(scope);
+          }
+        }
       },
       async loadmore() {
         return await this.getAccountChange(this.activeName, this.str, this.io);
@@ -184,7 +187,6 @@
         return data[val];
       },
       async payTabClick(val) {
-        console.log(val.name);
         try {
           this.loadingText = '加载中';
           if (val.name === 'get') {
@@ -218,7 +220,8 @@
         this.$router.push({
           path: "/company/account/account_change_type",
           query: {
-            type: key
+            type: key,
+            show: true
           }
         });
       },
@@ -269,11 +272,8 @@
             $exists: true
           }
         });
-      }
-    },
-    async created() {
-      if (!this.$route.query.type) {
-        this.show = true;
+      },
+      async getData() {
         try {
           this.loadingText = "加载中...";
           await this.getAccount();
@@ -283,16 +283,24 @@
             } else {
               this.str = 'user';
             }
+            this.accountChangeData = [];
             this.accountChangeData = await this.getAccountChange(this.activeName, this.str, this.io);
           }
           await this.getBusinessTrains();
-        } catch (error) {
-          console.log(error);
-        }
+        } catch (error) {}
         this.loadingText = "";
-      } else {
-        this.show = false;
       }
+    },
+    async created() {
+      console.log(this.$route.query.show);
+      if (this.$route.query.show === 'false') {
+        this.$router.push({
+          path: '/company/account',
+          query: {}
+        })
+      }
+      this.$store.dispatch('getRole', this.company._id);
+      await this.getData();
     }
   };
 </script>
