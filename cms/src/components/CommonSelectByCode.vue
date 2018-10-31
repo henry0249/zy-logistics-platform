@@ -52,20 +52,26 @@
             <div :style="{fontSize:fontSize}" v-if="checkData.length <= 0">未选择</div>
           </div>
         </div>
-        <div v-if="dialogTableVisible" style="height:calc(50vh - 50px)">
-          <my-table v-if="dialogTableVisible" border stripe size="mini" height="50vh - 50px" @current-change="handleCurrentChange" :thead="thead" :data="tableData">
-            <div slot="header" class="jc jb" style="margin:10px 0">
-              <my-form-item v-if="typeStr === 'company'" size="mini" width="250px" v-model="input" @change="inputChange" placeholder="输入公司关联代码"></my-form-item>
-              <my-form-item v-if="typeStr === 'user'" size="mini" width="250px" v-model="mobile" @change="mobileChange" placeholder="输入手机号"></my-form-item>
-              <el-button size="mini" type="primary" @click="search">搜 索</el-button>
+        <div v-if="dialogTableVisible">
+          <div class="jc jb searchBox">
+            <div class="jc js">
+              <my-form-item v-if="typeStr === 'company' && type" size="mini" width="250px" v-model="input" placeholder="输入公司关联代码"></my-form-item>
+              <my-form-item v-if="typeStr === 'company' && !type" size="mini" width="250px" v-model="nickInput" placeholder="输入公司全称、简称或者公司代码"></my-form-item>
+              <my-form-item v-if="typeStr === 'user'" size="mini" width="250px" v-model="mobile" placeholder="输入手机号"></my-form-item>
             </div>
-            <div slot-scope="scope" v-if="scope.prop === 'type'">
-              <div v-if="scope.row[scope.prop].length > 0">
-                <el-tag size="mini" v-for="item in scope.row[scope.prop]" :key="item.id">{{field.Company.type.option[item]}}</el-tag>
-              </div>
-              <div v-if="scope.row[scope.prop].length === 0">11</div>
-            </div>
-          </my-table>
+            <el-button size="mini" type="primary" @click="search">搜 索</el-button>
+          </div>
+          <el-table @cell-click="cellClick" v-if="dialogTableVisible" border stripe size="mini" :data="tableData">
+            <template  v-for="(item, key) in thead">
+              <el-table-column v-if="key === 'type'" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
+                <template slot-scope="scope">
+                  <el-tag size="mini" v-for="v in scope.row.type" :key="v.id">{{field.Company.type.option[v]}}</el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column v-else show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
+              </el-table-column>
+            </template>
+          </el-table>
         </div>
       </loading-box>
       <div slot="footer" class="jb">
@@ -135,6 +141,7 @@
         loadingText: '',
         dialogTableVisible: false,
         input: '',
+        nickInput: '',
         op: {},
         thead: {},
         tableData: [],
@@ -168,6 +175,7 @@
         this.tableData = [];
         this.input = '';
         this.mobile = '';
+        this.nickInput = '';
       },
       checkData: {
         handler(val) {
@@ -176,7 +184,6 @@
         deep: true
       },
       value(val) {
-        console.log(val);
         this.$emit('update:userType', val);
         this.typeStr = val;
         this.checkData = [];
@@ -223,8 +230,6 @@
     },
     methods: {
       clickInputt() {
-        console.log(this.value !== 'mobile');
-        console.log(this.$attrs.disabled);
         if (this.value !== 'mobile') {
           if (!this.$attrs.disabled) {
             this.dialogTableVisible = true;
@@ -235,11 +240,11 @@
         this.checkData.splice(index, 1);
       },
       async search() {
-        if (this.input || this.mobile) {
+        if (this.input || this.mobile || this.nickInput) {
           this.tableData = [];
           try {
             this.loadingText = '搜索中...';
-            if (this.typeStr === 'company') {
+            if (this.typeStr === 'company' && this.type) {
               let res = await this.$ajax.post('/relationCode/findOne', {
                 value: this.input,
                 populate: [{
@@ -255,6 +260,17 @@
                 }]
               });
               this.tableData.push(res);
+            } else if (this.typeStr === 'company' && !this.type) {
+              let res = await this.$ajax.post('/company/findOne', {
+                $or: [{
+                  name: this.nickInput
+                }, {
+                  nick: this.nickInput
+                }, {
+                  code: this.nickInput
+                }]
+              });
+              this.tableData.push(res);
             }
             this.duplication(this.tableData);
           } catch (error) {}
@@ -265,21 +281,22 @@
         this.checkData.splice(index, 1);
         this.$emit('update:data', this.checkData);
       },
-      handleCurrentChange(val) {
+      cellClick(row, column, cell, event) {
+        console.log(row);
         let io = true;
         this.checkData.forEach(item => {
-          if (val._id === item._id) {
-            this.$message.warn('已选择该商品');
+          if (row._id === item._id) {
+            this.$message.warn(`已选择该${this.typeStr === 'company'?'公司':'用户'}`);
             io = false;
           }
         });
         if (io) {
           if (this.isArray) {
-            this.checkData.push(val);
+            this.checkData.push(row);
             this.checkData = this.duplication(this.checkData);
           } else {
             this.checkData = [];
-            this.checkData.push(val);
+            this.checkData.push(row);
           }
         }
       },
@@ -402,5 +419,9 @@
   }
   .del:hover {
     color: #909399;
+  }
+  .searchBox {
+    height: 28px;
+    margin: 10px 0;
   }
 </style>
