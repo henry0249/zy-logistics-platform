@@ -223,8 +223,12 @@
     },
     methods: {
       clickInputt() {
-        if (this.value !== 'mobile' && !this.$attrs.disabled) {
-          this.dialogTableVisible = true;
+        console.log(this.value !== 'mobile');
+        console.log(this.$attrs.disabled);
+        if (this.value !== 'mobile') {
+          if (!this.$attrs.disabled) {
+            this.dialogTableVisible = true;
+          }
         }
       },
       handleClose(tag, index) {

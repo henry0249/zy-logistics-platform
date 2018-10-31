@@ -5,7 +5,7 @@
         <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
           <strong>账户管理</strong>
         </div>
-        <div class="tab-box">
+        <div v-if="accountData.length > 0" class="tab-box">
           <el-tabs v-model="activeName" type="border-card" @tab-click="tabClick	">
             <el-tab-pane v-for="item in accountData" :name="item.type === 'company'?item.relationCompany._id : item.relationUser._id" :key="item.id" :label="item.type === 'company'?item.relationCompany.name : item.relationUser.name + '(个人)'">
               <div class="col-flex tab-height">
@@ -29,6 +29,9 @@
               </div>
             </el-tab-pane>
           </el-tabs>
+        </div>
+        <div v-else class="tab-height noData jc">
+          <span>未发现账户，你可以<el-button style="margin:0 10px;" plain size="mini" type="primary" icon="el-icon-plus" @click="addAcount">添加</el-button>或者<el-button plain size="mini" icon="el-icon-refresh" @click="$router.go(0)">刷新</el-button></span>
         </div>
         <div class="btm-box jc js">
           <el-button v-if="false" @click="go(key)" v-for="(item,key) in field.AccountChange.type.option" :key="key" size="mini">{{item}}</el-button>
@@ -130,6 +133,16 @@
       }
     },
     methods: {
+      addAcount() {
+        this.$router.push({
+          path: '/company/account/account_add',
+          query: {
+            type: 'company',
+            relationType: 'company',
+            show:true
+          }
+        })
+      },
       check(scope) {
         if (!scope.row.check) {
           if (this.role.financialManager) {
@@ -292,7 +305,6 @@
       }
     },
     async created() {
-      console.log(this.$route.query.show);
       if (this.$route.query.show === 'false') {
         this.$router.push({
           path: '/company/account',
@@ -329,5 +341,10 @@
     right: 30px;
     top: 30px;
     height: 33px;
+  }
+  .noData {
+    border: 1px solid #dcdfe6;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04);
   }
 </style>
