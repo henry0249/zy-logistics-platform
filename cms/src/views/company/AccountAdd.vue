@@ -11,8 +11,8 @@
             <my-form-item number :min="0" v-model="data.prepaid" label="预付款"></my-form-item>
             <common-select-by-code v-if="relationType" width="24%" :disabled="true" company :data.sync="data.company" size="mini" placeholder="未选择" label="所属公司"></common-select-by-code>
             <common-select-by-code v-if="!relationType" width="24%" :disabled="true" user :data.sync="data.user" size="mini" placeholder="未选择" label="所属用户"></common-select-by-code>
-            <common-select-by-code v-if="relationType" width="24%" company :data.sync="data.relationCompany" size="mini" placeholder="未选择" label="关联公司"></common-select-by-code>
-            <common-select-by-code v-if="!relationType" width="24%" user :data.sync="data.relationUser" size="mini" placeholder="未选择" label="关联用户"></common-select-by-code>
+            <common-select-by-code check width="24%" company :user-type.sync="type" :data.sync="data.relationCompany" size="mini" placeholder="未选择" label="关联单位"></common-select-by-code>
+            <!-- <common-select-by-code v-if="!relationType" width="24%" user :data.sync="data.relationUser" size="mini" placeholder="未选择" label="关联用户"></common-select-by-code> -->
           </div>
           <div class="jb" style="margin-top:15px;">
           </div>
@@ -33,6 +33,7 @@
     data() {
       return {
         loadingText: '',
+        type: '',
         data: {
           type: 'company',
           value: 0,
@@ -69,6 +70,8 @@
         return io;
       },
       sub() {
+        console.log(this.data);
+        console.log(this.type);
         if (this.checkData()) {
           this.setAccount();
         }
