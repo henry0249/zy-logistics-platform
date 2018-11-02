@@ -146,6 +146,12 @@
           this.myAlert("公司固话格式不正确！");
           returnIo = false;
         }
+        this.roleArr.forEach(item => {
+          if (item.type !== 'companyAdmin' && item.area.length === 0 && this.type[item.type]) {
+            this.$message.warn(`${this.field.Role.type.option[item.type]}地区不能为空`);
+            return returnIo = false;
+          }
+        });
         return returnIo;
       },
       async sub() {
@@ -155,19 +161,23 @@
             this.loadingText = "更新中";
             let companyOp = JSON.parse(JSON.stringify(this.companyArr));
             delete companyOp._id;
-            if (companyOp.businessRelationCompany.length > 0) {
-              let data = [];
-              companyOp.businessRelationCompany.forEach(item => {
-                data.push(item._id);
-              });
-              this.$set(companyOp, 'businessRelationCompany', data);
+            if (companyOp.businessRelationCompany) {
+              if (companyOp.businessRelationCompany.length > 0) {
+                let data = [];
+                companyOp.businessRelationCompany.forEach(item => {
+                  data.push(item._id);
+                });
+                this.$set(companyOp, 'businessRelationCompany', data);
+              }
             }
-            if (companyOp.transportTrainsRelationCompany.length > 0) {
-              let data = [];
-              companyOp.transportTrainsRelationCompany.forEach(item => {
-                data.push(item._id);
-              });
-              this.$set(companyOp, 'transportTrainsRelationCompany', data);
+            if (companyOp.transportTrainsRelationCompany) {
+              if (companyOp.transportTrainsRelationCompany.length > 0) {
+                let data = [];
+                companyOp.transportTrainsRelationCompany.forEach(item => {
+                  data.push(item._id);
+                });
+                this.$set(companyOp, 'transportTrainsRelationCompany', data);
+              }
             }
             let company = await this.$api.curd({
               model: "company",
@@ -300,7 +310,9 @@
             this.data = JSON.parse(JSON.stringify(this.startShipObj));
             this.show = true;
             // }
-          } catch (error) {}
+          } catch (error) {
+            console.log(error);
+          }
           this.loadingText = "";
         }
       },

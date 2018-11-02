@@ -91,12 +91,12 @@
       },
       confirmation() {
         let returnIo = true;
-        this.roleArr.forEach(item => {
-          if (item.type !== 'companyAdmin' && item.area.length === 0 && this.type[item.type]) {
-            this.$message.warn('地区不能为空');
+        for (let index = 0; index < this.roleArr.length; index++) {
+          if (this.roleArr[index].type !== 'companyAdmin' && this.roleArr[index].area.length === 0 && this.type[this.roleArr[index].type]) {
+            this.$message.warn(`${this.field.Role.type.option[this.roleArr[index].type]}地区不能为空`);
             return returnIo = false;
           }
-        });
+        }
         return returnIo;
       },
       async sub() {

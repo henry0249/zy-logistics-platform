@@ -86,7 +86,7 @@
   import commonData from './CommonSelectByCode.js';
   export default {
     props: {
-      userTtype: {
+      userType: {
         type: String,
         default: ''
       },
