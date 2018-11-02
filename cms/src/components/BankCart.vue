@@ -47,7 +47,6 @@
       }
     },
     created() {
-      console.log('object',this.initData);
       this.form = JSON.parse(JSON.stringify(this.initData));
     }
   };

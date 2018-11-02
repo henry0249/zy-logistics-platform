@@ -36,6 +36,11 @@
           <my-form-item v-else size="mini" label="到账日期" date v-model="data.accountingTime" type="date" placeholder="选择日期" :picker-options="pickerOptions">
           </my-form-item>
         </div>
+        <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
+        <div class="jb">
+          <my-form-item v-if="isFrom" size="mini" input type="textarea" autosize v-model="data.from.remark" placeholder="请输入付款备注" label="备注"></my-form-item>
+          <my-form-item v-else size="mini" input type="textarea" autosize v-model="data.from.remark" placeholder="请输入收款备注" label="备注"></my-form-item>
+        </div>
       </slot>
     </el-card>
   </loading-box>
@@ -65,10 +70,10 @@
     },
     watch: {
       'data.company' (val) {
-        console.log('company',val);
+        console.log('company', val);
       },
       'data.toCompany' (val) {
-        console.log('toCompany',val);
+        console.log('toCompany', val);
       },
       userType(val) {
         let data = JSON.parse(JSON.stringify(this.data));
