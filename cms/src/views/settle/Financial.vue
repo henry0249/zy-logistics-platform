@@ -4,10 +4,9 @@
       <div slot="header">
         <div class="flex ac jb" style="color:#909399;background:#f4f4f5;font-size:13px;border-radius:4px;padding:10px 15px;margin-bottom:15px;">
           <div class="info">
-            <i class="el-icon-info"></i>
-            订单预审
+            <i class="el-icon-info"></i> 订单预审
             <!-- <el-radio v-model="radio" label="businessTrains">订单结算</el-radio>
-            <el-radio v-model="radio" label="logistics">物流结算</el-radio> -->
+                <el-radio v-model="radio" label="logistics">物流结算</el-radio> -->
           </div>
           <div class="f1"></div>
         </div>
@@ -22,8 +21,19 @@
           </div>
         </el-tab-pane>
         <loading-box v-model="tableLoadingText">
-          <el-table size="small" :data="receivables" :height="tableHeight" style="width: 100%" @selection-change="handleSelectionChange">
+          <el-table size="small" :data="receivables" :height="tableHeight" style="width: 100%" @selection-change="handleSelectionChange" show-summary :summary-method="getSummaries">
             <el-table-column type="selection" width="55">
+            </el-table-column>
+            <el-table-column label="订单号" width="120">
+              <div slot-scope="scope" class="blue flex ac">
+                {{scope.row.order.no}}
+                <el-popover placement="top" trigger="hover" v-if="scope.row.stateCheckFail">
+                  <div >
+                    <div v-html="checkFailText(scope.row.stateCheckFailLog)"></div>
+                  </div>
+                  <i slot="reference" class="el-icon-error danger pointer" style="margin-left:5px"></i>
+                </el-popover>
+              </div>
             </el-table-column>
             <el-table-column v-if="key !== 'balancePrice'" :prop="key" :label="val" v-for="(val,key) in thead" :key="key">
             </el-table-column>
@@ -31,9 +41,14 @@
               <my-form-item number size="mini" slot-scope="scope" v-model="scope.row.balancePrice" :min="0">
               </my-form-item>
             </el-table-column>
+            <el-table-column label="已结算金额">
+              <div slot-scope="scope" class="danger">
+                ¥ {{(scope.row.balancedSettlement + scope.row.balancedPrepaid)}}
+              </div>
+            </el-table-column>
             <el-table-column label="待结算总额">
-              <div slot-scope="scope" class="warning"> 
-                {{Number(scope.row.balancePrice) * Number(scope.row.balanceCount)}}
+              <div slot-scope="scope" class="warning">
+                {{Number(scope.row.balancePrice) * Number(scope.row.balanceCount) - scope.row.balancedSettlement - scope.row.balancedPrepaid}}
               </div>
             </el-table-column>
           </el-table>
@@ -65,7 +80,6 @@ export default {
       tableLoadingText: "",
       activeTab: "",
       thead: {
-        "order.no": "订单号",
         "goods.name": "商品",
         receive: "实收数量",
         loss: "损耗数量",
@@ -87,26 +101,31 @@ export default {
       if (!item) {
         return;
       }
-      this.getReceivables(item._id, item.isUser);
+      this.getReceivables(item);
     }
   },
   methods: {
+    checkFailText(checkFailLog) {
+      return `<span class="info">${this.formatTime(
+        checkFailLog.createdAt
+      )}</span>: <span class="danger">${checkFailLog.remark}</span>`;
+    },
     tabLabel(item) {
-      let res = item.name;
-      if (item.isUser) {
-        res += "(个人)";
+      let res = "";
+      if (item.type === "user" && item.relationUser) {
+        res = item.relationUser.name || item.relationUser.mobile + "(个人)";
+      }
+      if (item.type === "company" && item.relationCompany) {
+        res = item.relationCompany.name || item.relationCompany.mobile;
       }
       return res;
-    },
-    getHeight(val) {
-      this.tableHeight = val;
     },
     async getAccountList() {
       this.loadingText = "加载中";
       try {
         let res = await this.$ajax.post("/company/receivablesTab", {
           company: this.company._id,
-          role: 'financial'
+          settleState: "financial"
         });
         this.tab = res;
         if (res.length > 0) {
@@ -115,21 +134,21 @@ export default {
       } catch (error) {}
       this.loadingText = "";
     },
-    async getReceivables(payCompanyOrUser, isUser) {
-      if (!payCompanyOrUser) {
+    async getReceivables(account) {
+      if (!account._id) {
         return;
       }
       this.tableLoadingText = "加载中";
       try {
         this.receivables = [];
         let findBody = {
-          company: this.company._id,
-          role: "financial"
+          receivedCompany: account.company._id || account.company,
+          settleState: "financial"
         };
-        if (isUser) {
-          findBody.payUser = payCompanyOrUser;
+        if (account.type === "user") {
+          findBody.user = account.relationUser._id;
         } else {
-          findBody.payCompany = payCompanyOrUser;
+          findBody.company = account.relationCompany._id;
         }
         this.receivables = await this.$ajax.post(
           "/company/receivables",
@@ -186,32 +205,43 @@ export default {
       }
       let postData = {
         company: this.company._id,
+        oldSettleState: "financial",
+        newSettleState: "settle",
         businessTrains: []
       };
       for (let i = 0; i < this.select.length; i++) {
         const item = this.select[i];
-        if ((Number(item.balancePrice) || 0) == 0) {
+        if ((Number(item.balancePrice) || 0) === 0) {
           this.$message.warning("结算价格不能为0");
           return;
         }
-        postData.businessTrains.push({
-          _id: item._id,
-          balancePrice: Number(item.balancePrice) || 0
-        });
+        postData.businessTrains.push(item);
       }
       this.loadingText = "正在审核";
       try {
-        await this.$ajax.post("/businessTrains/financial", postData);
+        await this.$ajax.post("/businessTrains/multi/update", postData);
         this.$message.success("预审成功");
         let item = this.getTabItem(this.activeTab);
-        if (item) {
-          await this.getReceivables(item._id, item.isUser);
-        }
+        if (item) await this.getReceivables(item);
       } catch (error) {}
       this.loadingText = "";
+    },
+    getSummaries(param) {
+      const { columns, data } = param;
+      const sums = [];
+      sums[0] = "合计";
+      let selectPreBalanced = 0;
+      this.select.forEach(item => {
+        selectPreBalanced +=
+          item.balancePrice * item.balanceCount -
+          item.balancedSettlement -
+          item.balancedPrepaid;
+      });
+      sums[9] = "¥ " + selectPreBalanced;
+      return sums;
     }
   },
-  mounted() {
+  async mounted() {
     this.getAccountList();
   }
 };

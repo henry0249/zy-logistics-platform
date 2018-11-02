@@ -216,16 +216,18 @@ class OrderService extends Service {
       return;
     }
     let findOption = {
+      type: 'company',
       company: businessTrains.company,
       relationCompany: nextBusinessTrains.company
     }
     if (nextBusinessTrains.customerType === 'user') {
       findOption = {
+        type: 'user',
         company: businessTrains.company,
         relationUser: nextBusinessTrains.user
       };
     }
-    let account = await ctx.model.Account.findOne(findOption);
+    let account = await ctx.service.account.set(findOption);
     if (account) {
       return account;
     }

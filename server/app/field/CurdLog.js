@@ -5,7 +5,8 @@ module.exports = {
     option: {
       default: '默认操作日志',
       orderCheckFail: '订单审核失败记录',
-      logisticsCheckFail: '物流单审核失败记录'
+      logisticsCheckFail: '物流单审核失败记录',
+      businessTrainsCheckFail: '贸易链审核失败记录'
     },
     default: 'default'
   },
@@ -28,6 +29,11 @@ module.exports = {
     name: '关联物流单',
     type: 'ObjectId',
     ref: 'Logistics'
+  },
+  businessTrains: {
+    name: '关联贸易链',
+    type: 'ObjectId',
+    ref: 'BusinessTrains'
   },
   ua: {
     name: '设备信息',

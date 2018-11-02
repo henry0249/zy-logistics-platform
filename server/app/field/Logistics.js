@@ -3,6 +3,26 @@ module.exports = {
     type: 'String',
     name: '单号',
   },
+  settleState: {
+    type: 'String',
+    name: '结算状态',
+    default: 'financial',
+    option: {
+      financial: '待预审',
+      settle: '待结算',
+      financialManager: '待审核',
+      finish: '结算完成'
+    }
+  },
+  stateCheckFail:{
+    type: 'String',
+    name: '结算审核未通过状态',
+    option: {
+      settle: '结算专员审核未通过',
+      financialManager: '财务经理审核未通过',
+    },
+    default: ""
+  },
   state: {
     type: 'Number',
     name: '状态',
@@ -108,23 +128,28 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
-  balanceForAccount: {
-    name: '用结算款结算金额',
+  preSettlement: {
+    name: '用结算款结算金额', //仅做记录
     type: 'Number',
     default: 0
   },
-  balanceForAccountPrepaid: {
-    name: '用预付款结算金额',
+  prePrepaid: {
+    name: '用预付款结算金额', //仅做记录
     type: 'Number',
     default: 0
   },
-  balanced: {
-    name: '已结算金额',
+  balancedSettlement: {
+    name: '已用结算款结算金额', //真实记录
     type: 'Number',
     default: 0
   },
-  balancedObj: {
-    name: '已结算金额对象', //一个accountChange的_id对应一个金额,因为一次结算,不一定付完
+  balancedPrepaid: {
+    name: '已用预付款结算金额', //真实记录
+    type: 'Number',
+    default: 0
+  },
+  balancedArr: {
+    name: '已结算金额数组', //一个accountChange的_id对应一个金额,因为一次结算,不一定付完
     type: 'Object'
   },
   loss: {

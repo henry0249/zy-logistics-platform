@@ -17,8 +17,6 @@ const store = new Vuex.Store({
     orderBadge: {},
     baseUrl: window.location.protocol + '//' + window.location.host,
     role: {},
-    businessTrainsSettlelist:[],
-    logisticsSettlelist: []
   },
   mutations: {
     headerToggle(state, flag) {
@@ -53,14 +51,9 @@ const store = new Vuex.Store({
         localStorage.removeItem('token');
       }
     },
-    logout(state) {
+    logout() {
       localStorage.removeItem('token');
       router.replace('/');
-    },
-    setSettlelist(state, data) {
-      if (data.type && state[data.type]) {
-        state[data.type] = data.list;
-      }
     }
   },
   actions: {

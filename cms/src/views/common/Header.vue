@@ -58,7 +58,7 @@ export default {
     activeNavIndex() {
       let res = -1;
       this.$route.matched.forEach(matchedItem => {
-        this.nav.forEach((navItem,navIndex) => {
+        this.nav.forEach((navItem, navIndex) => {
           if (navItem.path === matchedItem.path) {
             this.defaultActive = navItem.path;
             res = navIndex;
@@ -97,7 +97,7 @@ export default {
     },
     handleCommand(index) {
       this.$store.commit("setCompany", this.roleCompany[index]);
-      this.$store.dispatch('getRole',this.roleCompany[index]._id);
+      this.$store.dispatch("getRole", this.roleCompany[index]._id);
     },
     setNav() {
       this.nav = [];
@@ -190,7 +190,8 @@ export default {
         }
         if (item.path === "/settle") {
           item.badge =
-            this.orderBadge.documentClerk + this.orderBadge.documentClerkManager || 0;
+            this.orderBadge.documentClerk +
+              this.orderBadge.documentClerkManager || 0;
           this.$set(this.nav, index, item);
         }
       });

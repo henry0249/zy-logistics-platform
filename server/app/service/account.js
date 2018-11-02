@@ -6,9 +6,9 @@ class CompanyService extends Service {
   async add() {
     return await this.set();
   }
-  async set() {
+  async set(data) {
     const ctx = this.ctx;
-    let body = ctx.request.body;
+    let body = data || ctx.request.body;
     let res = {};
     if (body._id) {
       return body;
@@ -32,10 +32,14 @@ class CompanyService extends Service {
       type: body.type,
       company: body.company
     };
-    if (body.type === 'user') {
+    if (body.payUserType === 'user') {
+      let hasUser = await ctx.model.User.findById(body.user);
+      if (!hasUser) ctx.throw(404, '付款人不存在');
       findBody.relationUser = body.relationUser;
     }
-    if (body.type === 'company') {
+    if (body.payUserType === 'company') {
+      let hasCompany = await ctx.model.Company.findById(body.company);
+      if (!hasCompany) ctx.throw(404, '付款公司不存在');
       findBody.relationCompany = body.relationCompany;
     }
     let hasAccount = await ctx.model.Account.findOne(findBody);

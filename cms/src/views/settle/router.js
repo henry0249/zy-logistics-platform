@@ -4,7 +4,6 @@ import DocumentClerkManager from './DocumentClerkManager.vue';
 import Financial from './Financial.vue';
 import Settle from './Settle.vue';
 import FinancialManager from './FinancialManager.vue';
-import SettleAccount from './SettleAccount.vue';
 
 export default [{
   path: '/settle',
@@ -64,9 +63,5 @@ export default [{
       state: 'dinancialManager',
       nav: true
     }
-  }, {
-    path: '/settle/account',
-    component: SettleAccount,
-    name: '结算详情'
   }]
 }]

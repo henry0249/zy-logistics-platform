@@ -102,8 +102,8 @@ export default {
         this.order = await this.$ajax("/order/info/" + this.$route.params._id);
         if (this.order.checkFail) {
           this.checkFailLog = await this.$ajax.post("/curdLog/findOne", {
-            type: "orderCheckFail",
-            order: this.order._id,
+            type: "businessTrainsCheckFail",
+            order: item._id,
             sort: {
               createdAt: -1
             }
