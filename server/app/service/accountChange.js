@@ -104,9 +104,16 @@ class CompanyService extends Service {
     let accountChangeId = body._id;
     let accountChange = await ctx.model.AccountChange.findById(accountChangeId);
     if (!accountChange) ctx.throw(404, '账单不存在');
+    if (accountChange.invoice) ctx.throw(404, '账单已经开票了');
+    if (accountChange.check) {
+      let hasRole = await ctx.model.Role.findOne({
+        type: 'financialManager',
+        user: ctx.user._id,
+        company: accountChange.handle
+      });
+      if (!hasRole) ctx.throw(400, '您无操作权限');
+    }
     await this.checkField(body);
-    await this.setBalanced(accountChangeId, 'businessTrains');
-    await this.setBalanced(accountChangeId, 'logistics');
     body.author = ctx.user._id;
     delete body._id;
     delete body.check;
@@ -116,18 +123,37 @@ class CompanyService extends Service {
     delete body.createdAt;
     delete body.updatedAt;
     body.editCheckFailText = "";
+
+    if (accountChange.check && accountChange.account) {
+      let updateAccount = {
+        $inc: {}
+      };
+      if (Number(accountChange.type) === 1) {
+        updateAccount.$inc.value = body.value - accountChange.value;
+      }
+      if (Number(accountChange.type) === 4) {
+        updateAccount.$inc.prepaid = body.value - accountChange.value;
+      }
+      await ctx.model.Account.update({
+        _id: accountChange.account
+      }, updateAccount);
+      body.$unset = {
+        childern: 1
+      };
+    }
     await ctx.model.AccountChange.update({
       _id: accountChangeId
     }, body);
     return 'ok';
   }
-  async payUserUpdate() {
+  async payUserUpdateApply() {
     const ctx = this.ctx;
     let body = ctx.request.body;
     if (!body._id) ctx.throw(422, '账单_id必填');
     let accountChangeId = body._id;
     let accountChange = await ctx.model.AccountChange.findById(accountChangeId);
     if (!accountChange) ctx.throw(404, '账单不存在');
+    if (accountChange.invoice) ctx.throw(404, '账单已经开票了');
     await this.checkField(body);
     if (payUserType === 'user') {
       if (ctx.user !== body.user) {
@@ -142,8 +168,6 @@ class CompanyService extends Service {
       });
       if (!hasRole) ctx.throw(400, '您无权限操作该流水');
     }
-    await this.setBalanced(accountChangeId, 'businessTrains');
-    await this.setBalanced(accountChangeId, 'logistics');
     delete body._id;
     delete body.check;
     delete body.invoice;
@@ -151,10 +175,24 @@ class CompanyService extends Service {
     delete body.handle;
     delete body.createdAt;
     delete body.updatedAt;
-    body.editCheckFailText = "";
-    await ctx.model.AccountChange.update({
-      _id: accountChangeId
-    }, body);
+    if (accountChange.childern) {
+      await ctx.model.AccountChange.update({
+        _id: accountChange.childern
+      }, body);
+    } else {
+      childern = new ctx.model.AccountChange({
+        ...body,
+        handle: accountChange.handle,
+        author: ctx.user._id,
+        parent: accountChangeId
+      });
+      await childernModel.save();
+      await ctx.model.AccountChange.update({
+        _id: accountChangeId
+      }, {
+        childern: childern._id
+      });
+    }
     return 'ok';
   }
 
@@ -164,7 +202,7 @@ class CompanyService extends Service {
     if (!body._id) ctx.throw(422, '账单_id必填');
     let accountChangeId = body._id;
     await this.checkField(body, ['financialManager']);
-    let accountChange = ctx.model.AccountChange.findById(accountChangeId);
+    let accountChange = await ctx.model.AccountChange.findById(accountChangeId);
     if (!accountChange) ctx.throw(404, '账单不存在');
     if (accountChange.check) ctx.throw(422, '账单已经审核,请勿重复操作');
     body.author = ctx.user._id;

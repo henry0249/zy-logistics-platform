@@ -54,6 +54,7 @@ module.exports = app => {
     .post('/businessTrains/multi/checkFail', checkToken(), 'businessTrains.multiCheckFail') //结算流程
     //账单流水接口
     .post('/accountChange/check', checkToken(), 'accountChange.check') //账单流水审核
+    .post('/accountChange/payUserUpdateApply', checkToken(), 'accountChange.payUserUpdateApply') //付款方进行修改账单申请
     //页面接口
     .get('/', 'static.views') //根路径匹配
     .get(/views/, 'static.views') //根views页面
