@@ -3,11 +3,11 @@
 const Controller = require('egg').Controller;
 
 class BusinessTrainsController extends Controller {
-  async financial() {
-    this.ctx.body = await this.ctx.service.businessTrains.financial();
+  async multiUpdate(){
+    this.ctx.body = await this.ctx.service.businessTrains.multiUpdate();
   }
-  async settle(){
-    this.ctx.body = await this.ctx.service.businessTrains.settle();
+  async multiCheckFail(){
+    this.ctx.body = await this.ctx.service.businessTrains.multiCheckFail();
   }
 }
 module.exports = BusinessTrainsController;

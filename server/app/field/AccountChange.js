@@ -4,6 +4,11 @@ module.exports = {
     type: 'Boolean',
     default: false
   },
+  forEdit: {
+    name: '是否仅为修改使用',
+    type: 'Boolean',
+    default: false
+  },
   value: {
     name: '金额',
     type: 'Number'
@@ -82,7 +87,7 @@ module.exports = {
   },
   auditor: {
     name: '审核人',
-    type: 'ObjectIdArray',
+    type: 'ObjectId',
     ref: 'User'
   },
   accountChange: {

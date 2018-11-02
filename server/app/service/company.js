@@ -170,8 +170,8 @@ class CompanyService extends Service {
     if (!body.company) {
       ctx.throw(422, '公司信息必填', body);
     }
-    if (!body.role) {
-      ctx.throw(422, '权限信息获取失败', body);
+    if (!body.settleState) {
+      ctx.throw(422, '订单结算状态获取失败', body);
     }
     let company = await ctx.model.Company.findById(body.company);
     if (!company) {
@@ -180,95 +180,72 @@ class CompanyService extends Service {
     let hasRole = await ctx.model.Role.findOne({
       user: ctx.user._id,
       company: company._id,
-      type: body.role
+      type: body.settleState
     });
     if (!hasRole) {
       // ctx.throw(400, '您无操作权限', body);
       return [];
     }
-    let businessTrainsData = await ctx.model.BusinessTrains.find({
-      receivedCompany: company._id
-    });
-    let payIdArr = [];
-    businessTrainsData.forEach((item) => {
-      let addType = 'company';
-      if (item.type === 'customer') {
-        addType = item.customerType;
-      }
-      let pushItem = {
-        type: addType,
-        _id: item[addType].toString()
-      };
-      payIdArr.push(pushItem);
-    });
-    payIdArr = ctx.helper.unique(payIdArr, '_id');
-    let res = [];
-    for (let i = 0; i < payIdArr.length; i++) {
-      let payItem = payIdArr[i];
-      let payData;
-      if (payItem.type === 'company') {
-        payData = await ctx.model.Company.findById(payItem._id);
-      }
-      if (payItem.type === 'user') {
-        payData = await ctx.model.User.findById(payItem._id);
-      }
-      let pushItem = JSON.parse(JSON.stringify(payData));
-      if (payItem.type === 'user') {
-        pushItem.isUser = true;
-      }
-      res.push(pushItem);
-    }
-    return res;
+    return await ctx.model.Account.find({
+      company: company._id,
+      $or: [{
+          relationCompany: {
+            $exists: true
+          }
+        },
+        {
+          relationUser: {
+            $exists: true
+          }
+        }
+      ]
+    }).populate([{
+      path: 'relationUser'
+    }, {
+      path: 'relationCompany'
+    }]);
   }
   async receivables() {
     const ctx = this.ctx;
     let body = ctx.request.body;
-    if (!body.company) {
-      ctx.throw(422, '公司信息必填', body);
+    if (!body.company && !body.user) {
+      ctx.throw(422, '付款信息获取失败', body);
     }
-    if (!body.role) {
-      ctx.throw(422, '权限信息获取失败', body);
+    if (!body.receivedCompany) {
+      ctx.throw(422, '收款公司信息获取失败', body);
     }
-    let company = await ctx.model.Company.findById(body.company);
-    if (!company) {
-      ctx.throw(404, '公司信息未找到', body);
+    if (!body.settleState) {
+      ctx.throw(422, '订单结算状态获取失败', body);
+    }
+    let receivedCompany = await ctx.model.Company.findById(body.receivedCompany);
+    if (!receivedCompany) {
+      ctx.throw(404, '收款公司信息未找到', body);
     }
     let hasRole = await ctx.model.Role.findOne({
       user: ctx.user._id,
-      company: company._id,
-      type: body.role
+      company: receivedCompany._id,
+      type: body.settleState
     });
     if (!hasRole) {
       return [];
     }
     let findBody = {
-      receivedCompany: company._id,
-      financial: body.financial || false,
-      user: "",
-      company: ""
+      receivedCompany: receivedCompany._id,
+      settleState: body.settleState || 'financial'
     };
-    if (body.payCompany) {
-      findBody.company = body.payCompany;
-      delete findBody.user;
-      if (!findBody.company) {
-        ctx.throw(422, '参数错误', body);
-      }
+    if (body.company) {
+      findBody.company = body.company;
     }
-    if (body.payUser) {
-      findBody.user = body.payUser;
-      delete findBody.company;
-      if (!findBody.user) {
-        ctx.throw(422, '参数错误', body);
-      }
+    if (body.user) {
+      findBody.user = body.company;
     }
+    let settleType = body.settleType || 'businessTrains';
+    if (!(settleType === 'businessTrains' || settleType === 'logistics')) ctx.throw(422, '结算模式错误', body);
     let modelNameObj = {
       'businessTrains': 'BusinessTrains',
       'logistics': 'Logistics'
     };
-    let modelName = modelNameObj.businessTrains;
-    if (body.type === 'businessTrains' || body.type === 'logistics') {
-      modelName = modelNameObj[body.type];
-    }
+    let modelName = modelNameObj[settleType];
     let data = await ctx.model[modelName].find(findBody).populate([{
       path: 'order'
     }, {
@@ -278,11 +255,29 @@ class CompanyService extends Service {
       }]
     }]);
     let res = [];
-    data.forEach((item) => {
-      if (item.balancePrice * item.balanceCount - item.balanced > 0) {
-        res.push(item);
+    for (let i = 0; i < data.length; i++) {
+      let item = JSON.parse(JSON.stringify(data[i]));
+      let balanced = item.balancedSettlement + item.balancedPrepaid;
+      let preBalanced = item.balancePrice * item.balanceCount;
+      if (item.balancePrice === 0) {
+        preBalanced = item.preBalancePrice * item.balanceCount;
       }
-    });
+      if (preBalanced - balanced > 0) {
+        if (item.order.state === 'financial') {
+          if (item.stateCheckFail) {
+            let findBody = {
+              type: settleType + 'CheckFail',
+              [settleType]: item._id
+            }
+            let checkFailLog = await ctx.model.CurdLog.findOne(findBody).sort({
+              createdAt: -1
+            });
+            item.stateCheckFailLog = checkFailLog;
+          }
+          res.push(item);
+        }
+      }
+    }
     return res;
   }
 }

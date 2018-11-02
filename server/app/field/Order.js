@@ -25,8 +25,8 @@ module.exports = {
       documentClerk: '单据文员审核', //添加贸易链,物流链的结算价格,数量等
       documentClerkManager: '单据主管审核', //审核单据文员操作,进入结算环节
       financial: '财务文员预审', //在此状态财务文员能进行批量修改贸易链结算价格,恢复贸易链价格等
-      settled: '已结算',
-      invoiced: '已开票',
+      settle: '结算文员结算',
+      financialManager: '财务经理审核',
       cancel: '取消',
       delete: '删除'
     },

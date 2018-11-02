@@ -49,9 +49,11 @@ module.exports = app => {
     //库存接口
     .post('/stock/multi', checkToken(), 'stock.multi') //批量添加库存单
     .post('/stock/simpleStatistics', checkToken(), 'stock.simpleStatistics') //简单的库存统计
-    //物流链接口
-    .post('/businessTrains/financial', checkToken(), 'businessTrains.financial') //财务文员预审
-    .post('/businessTrains/settle', checkToken(), 'businessTrains.settle') //结算专员结算
+    //贸易链接口
+    .post('/businessTrains/multi/update', checkToken(), 'businessTrains.multiUpdate') //结算流程
+    .post('/businessTrains/multi/checkFail', checkToken(), 'businessTrains.multiCheckFail') //结算流程
+    //账单流水接口
+    .post('/accountChange/check', checkToken(), 'accountChange.check') //账单流水审核
     //页面接口
     .get('/', 'static.views') //根路径匹配
     .get(/views/, 'static.views') //根views页面
