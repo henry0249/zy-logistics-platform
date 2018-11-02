@@ -112,5 +112,15 @@ module.exports = {
   accountingTime: {
     name: '到账时间',
     type: 'String'
+  },
+  parent: {
+    name: '父级流水',
+    type: 'ObjectId',
+    ref: 'AccountChange'
+  },
+  children: {
+    name: '子账单',
+    type: 'ObjectId',
+    ref: 'AccountChange'
   }
 }
