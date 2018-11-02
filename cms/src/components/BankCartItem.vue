@@ -9,7 +9,7 @@
               <common-select-by-code v-else width="300px" :userType.sync="userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收款方"></common-select-by-code>
             </div>
             <div class="jc js">
-              <my-form-item :readonly="isFrom?false:true" width="200px" size="mini" label="付款金额" v-model="data.value" placeholder="请输入付款金额"></my-form-item>
+              <my-form-item number :disabled="isFrom?false:true" width="200px" size="mini" label="付款金额" v-model.number="data.value" placeholder="请输入付款金额"></my-form-item>
             </div>
           </div>
         </slot>
@@ -69,12 +69,6 @@
       }
     },
     watch: {
-      'data.company' (val) {
-        console.log('company', val);
-      },
-      'data.toCompany' (val) {
-        console.log('toCompany', val);
-      },
       userType(val) {
         let data = JSON.parse(JSON.stringify(this.data));
         if (this.isFrom) {
@@ -248,7 +242,7 @@
       }
     },
     created() {
-      if (Object.keys(this.data).length > 0) {}
+      // console.log(this.isFrom, this.data);
     }
   }
 </script>

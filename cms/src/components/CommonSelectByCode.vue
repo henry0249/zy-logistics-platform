@@ -201,7 +201,6 @@
     computed: {
       text() {
         if (this.checkData.length > 0) {
-          console.log('this.checkData[this.checkData - 1]', this.checkData[this.checkData.length - 1]);
           return this.checkData[this.checkData.length - 1].name;
         } else {
           return '未选择'

@@ -33,13 +33,11 @@
           }
           this.initData = await this.$ajax.post('/accountChange/findOne', data);
         } catch (error) {
-          console.log(error);
         }
         this.loadingText = '';
       }
     },
     created() {
-      console.log(this.$route);
       this.getAccountChange();
     }
   }

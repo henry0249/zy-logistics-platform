@@ -10,7 +10,7 @@
             <el-tab-pane v-for="item in accountData" :name="item._id" :key="item.id" :label="item.userType === 'company'?item.name : item.name + '(个人)'">
               <div class="col-flex tab-height">
                 <div class="tab-top">
-                  <span>结算款：<span class="blue">{{item.value}}</span> 预付款：<span class="danger">{{item.prepaid}}</span></span>
+                  <span>结算款：<span style="margin-right:30px;" class="blue">{{accountObj.value}}</span> 预付款：<span class="danger">{{accountObj.prepaid}}</span></span>
                 </div>
                 <el-tabs v-model="payName" @tab-click="payTabClick" type="card">
                   <el-tab-pane v-for="(v,i) in payArr" :name="v.key" :label="v.label" :key="`${i}pay`">
@@ -73,6 +73,10 @@
         tableHeight: 'calc(100% - 37px)',
         accountData: [],
         accountChangeData: [],
+        accountObj: {
+          value: 0,
+          prepaid: 0
+        },
         payArr: [{
           key: 'pay',
           label: '付款记录'
@@ -82,17 +86,13 @@
         }, {
           key: 'noCheck',
           label: '待审核'
+        }, {
+          key: 'hasChild',
+          label: '待修改'
         }]
       };
     },
     watch: {
-      $route: {
-        async handler(val) {
-          this.payName = 'pay'
-          await this.getData();
-        },
-        deep: true
-      },
       async routeShow(val) {
         if (!val) {
           await this.getData();
@@ -165,7 +165,6 @@
         })
       },
       check(scope) {
-        console.log(scope);
         if (!scope.row.check) {
           if (this.role.financialManager) {
             this.resMethods(scope, true);
@@ -270,6 +269,7 @@
           } else {
             this.str = "toCompany";
           }
+          await this.getAccountValue(this.activeName);
           this.accountChangeData = [];
           this.accountChangeData = await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
         } catch (error) {}
@@ -286,6 +286,15 @@
         });
       },
       async sub() {},
+      async getAccountValue(_id) {
+        let res = await this.$ajax.post("/account/findOne", {
+          company: this.company._id,
+          relationCompany: _id
+        });
+        if (Object.keys(res).length > 0) {
+          this.accountObj = res;
+        }
+      },
       async getAccount() {
         let _id = this.sys ? this.$route.parmas._id : this.company._id;
         let data = [];
@@ -329,7 +338,7 @@
         });
         let set = new Set()
         this.accountData = data.filter((item) => {
-          return !set.has(item._id) && set.add(item);
+          return !set.has(item._id) && set.add(item._id);
         });
         if (this.accountData.length > 0) {
           this.activeName = this.accountData[0]._id;
@@ -360,9 +369,23 @@
           this.$set(data, 'check', false);
           this.$set(data, str, company_id);
           this.$set(data, 'company', _id);
+          this.$set(data, 'children', {
+            $exists: false
+          });
+        } else if (check === 'hasChild') {
+          this.$set(data, 'check', true);
+          this.$set(data, 'children', {
+            $exists: true
+          });
         } else {
           this.$set(data, 'check', true);
+          this.$set(data, 'children', {
+            $exists: false
+          });
         }
+        this.$set(data, 'parent', {
+          $exists: false
+        });
         return await this.$ajax.post("/accountChange/find", data);
       },
       async getBusinessTrains() {
@@ -385,6 +408,7 @@
             }
             this.io = false;
             this.payName = 'pay';
+            await this.getAccountValue(this.activeName);
             this.accountChangeData = [];
             this.accountChangeData = await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
           }
@@ -402,6 +426,9 @@
       }
       this.$store.dispatch('getRole', this.company._id);
       await this.getData();
+      if (!this.role.financialManager) {
+        this.payArr.splice(2, 1);
+      }
     }
   };
 </script>
