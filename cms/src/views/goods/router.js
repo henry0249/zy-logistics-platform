@@ -9,6 +9,7 @@ import CategoryEdit from './CategoryEdit.vue';
 import Edit from './Edit.vue';
 import brandAdd from './brandAdd.vue';
 import Test from './Test.vue';
+import TestChild from './TestChild.vue';
 
 export default [{
   path: '/goods',
@@ -27,7 +28,11 @@ export default [{
   }, {
     path: 'test',
     name: 'Test',
-    component: Test
+    component: Test,
+    children:[{
+      path:'child',
+      component:TestChild
+    }]
   }, {
     path: 'add',
     name: '添加商品',

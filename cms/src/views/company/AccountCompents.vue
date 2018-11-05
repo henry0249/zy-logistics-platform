@@ -14,6 +14,10 @@
                 </div>
                 <el-tabs v-model="payName" @tab-click="payTabClick" type="card">
                   <el-tab-pane v-for="(v,i) in payArr" :name="v.key" :label="v.label" :key="`${i}pay`">
+                    <div slot="label">
+                      {{v.label}}
+                      <el-badge v-if="v.key === 'noCheck' || v.key === 'hasChild'" :value="badge(v.key)" />
+                    </div>
                     <my-table op opWidth="45" height="calc(100vh - 50px - 70px - 62px - 53px - 40px - 30px - 30px - 37px - 40px)" index :loadmore="loadmore" stripe :thead="thead" :data.sync="accountChangeData" size="mini" border>
                       <div slot="op" class="jc" slot-scope="scope">
                         <i style="color:#909399" class="el-icon-view pointer" @click="check(scope)" :title="payName === 'noCheck'?'点击进行审核':'点击查看详情'"></i>
@@ -73,6 +77,8 @@
         tableHeight: 'calc(100% - 37px)',
         accountData: [],
         accountChangeData: [],
+        noCheckCount: undefined,
+        hasChildCount: undefined,
         accountObj: {
           value: 0,
           prepaid: 0
@@ -154,6 +160,13 @@
       }
     },
     methods: {
+      badge(val) {
+        let data = {
+          noCheck: this.noCheckCount?this.noCheckCount:undefined,
+          hasChild: this.hasChildCount?this.hasChildCount:undefined,
+        };
+        return data[val];
+      },
       addAcount() {
         this.$router.push({
           path: '/company/account/account_add',
@@ -255,11 +268,17 @@
           }
           this.accountChangeData = [];
           this.accountChangeData = await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
+          this.noCheckCount = await this.getCount('noCheck');
+          this.hasChildCount = await this.getCount('hasChild');
         } catch (error) {}
         this.loadingText = '';
       },
       async tabClick(val) {
         try {
+          this.accountObj = {
+            value: 0,
+            prepaid: 0
+          };
           this.io = false;
           this.payName = 'pay';
           this.accountChangeData = [];
@@ -272,7 +291,9 @@
           await this.getAccountValue(this.activeName);
           this.accountChangeData = [];
           this.accountChangeData = await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
-        } catch (error) {}
+          this.noCheckCount = await this.getCount('noCheck');
+          this.hasChildCount = await this.getCount('hasChild');
+        } catch (error) {};
         this.loadingText = "";
       },
       go(key) {
@@ -396,6 +417,29 @@
           }
         });
       },
+      async getCount(val) {
+        let data = {
+          noCheck: {
+            check: false,
+            parent: {
+              $exists: false
+            }
+          },
+          hasChild: {
+            children: {
+              $exists: true
+            },
+            parent: {
+              $exists: false
+            },
+            check: true,
+          }
+        };
+        return await this.$ajax.post('/accountChange/count', { ...data[val],
+          toCompany: this.company._id,
+          company: this.activeName
+        });
+      },
       async getData() {
         try {
           this.loadingText = "加载中...";
@@ -411,6 +455,8 @@
             await this.getAccountValue(this.activeName);
             this.accountChangeData = [];
             this.accountChangeData = await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
+            this.noCheckCount = await this.getCount('noCheck');
+            this.hasChildCount = await this.getCount('hasChild');
           }
           await this.getBusinessTrains();
         } catch (error) {}
@@ -429,6 +475,7 @@
       if (!this.role.financialManager) {
         this.payArr.splice(2, 1);
       }
+      console.log(this.noCheckCount);
     }
   };
 </script>

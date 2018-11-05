@@ -7,10 +7,10 @@
         </div>
         <my-form width="24%" size="mini">
           <div class="jc jb" style="margin-top:15px;">
-            <bank-cart :data.sync="data" :initData="newData" style="width:100%" :key="1"></bank-cart>
+            <bank-cart v-if="showCart" :data.sync="data" :initData="newData" style="width:100%" :key="1"></bank-cart>
           </div>
         </my-form>
-        <div v-if="hasChild">
+        <div v-if="isShow">
           <div class="flex ac jc" style="font-size:22px;padding:31px 0 20px 0">
             <strong>修改后</strong>
           </div>
@@ -26,6 +26,7 @@
           <el-button size="small" @click="$router.go(-1)">返 回</el-button>
         </div>
         <div class="jc js">
+          <el-button v-if="isShow" size="small" type="primary" @click="edmitMethods">替换修改</el-button>
           <el-button size="small" type="primary" @click="sub">{{subText}}</el-button>
         </div>
       </div>
@@ -61,6 +62,8 @@
       return {
         loadingText: '',
         io: false,
+        show: true,
+        showCart: true,
         changeChild: false,
         data: {},
         children: {},
@@ -97,18 +100,26 @@
       },
       data: {
         handler(val) {
+          console.log(val);
           this.io = true;
         },
         deep: true
       }
     },
     computed: {
+      isShow() {
+        if (this.hasChild) {
+          return this.show;
+        } else {
+          return false;
+        }
+      },
       hasChild() {
         if (this.accountChangeData.children) {
           return true;
         } else {
           return false;
-        }
+        };
       },
       title() {
         let data = '';
@@ -122,9 +133,10 @@
         return data;
       },
       subText() {
+        console.log('!!!!', this.$route.query);
         let data = '添加';
         if (this.edmit) {
-          if (this.$route.query.check) {
+          if (this.$route.query.check === true || this.$route.query.check === 'true') {
             data = '审核';
           } else if (this.ispay) {
             if (this.hasChild) {
@@ -156,8 +168,26 @@
       },
     },
     methods: {
+      edmitMethods() {
+        this.$confirm(`将${this.title}单的数据更改为对方申请修改的数据`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.show = false;
+          this.showCart = false;
+          this.$nextTick(() => {
+            this.newData = Object.assign({}, this.newData, {
+              value: this.childrenData.value,
+              from: this.childrenData.from,
+              to: this.childrenData.to,
+            });
+            this.showCart = true;
+          })
+        }).catch(() => {});
+      },
       async sub() {
-        if (this.$route.query.check) {
+        if (this.$route.query.check === true || this.$route.query.check === 'true') {
           if (this.role.financialManager) {
             this.edmitAccountChange('check');
           } else {
@@ -185,6 +215,9 @@
             newData = this.changeChild ? this.children : this.childrenData;
             this.$set(newData, '_id', this.newData._id);
             delete newData.parent;
+          };
+          if (!this.show) {
+            newData = this.data;
           }
           let update = JSON.parse(JSON.stringify(newData));
           this.$set(update, 'company', this.data.company._id);
