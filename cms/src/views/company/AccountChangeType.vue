@@ -16,7 +16,7 @@
           </div>
           <my-form width="24%" size="mini">
             <div class="jc jb" style="margin-top:15px;">
-              <bank-cart :data.sync="children" :initData="newData.children" style="width:100%" :key="2"></bank-cart>
+              <bank-cart :data.sync="children" :initData="childrenData" style="width:100%" :key="2"></bank-cart>
             </div>
           </my-form>
         </div>
@@ -312,6 +312,9 @@
     async created() {
       if (Object.keys(this.initData).length > 0) {
         this.newData = JSON.parse(JSON.stringify(this.initData));
+      }
+      if (this.newData.children) {
+        this.childrenData = this.newData.children;
       }
       if (!this.edmit) {
         if (this.$route.query.type === '5' || this.$route.query.type === '6') {
