@@ -13,12 +13,12 @@
         </my-table>
       </el-tab-pane>
     </el-tabs>
-    <div class="jc" style="height:40px;position: absolute;top:0;right:0">
+    <div class="jc" style="height:40px;position: absolute;top:-33.5px;right:0;transform: translate(0,-50%);">
       <el-tooltip class="item" effect="dark" content="快速添加所有管理人员" placement="top">
-        <el-button style="padding:5px" type="warning" icon="el-icon-info" size="mini" @click="fastAdd"></el-button>
+        <el-button style="padding:5px" type="warning" icon="el-icon-info" size="mini" @click="fastAdd">快速初始化</el-button>
       </el-tooltip>
       <el-tooltip class="item" effect="dark" :content="`添加${btmText}`" placement="top">
-        <el-button style="padding:5px" type="success" icon="el-icon-plus" size="mini" @click="addUser"></el-button>
+        <el-button style="padding:5px" type="success" icon="el-icon-plus" size="mini" @click="addUser">添加{{btmText}}</el-button>
       </el-tooltip>
     </div>
     <el-dialog :title="`添加${btmText}`" width="70%" :visible.sync="dialogTableVisible">
@@ -280,5 +280,7 @@
 </script>
 
 <style scoped>
-
+.c{
+  
+}
 </style>

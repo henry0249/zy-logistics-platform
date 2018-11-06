@@ -5,6 +5,7 @@
         <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
           <strong>角色管理</strong>
         </div>
+        <common-alert style="margin:15px 0">公司角色</common-alert>
         <Role v-if="!loadingText" :startData="roleStartData" :data.sync="roleArr" :removeList.sync="removeList"></Role>
       </div>
       <div class="tr jb" style="margin-top:30px">
