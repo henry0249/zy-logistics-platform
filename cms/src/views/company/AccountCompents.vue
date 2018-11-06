@@ -103,13 +103,15 @@
         }, {
           key: 'applyEdit',
           label: '申请修改'
+        }, {
+          key: 'invoice',
+          label: '待开票'
         }]
       };
     },
     watch: {
       async routeShow(val) {
         if (!val) {
-          console.log('111111');
           await this.getData();
         }
       }
@@ -127,7 +129,8 @@
           },
           type: {
             name: '类型',
-            slot: true
+            slot: true,
+            width: 70
           },
           payUser: {
             name: '付款方',
@@ -153,10 +156,6 @@
             name: '到账日期',
             readOnly: true
           },
-          // check: {
-          //   name: '是否已审核',
-          //   slot: true
-          // }
         };
         return thead;
       },
@@ -272,13 +271,17 @@
       async payTabClick(val) {
         try {
           this.loadingText = '加载中';
-          if (val.name === 'pay' || val.name === 'applyEdit') {
-            this.io = false;
+          if (val.name === 'invoice') {
+            this.accountChangeData = [];
           } else {
-            this.io = true;
+            if (val.name === 'pay' || val.name === 'applyEdit') {
+              this.io = false;
+            } else {
+              this.io = true;
+            }
+            this.accountChangeData = [];
+            this.accountChangeData = await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
           }
-          this.accountChangeData = [];
-          this.accountChangeData = await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
           this.noCheckCount = await this.getCount('noCheck');
           this.hasChildCount = await this.getCount('hasChild');
           this.applyEditCount = await this.getCount('applyEdit');
@@ -433,7 +436,6 @@
             $exists: false
           });
         }
-        console.log(data);
         return await this.$ajax.post("/accountChange/find", { ...data,
           ...op[payName]
         });
