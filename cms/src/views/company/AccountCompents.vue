@@ -16,7 +16,7 @@
                   <el-tab-pane v-for="(v,i) in payArr" :name="v.key" :label="v.label" :key="`${i}pay`">
                     <div slot="label">
                       {{v.label}}
-                      <el-badge v-if="v.key === 'noCheck' || v.key === 'hasChild'" :value="badge(v.key)" />
+                      <el-badge v-if="v.key === 'noCheck' || v.key === 'hasChild' || v.key === 'applyEdit'" :value="badge(v.key)" />
                     </div>
                     <my-table op opWidth="45" height="calc(100vh - 50px - 70px - 62px - 53px - 40px - 30px - 30px - 37px - 40px)" index :loadmore="loadmore" stripe :thead="thead" :data.sync="accountChangeData" size="mini" border>
                       <div slot="op" class="jc" slot-scope="scope">
@@ -79,6 +79,7 @@
         accountChangeData: [],
         noCheckCount: undefined,
         hasChildCount: undefined,
+        applyEditCount: undefined,
         accountObj: {
           value: 0,
           prepaid: 0
@@ -95,6 +96,9 @@
         }, {
           key: 'hasChild',
           label: '待修改'
+        }, {
+          key: 'applyEdit',
+          label: '申请修改'
         }]
       };
     },
@@ -162,8 +166,9 @@
     methods: {
       badge(val) {
         let data = {
-          noCheck: this.noCheckCount?this.noCheckCount:undefined,
-          hasChild: this.hasChildCount?this.hasChildCount:undefined,
+          noCheck: this.noCheckCount ? this.noCheckCount : undefined,
+          hasChild: this.hasChildCount ? this.hasChildCount : undefined,
+          applyEdit: this.applyEditCount ? this.applyEditCount : undefined
         };
         return data[val];
       },
@@ -200,7 +205,8 @@
           query: {
             type,
             check: check ? true : false,
-            show: true
+            show: true,
+            payName: this.payName
           }
         })
       },
@@ -261,7 +267,7 @@
       async payTabClick(val) {
         try {
           this.loadingText = '加载中';
-          if (val.name === 'pay') {
+          if (val.name === 'pay' || val.name === 'applyEdit') {
             this.io = false;
           } else {
             this.io = true;
@@ -270,6 +276,7 @@
           this.accountChangeData = await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
           this.noCheckCount = await this.getCount('noCheck');
           this.hasChildCount = await this.getCount('hasChild');
+          this.applyEditCount = await this.getCount('applyEdit');
         } catch (error) {}
         this.loadingText = '';
       },
@@ -293,6 +300,7 @@
           this.accountChangeData = await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
           this.noCheckCount = await this.getCount('noCheck');
           this.hasChildCount = await this.getCount('hasChild');
+          this.applyEditCount = await this.getCount('applyEdit');
         } catch (error) {};
         this.loadingText = "";
       },
@@ -365,7 +373,7 @@
           this.activeName = this.accountData[0]._id;
         }
       },
-      async getAccountChange(_id, str, io, check) {
+      async getAccountChange(_id, str, io, payName) {
         let company_id = this.company._id
         let data = {
           company: company_id,
@@ -386,28 +394,43 @@
           this.$set(data, str, company_id);
           this.$set(data, 'company', _id);
         }
-        if (check === 'noCheck') {
-          this.$set(data, 'check', false);
-          this.$set(data, str, company_id);
-          this.$set(data, 'company', _id);
-          this.$set(data, 'children', {
-            $exists: false
-          });
-        } else if (check === 'hasChild') {
-          this.$set(data, 'check', true);
-          this.$set(data, 'children', {
-            $exists: true
-          });
-        } else {
-          this.$set(data, 'check', true);
+        let op = {
+          pay: {
+            check: true,
+          },
+          get: {
+            check: true,
+          },
+          noCheck: {
+            check: false,
+            company: _id,
+            // children: {
+            //   $exists: false
+            // }
+          },
+          hasChild: {
+            children: {
+              $exists: true
+            }
+          },
+          applyEdit: {
+            children: {
+              $exists: true
+            }
+          }
+        };
+        this.$set(data, 'parent', {
+          $exists: false
+        });
+        if (payName !== 'hasChild' || payName !== 'applyEdit') {
           this.$set(data, 'children', {
             $exists: false
           });
         }
-        this.$set(data, 'parent', {
-          $exists: false
+        console.log(data);
+        return await this.$ajax.post("/accountChange/find", { ...data,
+          ...op[payName]
         });
-        return await this.$ajax.post("/accountChange/find", data);
       },
       async getBusinessTrains() {
         this.businessTrainsData = await this.$ajax.post("businessTrains/find", {
@@ -423,7 +446,10 @@
             check: false,
             parent: {
               $exists: false
-            }
+            },
+            children: {
+              $exists: false
+            },
           },
           hasChild: {
             children: {
@@ -433,11 +459,25 @@
               $exists: false
             },
             check: true,
+          },
+          applyEdit: {
+            children: {
+              $exists: true
+            },
           }
         };
-        return await this.$ajax.post('/accountChange/count', { ...data[val],
+        let op = {
           toCompany: this.company._id,
           company: this.activeName
+        }
+        if (val === 'applyEdit') {
+          op = Object.assign({}, op, {
+            company: this.company._id,
+            toCompany: this.activeName
+          })
+        }
+        return await this.$ajax.post('/accountChange/count', { ...data[val],
+          ...op
         });
       },
       async getData() {
@@ -457,6 +497,7 @@
             this.accountChangeData = await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
             this.noCheckCount = await this.getCount('noCheck');
             this.hasChildCount = await this.getCount('hasChild');
+            this.applyEditCount = await this.getCount('applyEdit');
           }
           await this.getBusinessTrains();
         } catch (error) {}
@@ -464,7 +505,7 @@
       }
     },
     async created() {
-      if (this.$route.query.show === 'false') {
+      if (this.$route.query.show === 'false' || this.$route.query.show === false) {
         this.$router.push({
           path: '/company/account',
           query: {}

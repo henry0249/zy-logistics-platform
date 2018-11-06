@@ -25,7 +25,7 @@
         <div>
           <el-button size="small" @click="$router.go(-1)">返 回</el-button>
         </div>
-        <div class="jc js">
+        <div class="jc js" v-if="$route.query.payName !== 'applyEdit'">
           <el-button v-if="isShow" size="small" type="primary" @click="edmitMethods">替换修改</el-button>
           <el-button size="small" type="primary" @click="sub">{{subText}}</el-button>
         </div>

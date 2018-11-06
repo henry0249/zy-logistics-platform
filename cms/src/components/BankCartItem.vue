@@ -9,7 +9,7 @@
               <common-select-by-code v-else width="300px" :userType.sync="userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收款方"></common-select-by-code>
             </div>
             <div class="jc js">
-              <my-form-item number :disabled="isFrom?false:true" width="200px" size="mini" label="付款金额" v-model.number="data.value" placeholder="请输入付款金额"></my-form-item>
+              <my-form-item number :controls="isFrom" :disabled="isFrom?false:true" width="200px" size="mini" :label="isFrom?'付款金额':'收款金额'" v-model.number="data.value" :placeholder="`请输入${isFrom?'付款':'收款'}金额`"></my-form-item>
             </div>
           </div>
         </slot>

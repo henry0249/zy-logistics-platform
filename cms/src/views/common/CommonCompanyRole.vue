@@ -280,7 +280,4 @@
 </script>
 
 <style scoped>
-.c{
-  
-}
 </style>
