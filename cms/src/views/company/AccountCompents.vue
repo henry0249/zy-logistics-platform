@@ -316,7 +316,7 @@
           show: true
         }
         if (val) {
-          this.$set(query,'company',val);
+          this.$set(query, 'company', val);
         }
         this.$router.push({
           path: "/company/account/account_change_type",
@@ -511,18 +511,11 @@
       }
     },
     async created() {
-      if (this.$route.query.show === 'false' || this.$route.query.show === false) {
-        this.$router.push({
-          path: '/company/account',
-          query: {}
-        })
-      }
       this.$store.dispatch('getRole', this.company._id);
       await this.getData();
       if (!this.role.financialManager) {
         this.payArr.splice(2, 1);
       }
-      console.log(this.noCheckCount);
     }
   };
 </script>
