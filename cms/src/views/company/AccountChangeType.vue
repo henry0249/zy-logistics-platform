@@ -16,7 +16,7 @@
           </div>
           <my-form width="24%" size="mini">
             <div class="jc jb" style="margin-top:15px;">
-              <bank-cart :data.sync="children" :initData="childrenData" style="width:100%" :key="2"></bank-cart>
+              <bank-cart :data.sync="children" :initData="newData.children" style="width:100%" :key="2"></bank-cart>
             </div>
           </my-form>
         </div>
@@ -115,7 +115,7 @@
         }
       },
       hasChild() {
-        if (this.accountChangeData.children) {
+        if (this.newData.children) {
           return true;
         } else {
           return false;
@@ -158,7 +158,7 @@
           //
           //
         } else {
-          if (this.accountChangeData.toCompany._id === this.company._id) {
+          if (this.newData.toCompany._id === this.company._id) {
             data = true;
           } else {
             data = false;
@@ -296,28 +296,18 @@
         } catch (error) {}
         this.loadingText = '';
       },
-      async getAccountChange() {
+      async getCompanyByQuery() {
         try {
           this.loadingText = '加载中...';
-          this.accountChangeData = await this.$ajax.post('/accountChange/findOne', {
-            _id: this.$route.params._id,
-            populate: [{
-              path: 'toCompany'
-            }, {
-              path: 'children',
-              populate: [{
-                path: 'toCompany'
-              }, {
-                path: 'company'
-              }]
-            }]
+          let res = await this.$ajax.post('/company/findOne', {
+            _id: this.$route.query.company
           })
-          if (this.accountChangeData.children) {
-            this.childrenData = this.accountChangeData.children;
+          if (res) {
+            this.$set(this.newData, 'company', res);
           }
         } catch (error) {}
         this.loadingText = '';
-      },
+      }
     },
     async created() {
       if (Object.keys(this.initData).length > 0) {
@@ -337,7 +327,9 @@
         this.$set(this.newData.to, 'disabled', true);
         this.$set(this.newData.from, 'disabled', true);
       }
-      await this.getAccountChange();
+      if (this.$route.query.company) {
+        await this.getCompanyByQuery();
+      }
     }
   };
 </script>

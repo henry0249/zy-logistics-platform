@@ -9,8 +9,12 @@
           <el-tabs v-model="activeName" type="border-card" @tab-click="tabClick	">
             <el-tab-pane v-for="item in accountData" :name="item._id" :key="item.id" :label="item.userType === 'company'?item.name : item.name + '(个人)'">
               <div class="col-flex tab-height">
-                <div class="tab-top">
+                <div class="tab-top jc jb">
                   <span>结算款：<span style="margin-right:30px;" class="blue">{{accountObj.value}}</span> 预付款：<span class="danger">{{accountObj.prepaid}}</span></span>
+                  <div class="js">
+                    <el-button @click="go('5',activeName)" size="mini">收款</el-button>
+                    <el-button @click="go('6',activeName)" size="mini">预收款</el-button>
+                  </div>
                 </div>
                 <el-tabs v-model="payName" @tab-click="payTabClick" type="card">
                   <el-tab-pane v-for="(v,i) in payArr" :name="v.key" :label="v.label" :key="`${i}pay`">
@@ -105,6 +109,7 @@
     watch: {
       async routeShow(val) {
         if (!val) {
+          console.log('111111');
           await this.getData();
         }
       }
@@ -304,14 +309,18 @@
         } catch (error) {};
         this.loadingText = "";
       },
-      go(key) {
+      go(key, val) {
         this.show = false;
+        let query = {
+          type: key,
+          show: true
+        }
+        if (val) {
+          this.$set(query,'company',val);
+        }
         this.$router.push({
           path: "/company/account/account_change_type",
-          query: {
-            type: key,
-            show: true
-          }
+          query
         });
       },
       async sub() {},
@@ -404,9 +413,6 @@
           noCheck: {
             check: false,
             company: _id,
-            // children: {
-            //   $exists: false
-            // }
           },
           hasChild: {
             children: {
