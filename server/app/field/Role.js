@@ -16,6 +16,8 @@ module.exports = {
       financial: '财务文员', //财务预审 ,按贸易链关系归集结算
       settle: '结算专员', //打款操作
       financialManager: '财务经理', //流水审核
+      cashier:'出纳专员',
+      invoiceCleck:'发票专员',
       companyAdmin: '公司管理员',
       sysAdmin: '系统管理员',
       sysSalesman: '系统业务员',

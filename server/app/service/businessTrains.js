@@ -152,5 +152,38 @@ class BusinessTrainsService extends Service {
     }
 
   }
+  async getInvoiceList() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
+    if (!body.account) ctx.throw(422, '账户信息必填');
+    if (!body.company) ctx.throw(422, '公司信息必填');
+    let account = await ctx.model.Account.findOne({
+      _id: body.account,
+      company: body.company
+    });
+    if (!account) ctx.throw(404, '账户信息未找到');
+    let data = await ctx.model.BusinessTrains.find({
+      account: body.account
+    }).populate([{
+      path: 'order'
+    }, {
+      path: 'goods',
+      populate: [{
+        path: 'brand'
+      }]
+    }]);
+    let res = [];
+    for (let i = 0; i < data.length; i++) {
+      let item = data[i];
+      let invoicedLess = item.balancePrice * item.balanceCount -
+        balancedSettlement -
+        balancedPrepaid -
+        item.invoiced;
+      if (invoicedLess > 0) {
+        res.push(item);
+      }
+    }
+    return res;
+  }
 }
 module.exports = BusinessTrainsService;

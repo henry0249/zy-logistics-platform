@@ -9,5 +9,8 @@ class BusinessTrainsController extends Controller {
   async multiCheckFail(){
     this.ctx.body = await this.ctx.service.businessTrains.multiCheckFail();
   }
+  async getInvoiceList(){
+    this.ctx.body = await this.ctx.service.businessTrains.getInvoiceList();
+  }
 }
 module.exports = BusinessTrainsController;

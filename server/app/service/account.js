@@ -1,8 +1,6 @@
 const Service = require('egg').Service;
-const areaField = require('../field/Area');
 
 class CompanyService extends Service {
-
   async add() {
     return await this.set();
   }
@@ -56,11 +54,15 @@ class CompanyService extends Service {
     let body = ctx.request.body;
     let type = body.type;
     if (type === 'businessTrains' || type === 'logistics') {
-      if (body[type] instanceof Array && body[type].length>0) {
-      
+      if (body[type] instanceof Array && body[type].length > 0) {
+
       }
     }
     return 'ok';
+  }
+  async invoice() {
+    const ctx = this.ctx;
+    let body = ctx.request.body;
   }
 }
 module.exports = CompanyService;

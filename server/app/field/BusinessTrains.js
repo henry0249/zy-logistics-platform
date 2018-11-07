@@ -126,6 +126,11 @@ module.exports = {
     name: '已结算金额数组', //一个accountChange的_id对应一个金额,因为一次结算,不一定付完
     type: 'Object'
   },
+  invoiced: {
+    name: '已开票金额',
+    type: 'Number',
+    default: 0
+  },
   stock: {
     name: '关联的库存单',
     type: 'ObjectId',

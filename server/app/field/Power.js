@@ -24,6 +24,7 @@ module.exports = {
   }, // 可以使用哪些方法 'add', 'set', 'update', 'find', 'findOne', 'findById', 'delete'
   user: {
     type: 'ObjectId',
+    name: '属于哪个用户',
     ref: 'User'
   }
 }

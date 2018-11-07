@@ -58,7 +58,10 @@ class CompanyService extends Service {
       if (body.payUserType === 'company') {
         accountBody.relationCompany = body.company;
       }
-      let account = await ctx.service.account.set(accountBody);
+      let account = await ctx.service.account.set({
+        ...accountBody,
+        payUserType:body.payUserType
+      });
       body.account = account._id;
     }
     let accountChange = new ctx.model.AccountChange(body);
@@ -122,8 +125,9 @@ class CompanyService extends Service {
     delete body.handle;
     delete body.createdAt;
     delete body.updatedAt;
+    delete body.children;
+    delete body.parent;
     body.editCheckFailText = "";
-
     if (accountChange.check && accountChange.account) {
       let updateAccount = {
         $inc: {}
@@ -134,11 +138,13 @@ class CompanyService extends Service {
       if (Number(accountChange.type) === 4) {
         updateAccount.$inc.prepaid = body.value - accountChange.value;
       }
+      console.log(updateAccount);
       await ctx.model.Account.update({
         _id: accountChange.account
       }, updateAccount);
       body.$unset = {
-        childern: 1
+        children: 1,
+        parent: 1
       };
     }
     await ctx.model.AccountChange.update({
@@ -155,12 +161,12 @@ class CompanyService extends Service {
     if (!accountChange) ctx.throw(404, '账单不存在');
     if (accountChange.invoice) ctx.throw(404, '账单已经开票了');
     await this.checkField(body);
-    if (payUserType === 'user') {
+    if (body.payUserType === 'user') {
       if (ctx.user !== body.user) {
         ctx.throw(400, '您无权限操作该流水');
       }
     }
-    if (payUserType === 'company') {
+    if (body.payUserType === 'company') {
       let hasRole = await ctx.model.Role.findOne({
         type: ['settle', 'financialManager'],
         user: ctx.user._id,
@@ -175,12 +181,14 @@ class CompanyService extends Service {
     delete body.handle;
     delete body.createdAt;
     delete body.updatedAt;
-    if (accountChange.childern) {
+    delete body.children;
+    delete body.parent;
+    if (accountChange.children) {
       await ctx.model.AccountChange.update({
-        _id: accountChange.childern
+        _id: accountChange.children
       }, body);
     } else {
-      childern = new ctx.model.AccountChange({
+      let childernModel = new ctx.model.AccountChange({
         ...body,
         handle: accountChange.handle,
         author: ctx.user._id,
@@ -190,7 +198,7 @@ class CompanyService extends Service {
       await ctx.model.AccountChange.update({
         _id: accountChangeId
       }, {
-        childern: childern._id
+        children: childernModel._id
       });
     }
     return 'ok';
