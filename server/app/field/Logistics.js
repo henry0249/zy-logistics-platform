@@ -128,6 +128,16 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
+  receivedCompany: {
+    type: 'ObjectId',
+    name: '收款公司',
+    ref: 'Company'
+  },
+  receivedUser: {
+    type: 'ObjectId',
+    name: '收款人',
+    ref: 'User'
+  },
   preSettlement: {
     name: '用结算款结算金额', //仅做记录
     type: 'Number',

@@ -60,6 +60,8 @@ module.exports = app => {
     .post('/accountChange/check', checkToken(), 'accountChange.check') //账单流水审核
     .post('/accountChange/payUserUpdateApply', checkToken(), 'accountChange.payUserUpdateApply') //付款方进行修改账单申请
     //发票接口
+    .post('/invoice/tab', checkToken(), 'invoice.getInvoiceTab') //获取发票关联公司
+    .post('/invoice/list', checkToken(), 'invoice.getInvoiceList') //获取可开票列表
     .post('/invoice/check', checkToken(), 'invoice.check') //发票审核
     .post('/invoice/checkFail', checkToken(), 'invoice.checkFail') //发票打回
     //页面接口

@@ -1,6 +1,138 @@
 const Service = require('egg').Service;
 
 class InvoiceService extends Service {
+  async getInvoiceTab() {
+    const ctx = this.ctx;
+    let req = ctx.request.body;
+    if (!req.company) ctx.throw(422, '公司信息获取失败');
+    let res = [];
+    let type = req.type || 'businessTrains';
+    if (['businessTrains', 'logistics'].indexOf(type) < 0) return res;
+    if (type === 'businessTrains') {
+      let businessTrainsData = await ctx.model.BusinessTrains.find({
+        receivedCompany: req.company
+      }).populate([{
+        path: 'company'
+      }, {
+        path: 'user'
+      }]);
+      businessTrainsData.forEach(item => {
+        let resItem = {};
+        if (item.company && item.company._id) {
+          resItem._id = item.company._id;
+          resItem.name = item.company.name || item.company.nick || item.company.code || item.company.mobile;
+        }
+        if (item.user && item.user._id) {
+          resItem.isUser = true;
+          resItem._id = item.user._id;
+          resItem.name = item.user.name || item.user.nick || item.user.mobile;
+        }
+        if (resItem._id) res.push(resItem);
+      });
+    }
+    if (type === 'logistics') {
+      let logisticsData = await ctx.model.Logistics.find({
+        receivedCompany: req.company
+      }).populate([{
+        path: 'truck',
+        populate: [{
+          path: 'company'
+        }]
+      }, {
+        path: 'ship',
+        populate: [{
+          path: 'company'
+        }]
+      }]);
+      logisticsData.forEach(item => {
+        let resItem = {};
+        let company = {};
+        if (item.truck && item.truck.company && item.truck.company._id) {
+          company = item.truck.company;
+          resItem._id = item.company._id;
+        }
+        if (item.ship && item.ship.company && item.ship.company._id) {
+          company = item.ship.company;
+        }
+
+        resItem._id = company._id;
+        resItem.name = company.name || company.nick || company.code || company.mobile;
+        if (resItem._id) res.push(resItem);
+      });
+    }
+    return ctx.helper.unique(res, '_id');
+  }
+  async getInvoiceList(params) {
+    const ctx = this.ctx;
+    let req = params || ctx.request.body;
+    if (!req.fromCompany) ctx.throw(422, '开票公司信息获取失败');
+    if (!req.toType) ctx.throw(422, '收票方类型获取失败');
+    if (['user', 'company'].indexOf(type) < 0) ctx.throw(422, '收票方类型错误');
+    if (req.toType === 'company' && !req.toCompany) ctx.throw(422, '收票公司信息获取失败');
+    if (req.toType === 'user' && !req.toUser) ctx.throw(422, '收票人信息获取失败');
+    let res = [],
+      type = req.type || 'businessTrains',
+      limit = req.limit || 10,
+      skip = req.skip || 0;
+    if (['businessTrains', 'logistics'].indexOf(type) < 0) return res;
+    if (type === 'businessTrains') {
+      let businessTrainsData = await ctx.model.BusinessTrains.find({
+        receivedCompany: req.fromCompany,
+        [req.toType]: req.toType === 'company' ? req.toCompany : req.toUser
+      }).populate([{
+        path: 'order'
+      }, {
+        path: 'goods',
+        populate: [{
+          path: 'brand'
+        }]
+      }, {
+        path: 'company'
+      }, {
+        path: 'receivedCompany'
+      }, {
+        path: 'user'
+      }]).sort({
+        createdAt: -1
+      }).limit(limit).skip(skip);
+      for (let i = 0; i < businessTrainsData.length; i++) {
+        let item = JSON.parse(JSON.stringify(data[i]));
+        item.isBusinessTrains = true;
+        let invoicedLess = item.balancedSettlement + item.balancedPrepaid - item.invoiced - item.preInvoiced;
+        if (invoicedLess > 0) res.push(item);
+      }
+    }
+    if (type === 'logistics') {
+      if (req.toCompany) ctx.throw(422, '收票公司信息获取失败');
+      let logisticsData = await ctx.model.Logistics.find({
+        receivedCompany: req.company,
+        balanceCompany: req.toCompany
+      }).populate([{
+        path: 'receivedCompany'
+      }, {
+        path: 'balanceCompany'
+      }, {
+        path: 'truck',
+        populate: [{
+          path: 'company'
+        }]
+      }, {
+        path: 'ship',
+        populate: [{
+          path: 'company'
+        }]
+      }]).sort({
+        createdAt: -1
+      }).limit(limit).skip(skip);
+      for (let i = 0; i < logisticsData.length; i++) {
+        let item = JSON.parse(JSON.stringify(data[i]));
+        item.isLogistics = true;
+        let invoicedLess = item.balancedSettlement + item.balancedPrepaid - item.invoiced - item.preInvoiced;
+        if (invoicedLess > 0) res.push(item);
+      }
+    }
+    return res;
+  }
   async setInvoiceList(type = "businessTrains", arr, updateType = 'preCheck') {
     const ctx = this.ctx;
     let req = ctx.request.body;
