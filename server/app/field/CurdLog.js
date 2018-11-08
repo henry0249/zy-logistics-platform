@@ -6,7 +6,8 @@ module.exports = {
       default: '默认操作日志',
       orderCheckFail: '订单审核失败记录',
       logisticsCheckFail: '物流单审核失败记录',
-      businessTrainsCheckFail: '贸易链审核失败记录'
+      businessTrainsCheckFail: '贸易链审核失败记录',
+      invoiceCheckFail: '发票审核失败记录'
     },
     default: 'default'
   },

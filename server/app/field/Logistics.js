@@ -152,6 +152,16 @@ module.exports = {
     name: '已结算金额数组', //一个accountChange的_id对应一个金额,因为一次结算,不一定付完
     type: 'Object'
   },
+  preInvoiced: {
+    name: '等待开票金额', //仅做记录
+    type: 'Number',
+    default: 0
+  },
+  invoiced: {
+    name: '已开票金额',
+    type: 'Number',
+    default: 0
+  },
   loss: {
     name: '损耗数量',
     type: 'Number',

@@ -6,4 +6,5 @@ module.exports = {
   '/invoice/set': ['invoiceCleck'],
   '/invoice/update': ['invoiceCleck'],
   '/invoice/check': ['financialManager'],
+  '/invoice/checkFail': ['financialManager'],
 }
