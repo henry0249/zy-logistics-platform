@@ -52,7 +52,10 @@ module.exports = app => {
     //贸易链接口
     .post('/businessTrains/multi/update', checkToken(), 'businessTrains.multiUpdate') //结算流程
     .post('/businessTrains/multi/checkFail', checkToken(), 'businessTrains.multiCheckFail') //结算流程
+    .post('/businessTrains/invoice/summary', checkToken(), 'businessTrains.getInvoiceSummary') //待开票列表总计
     .post('/businessTrains/invoice/list', checkToken(), 'businessTrains.getInvoiceList') //待开票列表
+    //结算接口
+    .post('/settle/businessTrains/tab', checkToken(), 'settle.getBusinessTrainsTab') //获取贸易链相关公司,准备展示结算列表
     //账单流水接口
     .post('/accountChange/check', checkToken(), 'accountChange.check') //账单流水审核
     .post('/accountChange/payUserUpdateApply', checkToken(), 'accountChange.payUserUpdateApply') //付款方进行修改账单申请

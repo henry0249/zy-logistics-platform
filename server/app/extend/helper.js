@@ -19,14 +19,18 @@ module.exports = {
     })
     return path
   },
-  aesEncrypt(data) {
-    const cipher = crypto.createCipher('aes192', this.config.keys);
+  //加密
+  aesEncrypt(data, key) {
+    if (!key) key = this.config.keys;
+    const cipher = crypto.createCipher('aes192', key);
     var crypted = cipher.update(data, 'utf8', 'hex');
     crypted += cipher.final('hex');
     return crypted;
   },
-  aesDecrypt(encrypted) {
-    const decipher = crypto.createDecipher('aes192', this.config.keys);
+  //解密,参数为aesEncrypt加密后的密文
+  aesDecrypt(encrypted, key) {
+    if (!key) key = this.config.keys;
+    const decipher = crypto.createDecipher('aes192', key);
     var decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
     return decrypted;

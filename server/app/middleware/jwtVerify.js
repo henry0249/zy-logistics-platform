@@ -10,9 +10,8 @@ module.exports = () => {
   };
 };
 
-let roleConfig = {
-  '/bus': ['invoiceCleck'],
-}
+let roleConfig = require('./role');
+
 async function authentication(ctx, user_id) {
   let path = ctx.request.path;
   if (roleConfig[path]) {

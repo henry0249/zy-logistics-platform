@@ -29,11 +29,6 @@ module.exports = {
       mobile: '手机号' //未注册用户
     }
   },
-  user: {
-    name: '开票方用户',
-    type: 'ObjectId',
-    ref: 'User'
-  },
   company: {
     name: '开票方公司',
     type: 'ObjectId',
@@ -60,6 +55,14 @@ module.exports = {
   to: {
     name: '收票方信息',
     type: 'Object',
+  },
+  businessTrainsArr: {
+    name: '关联的贸易链',
+    type: 'Array',
+  },
+  logisticsArr: {
+    name: '关联的运单',
+    type: 'Array',
   },
   account: {
     name: '所属账户',

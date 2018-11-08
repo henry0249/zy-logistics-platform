@@ -120,6 +120,19 @@ export default {
       }
       return res;
     },
+    async getTab(){
+      this.loadingText = "加载中";
+      try {
+        let res = await this.$ajax.post("/settle/businessTrains/tab", {
+          company: this.company._id
+        });
+        this.tab = res;
+        if (res.length > 0) {
+          this.activeTab = res[0]._id;
+        }
+      } catch (error) {}
+      this.loadingText = "";
+    },
     async getAccountList() {
       this.loadingText = "加载中";
       try {
@@ -243,6 +256,7 @@ export default {
   },
   async mounted() {
     this.getAccountList();
+    // this.getTab();
   }
 };
 </script>

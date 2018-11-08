@@ -227,3 +227,5 @@ module.exports = {
 }
 
 //进入审核条件 运输工具和运输单价都填完整,审核后不能修改
+
+//付款方: balanceCompany 收款方:truck/ship的所属公司或者所属人

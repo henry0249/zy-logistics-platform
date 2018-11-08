@@ -3,13 +3,16 @@
 const Controller = require('egg').Controller;
 
 class BusinessTrainsController extends Controller {
-  async multiUpdate(){
+  async multiUpdate() {
     this.ctx.body = await this.ctx.service.businessTrains.multiUpdate();
   }
-  async multiCheckFail(){
+  async multiCheckFail() {
     this.ctx.body = await this.ctx.service.businessTrains.multiCheckFail();
   }
-  async getInvoiceList(){
+  async getInvoiceSummary() {
+    this.ctx.body = await this.ctx.service.businessTrains.getInvoiceSummary();
+  }
+  async getInvoiceList() {
     this.ctx.body = await this.ctx.service.businessTrains.getInvoiceList();
   }
 }

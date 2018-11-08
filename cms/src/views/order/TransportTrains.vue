@@ -63,7 +63,7 @@
               </my-form-item>
               <my-form-item v-if="scope.prop==='balanceCount'" v-model="scope.row.balanceCount" size="mini" type="number" min="0">
               </my-form-item>
-              <relation-company v-if="scope.prop==='balanceCompany' && order._id" :order="order" :data.sync="scope.row.balanceCompany" business tranport :append="scope.row[scope.row.transportation] && scope.row[scope.row.transportation].company"></relation-company>
+              <relation-company v-if="scope.prop==='balanceCompany' && order._id" :order="order" :data.sync="scope.row.balanceCompany" business tranport></relation-company>
               <my-form-item v-if="scope.prop==='loss'" v-model="scope.row.loss" size="mini" type="number" min="0">
               </my-form-item>
               <relation-company v-if="scope.prop==='lossCompany' && order._id" :order="order" :data.sync="scope.row.lossCompany" business tranport :append="scope.row[scope.row.transportation] && scope.row[scope.row.transportation].company"></relation-company>

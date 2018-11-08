@@ -18,7 +18,7 @@ module.exports = {
     require: true
   },
   nick: {
-    name: '简称',
+    name: '昵称',
     type: 'String',
   },
   code: {

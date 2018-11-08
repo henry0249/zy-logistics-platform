@@ -11,6 +11,10 @@ module.exports = {
     name: '用户名',
     type: 'String'
   },
+  nick: {
+    name: '昵称',
+    type: 'String',
+  },
   mobile: {
     name: '手机号',
     type: 'String'

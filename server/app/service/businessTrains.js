@@ -152,18 +152,27 @@ class BusinessTrainsService extends Service {
     }
 
   }
-  async getInvoiceList() {
+  async getInvoiceSummary() {
+    let data = await this.getInvoiceList(0, 0);
+    let total = 0;
+    for (let i = 0; i < data.length; i++) {
+      let item = data[i];
+      let invoicedLess = item.balancedSettlement + item.balancedPrepaid - item.invoiced - item.preInvoiced;
+      if (invoicedLess > 0) total += invoicedLess;
+    }
+    return {
+      count: data.length,
+      total
+    };
+  }
+  async getInvoiceList(limit = 10, skip = 0) {
     const ctx = this.ctx;
     let body = ctx.request.body;
-    if (!body.account) ctx.throw(422, '账户信息必填');
     if (!body.company) ctx.throw(422, '公司信息必填');
-    let account = await ctx.model.Account.findOne({
-      _id: body.account,
-      company: body.company
-    });
-    if (!account) ctx.throw(404, '账户信息未找到');
+    if (body.limit !== undefined) limit = body.limit;
+    if (body.skip !== undefined) skip = body.skip;
     let data = await ctx.model.BusinessTrains.find({
-      account: body.account
+      receivedCompany: body.company
     }).populate([{
       path: 'order'
     }, {
@@ -171,19 +180,22 @@ class BusinessTrainsService extends Service {
       populate: [{
         path: 'brand'
       }]
-    }]);
-    let res = [];
+    }, {
+      path: 'company'
+    }, {
+      path: 'receivedCompany'
+    }, {
+      path: 'user'
+    }]).sort({
+      createdAt: -1
+    }).limit(limit).skip(skip);
+    let list = [];
     for (let i = 0; i < data.length; i++) {
       let item = data[i];
-      let invoicedLess = item.balancePrice * item.balanceCount -
-        balancedSettlement -
-        balancedPrepaid -
-        item.invoiced;
-      if (invoicedLess > 0) {
-        res.push(item);
-      }
+      let invoicedLess = item.balancedSettlement + item.balancedPrepaid - item.invoiced - item.preInvoiced;
+      if (invoicedLess > 0) list.push(item);
     }
-    return res;
+    return list;
   }
 }
 module.exports = BusinessTrainsService;
