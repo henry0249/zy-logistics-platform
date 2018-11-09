@@ -60,19 +60,19 @@
         window.clipboardData.setData("Text", 'clipBoardContent');
         alert("复制成功!");
       },
-      test() {
-        return {
-          test1: () => {
-            console.log('test1');
-          },
-          test2: () => {
-            console.log('test2');
-          }
+      async test() {
+        try {
+          await this.$ajax.post('/businessTrains/invoice/list',{
+            company:this.company._id,
+            account:'5be0f3a352ace410874ebbfe'
+          })
+        } catch (error) {
+          
         }
       }
     },
     created() {
-      this.test().test1()
+      this.test();
     }
   }
 </script>

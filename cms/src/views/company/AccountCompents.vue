@@ -45,7 +45,7 @@
     },
     computed: {
       routeShow() {
-        return this.$route.query.show;
+        return this.$route.query.show === true || this.$route.query.show === 'true';
       },
     },
     methods: {

@@ -1,30 +1,36 @@
 <template>
-  <el-tabs v-model="activeName" type="border-card" @tab-click="tabClick	">
-    <el-tab-pane v-for="item in newData" :name="item._id" :key="item.id" :label="item.userType === 'company'?item.name : item.name + '(个人)'">
-      <div class="col-flex tab-height">
-        <div class="tab-top jc jb">
-          <span>结算款：<span style="margin-right:30px;" class="blue">{{accountObj.value}}</span> 预付款：<span class="danger">{{accountObj.prepaid}}</span></span>
-          <div class="js">
-            <el-button @click="go('5',activeName)" size="mini">收款</el-button>
-            <el-button @click="go('6',activeName)" size="mini">预收款</el-button>
-          </div>
-        </div>
-        <el-tabs v-model="payName" @tab-click="payTabClick" type="card">
-          <el-tab-pane v-for="(v,i) in payArr" :name="v.key" :label="v.label" :key="`${i}pay`">
-            <div slot="label">
-              {{v.label}}
-              <el-badge v-if="v.key === 'noCheck' || v.key === 'hasChild' || v.key === 'applyEdit'" :value="badge(v.key)" />
+  <loading-box v-model="loadingText">
+    <el-tabs v-model="activeName" @tab-click="tabClick">
+      <el-tab-pane v-for="item in newData" :name="item._id" :key="item.id" :label="item.userType === 'company'?item.name : item.name + '(个人)'">
+        <div class="col-flex tab-height">
+          <div class="tab-top jc jb" style="margin:15px 0;">
+            <div class="jc js">
+              <span>结算款：<span style="margin-right:30px;" class="blue">{{accountObj.value}}</span> 预付款：<span class="danger">{{accountObj.prepaid}}</span></span>
+              <div class="marginRight" style="font-size:13px;margin:0 30px;">可开票总金额：<span class="blue"> {{invoiceTotal}}</span></div>
+              <el-button type="success" size="mini" @click="setInvoice">去开票</el-button>
             </div>
-            <Account-change-tabs-table :loadmore="loadmore" :data="accountChangeData" :payName="payName"></Account-change-tabs-table>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
-    </el-tab-pane>
-  </el-tabs>
+            <div class="js">
+              <el-button @click="go('5',activeName)" size="mini">收款</el-button>
+              <el-button @click="go('6',activeName)" size="mini">预收款</el-button>
+            </div>
+          </div>
+          <el-tabs v-model="payName" @tab-click="payTabClick" type="card">
+            <el-tab-pane v-for="(v,i) in payArr" :name="v.key" :label="v.label" :key="`${i}pay`">
+              <div slot="label">
+                {{v.label}}
+                <el-badge v-if="v.key === 'noCheck' || v.key === 'hasChild' || v.key === 'applyEdit' || v.key === 'invoice'" :value="badge(v.key)" />
+              </div>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
+      </el-tab-pane>
+    </el-tabs>
+    <Account-change-tabs-table v-if="!loadingText" :loadmore="loadmore" :data="accountChangeData" :payName="payName"></Account-change-tabs-table>
+  </loading-box>
 </template>
 
 <script>
-import AccountChangeTabsTable from './AccountChangeTabsTable.vue';
+  import AccountChangeTabsTable from './AccountChangeTabsTable.vue';
   export default {
     components: {
       AccountChangeTabsTable
@@ -36,15 +42,13 @@ import AccountChangeTabsTable from './AccountChangeTabsTable.vue';
           return [];
         }
       },
-      loadingText: {
-        type: String,
-        default: ''
-      }
     },
     data() {
       return {
         activeName: '',
+        loadingText: '',
         payName: 'pay',
+        invoiceTotal: 0,
         accountObj: {
           value: 0,
           prepaid: 0
@@ -52,30 +56,50 @@ import AccountChangeTabsTable from './AccountChangeTabsTable.vue';
         noCheckCount: undefined,
         hasChildCount: undefined,
         applyEditCount: undefined,
+        invoiceCount: undefined,
         newData: [],
         accountChangeData: [],
         payArr: [{
-          key: 'pay',
-          label: '付款记录'
-        }, {
-          key: 'get',
-          label: '收款记录'
-        }, {
-          key: 'noCheck',
-          label: '待审核'
-        }, {
-          key: 'hasChild',
-          label: '待修改'
-        }, {
-          key: 'applyEdit',
-          label: '申请修改'
-        }, {
-          key: 'invoice',
-          label: '待开票'
-        }]
+            key: 'pay',
+            label: '付款记录'
+          }, {
+            key: 'get',
+            label: '收款记录'
+          }, {
+            key: 'noCheck',
+            label: '待审核'
+          }, {
+            key: 'hasChild',
+            label: '待修改'
+          }, {
+            key: 'applyEdit',
+            label: '申请修改'
+          },
+          // {
+          //   key: 'invoice',
+          //   label: '待开票'
+          // }
+        ],
+        roleArr: {
+          get: 'all',
+          pay: 'all',
+          noCheck: ['financialManager'],
+          hasChild: ['financialManager'],
+          applyEdit: ['financialManager'],
+          invoice: ['']
+        }
       }
     },
+    computed: {},
     methods: {
+      setInvoice() {
+        this.$router.push({
+          path: '/company/account/invoice',
+          query: {
+            show: 'true'
+          }
+        })
+      },
       res(scope, check) {
         if (scope.row.check) {
           if (this.role.financialManager) {
@@ -88,13 +112,18 @@ import AccountChangeTabsTable from './AccountChangeTabsTable.vue';
         }
       },
       async loadmore() {
-        return await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
+        if (this.payName === 'invoice') {
+          return await this.getInvoice();
+        } else {
+          return await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
+        }
       },
       badge(val) {
         let data = {
           noCheck: this.noCheckCount ? this.noCheckCount : undefined,
           hasChild: this.hasChildCount ? this.hasChildCount : undefined,
-          applyEdit: this.applyEditCount ? this.applyEditCount : undefined
+          applyEdit: this.applyEditCount ? this.applyEditCount : undefined,
+          invoice: this.invoiceCount ? this.invoiceCount : undefined
         };
         return data[val];
       },
@@ -114,10 +143,11 @@ import AccountChangeTabsTable from './AccountChangeTabsTable.vue';
       },
       async payTabClick(val) {
         try {
-          console.log(val);
-          this.$emit('update:loadingText', '加载中');
+          this.loadingText = '加载中';
           this.accountChangeData = [];
-          if (val.name === 'invoice') {} else {
+          if (val.name === 'invoice') {
+            this.accountChangeData = await this.getInvoice();
+          } else {
             if (val.name === 'pay' || val.name === 'applyEdit') {
               this.io = false;
             } else {
@@ -128,8 +158,12 @@ import AccountChangeTabsTable from './AccountChangeTabsTable.vue';
           this.noCheckCount = await this.getCount('noCheck');
           this.hasChildCount = await this.getCount('hasChild');
           this.applyEditCount = await this.getCount('applyEdit');
-        } catch (error) {}
-        this.$emit('update:loadingText', '');
+          let invoiceCount = await this.getCount('invoice');
+          this.invoiceTotal = invoiceCount.total;
+        } catch (error) {
+          console.log(error);
+        }
+        this.loadingText = '';
       },
       async tabClick(val) {
         try {
@@ -140,7 +174,7 @@ import AccountChangeTabsTable from './AccountChangeTabsTable.vue';
           this.io = false;
           this.payName = 'pay';
           this.accountChangeData = [];
-          this.$emit('update:loadingText', '加载中');
+          this.loadingText = '加载中';
           if (val.label.substr(val.label.length - 5, 4) === "(个人)") {
             this.str = "user";
           } else {
@@ -152,8 +186,27 @@ import AccountChangeTabsTable from './AccountChangeTabsTable.vue';
           this.noCheckCount = await this.getCount('noCheck');
           this.hasChildCount = await this.getCount('hasChild');
           this.applyEditCount = await this.getCount('applyEdit');
+          let invoiceCount = await this.getCount('invoice');
+          this.invoiceTotal = invoiceCount.total;
         } catch (error) {};
-        this.$emit('update:loadingText', '');
+        this.loadingText = '';
+      },
+      async getInvoice() {
+        try {
+          return await this.$ajax.post('/businessTrains/invoice/list', {
+            company: this.company._id,
+            limit: 10,
+            skip: this.accountChangeData.length,
+            populate: [{
+              path: 'company'
+            }, {
+              path: 'user'
+            }, {
+              path: 'receivedCompany'
+            }]
+          })
+        } catch (error) {
+        }
       },
       async getAccountValue(_id) {
         let res = await this.$ajax.post("/account/findOne", {
@@ -243,6 +296,9 @@ import AccountChangeTabsTable from './AccountChangeTabsTable.vue';
             children: {
               $exists: true
             },
+          },
+          invoice: {
+            company: this.company._id
           }
         };
         let op = {
@@ -255,13 +311,17 @@ import AccountChangeTabsTable from './AccountChangeTabsTable.vue';
             toCompany: this.activeName
           })
         }
-        return await this.$ajax.post('/accountChange/count', { ...data[val],
-          ...op
-        });
+        if (val === 'invoice') {
+          return await this.$ajax.post('/businessTrains/invoice/summary', data[val]);
+        } else {
+          return await this.$ajax.post('/accountChange/count', { ...data[val],
+            ...op
+          });
+        }
       },
       async getData() {
         try {
-          this.$emit('update:loadingText', '加载中');
+          this.loadingText = '加载中';
           if (this.activeName) {
             if (this.newData[0].userType === 'company') {
               this.str = 'toCompany';
@@ -276,11 +336,13 @@ import AccountChangeTabsTable from './AccountChangeTabsTable.vue';
             this.noCheckCount = await this.getCount('noCheck');
             this.hasChildCount = await this.getCount('hasChild');
             this.applyEditCount = await this.getCount('applyEdit');
+            let invoiceCount = await this.getCount('invoice');
+            this.invoiceTotal = invoiceCount.total;
           }
         } catch (error) {
           console.log(error);
         }
-        this.$emit('update:loadingText', '');
+        this.loadingText = '';
       }
     },
     async created() {

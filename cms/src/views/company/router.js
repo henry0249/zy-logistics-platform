@@ -7,6 +7,7 @@ import AccountChangeType from './AccountChangeType.vue';
 import RelationCode from './RelationCode.vue';
 import AccountEdmit from './AccountEdmit.vue';
 import AccountAdd from './AccountAdd.vue';
+import CompanyInvoice from './CompanyInvoice.vue';
 
 export default [{
   path: '/company',
@@ -25,6 +26,10 @@ export default [{
       path: 'account_change_type',
       name: '付款单',
       component: AccountChangeType
+    },{
+      path: 'invoice',
+      name: '开发票',
+      component: CompanyInvoice
     }, {
       path: 'account_add',
       name: '',

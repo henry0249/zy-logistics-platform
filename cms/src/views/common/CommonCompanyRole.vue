@@ -82,18 +82,20 @@
         newData: [],
         type: {
           companyAdmin: '公司管理员',
-          broker: '经纪人',
+          broker: '经纪人', //公司经纪人,区域划分,有提成信息
           salesman: '业务员', //审核修改订单信息
           salesmanManager: '业务经理', //审核修改订单信息
           tradeClerk: '贸易文员', //添加物流链
-          settle: '结算专员', //打款操作
           dispatcher: '调度专员', //添加物流链,提交配送,确认配送完成
           dispatcherManager: '调度经理', //审核物流单
           logisticsClerk: '物流文员', //审核物流单
           documentClerk: '单据文员', //编辑贸易链和物流链结算相关
           documentClerkManager: '单据主管', //审核单据文员操作
           financial: '财务文员', //财务预审 ,按贸易链关系归集结算
-          financialManager: '财务经理', //打款操作确认
+          settle: '结算专员', //打款操作
+          financialManager: '财务经理', //流水审核
+          cashier: '出纳专员',
+          invoiceCleck: '发票专员',
         },
       };
     },
@@ -280,4 +282,5 @@
 </script>
 
 <style scoped>
+
 </style>
