@@ -152,50 +152,5 @@ class BusinessTrainsService extends Service {
     }
 
   }
-  async getInvoiceSummary() {
-    let data = await this.getInvoiceList(0, 0);
-    let total = 0;
-    for (let i = 0; i < data.length; i++) {
-      let item = data[i];
-      let invoicedLess = item.balancedSettlement + item.balancedPrepaid - item.invoiced - item.preInvoiced;
-      if (invoicedLess > 0) total += invoicedLess;
-    }
-    return {
-      count: data.length,
-      total
-    };
-  }
-  async getInvoiceList(limit = 10, skip = 0) {
-    const ctx = this.ctx;
-    let body = ctx.request.body;
-    if (!body.company) ctx.throw(422, '公司信息必填');
-    if (body.limit !== undefined) limit = body.limit;
-    if (body.skip !== undefined) skip = body.skip;
-    let data = await ctx.model.BusinessTrains.find({
-      receivedCompany: body.company
-    }).populate([{
-      path: 'order'
-    }, {
-      path: 'goods',
-      populate: [{
-        path: 'brand'
-      }]
-    }, {
-      path: 'company'
-    }, {
-      path: 'receivedCompany'
-    }, {
-      path: 'user'
-    }]).sort({
-      createdAt: -1
-    }).limit(limit).skip(skip);
-    let list = [];
-    for (let i = 0; i < data.length; i++) {
-      let item = data[i];
-      let invoicedLess = item.balancedSettlement + item.balancedPrepaid - item.invoiced - item.preInvoiced;
-      if (invoicedLess > 0) list.push(item);
-    }
-    return list;
-  }
 }
 module.exports = BusinessTrainsService;
