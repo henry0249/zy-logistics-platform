@@ -75,8 +75,6 @@ class InvoiceService extends Service {
     if (innerType) {
       type = innerType;
     }
-    if (req.limit !== undefined) limit = Number(req.limit);
-    if (req.skip !== undefined) skip = Number(req.skip);
     if (['businessTrains', 'logistics'].indexOf(type) < 0) return res;
     if (type === 'businessTrains') {
       let businessTrainsData = await ctx.model.BusinessTrains.find({
@@ -102,8 +100,6 @@ class InvoiceService extends Service {
         let item = JSON.parse(JSON.stringify(businessTrainsData[i]));
         item.isBusinessTrains = true;
         let invoicedLess = item.balancedSettlement + item.balancedPrepaid - item.invoiced - item.preInvoiced;
-        console.log(withoutInvoiced);
-        console.log(item.preInvoiced);
         if (withoutInvoiced) {
           invoicedLess += item.preInvoiced;
         }
@@ -131,20 +127,17 @@ class InvoiceService extends Service {
         }]
       }]).sort({
         createdAt: -1
-      }).limit(limit).skip(skip);
+      });
       for (let i = 0; i < logisticsData.length; i++) {
         let item = JSON.parse(JSON.stringify(logisticsData[i]));
         item.isLogistics = true;
         let invoicedLess = item.balancedSettlement + item.balancedPrepaid - item.invoiced - item.preInvoiced;
-        console.log(withoutInvoiced);
-        console.log(item.preInvoiced);
         if (withoutInvoiced) {
           invoicedLess += item.preInvoiced;
         }
         if (invoicedLess > 0) res.push(item);
       }
     }
-    console.log(res);
     return res;
   }
   async setWaitInvoiceList(type = "businessTrains", arr, updateType = 'preCheck') {
@@ -164,18 +157,20 @@ class InvoiceService extends Service {
       const item = arr[i];
       let update = {
         preCheck: {
-          preInvoiced: item.preInvoiced,
+          $inc: {
+            preInvoiced: item.preInvoiced || 0
+          }
         },
-        update: {
-          preInvoiced: item.preInvoiced,
-        },
+        update: {},
         checkFail: {
-          preInvoiced: 0
+          $inc: {
+            preInvoiced: -(item.preInvoiced || 0)
+          }
         },
         check: {
-          preInvoiced: 0,
-          invoiced: {
-            $inc: item.preInvoiced
+          $inc: {
+            invoiced: item.preInvoiced || 0,
+            preInvoiced: -(item.preInvoiced || 0)
           }
         }
       }
@@ -183,13 +178,20 @@ class InvoiceService extends Service {
         businessTrains: 'BusinessTrains',
         logistics: 'Logistics'
       };
+      let itemData = await ctx.model[modelNmae[type]].findById(item._id);
+      if (!itemData) return;
+      if (itemData.preInvoiced > item.preInvoiced) {
+        update.update.$inc = {
+          preInvoiced: item.preInvoiced || 0 - itemData.preInvoiced
+        };
+      }
       await ctx.model[modelNmae[type]].update({
         _id: item._id
       }, update[updateType]);
-      res.total += item.preInvoiced;
+      res.total += (item.preInvoiced || 0);
       res.list.push({
         _id: item._id,
-        preInvoiced: item.preInvoiced
+        preInvoiced: item.preInvoiced || 0
       });
     }
     return res;
@@ -326,7 +328,9 @@ class InvoiceService extends Service {
       await ctx.model.BusinessTrains.update({
         _id: item._id,
       }, {
-        preInvoiced: 0
+        $inc: {
+          $preInvoiced: -item.preInvoiced
+        }
       });
     }
     for (let i = 0; i < invoice.logisticsArr.length; i++) {
@@ -334,7 +338,9 @@ class InvoiceService extends Service {
       await ctx.model.Logistics.update({
         _id: item._id,
       }, {
-        preInvoiced: 0
+        $inc: {
+          $preInvoiced: -item.preInvoiced
+        }
       });
     }
     await ctx.service.curd.delete(ctx.model.Invoice, {
