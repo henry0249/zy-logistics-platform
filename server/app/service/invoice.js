@@ -322,16 +322,18 @@ class InvoiceService extends Service {
     if (!invoice) ctx.throw(404, '发票不存在');
     if (invoice.check) ctx.throw(404, '发票已经审核,不能删除');
     for (let i = 0; i < invoice.businessTrainsArr.length; i++) {
-      const item = businessTrainsArr[i];
+      const item = invoice.businessTrainsArr[i];
       await ctx.model.BusinessTrains.update({
         _id: item._id,
+      }, {
         preInvoiced: 0
       });
     }
     for (let i = 0; i < invoice.logisticsArr.length; i++) {
-      const item = logisticsArr[i];
+      const item = invoice.logisticsArr[i];
       await ctx.model.Logistics.update({
         _id: item._id,
+      }, {
         preInvoiced: 0
       });
     }
