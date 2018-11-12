@@ -8,6 +8,7 @@ import RelationCode from './RelationCode.vue';
 import AccountEdmit from './AccountEdmit.vue';
 import AccountAdd from './AccountAdd.vue';
 import CompanyInvoice from './CompanyInvoice.vue';
+import CompanyInvoiceEdit from './CompanyInvoiceEdit.vue';
 
 export default [{
   path: '/company',
@@ -30,6 +31,10 @@ export default [{
       path: 'invoice',
       name: '开发票',
       component: CompanyInvoice
+    },{
+      path: 'invoice_edit/:_id',
+      name: '审核发票',
+      component: CompanyInvoiceEdit
     }, {
       path: 'account_add',
       name: '',

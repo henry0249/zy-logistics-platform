@@ -1,10 +1,10 @@
 <template>
   <loading-box v-loading.fullscreen.lock="loadingText" :element-loading-text="loadingText" element-loading-spinner="el-icon-loading">
-    <my-table selection :height="tableHeight" index :loadmore="loadmore" stripe :thead="thead" :data.sync="newData" @selection-change="selectionChange" size="mini" border>
+    <my-table :selection="!$attrs.edit" :max-height="tableHeight" index stripe :thead="thead" :data.sync="newData" @selection-change="selectionChange" size="mini" border>
       <div slot-scope="scope">
         <span v-if="scope.prop === 'invoiced'" class="blue">{{scope.row[scope.prop]}}</span>
-        <span v-if="scope.prop === 'invo'" class="warning">{{scope.row[scope.prop]}}</span>
-        <my-form-item v-if="scope.prop === 'invoiceBalance'" number :min="0" :max="scope.row.balancedSettlement + scope.row.balancedPrepaid" v-model="scope.row[scope.prop]" size="mini"></my-form-item>
+        <span v-if="scope.prop === 'invo'" class="warning">{{scope.row.balancedSettlement + scope.row.balancedPrepaid - scope.row.preInvoiced - scope.row.invoiced}}</span>
+        <my-form-item :disabled="$attrs.edit" v-if="scope.prop === 'invoiceBalance'" number :min="0" :max="scope.row.balancedSettlement + scope.row.balancedPrepaid" v-model="scope.row[scope.prop]" size="mini"></my-form-item>
         <div v-if="scope.prop === 'company'">{{scope.row[scope.prop].name}}
           <el-tag size="mini" :type="scope.row.customerType === 'user'?'success':'warning'">{{scope.row.customerType === 'user'?'用户':'公司'}}</el-tag>
         </div>
@@ -15,16 +15,16 @@
     </my-table>
     <div class="jc jb" style="height:45px;background:#f3f4f5;margin-top:15px;padding:0 15px;">
       <div>
-        <div style="font-size:13px;" v-if="selectionChangeData.length > 0">已选择待开票数量：
+        <div style="font-size:13px;" v-if="selectionChangeData.length > 0 && !$attrs.edit">已选择待开票数量：
           <span class="warning">{{selectionChangeData.length}}</span>
         </div>
       </div>
       <div class="jc js">
         <div class="marginRight" style="font-size:13px;">可开票总金额：<span class="blue"> {{invoiceTotal}}</span></div>
         <div class="marginRight jc js" style="font-size:13px;">开票金额：
-          <my-form-item width="120px" number :min="0" :max="invoiceTotal" v-model="invoiceVal" size="mini"></my-form-item>
+          <my-form-item width="120px" :disabled="$attrs.edit" number :min="0" :max="invoiceTotal" v-model="invoiceVal" size="mini"></my-form-item>
         </div>
-        <el-button class="marginRight" type="primary" size="mini" @click="distribution">分配</el-button>
+        <el-button :disabled="$attrs.edit" class="marginRight" type="primary" size="mini" @click="distribution">分配</el-button>
       </div>
     </div>
   </loading-box>
@@ -39,38 +39,41 @@
           return [];
         }
       },
+      initData: {
+        type: Array,
+        default () {
+          return [];
+        }
+      },
       invoiceTotal: {
         type: Number,
         default: 0
       },
-      loadmore: [Function]
+      invoiceValue: {
+        type: Number,
+        default: 0
+      },
+      isCheck: {
+        type: Boolean,
+        default: false
+      }
     },
     data() {
       return {
         invoiceVal: 0,
         loadingText: '',
-        tableHeight: 'calc(100vh - 50px - 70px - 62px - 53px - 40px - 60px - 77px)',
+        tableHeight: 'calc(100vh - 50px - 70px - 62px - 53px - 40px - 60px - 77px - 120px)',
         newData: [],
         selectionChangeData: [],
       }
     },
     watch: {
-      data: {
+      invoiceVal(val) {
+        this.$emit('update:invoiceValue', val);
+      },
+      newData: {
         handler(val) {
-          console.log(val);
-          let value = JSON.parse(JSON.stringify(val))
-          if (this.isInvo) {
-            let data = [];
-            value.forEach(item => {
-              let obj = item;
-              this.$set(obj, 'invo', item.balancedSettlement + item.balancedPrepaid - item.invoiced);
-              this.$set(obj, 'invoiceBalance', 0);
-              data.push(obj);
-            });
-            this.newData = data;
-          } else {
-            this.newData = value;
-          }
+          this.$emit('update:data', val);
         },
         deep: true
       }
@@ -93,7 +96,7 @@
             slot: true
           },
           invoiceBalance: {
-            name: '选择开票金额',
+            name: '开票金额',
             slot: true
           },
           company: {
@@ -117,9 +120,12 @@
       distribution() {
         if (this.selectionChangeData.length === 0) {
           this.$message.warn('请先选择开票');
+          this.$emit('update:isCheck', false);
         } else if (this.invoiceVal === 0) {
           this.$message.warn('开票金额不能等于0');
+          this.$emit('update:isCheck', false);
         } else {
+          this.$emit('update:isCheck', true);
           this.indexData = [];
           this.selectionChangeData.forEach(item => {
             this.newData.forEach((newItem, index) => {
@@ -135,15 +141,17 @@
         if (data.length > 0) {
           if (val > 0) {
             let value = val;
-            if (this.newData[data[0]].invo <= value) {
-              this.$set(this.newData[data[0]], 'invoiceBalance', this.newData[data[0]].invo);
+            let num = this.newData[data[0]].balancedSettlement + this.newData[data[0]].balancedPrepaid;
+            console.log(num <= value);
+            if (num <= value) {
+              this.$set(this.newData[data[0]], 'invoiceBalance', num);
               let newData = [];
               data.forEach(item => {
                 if (item !== data[0]) {
                   newData.push(item);
                 }
               });
-              this.recursion(value - this.newData[data[0]].invo, newData);
+              this.recursion(value - num, newData);
             } else {
               this.$set(this.newData[data[0]], 'invoiceBalance', value);
             }
@@ -165,15 +173,11 @@
       },
     },
     created() {
-      if (this.data.length > 0) {
-        let data = [];
-        this.data.forEach(item => {
-          let obj = item;
-          this.$set(obj, 'invo', item.balancedSettlement + item.balancedPrepaid - item.invoiced);
-          this.$set(obj, 'invoiceBalance', 0);
-          data.push(obj);
-        });
-        this.newData = data;
+      if (this.initData.length > 0) {
+        this.newData = JSON.parse(JSON.stringify(this.initData));
+      }
+      if (this.$attrs.edit) {
+        this.invoiceVal = this.invoiceTotal;
       }
     }
   }

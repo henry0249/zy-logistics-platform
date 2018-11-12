@@ -2,18 +2,18 @@
   <loading-box v-loading.fullscreen.lock="loadingText" :element-loading-text="loadingText" element-loading-spinner="el-icon-loading">
     <my-table :op="op" opWidth="45" :selection="isInvo" :height="tableHeight" index :loadmore="loadmore" stripe :thead="thead" :data.sync="newData" @selection-change="selectionChange" size="mini" border>
       <div slot="op" class="jc" slot-scope="scope">
-        <i style="color:#909399" class="el-icon-view pointer" @click="check(scope)" :title="payName === 'noCheck'?'点击进行审核':'点击查看详情'"></i>
+        <i style="color:#909399" class="el-icon-view pointer" @click="check(scope)" :title="title"></i>
       </div>
       <div slot-scope="scope">
-        <span v-if="isInvo && scope.prop === 'invoiced'" class="blue">{{scope.row[scope.prop]}}</span>
-        <span v-if="isInvo && scope.prop === 'invo'" class="warning">{{scope.row[scope.prop]}}</span>
-        <my-form-item v-if="isInvo && scope.prop === 'invoiceBalance'" number :min="0" :max="scope.row.balancedSettlement + scope.row.balancedPrepaid" v-model="scope.row[scope.prop]" size="mini"></my-form-item>
+        <span v-if="payName === 'repulse' && scope.prop === 'text'" class="warning">{{scope.row[scope.prop]}}</span>
+        <span v-if="isInvo && scope.prop === 'taxRate'" class="warning">{{scope.row[scope.prop]}}</span>
         <div v-if="isInvo && scope.prop === 'company'">{{scope.row[scope.prop].name}}
-          <el-tag size="mini" :type="scope.row.customerType === 'user'?'success':'warning'">{{scope.row.customerType === 'user'?'用户':'公司'}}</el-tag>
+          <el-tag size="mini" type="warning">公司</el-tag>
         </div>
-        <div v-if="isInvo && scope.prop === 'receivedCompany'">{{changUser(scope).name}}
+        <div v-if="isInvo && scope.prop === 'toCompany'">{{changUser(scope).name}}
           <el-tag size="mini" :type="changUser(scope).type">{{changUser(scope).userType}}</el-tag>
         </div>
+        <el-tag size="mini" v-if="isInvo && scope.prop === 'type'" :type="typeOption(scope.row[scope.prop])">{{field.Invoice.type.option[scope.row[scope.prop]]}}</el-tag>
         <el-tag size="mini" v-if="!isInvo && scope.prop === 'type'" :type="typeOption(scope.row[scope.prop])">{{field.AccountChange.type.option[scope.row[scope.prop]]}}</el-tag>
         <div v-if="!isInvo && scope.prop === 'payUser'">{{payUser(scope.row).user}}
           <el-tag size="mini" :type="payUser(scope.row).type">{{field.AccountChange.payUserType.option[scope.row.payUserType]}}</el-tag>
@@ -71,32 +71,25 @@
       }
     },
     watch: {
-      newData: {
-        handler(val) {
-          console.log(val);
-        },
-        deep: true
-      },
       data: {
         handler(val) {
-          let value = JSON.parse(JSON.stringify(val))
-          if (this.isInvo) {
-            let data = [];
-            value.forEach(item => {
-              let obj = item;
-              this.$set(obj, 'invo', item.balancedSettlement + item.balancedPrepaid - item.invoiced);
-              this.$set(obj, 'invoiceBalance', 0);
-              data.push(obj);
-            });
-            this.newData = data;
-          } else {
-            this.newData = value;
-          }
+          let value = JSON.parse(JSON.stringify(val));
+          this.changData(value);
         },
         deep: true
       }
     },
     computed: {
+      title() {
+        let data = '点击查看详情';
+        if (this.payName === 'repulse') {
+          data = '点击查看该被打回发票';
+        }
+        if (this.payName === 'noCheck' || this.payName === 'invoNoCheck') {
+          data = '点击进行审核'
+        }
+        return data;
+      },
       total() {
         let total = 0;
         if (this.selectionData.length > 0) {
@@ -108,13 +101,13 @@
       },
       op() {
         if (this.isInvo) {
-          return false;
+          return this.role.financialManager;
         } else {
           return this.role.financialManager;
         }
       },
       isInvo() {
-        return this.payName === 'invoice';
+        return this.payName === 'invoNoCheck' || this.payName === 'repulse';
       },
       tableHeight() {
         if (this.isInvo) {
@@ -161,36 +154,43 @@
           },
         };
         let thead1 = {
-          balancedSettlement: {
-            name: '已用结算款结算金额',
-          },
-          balancedPrepaid: {
-            name: '已用预付款结算金额',
-          },
-          invoiced: {
-            name: '已开票金额',
+          value: {
+            name: '金额',
             slot: true
           },
-          invo: {
-            name: '可开票金额',
-            slot: true
-          },
-          invoiceBalance: {
-            name: '选择开票金额',
-            slot: true
-          },
-          company: {
-            name: '支付方',
-            slot: true,
-            readOnly: true
-          },
-          receivedCompany: {
-            name: '收款方',
+          taxRate: {
+            name: '税率',
             readOnly: true,
             slot: true
           },
+          type: {
+            name: '发票类型',
+            slot: true
+          },
+          company: {
+            name: '开票公司',
+            slot: true
+          },
+          toCompany: {
+            name: '收方公司',
+            slot: true
+          },
+          'to.account': {
+            name: '付款卡号',
+            readOnly: true
+          },
+          'from.account': {
+            name: '收款卡号',
+            readOnly: true
+          },
         };
         if (this.isInvo) {
+          if (this.payName === 'repulse') {
+            this.$set(thead1, 'text', {
+              name: '打回理由',
+              slot: true
+            })
+          }
           return thead1;
         } else {
           return thead;
@@ -266,26 +266,51 @@
         this.selectionData = val;
       },
       changUser(scope) {
-        let data = {
-          name: '',
-          type: '',
-          userType: ''
-        };
-        data = Object.assign({}, data, {
-          name: scope.row.receivedCompany.name,
-          userType: '公司',
-          type: 'warning',
-        })
-        return data;
+        let op = {
+          user: {
+            name: scope.row.toUser ? scope.row.toUser.name : '',
+            type: 'success',
+            userType: '用户'
+          },
+          company: {
+            name: scope.row.toCompany ? scope.row.toCompany.name : '',
+            type: 'warning',
+            userType: '公司'
+          },
+          mobile: {
+            name: scope.row.toMobile ? scope.row.toMobile : '',
+            type: undefined,
+            userType: '手机号'
+          }
+        }
+        return op[scope.row.toType];
       },
       check(scope) {
         if (!scope.row.check) {
           if (this.role.financialManager) {
-            this.resMethods(scope, true);
+            if (this.payName === 'invoNoCheck' || this.payName === 'repulse') {
+              this.goInvoCheck(scope);
+            } else {
+              this.resMethods(scope, true);
+            }
           }
         } else {
           this.resMethods(scope);
         }
+      },
+      goInvoCheck(scope) {
+        let query = {
+          show: true,
+          payName: this.payName,
+          activeName: this.$attrs.activeName
+        }
+        if (this.payName === 'repulse') {
+          query.checkFail = 'financialManager';
+        }
+        this.$router.push({
+          path: '/company/account/invoice_edit/' + scope.row._id,
+          query
+        })
       },
       resMethods(scope, check) {
         let type = scope.row.type;
@@ -346,21 +371,47 @@
         };
         return data[val];
       },
-    },
-    created() {
-      if (this.data.length > 0) {
+      async getCurdLog(_id) {
+        return await this.$ajax.post('/curdLog/findOne', {
+          invoice: _id,
+          type: 'invoiceCheckFail'
+        })
+      },
+      async changData(val) {
         if (this.isInvo) {
-          let data = [];
-          this.data.forEach(item => {
-            let obj = item;
-            this.$set(obj, 'invo', item.balancedSettlement + item.balancedPrepaid - item.invoiced);
-            this.$set(obj, 'invoiceBalance', 0);
-            data.push(obj);
-          });
-          this.newData = data;
+          if (this.payName === 'repulse') {
+            let data = [];
+            try {
+              this.loadingText = '加载中';
+              for (let index = 0; index < val.length; index++) {
+                let res = await this.getCurdLog();
+                let obj = val[index];
+                this.$set(obj, 'invo', val[index].balancedSettlement + val[index].balancedPrepaid - val[index].invoiced);
+                this.$set(obj, 'invoiceBalance', 0);
+                this.$set(obj, 'text', res.remark);
+                data.push(obj);
+              }
+            } catch (error) {}
+            this.newData = data;
+            this.loadingText = '';
+          } else {
+            let data = [];
+            val.forEach(item => {
+              let obj = item;
+              this.$set(obj, 'invo', item.balancedSettlement + item.balancedPrepaid - item.invoiced);
+              this.$set(obj, 'invoiceBalance', 0);
+              data.push(obj);
+            });
+            this.newData = data;
+          }
         } else {
-          this.newData = JSON.parse(JSON.stringify(this.data));
+          this.newData = JSON.parse(JSON.stringify(val));
         }
+      }
+    },
+    async created() {
+      if (this.data.length > 0) {
+        this.changData(this.data);
       }
     }
   }

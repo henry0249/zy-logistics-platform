@@ -1,11 +1,11 @@
 <template>
   <loading-box class="js" v-model="loadingText">
-    <bank-cart-item ref="item1" class="f1" :data.sync="form" from key="1"></bank-cart-item>
+    <bank-cart-item :isInvoice="isInvoice" ref="item1" class="f1" :data.sync="form" from key="1"></bank-cart-item>
     <div class="jc icon-right">
       <icon>icon-jiantou</icon>
       <icon>icon-jiantou</icon>
     </div>
-    <bank-cart-item ref="item2" class="f1" :data.sync="form" to key="2"></bank-cart-item>
+    <bank-cart-item :isInvoice="isInvoice" ref="item2" class="f1" :data.sync="form" to key="2"></bank-cart-item>
   </loading-box>
 </template>
 
@@ -23,6 +23,10 @@
         default () {
           return {};
         }
+      },
+      isInvoice: {
+        type: Boolean,
+        default: false
       }
     },
     data() {
@@ -32,6 +36,13 @@
       };
     },
     watch: {
+      initData: {
+        handler(val) {
+          console.log(val);
+          this.form = val;
+        },
+        deep: true
+      },
       form: {
         handler(val) {
           let data = JSON.parse(JSON.stringify(val));

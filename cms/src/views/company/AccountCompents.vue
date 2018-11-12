@@ -6,7 +6,7 @@
           <strong>账户管理</strong>
         </div>
         <div v-if="accountData.length > 0" class="tab-box">
-          <account-change-tabs v-if="show" :loadingText.sync="loadingText" :data="accountData"></account-change-tabs>
+          <account-change-tabs v-if="!loadingText" :loadingText.sync="loadingText" :data="accountData"></account-change-tabs>
         </div>
         <div v-else class="tab-height noData jc">
           <span>未发现账户，你可以<el-button style="margin:0 10px;" plain size="mini" type="primary" @click="go('5')">收款</el-button>或者<el-button plain size="mini" @click="go('6')">预收款</el-button></span>
@@ -39,7 +39,6 @@
     data() {
       return {
         loadingText: "",
-        show: true,
         accountData: [],
       };
     },
@@ -53,54 +52,11 @@
       async getAccount() {
         try {
           this.loadingText = '加载中...';
-          this.show = false;
-          let _id = this.sys ? this.$route.parmas._id : this.company._id;
-          let data = [];
-          let accountData1 = await this.$ajax.post("/account/find", {
-            company: _id,
-            populate: [{
-                path: "relationCompany"
-              },
-              {
-                path: "relationUser"
-              }
-            ]
-          });
-          let accountData2 = await this.$ajax.post('/account/find', {
-            relationCompany: _id,
-            populate: [{
-              path: 'company'
-            }, {
-              path: 'user'
-            }]
-          });
-          accountData1.forEach(item => {
-            let obj = {};
-            if (item.type === 'company') {
-              obj = item.relationCompany;
-            } else {
-              obj = item.relationUser;
-            }
-            this.$set(obj, 'userType', item.type);
-            data.push(obj);
-          });
-          accountData2.forEach(item => {
-            let obj = {};
-            if (item.type === 'company') {
-              obj = item.company;
-            } else {
-              obj = item.user;
-            }
-            this.$set(obj, 'userType', item.type);
-            data.push(obj);
-          });
-          let set = new Set()
-          this.accountData = data.filter((item) => {
-            return !set.has(item._id) && set.add(item._id);
-          });
+          this.accountData = await this.$ajax.post('/invoice/wait/tab', {
+            company: this.company._id
+          })
         } catch (error) {}
         this.loadingText = '';
-        this.show = true;
       },
     },
     async created() {

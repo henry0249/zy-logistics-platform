@@ -1,7 +1,7 @@
 <template>
   <loading-box v-model="loadingText">
     <el-tabs v-model="activeName" @tab-click="tabClick">
-      <el-tab-pane v-for="item in newData" :name="item._id" :key="item.id" :label="item.userType === 'company'?item.name : item.name + '(个人)'">
+      <el-tab-pane v-for="item in newData" :name="item._id" :key="item.id" :label="item.isUser?item.name + '(个人)' : item.name">
         <div class="col-flex tab-height">
           <div class="tab-top jc jb" style="margin:15px 0;">
             <div class="jc js">
@@ -14,18 +14,18 @@
               <el-button @click="go('6',activeName)" size="mini">预收款</el-button>
             </div>
           </div>
-          <el-tabs v-model="payName" @tab-click="payTabClick" type="card">
+          <el-tabs v-model="payName" @tab-click="payTabClick($event,item.isUser)" type="card">
             <el-tab-pane v-for="(v,i) in payArr" :name="v.key" :label="v.label" :key="`${i}pay`">
               <div slot="label">
                 {{v.label}}
-                <el-badge v-if="v.key === 'noCheck' || v.key === 'hasChild' || v.key === 'applyEdit' || v.key === 'invoice'" :value="badge(v.key)" />
+                <el-badge v-if="v.key === 'noCheck' || v.key === 'hasChild' || v.key === 'applyEdit' || v.key === 'invoNoCheck' || v.key === 'repulse'" :value="badge(v.key)" />
               </div>
             </el-tab-pane>
           </el-tabs>
         </div>
       </el-tab-pane>
     </el-tabs>
-    <Account-change-tabs-table v-if="!loadingText" :loadmore="loadmore" :data="accountChangeData" :payName="payName"></Account-change-tabs-table>
+    <Account-change-tabs-table v-if="!loadingText" :activeName="activeName" :loadmore="loadmore" :data="accountChangeData" :payName="payName"></Account-change-tabs-table>
   </loading-box>
 </template>
 
@@ -57,6 +57,7 @@
         hasChildCount: undefined,
         applyEditCount: undefined,
         invoiceCount: undefined,
+        repulseCount: undefined,
         newData: [],
         accountChangeData: [],
         payArr: [{
@@ -75,10 +76,13 @@
             key: 'applyEdit',
             label: '申请修改'
           },
-          // {
-          //   key: 'invoice',
-          //   label: '待开票'
-          // }
+          {
+            key: 'invoNoCheck',
+            label: '待审核开票'
+          }, {
+            key: "repulse",
+            label: '被打回发票'
+          }
         ],
         roleArr: {
           get: 'all',
@@ -112,8 +116,8 @@
         }
       },
       async loadmore() {
-        if (this.payName === 'invoice') {
-          return await this.getInvoice();
+        if (this.payName === 'invoNoCheck' || this.payName === 'repulse') {
+          return await this.getInvoiceByCheck();
         } else {
           return await this.getAccountChange(this.activeName, this.str, this.io, this.payName);
         }
@@ -123,7 +127,8 @@
           noCheck: this.noCheckCount ? this.noCheckCount : undefined,
           hasChild: this.hasChildCount ? this.hasChildCount : undefined,
           applyEdit: this.applyEditCount ? this.applyEditCount : undefined,
-          invoice: this.invoiceCount ? this.invoiceCount : undefined
+          invoNoCheck: this.invoiceCount ? this.invoiceCount : undefined,
+          repulse: this.repulseCount ? this.repulseCount : undefined,
         };
         return data[val];
       },
@@ -141,12 +146,13 @@
           query
         });
       },
-      async payTabClick(val) {
+      async payTabClick(val, isUser) {
+        console.log(isUser);
         try {
           this.loadingText = '加载中';
           this.accountChangeData = [];
-          if (val.name === 'invoice') {
-            this.accountChangeData = await this.getInvoice();
+          if (val.name === 'invoNoCheck' || val.name === 'repulse') {
+            this.accountChangeData = await this.getInvoiceByCheck();
           } else {
             if (val.name === 'pay' || val.name === 'applyEdit') {
               this.io = false;
@@ -158,8 +164,9 @@
           this.noCheckCount = await this.getCount('noCheck');
           this.hasChildCount = await this.getCount('hasChild');
           this.applyEditCount = await this.getCount('applyEdit');
-          let invoiceCount = await this.getCount('invoice');
-          this.invoiceTotal = invoiceCount.total;
+          this.invoiceCount = await this.getCount('invoNoCheck');
+          this.repulseCount = await this.getCount('repulse');
+          await this.getInvoiceValue(isUser);
         } catch (error) {
           console.log(error);
         }
@@ -186,27 +193,44 @@
           this.noCheckCount = await this.getCount('noCheck');
           this.hasChildCount = await this.getCount('hasChild');
           this.applyEditCount = await this.getCount('applyEdit');
-          let invoiceCount = await this.getCount('invoice');
-          this.invoiceTotal = invoiceCount.total;
+          this.invoiceCount = await this.getCount('invoNoCheck');
+          this.repulseCount = await this.getCount('repulse');
+          await this.getInvoiceValue();
         } catch (error) {};
         this.loadingText = '';
       },
-      async getInvoice() {
-        try {
-          return await this.$ajax.post('/businessTrains/invoice/list', {
-            company: this.company._id,
-            limit: 10,
-            skip: this.accountChangeData.length,
-            populate: [{
-              path: 'company'
-            }, {
-              path: 'user'
-            }, {
-              path: 'receivedCompany'
-            }]
-          })
-        } catch (error) {
+      async getInvoiceValue(isUser) {
+        let data = {
+          fromCompany: this.company._id,
+        };
+        if (isUser) {
+          data.toUser = this.activeName;
+          data.toType = 'user';
+        } else {
+          data.toCompany = this.activeName;
+          data.toType = 'company';
         }
+        let res = await this.$ajax.post('/invoice/wait/summary', data);
+        this.invoiceTotal = res.total;
+      },
+      async getInvoiceByCheck() {
+        let data = {
+          company: this.company._id,
+          check: false,
+          checkFail: '',
+          populate: [{
+            path: 'company'
+          }, {
+            path: 'toCompany'
+          }, {
+            path: 'toUser'
+          }],
+          skip: this.accountChangeData.length
+        };
+        if (this.payName === 'repulse') {
+          this.$set(data, 'checkFail', 'financialManager');
+        }
+        return await this.$ajax.post('/invoice/find', data);
       },
       async getAccountValue(_id) {
         let res = await this.$ajax.post("/account/findOne", {
@@ -258,7 +282,7 @@
             children: {
               $exists: true
             }
-          }
+          },
         };
         this.$set(data, 'parent', {
           $exists: false
@@ -297,8 +321,15 @@
               $exists: true
             },
           },
-          invoice: {
-            company: this.company._id
+          invoNoCheck: {
+            company: this.company._id,
+            check: false,
+            checkFail: ''
+          },
+          repulse: {
+            company: this.company._id,
+            check: false,
+            checkFail: 'financialManager'
           }
         };
         let op = {
@@ -311,8 +342,16 @@
             toCompany: this.activeName
           })
         }
-        if (val === 'invoice') {
-          return await this.$ajax.post('/businessTrains/invoice/summary', data[val]);
+        if (val === 'invoNoCheck' || val === 'repulse') {
+          let invoOp = {};
+          if (this.newData[this.index].isUser) {
+            invoOp.toUser = this.activeName;
+          } else {
+            invoOp.toCompany = this.activeName;
+          }
+          return await this.$ajax.post('/invoice/count', { ...data[val],
+            ...invoOp
+          });
         } else {
           return await this.$ajax.post('/accountChange/count', { ...data[val],
             ...op
@@ -323,7 +362,7 @@
         try {
           this.loadingText = '加载中';
           if (this.activeName) {
-            if (this.newData[0].userType === 'company') {
+            if (!this.newData[0].isUser) {
               this.str = 'toCompany';
             } else {
               this.str = 'user';
@@ -336,8 +375,9 @@
             this.noCheckCount = await this.getCount('noCheck');
             this.hasChildCount = await this.getCount('hasChild');
             this.applyEditCount = await this.getCount('applyEdit');
-            let invoiceCount = await this.getCount('invoice');
-            this.invoiceTotal = invoiceCount.total;
+            this.invoiceCount = await this.getCount('invoNoCheck');
+            this.repulseCount = await this.getCount('repulse');
+            await this.getInvoiceValue();
           }
         } catch (error) {
           console.log(error);
@@ -348,6 +388,7 @@
     async created() {
       this.newData = JSON.parse(JSON.stringify(this.data));
       this.activeName = this.newData[0]._id;
+      this.index = 0;
       this.$store.dispatch('getRole', this.company._id);
       await this.getData();
       if (!this.role.financialManager) {

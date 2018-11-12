@@ -5,41 +5,82 @@
         <slot name="header">
           <div class="jb">
             <div class="jc js">
-              <common-select-by-code v-if="isFrom" :userType.sync="userType" width="300px" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未选择" label="付款方"></common-select-by-code>
-              <common-select-by-code v-else width="300px" :userType.sync="userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收款方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom && !isInvoice" :userType.sync="userType" width="300px" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未选择" label="付款方"></common-select-by-code>
+              <common-select-by-code v-if="!isFrom && !isInvoice" width="300px" :userType.sync="userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收款方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom && isInvoice" width="300px" :userStr="data.from.userStr" :userType.sync="userType" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未注册公司或用户" label="开票方"></common-select-by-code>
+              <common-select-by-code v-if="!isFrom && isInvoice" width="300px" :userStr="data.to.userStr" :userType.sync="userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收票方"></common-select-by-code>
             </div>
             <div class="jc js">
-              <my-form-item number :controls="isFrom" :disabled="isFrom?false:true" width="200px" size="mini" :label="isFrom?'付款金额':'收款金额'" v-model.number="data.value" :placeholder="`请输入${isFrom?'付款':'收款'}金额`"></my-form-item>
+              <my-form-item number :controls="!numberDis" :disabled="numberDis" width="200px" size="mini" :label="numberText" v-model.number="data.value"></my-form-item>
+            </div>
+          </div>
+          <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
+          <div class="jb" v-if="isInvoice">
+            <div class="jc js">
+              <my-form-item width="300px" :controls="isFrom" :disabled="isFrom?false:true" number :min="0" size="mini" v-model="data.taxRate" label="税率" placeholder="请输入税率"></my-form-item>
+            </div>
+            <div class="jc js">
+              <my-form-item width="200px" :disabled="isFrom?false:true" select :options="field.Invoice.type.option" size="mini" v-model="data.type" label="发票类型" placeholder="请选择"></my-form-item>
             </div>
           </div>
         </slot>
       </div>
       <slot>
+        <div class="jb" v-if="isInvoice">
+          <my-form-item v-if="isFrom" size="mini" v-model="data.from.name" label="开票名称" placeholder="请输入开票名称"></my-form-item>
+          <my-form-item v-else size="mini" v-model="data.to.name" label="收票名称" placeholder="请输入收票名称"></my-form-item>
+        </div>
+        <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
+        <div class="jb" v-if="isInvoice">
+          <my-form-item v-if="isFrom" size="mini" v-model="data.from.taxNumber" label="纳税号" placeholder="请输入纳税号"></my-form-item>
+          <my-form-item v-else size="mini" v-model="data.to.taxNumber" label="纳税号" placeholder="请输入纳税号"></my-form-item>
+        </div>
+        <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
+        <div class="jb" v-if="isInvoice">
+          <my-form-item v-if="isFrom" size="mini" v-model="data.contactNumber" label="联系电话" placeholder="请输入联系电话"></my-form-item>
+          <my-form-item :disabled="true" v-else size="mini" v-model="data.contactNumber" label="联系电话" placeholder="请输入联系电话"></my-form-item>
+        </div>
+        <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
+        <div class="jb" v-if="isInvoice">
+          <div style="width:100%" v-if="isFrom">
+            <my-select label="地址" size="mini" area :data.sync="data.address"></my-select>
+          </div>
+          <div style="width:100%" v-else>
+            <my-select :disabled="true" label="地址" size="mini" area :data.sync="data.address"></my-select>
+          </div>
+        </div>
+        <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
         <div class="jb">
-          <my-form-item v-if="isFrom" size="mini" v-model="data.from.account" label="账户：" placeholder="请输入银行卡号"></my-form-item>
+          <my-form-item v-if="isFrom" size="mini" v-model="data.from.account" label="账户" placeholder="请输入银行卡号"></my-form-item>
           <my-form-item v-else size="mini" v-model="data.to.account" label="账户：" placeholder="请输入银行卡号"></my-form-item>
         </div>
         <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;">{{check}}</span>
         <div class="jb">
-          <my-form-item v-if="isFrom" readonly size="mini" label="所属银行：" v-model="data.from.bank" placeholder="请先输入银行卡号"></my-form-item>
+          <my-form-item v-if="isFrom" readonly size="mini" label="所属银行" v-model="data.from.bank" placeholder="请先输入银行卡号"></my-form-item>
           <my-form-item v-else readonly size="mini" label="所属银行：" v-model="data.to.bank" placeholder="请先输入银行卡号"></my-form-item>
         </div>
         <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
         <div class="jb">
-          <my-form-item v-if="isFrom" size="mini" label="银行全称：" v-model="data.from.bankName" placeholder="比如 中国建设银行(桂平支行)"></my-form-item>
+          <my-form-item v-if="isFrom" size="mini" label="银行全称" v-model="data.from.bankName" placeholder="比如 中国建设银行(桂平支行)"></my-form-item>
           <my-form-item v-else size="mini" label="银行全称：" v-model="data.to.bankName" placeholder="比如 中国建设银行(桂平支行)"></my-form-item>
         </div>
         <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
         <div class="jb">
-          <my-form-item v-if="isFrom" size="mini" label="转账日期" date v-model="data.remittanceTime" type="date" placeholder="选择日期" :picker-options="pickerOptions">
+          <my-form-item v-if="isFrom && !isInvoice" size="mini" label="转账日期" date v-model="data.remittanceTime" type="date" placeholder="选择日期" :picker-options="pickerOptions">
           </my-form-item>
-          <my-form-item v-else size="mini" label="到账日期" date v-model="data.accountingTime" type="date" placeholder="选择日期" :picker-options="pickerOptions">
+          <my-form-item v-if="!isFrom && !isInvoice" size="mini" label="到账日期" date v-model="data.accountingTime" type="date" placeholder="选择日期" :picker-options="pickerOptions">
+          </my-form-item>
+          <my-form-item v-if="isFrom && isInvoice" size="mini" label="开票日期" date v-model="data.billingDate" type="date" placeholder="选择日期" :picker-options="pickerOptions">
+          </my-form-item>
+          <my-form-item v-if="!isFrom && isInvoice" size="mini" label="录单日期" date v-model="data.recordDate" type="date" placeholder="选择日期" :picker-options="pickerOptions">
           </my-form-item>
         </div>
         <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
         <div class="jb">
-          <my-form-item v-if="isFrom" size="mini" input type="textarea" autosize v-model="data.from.remark" placeholder="请输入付款备注" label="备注"></my-form-item>
-          <my-form-item v-else size="mini" input type="textarea" autosize v-model="data.from.remark" placeholder="请输入收款备注" label="备注"></my-form-item>
+          <my-form-item v-if="isFrom && !isInvoice" size="mini" input type="textarea" autosize v-model="data.from.remark" placeholder="请输入付款备注" label="备注"></my-form-item>
+          <my-form-item v-if="!isFrom && !isInvoice" size="mini" input type="textarea" autosize v-model="data.to.remark" placeholder="请输入收款备注" label="备注"></my-form-item>
+          <my-form-item v-if="isFrom && isInvoice" size="mini" input type="textarea" autosize v-model="data.remark" placeholder="请输入备注" label="备注"></my-form-item>
+          <my-form-item :disabled="true" v-if="!isFrom && isInvoice" size="mini" input type="textarea" autosize v-model="data.remark" placeholder="请输入备注" label="备注"></my-form-item>
         </div>
       </slot>
     </el-card>
@@ -54,6 +95,10 @@
         default () {
           return {};
         }
+      },
+      isInvoice: {
+        type: Boolean,
+        default: false
       }
     },
     data() {
@@ -91,9 +136,40 @@
             this.checkMethods(val);
           }
         }
+      },
+      'data.address'(val){
+        console.log(val);
       }
     },
     computed: {
+      numberDis() {
+        if (this.isInvoice) {
+          return true;
+        } else {
+          if (this.isFrom) {
+            return false;
+          } else {
+            return true;
+          }
+        }
+      },
+      numberText() {
+        let data = '';
+        if (this.isFrom) {
+          if (this.isInvoice) {
+            data = '发票金额';
+          } else {
+            data = '付款金额';
+          }
+        } else {
+          if (this.isInvoice) {
+            data = '收票金额';
+          } else {
+            data = '收款金额';
+          }
+        }
+        return data;
+      },
       type() {
         for (const key in this.$attrs) {
           if (key === 'from') {
@@ -240,9 +316,6 @@
           isBank: true
         }
       }
-    },
-    created() {
-      // console.log(this.isFrom, this.data);
     }
   }
 </script>
