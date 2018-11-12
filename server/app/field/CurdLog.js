@@ -36,6 +36,11 @@ module.exports = {
     type: 'ObjectId',
     ref: 'BusinessTrains'
   },
+  invoice: {
+    name: '关联的发票',
+    type: 'ObjectId',
+    ref: 'Invoice'
+  },
   ua: {
     name: '设备信息',
     type: 'String',

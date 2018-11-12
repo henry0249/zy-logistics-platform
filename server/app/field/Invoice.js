@@ -82,4 +82,16 @@ module.exports = {
     type: 'ObjectIdArray',
     ref: 'User'
   },
+  contactNumber: {
+    name: '联系电话',
+    type: 'String',
+  },
+  address: {
+    name: '地址',
+    type: 'String',
+  },
+  billingDate: {
+    name: '开票日期',
+    type: 'Date',
+  }
 }

@@ -1,7 +1,7 @@
 const Service = require('egg').Service;
 
 class InvoiceService extends Service {
-  async getInvoiceTab() {
+  async getWaitInvoiceTab() {
     const ctx = this.ctx;
     let req = ctx.request.body;
     if (!req.company) ctx.throw(422, '公司信息获取失败');
@@ -62,18 +62,18 @@ class InvoiceService extends Service {
     }
     return ctx.helper.unique(res, '_id');
   }
-  async getInvoiceList(params) {
+  async getWaitInvoiceList(limit = 10, skip = 0) {
     const ctx = this.ctx;
-    let req = params || ctx.request.body;
+    let req = ctx.request.body;
     if (!req.fromCompany) ctx.throw(422, '开票公司信息获取失败');
     if (!req.toType) ctx.throw(422, '收票方类型获取失败');
-    if (['user', 'company'].indexOf(type) < 0) ctx.throw(422, '收票方类型错误');
+    if (['user', 'company'].indexOf(req.toType) < 0) ctx.throw(422, '收票方类型错误');
     if (req.toType === 'company' && !req.toCompany) ctx.throw(422, '收票公司信息获取失败');
     if (req.toType === 'user' && !req.toUser) ctx.throw(422, '收票人信息获取失败');
     let res = [],
-      type = req.type || 'businessTrains',
-      limit = req.limit || 10,
-      skip = req.skip || 0;
+      type = req.type || 'businessTrains';
+    if (req.limit !== undefined) limit = Number(req.limit);
+    if (req.skip !== undefined) skip = Number(req.skip);
     if (['businessTrains', 'logistics'].indexOf(type) < 0) return res;
     if (type === 'businessTrains') {
       let businessTrainsData = await ctx.model.BusinessTrains.find({
@@ -94,9 +94,9 @@ class InvoiceService extends Service {
         path: 'user'
       }]).sort({
         createdAt: -1
-      }).limit(limit).skip(skip);
+      });
       for (let i = 0; i < businessTrainsData.length; i++) {
-        let item = JSON.parse(JSON.stringify(data[i]));
+        let item = JSON.parse(JSON.stringify(businessTrainsData[i]));
         item.isBusinessTrains = true;
         let invoicedLess = item.balancedSettlement + item.balancedPrepaid - item.invoiced - item.preInvoiced;
         if (invoicedLess > 0) res.push(item);
@@ -125,7 +125,7 @@ class InvoiceService extends Service {
         createdAt: -1
       }).limit(limit).skip(skip);
       for (let i = 0; i < logisticsData.length; i++) {
-        let item = JSON.parse(JSON.stringify(data[i]));
+        let item = JSON.parse(JSON.stringify(logisticsData[i]));
         item.isLogistics = true;
         let invoicedLess = item.balancedSettlement + item.balancedPrepaid - item.invoiced - item.preInvoiced;
         if (invoicedLess > 0) res.push(item);
@@ -133,7 +133,7 @@ class InvoiceService extends Service {
     }
     return res;
   }
-  async setInvoiceList(type = "businessTrains", arr, updateType = 'preCheck') {
+  async setWaitInvoiceList(type = "businessTrains", arr, updateType = 'preCheck') {
     const ctx = this.ctx;
     let req = ctx.request.body;
     let res = {
@@ -141,11 +141,11 @@ class InvoiceService extends Service {
       list: []
     };
     if (!(arr && arr instanceof Array && arr.length > 0)) return res;
-    if (type === 'businessTrains' && req.value !== undefined) {
+    if (type === 'businessTrains' && req.value !== undefined && updateType === 'preCheck') {
       let summary = await ctx.service.businessTrains.getInvoiceSummary();
       if (req.value > summary.total) ctx.throw(400, '可开票金额不足');
     }
-    if (type === 'logistics' && req.value !== undefined) {
+    if (type === 'logistics' && req.value !== undefined && updateType === 'preCheck') {
       let summary = {
         total: 0
       };
@@ -188,27 +188,36 @@ class InvoiceService extends Service {
   async set() {
     const ctx = this.ctx;
     let body = ctx.request.body;
-    if (!body.company) ctx.throw(400, '开票公司获取失败');
-    let businessTrains = await this.setInvoiceList('businessTrains', body.businessTrains, 'preCheck');
-    let logistics = await this.setInvoiceList('logistics', body.logistics, 'preCheck');
-    let total = businessTrains.total + logistics.total;
-    if (body.value > total) ctx.throw(400, '可开票金额不足');
-    if (body.value !== total) ctx.throw(400, '开票金额错误');
-    if (businessTrains.list.length === 0 && logistics.list.length === 0) ctx.throw(400, '开票列表不能为空');
     let invoiceBody = {
       value: body.value,
       taxRate: body.taxRate,
       type: body.type,
       company: body.company,
-      businessTrainsArr: businessTrains.list,
-      logisticsArr: logistics.list,
-      check: false
+      businessTrainsArr: body.businessTrainsArr || [],
+      logisticsArr: body.logisticsArr || [],
+      check: false,
+      toType: body.toType,
+      from: body.from,
+      to: body.to,
+      contactNumber: body.contactNumber,
+      address: body.address,
+      billingDate: new Date(body.billingDate)
     };
+    if (invoiceBody.businessTrainsArr.length === 0 && invoiceBody.logisticsArr.length === 0) ctx.throw(400, '开票列表不能为空');
+    if (!invoiceBody.company) ctx.throw(400, '开票公司获取失败');
     if (invoiceBody.value === 0) ctx.throw(400, '开票金额不能为0');
-    if (['user', 'company', 'mobile'].indexOf(invoiceBody.type) < 0) ctx.throw(400, '收票方类型错误');
+    if (['user', 'company', 'mobile'].indexOf(invoiceBody.toType) < 0) ctx.throw(400, '收票方类型错误');
+    if (!body.contactNumber) ctx.throw(400, '联系电话必填');
+    if (!body.address) ctx.throw(400, '地址必填');
+    if (!body.billingDate) ctx.throw(400, '开票日期必填');
     if (body.toType === 'user') invoiceBody.toUser = body.toUser;
     if (body.toType === 'company') invoiceBody.toCompany = body.toCompany;
     if (body.toType === 'mobile') invoiceBody.toMobile = body.toMobile;
+    let businessTrains = await this.setWaitInvoiceList('businessTrains', body.businessTrainsArr, 'preCheck');
+    let logistics = await this.setWaitInvoiceList('logistics', body.logisticsArr, 'preCheck');
+    let total = businessTrains.total + logistics.total;
+    if (body.value > total) ctx.throw(400, '可开票金额不足');
+    if (body.value !== total) ctx.throw(400, '开票金额错误');
     if (body._id) {
       await ctx.model.Invoice.update({
         _id: body._id
@@ -238,8 +247,8 @@ class InvoiceService extends Service {
       check: true,
       checkFail: ''
     });
-    await this.setInvoiceList('businessTrains', invoice.businessTrainsArr, 'check');
-    await this.setInvoiceList('logistics', invoice.logisticsArr, 'check');
+    await this.setWaitInvoiceList('businessTrains', invoice.businessTrainsArr, 'check');
+    await this.setWaitInvoiceList('logistics', invoice.logisticsArr, 'check');
     return 'ok';
   }
 
@@ -255,8 +264,8 @@ class InvoiceService extends Service {
       check: false,
       checkFail: 'financialManager'
     });
-    await this.setInvoiceList('businessTrains', invoice.businessTrainsArr, 'checkFail');
-    await this.setInvoiceList('logistics', invoice.logisticsArr, 'checkFail');
+    await this.setWaitInvoiceList('businessTrains', invoice.businessTrainsArr, 'checkFail');
+    await this.setWaitInvoiceList('logistics', invoice.logisticsArr, 'checkFail');
     let curdLog = new ctx.model.CurdLog({
       type: 'invoiceCheckFail',
       invoice: invoice._id,
@@ -264,6 +273,20 @@ class InvoiceService extends Service {
     });
     await curdLog.save();
     return 'ok';
+  }
+
+  async waitSummary() {
+    let data = await this.getWaitInvoiceList(0, 0);
+    let total = 0;
+    for (let i = 0; i < data.length; i++) {
+      let item = data[i];
+      let invoicedLess = item.balancedSettlement + item.balancedPrepaid - item.invoiced - item.preInvoiced;
+      if (invoicedLess > 0) total += invoicedLess;
+    }
+    return {
+      count: data.length,
+      total
+    };
   }
 }
 module.exports = InvoiceService;

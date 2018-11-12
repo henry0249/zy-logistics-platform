@@ -52,16 +52,17 @@ module.exports = app => {
     //贸易链接口
     .post('/businessTrains/multi/update', checkToken(), 'businessTrains.multiUpdate') //结算流程
     .post('/businessTrains/multi/checkFail', checkToken(), 'businessTrains.multiCheckFail') //结算流程
-    .post('/businessTrains/invoice/summary', checkToken(), 'businessTrains.getInvoiceSummary') //待开票列表总计
-    .post('/businessTrains/invoice/list', checkToken(), 'businessTrains.getInvoiceList') //待开票列表
+    // .post('/businessTrains/invoice/summary', checkToken(), 'businessTrains.getInvoiceSummary') //待开票列表总计
+    // .post('/businessTrains/invoice/list', checkToken(), 'businessTrains.getInvoiceList') //待开票列表
     //结算接口
     .post('/settle/businessTrains/tab', checkToken(), 'settle.getBusinessTrainsTab') //获取贸易链相关公司,准备展示结算列表
     //账单流水接口
     .post('/accountChange/check', checkToken(), 'accountChange.check') //账单流水审核
     .post('/accountChange/payUserUpdateApply', checkToken(), 'accountChange.payUserUpdateApply') //付款方进行修改账单申请
     //发票接口
-    .post('/invoice/tab', checkToken(), 'invoice.getInvoiceTab') //获取发票关联公司
-    .post('/invoice/list', checkToken(), 'invoice.getInvoiceList') //获取可开票列表
+    .post('/invoice/wait/summary', checkToken(), 'invoice.waitSummary') //获取发票统计信息
+    .post('/invoice/wait/tab', checkToken(), 'invoice.getWaitInvoiceTab') //获取发票关联公司
+    .post('/invoice/wait/list', checkToken(), 'invoice.getWaitInvoiceList') //获取可开票列表
     .post('/invoice/check', checkToken(), 'invoice.check') //发票审核
     .post('/invoice/checkFail', checkToken(), 'invoice.checkFail') //发票打回
     //页面接口

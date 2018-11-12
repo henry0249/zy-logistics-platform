@@ -12,15 +12,21 @@ class InvoiceController extends Controller {
     ctx.body = await ctx.service.invoice.checkFail();
   }
 
-  async getInvoiceTab() {
+  async getWaitInvoiceTab() {
     const ctx = this.ctx
-    ctx.body = await ctx.service.invoice.getInvoiceTab();
+    ctx.body = await ctx.service.invoice.getWaitInvoiceTab();
   }
   
-  async getInvoiceList(){
+  async getWaitInvoiceList(){
     const ctx = this.ctx
-    ctx.body = await ctx.service.invoice.getInvoiceList();
+    ctx.body = await ctx.service.invoice.getWaitInvoiceList();
   }
+
+  async waitSummary(){
+    const ctx = this.ctx
+    ctx.body = await ctx.service.invoice.waitSummary();
+  }
+  
 }
 
 module.exports = InvoiceController;
