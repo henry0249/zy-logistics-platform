@@ -42,12 +42,8 @@
         </div>
         <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
         <div class="jb" v-if="isInvoice">
-          <div style="width:100%" v-if="isFrom">
-            <my-select label="地址" size="mini" area :data.sync="data.address"></my-select>
-          </div>
-          <div style="width:100%" v-else>
-            <my-select :disabled="true" label="地址" size="mini" area :data.sync="data.address"></my-select>
-          </div>
+          <my-form-item v-if="isFrom" size="mini" v-model="data.address" label="地址" placeholder="请输入地址"></my-form-item>
+          <my-form-item :disabled="true" v-else size="mini" v-model="data.address" label="地址" placeholder="请输入地址"></my-form-item>
         </div>
         <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
         <div class="jb">
@@ -72,7 +68,7 @@
           </my-form-item>
           <my-form-item v-if="isFrom && isInvoice" size="mini" label="开票日期" date v-model="data.billingDate" type="date" placeholder="选择日期" :picker-options="pickerOptions">
           </my-form-item>
-          <my-form-item v-if="!isFrom && isInvoice" size="mini" label="录单日期" date v-model="data.recordDate" type="date" placeholder="选择日期" :picker-options="pickerOptions">
+          <my-form-item v-if="!isFrom && isInvoice" size="mini" label="录单日期" date v-model="data.to.recordDate" type="date" placeholder="选择日期" :picker-options="pickerOptions">
           </my-form-item>
         </div>
         <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
@@ -137,7 +133,7 @@
           }
         }
       },
-      'data.address'(val){
+      'data.address' (val) {
         console.log(val);
       }
     },

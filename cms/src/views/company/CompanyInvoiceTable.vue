@@ -56,6 +56,12 @@
       isCheck: {
         type: Boolean,
         default: false
+      },
+      selection: {
+        type: Array,
+        default () {
+          return [];
+        }
       }
     },
     data() {
@@ -74,6 +80,12 @@
       newData: {
         handler(val) {
           this.$emit('update:data', val);
+        },
+        deep: true
+      },
+      selectionChangeData: {
+        handler(val) {
+          this.$emit('update:selection', val);
         },
         deep: true
       }

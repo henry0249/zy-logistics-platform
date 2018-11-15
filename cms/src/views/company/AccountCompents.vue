@@ -1,21 +1,8 @@
 <template>
   <loading-box v-if="!routeShow" v-model="loadingText">
     <div class="g-order-create">
-      <div class="g-order">
-        <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
-          <strong>账户管理</strong>
-        </div>
-        <div v-if="accountData.length > 0" class="tab-box">
-          <account-change-tabs v-if="!loadingText" :loadingText.sync="loadingText" :data="accountData"></account-change-tabs>
-        </div>
-        <div v-else class="tab-height noData jc">
-          <span>未发现账户，你可以<el-button style="margin:0 10px;" plain size="mini" type="primary" @click="go('5')">收款</el-button>或者<el-button plain size="mini" @click="go('6')">预收款</el-button></span>
-        </div>
-        <div class="btm-box jc js">
-          <el-button v-if="false" @click="go(key)" v-for="(item,key) in field.AccountChange.type.option" :key="key" size="mini">{{item}}</el-button>
-          <el-button @click="go('5')" size="mini">收款</el-button>
-          <el-button @click="go('6')" size="mini">预收款</el-button>
-        </div>
+      <div class="tab-box">
+        <account-change-tabs v-if="!loadingText" :loadingText.sync="loadingText"></account-change-tabs>
       </div>
     </div>
   </loading-box>
@@ -23,11 +10,9 @@
 </template>
 
 <script>
-  import AccountChangeType from "./AccountChangeType.vue";
   import AccountChangeTabs from "./AccountChangeTabs.vue";
   export default {
     components: {
-      AccountChangeType,
       AccountChangeTabs
     },
     props: {
@@ -39,7 +24,6 @@
     data() {
       return {
         loadingText: "",
-        accountData: [],
       };
     },
     computed: {
@@ -47,20 +31,8 @@
         return this.$route.query.show === true || this.$route.query.show === 'true';
       },
     },
-    methods: {
-      async sub() {},
-      async getAccount() {
-        try {
-          this.loadingText = '加载中...';
-          this.accountData = await this.$ajax.post('/invoice/wait/tab', {
-            company: this.company._id
-          })
-        } catch (error) {}
-        this.loadingText = '';
-      },
-    },
+    methods: {},
     async created() {
-      this.getAccount();
     }
   };
 </script>
@@ -72,8 +44,6 @@
   .g-order {
     margin: 0 auto;
     padding: 30px;
-    border: 1px solid #eee;
-    border-radius: 4px;
     position: relative;
   }
   .tab-height {

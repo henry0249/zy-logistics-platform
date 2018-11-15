@@ -5,11 +5,8 @@
         <div class="flex ac jc" style="font-size:22px;padding-bottom:20px">
           <strong>{{title}}</strong>
         </div>
-        <el-tabs v-model="activeName" @tab-click="tabClick">
-          <el-tab-pane :disabled="disabled(item._id)" v-for="item in newData" :name="item._id" :key="item.id" :label="item.isUser?item.name + '(个人)' : item.name"></el-tab-pane>
-        </el-tabs>
-        <company-invoice-table v-if="!loadingText" :edit="edit" :data.sync="tableData" :initData="tableInitData" :invoiceTotal="invoiceTotal" :isCheck.sync="isCheck" :invoiceValue.sync="invoiceValue"></company-invoice-table>
-        <bank-cart v-if="!loadingText && show" isInvoice style="margin-top:15px;width:100%" :data.sync="cartData" :initData="initCartData" :key="1"></bank-cart>
+        <company-invoice-table v-if="!loadingText" :selection.sync="selection" :edit="edit" :data.sync="tableData" :initData="tableInitData" :invoiceTotal="invoiceTotal" :isCheck.sync="isCheck" :invoiceValue.sync="invoiceValue"></company-invoice-table>
+        <bank-cart v-if="!loadingText && show" isInvoice style="margin-top:15px;width:100%" :data.sync="cartData" :initData="initCartData"></bank-cart>
       </div>
       <el-dialog :visible.sync="dialogVisible">
         <div class="jc jb">
@@ -36,8 +33,8 @@
 </template>
 
 <script>
-  import CompanyInvoiceTable from './CompanyInvoiceTable.vue';
-  import CompanyInvoiceCart from './CompanyInvoiceCart.vue';
+  import CompanyInvoiceTable from "./CompanyInvoiceTable.vue";
+  import CompanyInvoiceCart from "./CompanyInvoiceCart.vue";
   export default {
     components: {
       CompanyInvoiceTable,
@@ -54,94 +51,101 @@
           return [];
         }
       },
-      accountData: {
-        type: Array,
-        default () {
-          return [];
-        }
-      },
       invoiceData: {
         type: Object,
         default () {
           return {};
         }
-      },
+      }
     },
     data() {
       return {
-        loadingText: '',
-        input: '',
-        invoiceTotal: 0,
+        loadingText: "",
+        input: "",
         invoiceValue: 0,
         index: 0,
         show: true,
         isCheck: false,
         dialogVisible: false,
-        activeName: '',
-        tableHeight: 'calc(100vh - 50px - 70px - 62px - 53px - 40px - 60px - 77px)',
+        tableHeight: "calc(100vh - 50px - 70px - 62px - 53px - 40px - 60px - 77px)",
         tableData: [],
         tableInitData: [],
         newData: [],
         indexData: [],
         res: [],
+        selection: [],
         cartData: {},
         initCartData: {
           value: 0,
           from: {
-            name: '',
-            bank: '',
-            bankName: '',
-            account: '',
-            type: '',
-            remark: '',
+            name: "",
+            bank: "",
+            bankName: "",
+            account: "",
+            type: "",
+            remark: "",
             disabled: true
           },
           to: {
-            name: '',
-            bank: '',
-            bankName: '',
-            account: '',
-            type: '',
-            remark: '',
+            name: "",
+            bank: "",
+            bankName: "",
+            account: "",
+            type: "",
+            remark: "",
             disabled: true
           },
-          recordDate: '',
-          openDate: '',
+          recordDate: "",
+          openDate: "",
           toCompany: {},
           company: {},
           type: 0,
           taxRate: 0,
+          contactNumber: '',
+          address: '',
+          billingDate: ''
         }
-      }
+      };
     },
     watch: {
       invoiceValue(val) {
-        this.$set(this.initCartData, 'value', val);
+        this.$set(this.initCartData, "value", val);
+      },
+      tableData: {
+        handler(val) {
+          console.log(val);
+        },
+        deep: true
       }
     },
     computed: {
+      invoiceTotal() {
+        if (this.edit) {} else {
+          return typeof(this.$route.query.total) === 'number' ? this.$route.query.total : Number(this.$route.query.total);
+        }
+      },
       subText() {
-        let data = '开发票'
+        let data = "开发票";
         if (this.edit) {
-          if (this.$route.query.checkFail === 'financialManager') {
-            data = '回退发票';
+          if (this.$route.query.checkFail === "financialManager") {
+            data = "回退发票";
           } else {
-            data = '审核成功';
+            data = "审核成功";
           }
         }
         return data;
       },
       title() {
-        let data = '开发票';
-        if (this.$route.query.checkFail === 'financialManager') {
-          data = '被打回发票'
+        let data = "开发票";
+        if (this.$route.query.checkFail === "financialManager") {
+          data = "被打回发票";
         } else if (this.edit) {
-          data = '审核发票';
+          data = "审核发票";
         }
         return data;
       },
       isCheckFail() {
-        return this.$route.query.checkFail === 'financialManager'
+        return this.$route.query.checkFail === "financialManager";
       },
       isShow() {
         let data = true;
@@ -158,112 +162,139 @@
       }
     },
     methods: {
-      disabled(name) {
-        if (this.edit) {
-          if (name === this.activeName) {
-            return false;
-          } else {
-            return true;
-          }
-        } else {
-          return false;
-        }
-      },
-      async tabClick(val) {
-        this.index = val.index;
-        try {
-          this.loadingText = '加载中';
-          this.tableInitData = [];
-          await this.getInvoice();
-          await this.getCompany();
-        } catch (error) {}
-        this.loadingText = '';
-      },
       changUser(scope) {
         let data = {
-          name: '',
-          type: '',
-          userType: ''
+          name: "",
+          type: "",
+          userType: ""
         };
         data = Object.assign({}, data, {
           name: scope.row.receivedCompany.name,
-          userType: '公司',
-          type: 'warning',
-        })
+          userType: "公司",
+          type: "warning"
+        });
         return data;
       },
       async delInvoice() {
         try {
-          this.loadingText = '删除中';
-          await this.$ajax.post('/invoice/delete', {
+          this.loadingText = "删除中";
+          await this.$ajax.post("/invoice/delete", {
             _id: this.$route.params._id
-          })
-          this.goback('删除成功');
+          });
+          this.goback("删除成功");
         } catch (error) {}
-        this.loadingText = '';
+        this.loadingText = "";
       },
       async sub() {
         if (!this.edit) {
-          this.setInvoice('set');
+          if (this.checkMethods()) {
+            this.setInvoice("set");
+          }
         } else {
-          if (this.$route.query.checkFail === 'financialManager') {
-            this.setInvoice('update');
+          if (this.$route.query.checkFail === "financialManager") {
+            this.setInvoice("update");
           } else {
-            this.editInvoice();
+            if (this.checkMethods()) {
+              this.editInvoice();
+            }
           }
         }
       },
+      checkMethods(val) {
+        let check = true;
+        var integer1 = /^(0|86|17951)?(13[0-9]|15[012356789]|17[01678]|18[0-9]|14[57])[0-9]{8}$/;
+        var integer2 = /^(0[0-9]{2,3}\-)([2-9][0-9]{6,7})+(\-[0-9]{1,4})?$/;
+        let data = false;
+        this.tableData.forEach(item => {
+          if (item.invoiceBalance > 0) {
+            data = true;
+            return;
+          }
+        });
+        if (this.selection.length === 0) {
+          this.$message.warn("请先选择开票");
+          return (check = false);
+        } else if (!data) {
+          this.$message.warn("请先填写开票金额");
+          return (check = false);
+        } else if (!this.cartData.address) {
+          this.$message.warn("地址不能为空");
+          return (check = false);
+        } else if (!this.cartData.billingDate) {
+          this.$message.warn("开票日期不能为空");
+          return (check = false);
+        } else if (!this.cartData.contactNumber) {
+          this.$message.warn("联系电话不能为空");
+          return (check = false);
+        } else if (!integer1.test(this.cartData.contactNumber) &&
+          !integer2.test(this.cartData.contactNumber)
+        ) {
+          this.$message.warn("联系电话格式不正确");
+          return (check = false);
+        }
+        return check;
+      },
       repulse() {
-        this.dialogVisible = true
+        this.dialogVisible = true;
       },
       goback(text) {
         this.$message.success(text);
         this.$router.push({
-          path: '/company/account'
-        })
+          path: "/company/account"
+        });
       },
       async repulseInvoice() {
         this.dialogVisible = false;
         try {
-          this.loadingText = '打回中';
-          await this.$ajax.post('/invoice/checkFail', { ...this.invoiceData,
+          this.loadingText = "打回中";
+          await this.$ajax.post("/invoice/checkFail", {
+            ...this.invoiceData,
             text: this.input
           });
-          this.goback('打回成功');
+          this.goback("打回成功");
         } catch (error) {}
-        this.loadingText = '';
+        this.loadingText = "";
       },
       async editInvoice() {
         try {
-          this.loadingText = '发票审核中';
-          await this.$ajax.post('/invoice/check', this.invoiceData);
-          this.goback('审核成功');
+          this.loadingText = "发票审核中";
+          await this.$ajax.post("/invoice/check", this.invoiceData);
+          this.goback("审核成功");
         } catch (error) {}
-        this.loadingText = '';
+        this.loadingText = "";
       },
       async setInvoice(type) {
         try {
-          this.loadingText = type === 'set' ? '添加中' : '回退中';
+          this.loadingText = type === "set" ? "添加中" : "回退中";
+          let cartData = type === "set" ? this.cartData : this.initCartData;
           let data = {
-            value: this.initCartData.value,
-            type: this.initCartData.type,
-            taxRate: this.initCartData.taxRate,
-            to: this.initCartData.to,
-            from: this.initCartData.from,
-            toType: this.newData.isUser ? 'user' : 'company',
+            value: cartData.value,
+            type: cartData.type,
+            taxRate: cartData.taxRate,
+            to: cartData.to,
+            from: cartData.from,
+            toType: this.newData.isUser ? "user" : "company",
             company: this.company._id,
-            contactNumber: this.initCartData.contactNumber || '448828292',
-            address: this.initCartData.address || '5b18ff4b7e4da9b84b7e917e',
-            billingDate: this.initCartData.billingDate || new Date(),
+            contactNumber: cartData.contactNumber,
+            address: cartData.address,
+            billingDate: cartData.billingDate
           };
-          if (this.newData.isUser) {
-            data.toUser = this.activeName;
+          if (type === 'set') {
+            if (this.$route.query.type === 'company') {
+              data.toCompany = this.$route.query._id;
+            } else {
+              data.toUser = this.$route.query._id;
+            }
           } else {
-            data.toCompany = this.activeName;
+            // if (this.newData.isUser) {
+            //   data.toUser = this.activeName;
+            // } else {
+            //   data.toCompany = this.activeName;
+            // }
           }
           let businessTrainsArr = [];
           let logisticsArr = [];
-          if (type === 'set') {
+          if (type === "set") {
             this.tableData.forEach(item => {
               if (item.isBusinessTrains) {
                 businessTrainsArr.push({
@@ -274,7 +305,7 @@
                 logisticsArr.push({
                   _id: item._id,
                   preInvoiced: item.invoiceBalance
-                })
+                });
               }
             });
             if (businessTrainsArr.length > 0) {
@@ -292,95 +323,84 @@
               data.logisticsArr = this.invoiceData.logisticsArr;
             }
           }
-          let path = '/invoice/set'
-          if (type === 'update') {
-            path = '/invoice/update';
-          };
+          let path = "/invoice/set";
+          if (type === "update") {
+            path = "/invoice/update";
+          }
           await this.$ajax.post(path, data);
-          this.goback(`${type === 'set'?'开发票成功':'回退成功'}`);
+          this.goback(`${type === "set" ? "开发票成功" : "回退成功"}`);
         } catch (error) {}
-        this.loadingText = '';
+        this.loadingText = "";
       },
       async getInvoice() {
         let data = {
           fromCompany: this.company._id,
-          limit: 0,
-        }
-        if (this.newData[this.index].isUser) {
-          data.toUser = this.activeName;
-          data.toType = 'user';
+          limit: 0
+        };
+        if (this.$route.query.type === 'user') {
+          data.toUser = this.$route.query._id;
+          data.toType = "user";
         } else {
-          data.toCompany = this.activeName;
-          data.toType = 'company';
+          data.toCompany = this.$route.query._id;
+          data.toType = "company";
         }
-        this.tableInitData = await this.$ajax.post('/invoice/wait/list', data);
-        let invoiceTotal = 0;
-        this.tableInitData.forEach(item => {
-          invoiceTotal += item.balancedSettlement + item.balancedPrepaid - item.preInvoiced - item.invoiced;
-        });
-        this.invoiceTotal = invoiceTotal;
+        this.tableInitData = await this.$ajax.post("/invoice/wait/list", data);
       },
-      async getCompany() {
-        let res = await this.$ajax.post('/company/findOne', {
-          _id: this.activeName
+      async getUser(type) {
+        let path = type === 'user' ? '/user/findOne' : '/company/findOne';
+        let key = type === 'user' ? 'toUser' : 'toCompany';
+        let res = await this.$ajax.post(path, {
+          _id: this.$route.query._id
         });
-        this.$set(this.initCartData, 'toCompany', res);
+        this.$set(this.initCartData, type, res);
       },
       async getBusinessTrains() {
         let data = [];
-        for (let index = 0; index < this.invoiceData.businessTrainsArr.length; index++) {
-          let res = await this.$ajax.post('businessTrains/findOne', {
+        for (
+          let index = 0; index < this.invoiceData.businessTrainsArr.length; index++
+        ) {
+          let res = await this.$ajax.post("businessTrains/findOne", {
             _id: this.invoiceData.businessTrainsArr[index]._id
           });
           if (res) {
-            this.$set(res, 'invoiceBalance', this.invoiceData.businessTrainsArr[index].preInvoiced);
+            this.$set(
+              res,
+              "invoiceBalance",
+              this.invoiceData.businessTrainsArr[index].preInvoiced
+            );
             data.push(res);
           }
         }
         this.tableInitData = data;
-        let invoiceTotal = 0;
-        this.tableInitData.forEach(item => {
-          invoiceTotal += item.balancedSettlement + item.balancedPrepaid - item.preInvoiced - item.invoiced;
-        });
-        this.invoiceTotal = invoiceTotal;
-      }
+      },
+      async isEditChange() {
+        await this.getBusinessTrains();
+        for (const key in this.initCartData) {
+          if (this.invoiceData[key]) {
+            this.$set(this.initCartData, key, this.invoiceData[key]);
+          }
+        }
+      },
+      async noEditCHange() {
+        await this.getInvoice();
+        await this.getUser(this.$route.query.type);
+        this.$set(this.initCartData, 'billingDate', new Date());
+        this.$set(this.initCartData.to, 'recordDate', new Date());
+        this.$set(this.initCartData.to, 'userStr', this.$route.query.type);
+      },
     },
     async created() {
-      this.newData = JSON.parse(JSON.stringify(this.accountData));
-      this.activeName = this.$route.query.activeName ? this.$route.query.activeName : this.newData[0]._id;
       try {
-        this.loadingText = '加载中';
-        if (!this.edit) {
-          await this.getInvoice();
+        this.loadingText = "加载中";
+        if (this.edit) {
+          await this.isEditChange();
         } else {
-          await this.getBusinessTrains();
+          await this.noEditCHange();
         }
-        await this.getCompany();
-      } catch (error) {
-        console.log(error);
-      }
-      if (Object.keys(this.invoiceData).length > 0) {
-        let num = 0;
-        this.invoiceData.businessTrainsArr.forEach(item => {
-          num += item.preInvoiced;
-        });
-        this.invoiceData.logisticsArr.forEach(item => {
-          num += item.preInvoiced;
-        });
-        this.$set(this.initCartData, 'value', num);
-      }
-      if (!this.edit) {
-        this.$set(this.initCartData, 'recordDate', new Date());
-      }
-      this.$set(this.initCartData, 'company', this.company);
-      if (this.newData[0].isUser) {
-        this.$set(this.initCartData.to, 'userStr', 'user');
-      } else {
-        this.$set(this.initCartData.to, 'userStr', 'company');
-      }
-      this.loadingText = '';
+      } catch (error) {}
+      this.loadingText = "";
     }
-  }
+  };
 </script>
 
 <style scoped>

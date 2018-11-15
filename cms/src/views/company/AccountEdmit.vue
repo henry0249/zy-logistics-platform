@@ -1,7 +1,6 @@
 <template>
   <loading-box v-model="loadingText">
-    <account-change-type :init-data="initData" v-if="!loadingText" edmit>
-    </account-change-type>
+    <account-change-type :init-data="initData" v-if="!loadingText" edmit></account-change-type>
   </loading-box>
 </template>
 

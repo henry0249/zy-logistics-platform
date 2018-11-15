@@ -203,10 +203,7 @@
       },
       async edmitAccountChange(check) {
         try {
-          this.loadingText = check ? '提交审核中...' : '修改中...';
-          if (!this.ispay) {
-            this.loadingText = '提交修改申请中...';
-          };
+          this.loadingText = '修改中...';
           let find = {
             _id: this.$route.params._id
           };
