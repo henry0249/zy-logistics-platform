@@ -1,6 +1,6 @@
 <template>
   <loading-box v-loading.fullscreen.lock="loadingText" :element-loading-text="loadingText" element-loading-spinner="el-icon-loading">
-    <my-table :op="op" v-if="payName && table_js" opWidth="45" :selection="isInvo" :height="tableHeight" index :loadmore="loadmore" stripe :thead="table_js[payName].thead" :data.sync="newData" size="mini" border>
+    <my-table op v-if="payName && table_js" opWidth="45" :selection="isInvo" :height="tableHeight" index :loadmore="loadmore" stripe :thead="table_js[payName].thead" :data.sync="newData" size="mini" border>
       <div slot="op" class="jc" slot-scope="scope">
         <i style="color:#909399" class="el-icon-view pointer" @click="check(scope)" :title="table_js[payName].title"></i>
       </div>
@@ -58,13 +58,13 @@
     },
     watch: {},
     computed: {
-      op() {
-        if (this.isInvo) {
-          return this.role.financialManager;
-        } else {
-          return this.role.financialManager;
-        }
-      },
+      // op() {
+      //   if (this.isInvo) {
+      //     return this.role.financialManager;
+      //   } else {
+      //     return this.role.financialManager;
+      //   }
+      // },
       isInvo() {
         return this.payName === 'invoiceEditCheck' || this.payName === 'invoiceCheck' || this.payName === 'invoice';
       },
