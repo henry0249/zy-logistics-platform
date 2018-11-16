@@ -6,8 +6,8 @@ class AccountChangeController extends Controller {
   async check() {
     this.ctx.body = await this.ctx.service.accountChange.check();
   }
-  async payUserUpdateApply() {
-    this.ctx.body = await this.ctx.service.accountChange.payUserUpdateApply();
+  async checkFail(){
+    this.ctx.body = await this.ctx.service.accountChange.checkFail();
   }
 }
 module.exports = AccountChangeController;

@@ -2,12 +2,148 @@ const Service = require('egg').Service;
 const businessTrainsField = require('../field/BusinessTrains');
 
 class BusinessTrainsService extends Service {
+  formaterField(param) {
+    const ctx = this.ctx;
+    let req = param;
+    if (!req) return;
+    if (!businessTrainsField.type.option[req.type]) ctx.throw(422, '贸易节点错误', req);
+    if (req.type === 'customer') {
+      if (!businessTrainsField.type.option[req.customerType]) ctx.throw(422, '客户类型不合法', req);
+      if (req.customerType === 'user' && !req.user) ctx.throw(422, '下单用户获取失败', req);
+      if (req.customerType === 'company' && !req.company) ctx.throw(422, '下单公司获取失败', req);
+    } else {
+      if (req.type === 'supplier' && !req.company) ctx.throw(422, '供货商公司信息未填', req);
+      if (req.type === 'pool' && !req.company) ctx.throw(422, '联营商公司信息未填', req);
+    }
+    if (!req.order) ctx.throw(422, '贸易节点订单信息获取失败', req);
+    if (!req.goods) ctx.throw(422, '贸易节点商品信息获取失败', req);
+    if (!req.handle) ctx.throw(422, '贸易节点处理公司获取失败', req);
+    if (req.type === 'customer') {
+      if (req.customerType === 'user') {
+        req.balanceType = 'user';
+        req.balanceUser = req.user;
+      } else {
+        req.balanceType = 'company';
+        req.balanceCompany = req.company;
+      }
+    } else {
+      req.balanceType = 'company';
+      req.balanceCompany = req.company;
+    }
+    let initBody = {
+      customerType: req.customerType,
+      type: req.type,
+      order: req.order,
+      goods: req.goods,
+      handle: req.handle,
+      balanceType: req.balanceType,
+      receive: req.receive,
+      loss: req.loss,
+      preBalancePrice: req.preBalancePrice,
+      balancePrice: req.balancePrice,
+      balanceCount: req.balanceCount,
+      preSettlement: req.preSettlement,
+      prePrepaid: req.prePrepaid,
+      preInvoiced: req.preInvoiced
+    };
+    if (req._id) initBody._id = req._id;
+    if (req.balanceUser) initBody.balanceUser = req.balanceUser;
+    if (req.balanceCompany) initBody.balanceCompany = req.balanceCompany;
+    if (req.type === 'supplier' || req.type === 'pool') {
+      if (req.supplyCount <= 0) ctx.throw(422, '供货数量不能小于0', req);
+      if (req.supplyPrice <= 0) ctx.throw(422, '供货价格不能小于0', req);
+      initBody.supplyCount = req.supplyCount;
+      initBody.supplyPrice = req.supplyPrice;
+    }
+    return initBody;
+  }
+
+  async set(param, last) {
+    const ctx = this.ctx;
+    let req = param || ctx.request.body;
+    if (!req) return {};
+    let modelBody = this.formaterField(req);
+    if (!modelBody) return {};
+    if (last) {
+      if (last.type === 'supplier' || last.type === 'pool') {
+        modelBody.receivedType = 'company';
+        modelBody.receivedCompany = last.balanceCompany;
+      }
+    }
+    if (modelBody._id) {
+      let update = JSON.parse(JSON.stringify(modelBody));
+      delete update._id;
+      await ctx.model.BusinessTrains.update({
+        _id: modelBody._id
+      }, update);
+      return modelBody;
+    } else {
+      let businessTrains = new ctx.model.BusinessTrains(modelBody);
+      await businessTrains.save();
+      return businessTrains;
+    }
+  }
+
+  async add(param, last) {
+    await this.set(param, last);
+  }
+
+  async mutilSet(param) {
+    const ctx = this.ctx;
+    let req = param || ctx.request.body;
+    if (!req) return;
+    if (!(req instanceof Array)) return;
+    if (req.length < 2) ctx.throw(422, '贸易链至少两个节点', req);
+    let res = [];
+    for (let i = 0; i < req.length; i++) {
+      let item = req[i];
+      if (i === 0) {
+        item.type = 'supplier';
+      } else if (i === req.length - 1) {
+        item.type = 'customer';
+      } else {
+        item.type = 'pool';
+      }
+    }
+    for (let i = 0; i < req.length; i++) {
+      let item = this.formaterField(req[i]);
+      let last;
+      if (i > 0) {
+        last = this.formaterField(req[i - 1]);
+      }
+      let data = await this.set(item, last);
+      res.push(data._id);
+    }
+    for (let i = 0; i < res.length; i++) {
+      let item = res[i];
+      let update = {};
+      if (i === 0) {
+        update.next = res[i + 1];
+      } else if (i === res.length - 1) {
+        update.last = res[i - 1];
+      } else {
+        update.last = res[i - 1];
+        update.last = res[i + 1];
+      }
+      await ctx.model.BusinessTrains.update({
+        _id: item
+      }, update);
+    }
+    return res;
+  }
+
+  // async settle(param) {
+  //   const ctx = this.ctx;
+  //   let req = param || ctx.request.body;
+  //   if (!req._id) ctx.throw(422, '贸易节点信息获取失败', req);
+  //   let businessTrains = ctx.model.BusinessTrains.findById(req._id);
+  //   if (!businessTrains) ctx.throw(404, '贸易节点不存在', req);
+  // }
+
   async delete() {
     const ctx = this.ctx;
     let body = ctx.request.body || ctx.request.query;
-    if (!body._id) {
-      ctx.throw(422, '删除参数不完整', body);
-    }
+    if (!body._id) ctx.throw(422, '删除参数不完整', body);
     await ctx.service.curd.delete(ctx.model.BusinessTrains, {
       _id: body._id
     });
@@ -150,7 +286,8 @@ class BusinessTrainsService extends Service {
       });
       await curdLog.save();
     }
-
   }
+
+
 }
 module.exports = BusinessTrainsService;

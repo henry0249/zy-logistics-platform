@@ -3,26 +3,6 @@ module.exports = {
     type: 'String',
     name: '单号',
   },
-  settleState: {
-    type: 'String',
-    name: '结算状态',
-    default: 'financial',
-    option: {
-      financial: '待预审',
-      settle: '待结算',
-      financialManager: '待审核',
-      finish: '结算完成'
-    }
-  },
-  stateCheckFail:{
-    type: 'String',
-    name: '结算审核未通过状态',
-    option: {
-      settle: '结算专员审核未通过',
-      financialManager: '财务经理审核未通过',
-    },
-    default: ""
-  },
   state: {
     type: 'Number',
     name: '状态',
@@ -69,15 +49,15 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
-  transportCompany: {
-    name: '归属物流公司',
-    type: 'ObjectId',
-    ref: 'Company'
-  },
   transportTrains: {
     type: 'ObjectId',
     name: '起送点物流链节点',
     ref: 'TransportTrains'
+  },
+  carrierCompany: {
+    name: '承运公司',
+    type: 'ObjectId',
+    ref: 'Company'
   },
   transportation: {
     type: 'String',
@@ -123,10 +103,33 @@ module.exports = {
     type: 'Number',
     default: 0
   },
+  balanceType: {
+    name: '运费承担方类型',
+    type: 'String',
+    option: {
+      company: '公司',
+      user: '用户',
+    },
+    default: 'company'
+  },
+  balanceUser: {
+    name: '运费承担人',
+    type: 'ObjectId',
+    ref: 'User'
+  },
   balanceCompany: {
     name: '运费承担公司',
     type: 'ObjectId',
     ref: 'Company'
+  },
+  receivedType: {
+    name: '收款方类型',
+    type: 'String',
+    option: {
+      company: '公司',
+      user: '用户',
+    },
+    default: 'company'
   },
   receivedCompany: {
     type: 'ObjectId',
@@ -206,7 +209,6 @@ module.exports = {
     option: {
       0: '普通地址',
       1: '公司地址',
-      // 2: '贸易节点'
     }
   },
   area: {
@@ -245,7 +247,4 @@ module.exports = {
     ref: 'BusinessTrains'
   }
 }
-
-//进入审核条件 运输工具和运输单价都填完整,审核后不能修改
-
 //付款方: balanceCompany 收款方:truck/ship的所属公司或者所属人

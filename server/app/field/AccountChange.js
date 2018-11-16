@@ -8,6 +8,14 @@ module.exports = {
     name: '金额',
     type: 'Number'
   },
+  checkFail: {
+    type: 'String',
+    name: '审核未通过状态',
+    option: {
+      financialManager: '财务经理审核未通过',
+    },
+    default: ""
+  },
   payUserType: {
     name: '付款用户类型',
     type: 'String',
@@ -35,6 +43,15 @@ module.exports = {
   to: {
     name: '收款信息',
     type: 'Object',
+  },
+  toType: {
+    name: '收票方类型',
+    type: 'String',
+    option: {
+      user: '个人',
+      company: '公司',
+      mobile: '手机号' //未注册用户
+    }
   },
   account: {
     name: '所属账户',
@@ -75,30 +92,10 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
-  invoice: {
-    type: 'ObjectId',
-    name: '发票',
-    ref: 'Invoice'
-  },
   auditor: {
     name: '审核人',
     type: 'ObjectId',
     ref: 'User'
-  },
-  accountChange: {
-    name: '关联的流水单',
-    type: 'ObjectId',
-    ref: 'AccountChange'
-  },
-  businessTrains: {
-    name: '关联的贸易链', //贸易链中包含了付款方和收款方信息
-    type: 'ObjectIdArray',
-    ref: 'BusinessTrains'
-  },
-  logistics: {
-    name: '关联的物流单', //物流单付款方为运费承担方,收款方为司机关联的物流公司或司机自己
-    type: 'ObjectIdArray',
-    ref: 'Logistics'
   },
   remittanceTime: {
     name: '汇款时间',
@@ -108,14 +105,18 @@ module.exports = {
     name: '到账时间',
     type: 'String'
   },
-  parent: {
-    name: '父级流水',
+  isChildren: {
+    name: '是否是子账单',
+    type: 'Boolean'
+  },
+  children: {
+    name: '子账单', //做备份使用
     type: 'ObjectId',
     ref: 'AccountChange'
   },
-  children: {
-    name: '子账单',
-    type: 'ObjectId',
-    ref: 'AccountChange'
+  settleRelation: {
+    name: '结算关联', //关联贸易单和物流单
+    type: 'ObjectIdArray',
+    ref: 'SettleRelation'
   }
 }

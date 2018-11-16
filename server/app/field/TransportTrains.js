@@ -1,4 +1,9 @@
 module.exports = {
+  finish: {
+    type: 'Boolean',
+    name: '节点运输完成标识',
+    default: false
+  },
   type: {
     type: 'String',
     name: '当前节点类型',
@@ -51,4 +56,19 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
+  carrierCompany: {
+    name: '承运公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
+  last: {
+    name: '上一节点',
+    type: 'ObjectId',
+    ref: 'TransportTrains'
+  },
+  next: {
+    name: '下一节点',
+    type: 'ObjectId',
+    ref: 'TransportTrains'
+  }
 }

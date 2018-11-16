@@ -288,5 +288,98 @@ class LogisticsService extends Service {
     await curdLog.save();
     return 'ok';
   }
+
+  async handleTab() {
+    const ctx = this.ctx;
+    let req = ctx.request.body;
+    if (!req.company) ctx.throw(422, '公司信息获取失败');
+    let companyData = await ctx.service.role.getAllRoleCompany('dispatcher', true);
+    let res = [];
+    for (let i = 0; i < companyData.length; i++) {
+      let item = JSON.parse(JSON.stringify(companyData[i]));
+      item.listType = 'carrier';
+      item.count = await ctx.model.TransportTrains.count({
+        finish: false,
+        carrierCompany: item._id,
+        next: {
+          $exists: true
+        }
+      });
+      res.push(item);
+    }
+    let transportTrainsData = await ctx.model.TransportTrains.findOne({
+      finish: false,
+      handle: req.company,
+      carrierCompany: {
+        $exists: false
+      },
+      next: {
+        $exists: true
+      }
+    });
+    if (transportTrainsData) {
+      let count = await ctx.model.TransportTrains.count({
+        finish: false,
+        handle: req.company,
+        carrierCompany: {
+          $exists: false
+        },
+        next: {
+          $exists: true
+        }
+      });
+      res.push({
+        _id: req.company,
+        listType: 'handle',
+        name: '未分配承运公司物流节点',
+        count
+      });
+    }
+    return res;
+  }
+  async handleList() {
+    const ctx = this.ctx;
+    let req = ctx.request.body;
+    if (!req.company) ctx.throw(422, '公司信息获取失败');
+    let listType = req.listType || 'carrier';
+    if (['carrier', 'handle'].indexOf(listType) < 0) ctx.throw(422, '无效的列表类型');
+    let res = [];
+    let findBody = {
+      finish: false,
+      next: {
+        $exists: true
+      }
+    };
+    if (listType === 'carrier') {
+      findBody.carrierCompany = req.company;
+    }
+    if (listType === 'handle') {
+      findBody.handle = req.company;
+      findBody.carrierCompany = {
+        $exists: false
+      }
+    }
+    let limit = req.limit !== undefined ? Number(req.limit) : 10;
+    let skip = req.skip !== undefined ? Number(req.skip) : 0;
+    let transportTrainsData = await ctx.model.TransportTrains
+      .find(findBody)
+      .populate([{
+        path: 'goods'
+      }, {
+        path: 'order'
+      }, {
+        path: 'carrierCompany'
+      }])
+      .limit(limit)
+      .skip(skip);
+    for (let i = 0; i < transportTrainsData.length; i++) {
+      let item = JSON.parse(JSON.stringify(transportTrainsData[i]));
+      item.logisticsCount = await ctx.model.Logistics.count({
+        transportTrains: item._id
+      });
+      res.push(item);
+    }
+    return res;
+  }
 }
 module.exports = LogisticsService;

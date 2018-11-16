@@ -3,7 +3,7 @@
     <div class="g-order-body" v-if="show">
       <div class="my-title">订单<span style="color:#409EFF;font-weight:600">{{order.no}}</span>{{title}}</div>
       <div style="margin-top:15px" v-if="order.checkFail">
-        <el-alert :title="`${formatTime(checkFailLog.createdAt)} ${field.Order.checkFail.option[order.checkFail]}：${checkFailLog.remark}`" type="error" show-icon :closable="false">
+        <el-alert :title="`${formatTime(order.checkFailData.createdAt)} ${field.Order.checkFail.option[order.checkFail]}：${order.checkFailData.remark}`" type="error" show-icon :closable="false">
         </el-alert>
       </div>
       <Info :val="order" :data.sync="orderAsync"></Info>
@@ -87,12 +87,11 @@ export default {
         businessTrains: [],
         transportTrains: []
       },
-      order: {},
-      checkFailLog: {}
+      order: {}
     };
   },
   methods: {
-    reflesh(){
+    reflesh() {
       this.getOrderInfo();
     },
     async getOrderInfo() {
@@ -100,15 +99,6 @@ export default {
       this.loadingText = "正在获取订单数据";
       try {
         this.order = await this.$ajax("/order/info/" + this.$route.params._id);
-        if (this.order.checkFail) {
-          this.checkFailLog = await this.$ajax.post("/curdLog/findOne", {
-            type: "businessTrainsCheckFail",
-            order: item._id,
-            sort: {
-              createdAt: -1
-            }
-          });
-        }
       } catch (error) {}
       setTimeout(() => {
         this.loadingText = "";
@@ -147,7 +137,7 @@ export default {
       this.$prompt("请输入回退原因", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        inputErrorMessage:'原因不能为空',
+        inputErrorMessage: "原因不能为空",
         inputPattern: /\S/
       })
         .then(async ({ value }) => {
@@ -176,7 +166,7 @@ export default {
   font-size: 16px;
   padding: 15px 0;
 }
-.common-margin{
+.common-margin {
   margin-bottom: 15px;
 }
 </style>

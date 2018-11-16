@@ -93,5 +93,15 @@ module.exports = {
   billingDate: {
     name: '开票日期',
     type: 'Date',
+  },
+  children: {
+    name: '子发票', //做备份使用
+    type: 'ObjectId',
+    ref: 'Invoice'
+  },
+  settleRelation: {
+    name: '结算关联', //关联贸易单和物流单
+    type: 'ObjectIdArray',
+    ref: 'SettleRelation'
   }
 }

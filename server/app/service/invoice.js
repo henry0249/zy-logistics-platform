@@ -1,6 +1,23 @@
 const Service = require('egg').Service;
 
 class InvoiceService extends Service {
+  async setBalanced(invoice, arr) {
+    const ctx = this.ctx;
+    if (!(arr instanceof Array && arr.length > 0)) return;
+    let reqArr = [];
+    arr.forEach((item) => {
+      reqArr.push({
+        invoiced: item.invoiced,
+        invoice: invoice
+      });
+    });
+    let res = await ctx.service.settleRelation.mutilAdd(reqArr);
+    await ctx.model.invoice.update({
+      _id: invoice
+    }, {
+      settleRelation: res
+    });
+  }
   async getWaitInvoiceTab() {
     const ctx = this.ctx;
     let req = ctx.request.body;
@@ -54,7 +71,6 @@ class InvoiceService extends Service {
         if (item.ship && item.ship.company && item.ship.company._id) {
           company = item.ship.company;
         }
-
         resItem._id = company._id;
         resItem.name = company.name || company.nick || company.code || company.mobile;
         if (resItem._id) res.push(resItem);
@@ -323,23 +339,14 @@ class InvoiceService extends Service {
     let invoice = await ctx.model.Invoice.findById(body._id);
     if (!invoice) ctx.throw(404, '发票不存在');
     if (invoice.check) ctx.throw(404, '发票已经审核,不能删除');
-    for (let i = 0; i < invoice.businessTrainsArr.length; i++) {
-      const item = invoice.businessTrainsArr[i];
-      await ctx.model.BusinessTrains.update({
+    for (let i = 0; i < invoice.settleRelation.length; i++) {
+      const item = invoice.settleRelation[i];
+      let modelNmae = item.type === 'businessTrains' ? 'BusinessTrains' :'Logistics'
+      await ctx.model[modelNmae].update({
         _id: item._id,
       }, {
         $inc: {
-          $preInvoiced: -item.preInvoiced
-        }
-      });
-    }
-    for (let i = 0; i < invoice.logisticsArr.length; i++) {
-      const item = invoice.logisticsArr[i];
-      await ctx.model.Logistics.update({
-        _id: item._id,
-      }, {
-        $inc: {
-          $preInvoiced: -item.preInvoiced
+          preInvoiced: -item.invoiced
         }
       });
     }

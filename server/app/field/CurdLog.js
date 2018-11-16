@@ -7,6 +7,7 @@ module.exports = {
       orderCheckFail: '订单审核失败记录',
       logisticsCheckFail: '物流单审核失败记录',
       businessTrainsCheckFail: '贸易链审核失败记录',
+      accountChangeCheckFail: '账户流水审核失败记录',
       invoiceCheckFail: '发票审核失败记录'
     },
     default: 'default'
@@ -35,6 +36,11 @@ module.exports = {
     name: '关联贸易链',
     type: 'ObjectId',
     ref: 'BusinessTrains'
+  },
+  accountChange: {
+    name: '关联的流水',
+    type: 'ObjectId',
+    ref: 'AccountChange'
   },
   invoice: {
     name: '关联的发票',

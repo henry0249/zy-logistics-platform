@@ -46,6 +46,8 @@ module.exports = app => {
     .post('/logistics/company/badge', checkToken(), 'logistics.companyBadge') //公司运单标记
     .post('/logistics/check', checkToken(), 'logistics.check') //物流单审核
     .post('/logistics/checkFail', checkToken(), 'logistics.checkFail') //物流单审核失败
+    .post('/logistics/handleTab', checkToken(), 'logistics.handleTab') //物流管理相关公司tab
+    .post('/logistics/handleList', checkToken(), 'logistics.handleList') //物流管理节点列表
     //库存接口
     .post('/stock/multi', checkToken(), 'stock.multi') //批量添加库存单
     .post('/stock/simpleStatistics', checkToken(), 'stock.simpleStatistics') //简单的库存统计
@@ -55,14 +57,18 @@ module.exports = app => {
     // .post('/businessTrains/invoice/summary', checkToken(), 'businessTrains.getInvoiceSummary') //待开票列表总计
     // .post('/businessTrains/invoice/list', checkToken(), 'businessTrains.getInvoiceList') //待开票列表
     //结算接口
-    .post('/settle/businessTrains/tab', checkToken(), 'settle.getBusinessTrainsTab') //获取贸易链相关公司,准备展示结算列表
+    // .post('/settle/businessTrains/tab', checkToken(), 'settle.getBusinessTrainsTab') //获取贸易链相关公司,准备展示结算列表
+    //账户接口
+    .post('/account/relation/tab', checkToken(), 'account.relationTab') //账户关联公司
+    .post('/account/relation/list', checkToken(), 'account.relationList') //账户关联的流水列表
+    .post('/account/relation/waiting_for_invoice', checkToken(), 'account.waitingForInvoice') //账户关联的可开票列表
     //账单流水接口
     .post('/accountChange/check', checkToken(), 'accountChange.check') //账单流水审核
-    .post('/accountChange/payUserUpdateApply', checkToken(), 'accountChange.payUserUpdateApply') //付款方进行修改账单申请
+    .post('/accountChange/checkFail', checkToken(), 'accountChange.checkFail') //账单流水审核失败
     //发票接口
-    .post('/invoice/wait/summary', checkToken(), 'invoice.waitSummary') //获取发票统计信息
-    .post('/invoice/wait/tab', checkToken(), 'invoice.getWaitInvoiceTab') //获取发票关联公司
-    .post('/invoice/wait/list', checkToken(), 'invoice.getWaitInvoiceList') //获取可开票列表
+    // .post('/invoice/wait/summary', checkToken(), 'invoice.waitSummary') //获取发票统计信息
+    // .post('/invoice/wait/tab', checkToken(), 'invoice.getWaitInvoiceTab') //获取发票关联公司
+    // .post('/invoice/wait/list', checkToken(), 'invoice.getWaitInvoiceList') //获取可开票列表
     .post('/invoice/check', checkToken(), 'invoice.check') //发票审核
     .post('/invoice/checkFail', checkToken(), 'invoice.checkFail') //发票打回
     //页面接口

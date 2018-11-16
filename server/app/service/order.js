@@ -46,56 +46,28 @@ class OrderService extends Service {
     let body = ctx.request.body;
     let info = JSON.parse(JSON.stringify(payload));
     this.obj2id(info);
-    if (!info) {
-      ctx.throw(422, '订单信息未填', body);
-    }
-    if (!info.state) {
-      ctx.throw(422, '未选择订单状态', info);
-    }
-    if (!orderField.state.option[info.state]) {
-      ctx.throw(422, '非法的订单状态', info);
-    }
+    if (!info) ctx.throw(422, '订单信息未填', body);
+    if (!info.state) ctx.throw(422, '未选择订单状态', info);
+    if (!orderField.state.option[info.state]) ctx.throw(422, '非法的订单状态', info);
     if (info.type === 'company' || info.type === 'user') {
-      if (info.type === 'company') {
-        delete info.user;
-      }
-      if (info.type === 'user') {
-        delete info.company;
-      }
-      if (!info[info.type]) {
-        ctx.throw(422, "未选择订单客户", info);
-      }
+      if (info.type === 'company') delete info.user;
+      if (info.type === 'user') delete info.company;
+      if (!info[info.type]) ctx.throw(422, "未选择订单客户", info);
     } else {
       ctx.throw(422, "未选择订单客户", info);
     }
-    if (!info.contactName) {
-      ctx.throw(422, '未填写收货人', info);
-    }
-    if (!info.contactNumber) {
-      ctx.throw(422, '未填写收货人联系电话', info);
-    }
-    if (!info.area) {
-      ctx.throw(422, '未选择送货地址', info);
-    }
-    if (!info.goods) {
-      ctx.throw(422, '未选择商品', info);
-    }
-    if (Number(info.count) <= 0) {
-      ctx.throw(422, '商品数量必须大于0', info);
-    }
-    if (Number(info.factory) <= 0) {
-      ctx.throw(422, '商品出厂单价必须大于0', info);
-    }
-    if (Number(info.sell) <= 0) {
-      ctx.throw(422, '商品销售单价必须大于0', info);
-    }
+    if (!info.contactName) ctx.throw(422, '未填写收货人', info);
+    if (!info.contactNumber) ctx.throw(422, '未填写收货人联系电话', info);
+    if (!info.area) ctx.throw(422, '未选择送货地址', info);
+    if (!info.goods) ctx.throw(422, '未选择商品', info);
+    if (Number(info.count) <= 0) ctx.throw(422, '商品数量必须大于0', info);
+    if (Number(info.factory) <= 0) ctx.throw(422, '商品出厂单价必须大于0', info);
+    if (Number(info.sell) <= 0) ctx.throw(422, '商品销售单价必须大于0', info);
     // if (Number(info.transport) <= 0) {
     //   ctx.throw(422, '商品运输单价必须大于0', info);
     // }
     let goods = await ctx.model.Goods.findById(info.goods);
-    if (!goods) {
-      ctx.throw(422, '商品不存在', info);
-    }
+    if (!goods) ctx.throw(422, '商品不存在', info);
     info.handle = goods.company;
     if (info._id) {
       let update = JSON.parse(JSON.stringify(info));
@@ -240,39 +212,11 @@ class OrderService extends Service {
     for (let i = 0; i < arr.length; i++) {
       let item = arr[i];
       this.obj2id(item);
-      if (item.type !== 'customer' && !item.company) {
-        ctx.throw(422, '贸易节点中有联营商尚未选择', item);
-      }
-    }
-    let trainsIdArr = [];
-    for (let i = 0; i < arr.length; i++) {
-      let item = arr[i];
       item.order = order._id;
       item.handle = order.handle;
       item.goods = order.goods;
-      if (i > 0) {
-        item.receivedCompany = arr[i - 1].company;
-      }
-      let account = await this.setAccount(order, arr[i], arr[i + 1]);
-      if (account) {
-        item.account = account._id;
-      }
-      if (item._id) {
-        let update = JSON.parse(JSON.stringify(item));
-        delete update._id;
-        delete update.createdAt;
-        delete update.updatedAt;
-        await ctx.model.BusinessTrains.update({
-          _id: item._id
-        }, update);
-        trainsIdArr.push(item._id);
-      } else {
-        let trains = new ctx.model.BusinessTrains(item);
-        await trains.save();
-        trainsIdArr.push(trains._id);
-      }
-      await this.setStock(order, item, arr[i + 1]);
     }
+    let trainsIdArr = await ctx.service.businessTrains.mutilSet(arr);
     await ctx.model.Order.update({
       _id: order._id
     }, {
@@ -471,9 +415,6 @@ class OrderService extends Service {
     }
     if (body.transportTrains instanceof Array && body.transportTrains.length > 0) {
       let logisticsCount = await this.setTransportTrainsData(order, body.transportTrains);
-      // if (logisticsCount === 0) {
-      //   ctx.throw(422, '至少添加一张物流单');
-      // }
     } else {
       ctx.throw(422, '物流链不能为空');
     }
@@ -812,6 +753,14 @@ class OrderService extends Service {
       }, {
         path: 'lossCompany'
       }]);
+    }
+    if (res.checkFail) {
+      res.checkFailData = await ctx.model.CurdLog.findOne({
+        order: res._id,
+        type: 'orderCheckFail'
+      }).sort({
+        createdAt: -1
+      });
     }
     return res;
   }

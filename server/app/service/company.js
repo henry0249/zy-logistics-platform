@@ -167,25 +167,16 @@ class CompanyService extends Service {
   async receivablesTab() {
     const ctx = this.ctx;
     let body = ctx.request.body;
-    if (!body.company) {
-      ctx.throw(422, '公司信息必填', body);
-    }
-    if (!body.settleState) {
-      ctx.throw(422, '订单结算状态获取失败', body);
-    }
+    if (!body.company) ctx.throw(422, '公司信息必填', body);
+    if (!body.settleState) ctx.throw(422, '订单结算状态获取失败', body);
     let company = await ctx.model.Company.findById(body.company);
-    if (!company) {
-      ctx.throw(404, '公司信息未找到', body);
-    }
+    if (!company) ctx.throw(404, '公司信息未找到', body);
     let hasRole = await ctx.model.Role.findOne({
       user: ctx.user._id,
       company: company._id,
       type: body.settleState
     });
-    if (!hasRole) {
-      // ctx.throw(400, '您无操作权限', body);
-      return [];
-    }
+    if (!hasRole) return [];
     return await ctx.model.Account.find({
       company: company._id,
       $or: [{

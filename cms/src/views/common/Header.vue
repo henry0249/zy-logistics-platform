@@ -139,6 +139,11 @@ export default {
           {
             name: "调度中心",
             path: "/dispatch",
+            icon: "icon-tiaoduzhongxin"
+          },
+          {
+            name: "物流单管理",
+            path: "/logistics",
             icon: "icon-wuliu"
           },
           {
@@ -154,7 +159,7 @@ export default {
           {
             name: "商品管理",
             path: "/goods",
-            icon: "icon-leixing"
+            icon: "icon-tianjiashangpin1"
           },
           {
             name: "统计报表",

@@ -47,24 +47,4 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Account'
   },
-  // pre_payable: {
-  //   name: '预付',
-  //   type: 'Number',
-  //   default: 0
-  // },
-  // payable: {
-  //   name: '应付',
-  //   type: 'Number',
-  //   default: 0
-  // },
-  // pre_receivables: {
-  //   name: '预收',
-  //   type: 'Number',
-  //   default: 0
-  // },
-  // receivables: {
-  //   name: '应收',
-  //   type: 'Number',
-  //   default: 0
-  // }
 }

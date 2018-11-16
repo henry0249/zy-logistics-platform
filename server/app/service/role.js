@@ -46,5 +46,24 @@ class RoleService extends Service {
   async add() {
     return await this.set();
   }
+  async getAllRoleCompany(type, returnData) {
+    const ctx = this.ctx;
+    let roleData = await ctx.model.Role.find({
+      type: type,
+      user: ctx.user._id
+    });
+    let mySet = new Set();
+    roleData.forEach(item => {
+      if (item.company) mySet.add(item.company.toString());
+    });
+    if (returnData) {
+      return await ctx.model.Company.find({
+        _id: {
+          $in: [...mySet]
+        }
+      });
+    }
+    return [...mySet];
+  }
 }
 module.exports = RoleService;

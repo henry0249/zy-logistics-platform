@@ -7,7 +7,8 @@ module.exports = {
       financial: '待预审',
       settle: '待结算',
       financialManager: '待审核',
-      finish: '结算完成'
+      settleFinish: '结算完成',
+      invoiceFinish: '开票完成',
     }
   },
   stateCheckFail: {
@@ -19,15 +20,6 @@ module.exports = {
     },
     default: ""
   },
-  customerType: {
-    type: 'String',
-    name: '订单类型',
-    default: 'company',
-    option: {
-      user: '个人订单',
-      company: '公司订单'
-    }
-  },
   type: {
     type: 'String',
     name: '类型',
@@ -36,6 +28,25 @@ module.exports = {
       pool: '联营商',
       customer: '客户'
     }
+  },
+  customerType: {
+    type: 'String',
+    name: '客户类型',
+    default: 'company',
+    option: {
+      user: '用户',
+      company: '公司'
+    }
+  },
+  user: {
+    type: 'ObjectId',
+    name: '用户',
+    ref: 'User'
+  },
+  company: {
+    type: 'ObjectId',
+    name: '公司',
+    ref: 'Company'
   },
   goods: {
     type: 'ObjectId',
@@ -52,20 +63,43 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
-  user: {
+  balanceType: {
+    name: '付款方类型',
+    type: 'String',
+    option: {
+      user: '用户',
+      company: '公司',
+    },
+    default: 'company'
+  },
+  balanceUser: {
+    name: '付款人',
     type: 'ObjectId',
-    name: '用户', //当前用户,即是付款用户
     ref: 'User'
   },
-  company: {
+  balanceCompany: {
+    name: '付款公司',
     type: 'ObjectId',
-    name: '公司', //当前公司,即是付款公司
     ref: 'Company'
+  },
+  receivedType: {
+    name: '收款方类型',
+    type: 'String',
+    option: {
+      company: '公司',
+      user: '用户',
+    },
+    default: 'company'
   },
   receivedCompany: {
     type: 'ObjectId',
-    name: '收款公司', //当前公司付款去向的公司
+    name: '收款公司',
     ref: 'Company'
+  },
+  receivedUser: {
+    type: 'ObjectId',
+    name: '收款人',
+    ref: 'User'
   },
   supplyPrice: {
     name: '供货价格',
@@ -122,10 +156,6 @@ module.exports = {
     type: 'Number',
     default: 0
   },
-  balancedArr: {
-    name: '已结算金额数组', //一个accountChange的_id对应一个金额,因为一次结算,不一定付完
-    type: 'Object'
-  },
   preInvoiced: {
     name: '等待开票金额', //仅做记录
     type: 'Number',
@@ -155,5 +185,15 @@ module.exports = {
     name: '关联的账户',
     type: 'ObjectId',
     ref: 'Account'
+  },
+  last: {
+    name: '上一个贸易节点',
+    type: 'ObjectId',
+    ref: 'BusinessTrains'
+  },
+  next: {
+    name: '下一个贸易节点',
+    type: 'ObjectId',
+    ref: 'BusinessTrains'
   }
 }
