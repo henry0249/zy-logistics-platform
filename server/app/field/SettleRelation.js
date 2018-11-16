@@ -1,10 +1,18 @@
 module.exports = {
-  type: {
+  dataType: {
     type: 'String',
     name: '关联类型',
     option: {
       'logistics': '物流单',
       'businessTrains': '贸易单'
+    }
+  },
+  modelType: {
+    type: 'String',
+    name: '关联类型',
+    option: {
+      'accountChange': '流水',
+      'invoice': '发票'
     }
   },
   balancedSettlement: {
@@ -32,7 +40,7 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Logistics'
   },
-  accountChange:{
+  accountChange: {
     name: '关联的账单流水', //物流单付款方为运费承担方,收款方为司机关联的物流公司或司机自己
     type: 'ObjectId',
     ref: 'AccountChange'
@@ -45,7 +53,7 @@ module.exports = {
   order: {
     name: '关联的订单', //物流单付款方为运费承担方,收款方为司机关联的物流公司或司机自己
     type: 'ObjectId',
-    ref: 'Logistics'
+    ref: 'Order'
   },
   goods: {
     name: '关联的商品', //物流单付款方为运费承担方,收款方为司机关联的物流公司或司机自己

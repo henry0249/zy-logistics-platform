@@ -106,7 +106,7 @@ module.exports = {
     type: 'String'
   },
   isChildren: {
-    name: '是否是子账单',
+    name: '子账单标识',
     type: 'Boolean'
   },
   children: {

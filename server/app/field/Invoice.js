@@ -37,6 +37,11 @@ module.exports = {
       mobile: '手机号' //未注册用户
     }
   },
+  handle: {
+    name: '处理公司',
+    type: 'ObjectId',
+    ref: 'Company'
+  },
   company: {
     name: '开票方公司',
     type: 'ObjectId',
@@ -93,6 +98,10 @@ module.exports = {
   billingDate: {
     name: '开票日期',
     type: 'Date',
+  },
+  isChildren: {
+    name: '子发票标识',
+    type: 'Boolean'
   },
   children: {
     name: '子发票', //做备份使用
