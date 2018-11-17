@@ -5,9 +5,9 @@
         <slot name="header">
           <div class="jb">
             <div class="jc js">
-              <common-select-by-code v-if="isFrom && !isInvoice" :userType.sync="userType" width="300px" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未选择" label="付款方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom && !isInvoice" width="300px" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未选择" label="付款方"></common-select-by-code>
               <common-select-by-code v-if="!isFrom && !isInvoice" width="300px" :userType.sync="userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收款方"></common-select-by-code>
-              <common-select-by-code v-if="isFrom && isInvoice" width="300px" :userStr="data.from.userStr" :userType.sync="userType" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未注册公司或用户" label="开票方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom && isInvoice" width="300px" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未注册公司或用户" label="开票方"></common-select-by-code>
               <common-select-by-code v-if="!isFrom && isInvoice" width="300px" :userStr="data.to.userStr" :userType.sync="userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收票方"></common-select-by-code>
             </div>
             <div class="jc js">
@@ -28,7 +28,7 @@
       <slot>
         <div class="jb" v-if="isInvoice">
           <my-form-item v-if="isFrom" size="mini" v-model="data.from.name" label="开票名称" placeholder="请输入开票名称"></my-form-item>
-          <my-form-item v-else size="mini" v-model="data.to.name" label="收票名称" placeholder="请输入收票名称"></my-form-item>
+          <my-form-item v-else size="mini" disabled v-model="data.to.name" label="开票名称" placeholder="请输入开票名称"></my-form-item>
         </div>
         <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
         <div class="jb" v-if="isInvoice">
@@ -116,6 +116,9 @@
           this.$set(data.from, 'type', val);
         } else {
           this.$set(data.to, 'type', val);
+        }
+        if (this.userType) {
+          this.$set(data.to, 'userStr', this.userType);
         }
         this.$emit('update:data', data);
       },

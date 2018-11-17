@@ -21,6 +21,20 @@
       async getInvoice() {
         this.invoiceData = await this.$ajax.post('/invoice/findOne', {
           _id: this.$route.params._id,
+          populate: [{
+              path: 'toCompany'
+            }, {
+              path: 'toUser'
+            }, {
+              path: 'company'
+            },
+            {
+              path: 'settleRelation',
+              populate: [{
+                path: 'businessTrains'
+              }]
+            }
+          ]
         })
       },
     },

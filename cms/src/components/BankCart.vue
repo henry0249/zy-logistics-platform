@@ -38,7 +38,6 @@
     watch: {
       initData: {
         handler(val) {
-          console.log(val);
           this.form = val;
         },
         deep: true
@@ -59,6 +58,7 @@
     },
     created() {
       this.form = JSON.parse(JSON.stringify(this.initData));
+      console.log(this.initData);
     }
   };
 </script>

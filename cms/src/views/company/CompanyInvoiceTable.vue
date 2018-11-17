@@ -1,30 +1,30 @@
 <template>
   <loading-box v-loading.fullscreen.lock="loadingText" :element-loading-text="loadingText" element-loading-spinner="el-icon-loading">
-    <my-table :selection="!$attrs.edit" :max-height="tableHeight" index stripe :thead="thead" :data.sync="newData" @selection-change="selectionChange" size="mini" border>
+    <my-table :selection="select" :max-height="tableHeight" index stripe :thead="thead" :data.sync="newData" @selection-change="selectionChange" size="mini" border>
       <div slot-scope="scope">
-        <span v-if="scope.prop === 'invoiced'" class="blue">{{scope.row[scope.prop]}}</span>
-        <span v-if="scope.prop === 'invo'" class="warning">{{scope.row.balancedSettlement + scope.row.balancedPrepaid - scope.row.preInvoiced - scope.row.invoiced}}</span>
-        <my-form-item :disabled="$attrs.edit" v-if="scope.prop === 'invoiceBalance'" number :min="0" :max="scope.row.balancedSettlement + scope.row.balancedPrepaid" v-model="scope.row[scope.prop]" size="mini"></my-form-item>
-        <div v-if="scope.prop === 'company'">{{scope.row[scope.prop].name}}
-          <el-tag size="mini" :type="scope.row.customerType === 'user'?'success':'warning'">{{scope.row.customerType === 'user'?'用户':'公司'}}</el-tag>
-        </div>
-        <div v-if="scope.prop === 'receivedCompany'">{{changUser(scope).name}}
-          <el-tag size="mini" :type="changUser(scope).type">{{changUser(scope).userType}}</el-tag>
-        </div>
+        <span v-if="scope.prop === 'invoiced'" class="blue">{{$attrs.isInvoice?scope.row[scope.prop] -scope.row.invoiceBalance :scope.row[scope.prop]}}</span>
+        <span v-if="scope.prop === 'invo'" class="warning">{{$attrs.isInvoice?invo(scope.row) + initData[scope.index].invoiceBalance:invo(scope.row)}}</span>
+        <my-form-item :disabled="!select" v-if="scope.prop === 'invoiceBalance'" number :min="0" :max="scope.row.balancedSettlement + scope.row.balancedPrepaid" v-model="scope.row[scope.prop]" size="mini"></my-form-item>
+        <!-- <div v-if="scope.prop === 'company'">{{scope.row[scope.row.customerType].name}}
+                                <el-tag size="mini" :type="scope.row.customerType === 'user'?'success':'warning'">{{scope.row.customerType === 'user'?'用户':'公司'}}</el-tag>
+                              </div>
+                              <div v-if="scope.prop === 'receivedCompany'">{{changUser(scope).name}}
+                                <el-tag size="mini" :type="changUser(scope).type">{{changUser(scope).userType}}</el-tag>
+                              </div> -->
       </div>
     </my-table>
     <div class="jc jb" style="height:45px;background:#f3f4f5;margin-top:15px;padding:0 15px;">
       <div>
-        <div style="font-size:13px;" v-if="selectionChangeData.length > 0 && !$attrs.edit">已选择待开票数量：
+        <div style="font-size:13px;" v-if="selectionChangeData.length > 0 && select">已选择待开票数量：
           <span class="warning">{{selectionChangeData.length}}</span>
         </div>
       </div>
       <div class="jc js">
-        <div class="marginRight" style="font-size:13px;">可开票总金额：<span class="blue"> {{invoiceTotal}}</span></div>
-        <div class="marginRight jc js" style="font-size:13px;">开票金额：
-          <my-form-item width="120px" :disabled="$attrs.edit" number :min="0" :max="invoiceTotal" v-model="invoiceVal" size="mini"></my-form-item>
+        <div class="marginRight" v-if="select" style="font-size:13px;">可开票总金额：<span class="blue"> {{invoiceTotal}}</span></div>
+        <div class="marginRight jc js" style="font-size:13px;">开票总金额：
+          <my-form-item width="120px" :disabled="!select" number :min="0" :max="invoiceTotal" v-model="invoiceVal" size="mini"></my-form-item>
         </div>
-        <el-button :disabled="$attrs.edit" class="marginRight" type="primary" size="mini" @click="distribution">分配</el-button>
+        <el-button :disabled="!select" class="marginRight" type="primary" size="mini" @click="distribution">分配</el-button>
       </div>
     </div>
   </loading-box>
@@ -44,10 +44,6 @@
         default () {
           return [];
         }
-      },
-      invoiceTotal: {
-        type: Number,
-        default: 0
       },
       invoiceValue: {
         type: Number,
@@ -91,12 +87,34 @@
       }
     },
     computed: {
+      invoiceTotal() {
+        let num = 0;
+        this.initData.forEach(item => {
+          if (this.$attrs.isInvoice) {
+            num += item.balancedSettlement + item.balancedPrepaid - item.preInvoiced - item.invoiced + item.invoiceBalance;
+          } else {
+            num = this.$attrs.invoiceTotal;
+          }
+        });
+        return num;
+      },
+      select() {
+        if (!this.$attrs.edit) {
+          return true;
+        } else {
+          if (this.$attrs.isInvoice) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      },
       thead() {
         let thead = {
-          balancedSettlement: {
+          'businessTrains.balancedSettlement': {
             name: '已用结算款结算金额',
           },
-          balancedPrepaid: {
+          'businessTrains.balancedPrepaid': {
             name: '已用预付款结算金额',
           },
           invoiced: {
@@ -122,10 +140,18 @@
             slot: true
           },
         };
+        if (this.$route.query.payName === 'invoiceCheck' || this.$route.query.payName === 'invoiceEditCheck') {
+          this.$set(thead, 'invoiceBalance', {
+            name: '开票金额',
+          })
+        }
         return thead;
       },
     },
     methods: {
+      invo(scope) {
+        return scope.businessTrains.balancedSettlement + scope.businessTrains.balancedPrepaid - scope.invoiced;
+      },
       selectionChange(val) {
         this.selectionChangeData = val;
       },
@@ -154,7 +180,6 @@
           if (val > 0) {
             let value = val;
             let num = this.newData[data[0]].balancedSettlement + this.newData[data[0]].balancedPrepaid;
-            console.log(num <= value);
             if (num <= value) {
               this.$set(this.newData[data[0]], 'invoiceBalance', num);
               let newData = [];
@@ -186,10 +211,22 @@
     },
     created() {
       if (this.initData.length > 0) {
-        this.newData = JSON.parse(JSON.stringify(this.initData));
+        let data = JSON.parse(JSON.stringify(this.initData));
+        data.forEach(item => {
+          let obj = {
+            ...item,
+            invo: item.balancedSettlement + item.balancedPrepaid - item.preInvoiced - item.invoiced,
+            invoiceBalance: item.invoiced
+          }
+          this.newData.push(obj);
+        });
       }
-      if (this.$attrs.edit) {
-        this.invoiceVal = this.invoiceTotal;
+      if (this.$route.query.payName === 'invoice') {
+        this.invoiceVal = 0;
+      } else {
+        this.initData.forEach(item => {
+          this.invoiceVal += item.invoiced;
+        });
       }
     }
   }

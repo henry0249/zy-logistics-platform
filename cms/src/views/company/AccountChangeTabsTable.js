@@ -81,12 +81,12 @@ export default {
     type: 'receive',
     title: '查看未通过审核付款流水',
     thead: { ...thead1,
-      text: {
-        name: '打回理由',
-        slot: true
+      'checkFailData.remark': {
+        name: '回退理由',
+        readOnly: true,
       }
     },
-    
+
   },
   invoice: {
     thead: thead2,
@@ -100,9 +100,9 @@ export default {
   },
   invoiceEditCheck: {
     thead: { ...thead2,
-      text: {
-        name: '打回理由',
-        slot: true
+      'checkFailData.remark': {
+        name: '回退理由',
+        readOnly: true,
       }
     },
     type: 'invoice',

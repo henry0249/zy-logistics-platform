@@ -1,6 +1,6 @@
 <template>
-  <loading-box v-if="newData.length > 0" v-model="loadingText">
-    <el-tabs v-model="activeName" @tab-click="tabClick">
+  <loading-box v-model="loadingText">
+    <el-tabs v-if="newData.length > 0" v-model="activeName" @tab-click="tabClick">
       <el-tab-pane v-for="item in newData" :name="item._id" :key="item.id" :label="item.isUser?item.name + '(个人)' : item.name">
         <div class="col-flex tab-height">
           <div class="tab-top jc jb" style="margin:15px 0;">
@@ -17,7 +17,7 @@
           <el-tabs v-model="payName" type="card" @tab-click="tabPayClick">
             <el-tab-pane v-for="(v,i) in payArr" :name="v.type" :key="`${i}pay`">
               <div slot="label">
-                {{v.name + v.type}}
+                {{v.name}}
                 <el-badge :value="badge(v)" />
               </div>
             </el-tab-pane>
@@ -25,11 +25,11 @@
         </div>
       </el-tab-pane>
     </el-tabs>
-    <Account-change-tabs-table v-if="!loadingText" :activeName="activeName" :data="tableData" :payName="payName"></Account-change-tabs-table>
+    <div v-else class="tab-height noData jc">
+      <span>未发现账户，你可以<el-button style="margin:0 10px;" plain size="mini" type="primary" @click="go('5')">收款</el-button>或者<el-button plain size="mini" @click="go('6')">预收款</el-button></span>
+    </div>
+    <Account-change-tabs-table :isUser="isUser" v-if="!loadingText && newData.length > 0" :activeName="activeName" :data="tableData" :payName="payName"></Account-change-tabs-table>
   </loading-box>
-  <div v-else class="tab-height noData jc">
-    <span>未发现账户，你可以<el-button style="margin:0 10px;" plain size="mini" type="primary" @click="go('5')">收款</el-button>或者<el-button plain size="mini" @click="go('6')">预收款</el-button></span>
-  </div>
 </template>
 
 <script>
@@ -123,18 +123,18 @@
         try {
           this.loadingText = '加载中';
           this.tableData = [];
-          await this.getAllTab();
+          await this.getAllTab(val.name);
           this.tableData = this.payArr[val.index].list;
         } catch (error) {}
         this.loadingText = '';
       },
       async tabClick(val) {
-        this.payName = this.tableArr[0].type;
         if (val.label.substr(val.label.length - 5, 4) === "(个人)") {
-          this.str = "toUser";
+          this.isUser = true;
         } else {
-          this.str = "toCompany";
+          this.isUser = false;
         }
+        await this.getData();
       },
       async getData() {
         try {
@@ -153,18 +153,28 @@
         } catch (error) {}
         this.loadingText = '';
       },
-      async getAllTab() {
-        this.payArr = await this.$ajax.post('/account/relation/list', {
+      async getAllTab(type) {
+        let data = {
           company: this.company._id,
-          relationType: 'company',
-          relationCompany: this.activeName
-        });
+        }
+        if (this.isUser) {
+          data.relationType = 'user';
+          data.relationUser = this.activeName;
+        } else {
+          data.relationType = 'company';
+          data.relationCompany = this.activeName;
+        }
+        if (type) {
+          data.listType = type;
+        };
+        this.payArr = await this.$ajax.post('/account/relation/list', data);
       },
       async getAccount() {
         this.newData = await this.$ajax.post('/account/relation/tab', {
           company: this.company._id
         });
         this.activeName = this.newData[0]._id;
+        this.isUser = this.newData[0].isUser ? this.newData[0].isUser : false;
       },
     },
     async created() {

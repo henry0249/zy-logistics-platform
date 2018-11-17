@@ -56,20 +56,12 @@
         selectionData: [],
       }
     },
-    watch: {},
     computed: {
-      // op() {
-      //   if (this.isInvo) {
-      //     return this.role.financialManager;
-      //   } else {
-      //     return this.role.financialManager;
-      //   }
-      // },
       isInvo() {
         return this.payName === 'invoiceEditCheck' || this.payName === 'invoiceCheck' || this.payName === 'invoice';
       },
       tableHeight() {
-        return 'calc(100vh - 50px - 70px - 62px - 53px - 40px - 30px - 30px - 37px - 40px)';
+        return 'calc(100vh - 50px - 70px - 138px - 1vh)';
       },
     },
     methods: {
@@ -126,6 +118,7 @@
           show: 'true',
           payName: this.payName,
           activeName: this.$attrs.activeName,
+          type: this.$attrs.isUser?'user':'company'
         }
         if (this.payName === 'invoiceEditCheck') {
           query.checkFail = 'financialManager';

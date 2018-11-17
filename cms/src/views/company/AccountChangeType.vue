@@ -9,24 +9,19 @@
           <div class="jc jb" style="margin-top:15px;">
             <bank-cart v-if="showCart" :data.sync="data" :initData="newData" style="width:100%" :key="1"></bank-cart>
           </div>
-        </my-form>
-        <div v-if="isShow">
-          <div class="flex ac jc" style="font-size:22px;padding:31px 0 20px 0">
-            <strong>修改后</strong>
+          <div v-if="showBtm">
+            <div class="jc" style="margin:30px 0">修改后</div>
+            <bank-cart v-if="showCart" :data.sync="children" :initData="childrenData" style="width:100%" :key="2"></bank-cart>
           </div>
-          <my-form width="24%" size="mini">
-            <div class="jc jb" style="margin-top:15px;">
-              <bank-cart :data.sync="children" :initData="childrenData" style="width:100%" :key="2"></bank-cart>
-            </div>
-          </my-form>
-        </div>
+        </my-form>
       </div>
       <div class="tr jb" style="margin-top:30px">
         <div>
-          <el-button size="small" @click="$router.go(-1)">返 回</el-button>
+          <el-button v-if="leftText" size="small" type="danger" @click="res">{{leftText}}</el-button>
         </div>
         <div class="jc js" v-if="$route.query.payName !== 'applyEdit'">
-          <el-button v-if="isShow" size="small" type="primary" @click="edmitMethods">替换修改</el-button>
+          <el-button size="small" @click="$router.go(-1)">返 回</el-button>
+          <el-button v-if="showBtm" size="small" @click="changeInitData">使用申请修改的数据</el-button>
           <el-button size="small" type="primary" @click="sub">{{subText}}</el-button>
         </div>
       </div>
@@ -62,13 +57,28 @@
       return {
         loadingText: '',
         io: false,
-        show: true,
         showCart: true,
-        changeChild: false,
+        show: true,
         data: {},
         children: {},
         accountChangeData: {},
         childrenData: {},
+        obj: {
+          received: {
+            text: '付款流水',
+            subText: '修改'
+          },
+          receivedCheck: {
+            text: '待审核付款流水',
+            leftText: "回退修改",
+            subText: '通过审核'
+          },
+          receivedEditCheck: {
+            text: '未通过审核付款流水',
+            leftText: "",
+            subText: '修改'
+          }
+        },
         newData: {
           value: 0,
           from: {
@@ -93,33 +103,19 @@
       };
     },
     watch: {
-      children: {
-        handler(val) {
-          this.changeChild = true;
-        }
-      },
       data: {
         handler(val) {
-          console.log(val);
           this.io = true;
         },
         deep: true
       }
     },
     computed: {
-      isShow() {
-        if (this.hasChild) {
-          return this.show;
-        } else {
-          return false;
-        }
+      showBtm() {
+        return this.hasChild && this.show && this.$route.query.payName === 'receivedCheck';
       },
       hasChild() {
-        if (this.newData.children) {
-          return true;
-        } else {
-          return false;
-        };
+        return this.initData.children;
       },
       title() {
         let data = '';
@@ -128,94 +124,121 @@
         } else if (this.$route.query.type === '6') {
           data = '预收款';
         } else {
-          data = this.field.AccountChange.type.option[this.$route.query.type]
+          data = this.obj[this.$route.query.payName].text;
+        }
+        return data;
+      },
+      leftText() {
+        let data = '';
+        if (this.edmit) {
+          data = this.obj[this.$route.query.payName].leftText;
         }
         return data;
       },
       subText() {
-        console.log('!!!!', this.$route.query);
         let data = '添加';
         if (this.edmit) {
-          if (this.$route.query.check === true || this.$route.query.check === 'true') {
-            data = '审核';
-          } else if (this.ispay) {
-            if (this.hasChild) {
-              data = '确认修改';
-            } else {
-              data = '修改';
-            }
-          } else {
-            data = '提交修改申请';
-          }
-        }
-        return data;
-      },
-      ispay() {
-        let data = false;
-        if (this.isUser) {
-          //  
-          //    判断该用户是否有直接修改流水权限的代码逻辑
-          //
-          //
-        } else {
-          if (this.newData.toCompany._id === this.company._id) {
-            data = true;
-          } else {
-            data = false;
-          }
+          data = this.obj[this.$route.query.payName].subText;
         }
         return data;
       },
     },
     methods: {
-      edmitMethods() {
-        this.$confirm(`将${this.title}单的数据更改为对方申请修改的数据`, '提示', {
+      res() {
+        this.$prompt('请输入回退修改的原因', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+        }).then(async({
+          value
+        }) => {
+          await this.repulse(value);
+        }).catch(() => {});
+      },
+      async repulse(value) {
+        try {
+          this.loadingText = '加载中';
+          let data = {};
+          await this.$ajax.post('/accountChange/checkFail', {
+            _id: this.$route.params._id,
+            text: value
+          });
+          this.postSuccess('操作成功');
+        } catch (error) {}
+      },
+      postSuccess(data) {
+        this.$message.success(data);
+        this.$router.push({
+          path: '/company/account',
+          query: {
+            show: false
+          }
+        })
+      },
+      changeInitData() {
+        this.$confirm('将原来的数据替换为即将要修改的数据', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
+          this.newData = Object.assign({}, this.newData, {
+            value: this.childrenData.value,
+            to: this.childrenData.to,
+            from: this.childrenData.from,
+            remittanceTime: this.childrenData.remittanceTime,
+            accountingTime: this.childrenData.accountingTime,
+          });
           this.show = false;
-          this.showCart = false;
-          this.$nextTick(() => {
-            this.newData = Object.assign({}, this.newData, {
-              value: this.childrenData.value,
-              from: this.childrenData.from,
-              to: this.childrenData.to,
-            });
-            this.showCart = true;
-          })
         }).catch(() => {});
       },
       async sub() {
-        if (this.$route.query.check === true || this.$route.query.check === 'true') {
-          if (this.role.financialManager) {
-            this.edmitAccountChange('check');
+        if (this.checkMethods()) {
+          if (this.$route.query.check === true || this.$route.query.check === 'true') {
+            if (this.role.financialManager) {
+              this.edmitAccountChange('check');
+            } else {
+              this.$message.warn('您不是财务经理，没有该权限');
+            }
           } else {
-            this.$message.warn('您不是财务经理，没有该权限');
-          }
-        } else {
-          if (this.edmit) {
-            this.edmitAccountChange();
-          } else {
-            this.setAccountChange();
+            if (this.edmit) {
+              if (this.role.financialManager) {
+                this.edmitAccountChange();
+              } else {
+                this.$confirm('修改不会立即生效, 是否发起修改申请?', '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消',
+                  type: 'warning'
+                }).then(async() => {
+                  await this.edmitAccountChange('', true);
+                }).catch(() => {});
+              }
+            } else {
+              this.setAccountChange();
+            }
           }
         }
       },
-      async edmitAccountChange(check) {
+      checkMethods() {
+        let data = true;
+        if (this.io) {
+          if (this.data.value === 0) {
+            this.$message.warn('金额必须大于0');
+            return data = false;
+          }
+        } else {
+          if (this.newData.value === 0) {
+            this.$message.warn('金额必须大于0');
+            return data = false;
+          }
+        }
+        return data;
+      },
+      async edmitAccountChange(check, io) {
         try {
-          this.loadingText = '修改中...';
+          this.loadingText = check ? '审核中...' : '修改中...';
           let find = {
             _id: this.$route.params._id
           };
           let newData = this.io ? this.data : this.newData;
-          if (this.hasChild) {
-            newData = this.changeChild ? this.children : this.childrenData;
-            this.$set(newData, '_id', this.newData._id);
-            delete newData.parent;
-          };
-          if (!this.show) {
-            newData = this.data;
-          }
           let update = JSON.parse(JSON.stringify(newData));
           this.$set(update, 'company', this.data.company._id);
           if (typeof(this.data.toCompany) === 'string') {
@@ -228,18 +251,15 @@
           }
           let path = check ? '/accountChange/check' : '/accountChange/update';
           let data = check ? '已审核' : '修改成功';
-          if (!this.ispay) {
-            path = '/accountChange/payUserUpdateApply';
-            data = '提交修改申请成功';
+          if (this.$route.query.payName === 'receivedEditCheck') {
+            path = '/accountChange/update';
+            data = '修改成功'
+          }
+          if (io) {
+            data = '申请修改成功';
           }
           await this.$ajax.post(path, update);
-          this.$message.success(data);
-          this.$router.push({
-            path: '/company/account',
-            query: {
-              show: false
-            }
-          })
+          this.postSuccess(data);
         } catch (error) {}
         this.loadingText = '';
       },
@@ -310,7 +330,7 @@
       if (Object.keys(this.initData).length > 0) {
         this.newData = JSON.parse(JSON.stringify(this.initData));
       }
-      if (this.newData.children) {
+      if (this.hasChild) {
         this.childrenData = this.newData.children;
       }
       if (!this.edmit) {
