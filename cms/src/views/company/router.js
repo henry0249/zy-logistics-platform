@@ -1,9 +1,9 @@
 import App from './App.vue';
 import Edit from './Edit.vue';
-import Account from './Account.vue';
+import Account from './CompanyAccount.vue';
 import CompanyRole from './CompanyRole.vue';
 import CompanyShip from './CompanyShip.vue';
-import AccountChangeType from './AccountChangeType.vue';
+import CompanyAccountChange from './CompanyAccountChange.vue';
 import RelationCode from './RelationCode.vue';
 import AccountEdmit from './AccountEdmit.vue';
 import AccountAdd from './AccountAdd.vue';
@@ -24,9 +24,9 @@ export default [{
     name: '账户管理',
     component: Account,
     children: [{
-      path: 'account_change_type',
+      path: 'account_change',
       name: '付款单',
-      component: AccountChangeType
+      component: CompanyAccountChange
     },{
       path: 'invoice',
       name: '开发票',

@@ -5,10 +5,10 @@
         <slot name="header">
           <div class="jb">
             <div class="jc js">
-              <common-select-by-code v-if="isFrom && !isInvoice" width="300px" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未选择" label="付款方"></common-select-by-code>
-              <common-select-by-code v-if="!isFrom && !isInvoice" width="300px" :userType.sync="userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收款方"></common-select-by-code>
-              <common-select-by-code v-if="isFrom && isInvoice" width="300px" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未注册公司或用户" label="开票方"></common-select-by-code>
-              <common-select-by-code v-if="!isFrom && isInvoice" width="300px" :userStr="data.to.userStr" :userType.sync="userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收票方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom && !isInvoice" width="300px" :userType.sync="data.from.userType" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未选择" label="付款方"></common-select-by-code>
+              <common-select-by-code v-if="!isFrom && !isInvoice" width="300px" :userType.sync="data.to.userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收款方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom && isInvoice" width="300px" :userType.sync="data.from.userType" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未注册公司或用户" label="开票方"></common-select-by-code>
+              <common-select-by-code v-if="!isFrom && isInvoice" width="300px" :userType.sync="data.to.userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收票方"></common-select-by-code>
             </div>
             <div class="jc js">
               <my-form-item number :controls="!numberDis" :disabled="numberDis" width="200px" size="mini" :label="numberText" v-model.number="data.value"></my-form-item>
@@ -100,7 +100,6 @@
     data() {
       return {
         check: '',
-        userType: '',
         loadingText: '',
         pickerOptions: {
           disabledDate(time) {
@@ -110,18 +109,6 @@
       }
     },
     watch: {
-      userType(val) {
-        let data = JSON.parse(JSON.stringify(this.data));
-        if (this.isFrom) {
-          this.$set(data.from, 'type', val);
-        } else {
-          this.$set(data.to, 'type', val);
-        }
-        if (this.userType) {
-          this.$set(data.to, 'userStr', this.userType);
-        }
-        this.$emit('update:data', data);
-      },
       'data.from.account' (val) {
         if (val) {
           if (this.isFrom) {
@@ -135,9 +122,6 @@
             this.checkMethods(val);
           }
         }
-      },
-      'data.address' (val) {
-        console.log(val);
       }
     },
     computed: {

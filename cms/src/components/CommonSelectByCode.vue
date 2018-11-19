@@ -41,7 +41,7 @@
         </div>
       </my-form-item>
     </div>
-    <el-dialog :title="`添加${commonData.name[typeStr]}`" width="70%" top="15vh" :visible.sync="dialogTableVisible">
+    <el-dialog :title="`添加${commonData.name[userType]}`" width="70%" top="15vh" :visible.sync="dialogTableVisible">
       <loading-box v-model="loadingText">
         <div class="as js" ref="tag">
           <div :style="{fontSize:fontSize,flex:'0 0 80px'}">已选择：</div>
@@ -55,17 +55,17 @@
         <div v-if="dialogTableVisible">
           <div class="jc jb searchBox">
             <div class="jc js">
-              <my-form-item v-if="typeStr === 'company' && type" size="mini" width="250px" v-model="input" placeholder="输入公司关联代码"></my-form-item>
-              <my-form-item v-if="typeStr === 'company' && !type" size="mini" width="250px" v-model="nickInput" placeholder="输入公司全称、简称或者公司代码"></my-form-item>
-              <my-form-item v-if="typeStr === 'user'" size="mini" width="250px" v-model="mobile" placeholder="输入手机号"></my-form-item>
+              <my-form-item v-if="userType === 'company' && type" size="mini" width="250px" v-model="input" placeholder="输入公司关联代码"></my-form-item>
+              <my-form-item v-if="userType === 'company' && !type" size="mini" width="250px" v-model="nickInput" placeholder="输入公司全称、简称或者公司代码"></my-form-item>
+              <my-form-item v-if="userType === 'user'" size="mini" width="250px" v-model="mobile" placeholder="输入手机号"></my-form-item>
             </div>
             <el-button size="mini" type="primary" @click="search">搜 索</el-button>
           </div>
           <el-table @cell-click="cellClick" v-if="dialogTableVisible" border stripe size="mini" :data="tableData">
             <template v-for="(item, key) in thead">
-                  <el-table-column v-if="key === 'type'" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
-                    <template slot-scope="scope">
-                      <el-tag size="mini" v-for="v in scope.row.type" :key="v.id">{{field.Company.type.option[v]}}</el-tag>
+                                      <el-table-column v-if="key === 'type'" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
+                                        <template slot-scope="scope">
+                                          <el-tag size="mini" v-for="v in scope.row.type" :key="v.id">{{field.Company.type.option[v]}}</el-tag>
 </template>
               </el-table-column>
               <el-table-column v-else show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
@@ -136,7 +136,6 @@
         inputValue: '',
         value: 'company',
         mobile: '',
-        typeStr: '',
         checkData: [],
         loadingText: '',
         dialogTableVisible: false,
@@ -185,7 +184,6 @@
       },
       value(val) {
         this.$emit('update:userType', val);
-        this.typeStr = val;
         this.checkData = [];
         this.inputValue = '';
         if (val !== 'mobile') {
@@ -194,7 +192,7 @@
           this.show = false;
         }
       },
-      typeStr(val) {
+      userType(val) {
         this.thead = this.commonData.thead[val];
       }
     },
@@ -243,7 +241,7 @@
           this.tableData = [];
           try {
             this.loadingText = '搜索中...';
-            if (this.typeStr === 'company' && this.type) {
+            if (this.userType === 'company' && this.type) {
               let res = await this.$ajax.post('/relationCode/findOne', {
                 value: this.input,
                 populate: [{
@@ -251,7 +249,7 @@
                 }]
               });
               this.tableData.push(res.company);
-            } else if (this.typeStr === 'user') {
+            } else if (this.userType === 'user') {
               let res = await this.$ajax.post('/user/findOne', {
                 mobile: this.mobile,
                 populate: [{
@@ -259,7 +257,7 @@
                 }]
               });
               this.tableData.push(res);
-            } else if (this.typeStr === 'company' && !this.type) {
+            } else if (this.userType === 'company' && !this.type) {
               let res = await this.$ajax.post('/company/findOne', {
                 $or: [{
                   name: this.nickInput
@@ -285,7 +283,7 @@
         let io = true;
         this.checkData.forEach(item => {
           if (row._id === item._id) {
-            this.$message.warn(`已选择该${this.typeStr === 'company'?'公司':'用户'}`);
+            this.$message.warn(`已选择该${this.userType === 'company'?'公司':'用户'}`);
             io = false;
           }
         });
@@ -366,25 +364,25 @@
           this.checkData.push(this.data);
         }
       }
-
-      if (this.$attrs.userStr) {
-        this.typeStr = this.$attrs.userStr;
-      } else {
+      if (!this.$attrs.userStr) {
         for (const key in this.$attrs) {
           if (key === 'user') {
-            this.typeStr = key;
+            this.$emit('update:userType', key);
           }
           if (key === 'company') {
-            this.typeStr = key;
+            this.$emit('update:userType', key);
           }
           if (key === 'mobile') {
-            this.typeStr = key;
+            this.$emit('update:userType', key);
           }
         };
       }
-      this.value = this.typeStr;
-      this.$emit('update:userType', this.typeStr);
-      this.thead = this.commonData.thead[this.typeStr];
+      if (this.userType) {
+        this.value = this.userType;
+      } else {
+        this.value = 'company';
+      }
+      this.thead = this.commonData.thead[this.userType];
       if (this.$attrs.disabled) {
         let checkOptionData = [];
         this.checkOption.forEach(item => {
