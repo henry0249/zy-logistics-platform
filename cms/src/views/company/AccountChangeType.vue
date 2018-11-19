@@ -6,11 +6,10 @@
           <strong>{{title}}单</strong>
         </div>
         <my-form width="24%" size="mini">
-          <div class="jc jb" style="margin-top:15px;">
-            <bank-cart v-if="showCart" :data.sync="data" :initData="newData" style="width:100%" :key="1"></bank-cart>
-          </div>
+          <common-alert style="margin:15px 0">流水信息</common-alert>
+          <bank-cart v-if="showCart" :data.sync="data" :initData="newData" style="width:100%" :key="1"></bank-cart>
           <div v-if="showBtm">
-            <div class="jc" style="margin:30px 0">修改后</div>
+            <common-alert style="margin:15px 0">下方是申请修改的流水信息</common-alert>
             <bank-cart v-if="showCart" :data.sync="children" :initData="childrenData" style="width:100%" :key="2"></bank-cart>
           </div>
         </my-form>
