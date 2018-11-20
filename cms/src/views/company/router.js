@@ -9,6 +9,7 @@ import AccountEdmit from './AccountEdmit.vue';
 import AccountAdd from './AccountAdd.vue';
 import CompanyInvoice from './CompanyInvoice.vue';
 import CompanyInvoiceEdit from './CompanyInvoiceEdit.vue';
+import CompanyAccountEdit from './CompanyAccountEdit.vue';
 
 export default [{
   path: '/company',
@@ -24,6 +25,10 @@ export default [{
     name: '账户管理',
     component: Account,
     children: [{
+      path: 'account_edit/:_id',
+      name: '修改',
+      component: CompanyAccountEdit
+    },{
       path: 'account_change',
       name: '付款单',
       component: CompanyAccountChange

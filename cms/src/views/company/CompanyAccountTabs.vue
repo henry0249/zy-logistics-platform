@@ -1,13 +1,13 @@
 <template>
   <loading-box v-model="loadingText">
     <el-tabs v-model="activeName" @tab-click="tabClick">
-      <el-tab-pane v-for="item in data" :name="item._id" :key="item.id" :label="item.isUser?item.name + '(个人)' : item.name">
+      <el-tab-pane v-for="item in data" :name="item.relationCompany._id" :key="item.relationCompany.id" :label="item.relationType === 'user'?item.relationCompany.name + '(个人)' : item.relationCompany.name">
         <div class="col-flex tab-height">
           <div class="tab-top jc jb" style="margin:15px 0;">
             <div class="jc js">
               <span>结算款：<span style="margin-right:30px;" class="blue">{{item.value}}</span> 预付款：<span class="danger">{{item.prepaid}}</span></span>
-              <div class="marginRight" style="font-size:13px;margin:0 30px;">可开票总金额：<span class="blue"> {{item.waitingForInvoice.total}}</span></div>
-              <el-button :disabled="item.waitingForInvoice.total === 0" type="success" size="mini" @click="setInvoice">去开票</el-button>
+              <div class="marginRight" style="font-size:13px;margin:0 30px;">可开票总金额：<span class="blue"> {{item.invoiceData.total}}</span></div>
+              <el-button :disabled="item.invoiceData.total === 0" type="success" size="mini" @click="setInvoice">去开票</el-button>
             </div>
             <div class="js">
               <el-button @click="goAccountChange('5',activeName)" size="mini">收款</el-button>
@@ -77,6 +77,8 @@
             activeName: _id,
             show: 'true',
             titleType: 'isReceive',
+            relationType: 'company',
+            toUserType: 'company'
           }
         })
       },

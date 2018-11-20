@@ -34,7 +34,27 @@
       }
     },
     watch: {
-      activeName(val) {},
+      async routeShow(val) {
+        if (!val) {
+          try {
+            this.loadingText = '加载中';
+            await this.getTabsData();
+            if (this.accountData.length > 0) {
+              this.obj = this.accountData[0];
+              this.activeName = this.accountData[0].relationCompany._id;
+              await this.getData(this.obj, 'received');
+            }
+            if (this.payArr.length > 0) {
+              this.tableData = this.payArr[0].list;
+              this.isUser = this.payArr[0].isUser;
+              this.payName = this.payArr[0].type;
+            }
+          } catch (error) {
+            console.log(error);
+          }
+          this.loadingText = '';
+        }
+      }
     },
     computed: {
       routeShow() {
@@ -49,8 +69,8 @@
             type: val,
             titleType: 'isReceive',
             show: 'true',
-            payUserType:'company',
-            toUserType:'company'
+            relationType: 'company',
+            toUserType: 'company'
           }
         })
       },
@@ -88,10 +108,10 @@
         };
         if (obj.isUser) {
           data.relationType = 'user';
-          data.relationUser = obj._id;
+          data.relationUser = obj.relationUser._id;
         } else {
           data.relationType = 'company';
-          data.relationCompany = obj._id;
+          data.relationCompany = obj.relationCompany._id;
         };
         if (type) {
           data.listType = type;
@@ -106,17 +126,15 @@
           await this.getTabsData();
           if (this.accountData.length > 0) {
             this.obj = this.accountData[0];
-            this.activeName = this.accountData[0]._id;
-            await this.getData(this.obj);
+            this.activeName = this.accountData[0].relationCompany._id;
+            await this.getData(this.obj, 'received');
           }
           if (this.payArr.length > 0) {
             this.tableData = this.payArr[0].list;
             this.isUser = this.payArr[0].isUser;
             this.payName = this.payArr[0].type;
           }
-        } catch (error) {
-          console.log(error);
-        }
+        } catch (error) {}
         this.loadingText = '';
       }
     }

@@ -1,6 +1,8 @@
 <template>
-  <bank-cart :data.sync="newData" :initData="initData" style="width:100%">
-  </bank-cart>
+  <div>
+    <bank-cart :allDisabled="boo" :data.sync="newData" :initData="initData" style="width:100%">
+    </bank-cart>
+  </div>
 </template>
 
 <script>
@@ -22,6 +24,7 @@
     data() {
       return {
         newData: {},
+        boo: false
       }
     },
     watch: {
@@ -32,8 +35,30 @@
         deep: true
       }
     },
-    methods: {},
-    created() {}
+    computed: {
+      isInvoice() {
+        if (!this.$route.params._id) {
+          return false;
+        } else {
+          if (this.$route.query.payName === 'received' || this.$route.query.payName === 'invoice') {
+            return false;
+          } else {
+            return true;
+          }
+        }
+      },
+    },
+    created() {
+      if (this.$route.params._id) {
+        if (this.$route.query.payName === 'invoice' || this.$route.query.payName === 'received') {
+          this.boo = false;
+        } else {
+          this.boo = true;
+        }
+      } else {
+        this.boo = false;
+      }
+    }
   }
 </script>
 

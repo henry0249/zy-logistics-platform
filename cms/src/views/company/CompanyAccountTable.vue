@@ -7,23 +7,20 @@
         </div>
       </div>
       <div slot-scope="scope">
-        <span v-if="payName === 'invoiceEditCheck' && scope.prop === 'text'" class="warning">{{scope.row[scope.prop]}}</span>
-        <span v-if="isInvo && scope.prop === 'taxRate'" class="warning">{{scope.row[scope.prop]}}</span>
-        <div v-if="isInvo && scope.prop === 'company'">{{scope.row[scope.prop].name}}
-          <el-tag size="mini" type="warning">公司</el-tag>
-        </div>
-        <div v-if="isInvo && scope.prop === 'toCompany'">{{changUser(scope).name}}
-          <el-tag size="mini" :type="changUser(scope).type">{{changUser(scope).userType}}</el-tag>
-        </div>
-        <el-tag size="mini" v-if="isInvo && scope.prop === 'type'" :type="typeOption(scope.row[scope.prop])">{{field.Invoice.type.option[scope.row[scope.prop]]}}</el-tag>
-        <el-tag size="mini" v-if="!isInvo && scope.prop === 'type'" :type="typeOption(scope.row[scope.prop])">{{field.AccountChange.type.option[scope.row[scope.prop]]}}</el-tag>
-        <div v-if="!isInvo && scope.prop === 'payUser'">{{payUser(scope.row).user}}
-          <el-tag size="mini" :type="payUser(scope.row).type">{{field.AccountChange.payUserType.option[scope.row.payUserType]}}</el-tag>
-        </div>
-        <div v-if="!isInvo && scope.prop === 'getUser'">{{getUser(scope.row).user}}
-          <el-tag size="mini" :type="getUser(scope.row).type">{{field.AccountChange.payUserType.option[scope.row.payUserType]}}</el-tag>
-        </div>
         <div v-if="scope.prop === 'value'" class="blue">{{scope.row[scope.prop]}}</div>
+        <div v-if="scope.prop === 'payUser'">
+          {{payUser(scope.row).name}}
+          <el-tag size="mini" :type="payUser(scope.row).type">{{payUser(scope.row).typeText}}</el-tag>
+        </div>
+        <div v-if="scope.prop === 'getUser'">
+          {{getUser(scope.row).name}}
+          <el-tag size="mini" :type="getUser(scope.row).type">{{getUser(scope.row).typeText}}</el-tag>
+        </div>
+        <el-tag v-if="!isInvo &&scope.prop === 'type'" size="mini" :type="typeChange(scope.row[scope.prop])">{{field.AccountChange.type.option[scope.row[scope.prop]]}}</el-tag>
+        <div v-if="!isInvo && scope.prop === 'remittanceTime'">{{formatTime(scope.row[scope.prop],'YYYY-MM-DD')}}</div>
+        <div v-if="!isInvo && scope.prop === 'accountingTime'">{{formatTime(scope.row[scope.prop],'YYYY-MM-DD')}}</div>
+        <el-tag v-if="isInvo &&scope.prop === 'type'" size="mini" :type="typeChange(scope.row[scope.prop])">{{field.Invoice.type.option[scope.row[scope.prop]]}}</el-tag>
+        <div v-if="isInvo &&scope.prop === 'taxRate'" class="warn">{{scope.row[scope.prop]}}</div>
       </div>
     </my-table>
   </div>
@@ -60,13 +57,71 @@
     },
     computed: {
       isInvo() {
-        return this.payName === 'invoiceEditCheck' || this.payName === 'invoiceCheck' || this.payName === 'invoice';
+        return this.table_js[this.payName].type === 'isInvoice';
       },
       tableHeight() {
         return 'calc(100vh - 50px - 70px - 138px - 1vh)';
       },
     },
     methods: {
+      typeChange(val) {
+        let data = {
+          0: '',
+          1: 'success',
+          2: 'info',
+          3: 'warning',
+          4: 'danger',
+        }
+        return data[val];
+      },
+      getUser(val) {
+        let data = {
+          company: {
+            typeText: '公司',
+            type: 'success',
+            key: 'toCompany'
+          },
+          user: {
+            typeText: '用户',
+            type: 'warning',
+            key: 'toUser'
+          },
+          mobile: {
+            typeText: '未注册手机',
+            type: 'info',
+            key: 'toMobile'
+          }
+        };
+        return {
+          type: data[val.relationType].type,
+          typeText: data[val.relationType].typeText,
+          name: val[data[val.relationType].key].name
+        }
+      },
+      payUser(val) {
+        let data = {
+          company: {
+            typeText: '公司',
+            type: 'success',
+            key: 'company'
+          },
+          user: {
+            typeText: '用户',
+            type: 'warning',
+            key: 'user'
+          },
+          mobile: {
+            typeText: '未注册手机',
+            type: 'info',
+            key: 'mobile'
+          }
+        };
+        return {
+          type: data[val.relationType].type,
+          typeText: data[val.relationType].typeText,
+          name: val[data[val.relationType].key].name
+        }
+      },
       async loadmore() {
         return await this.getData();
       },
@@ -88,93 +143,34 @@
         return await this.$ajax.post('/account/relation/list', data);
       },
       check(scope) {
+        console.log(scope);
+        let query = {
+          activeName: this.activeName,
+          payName: this.payName,
+          show: 'true',
+          relationType: scope.row.relationType,
+          toUserType: scope.row.toType,
+          titleType: this.table_js[this.payName].type,
+          // type: this.table_js[this.payName].type === 'isReceive' ? scope.row.type
+        }
+        if (this.isInvo) {
+          query.type = scope.row.type;
+        } else {
+          if (scope.row.type === 1) {
+            query.type = '5';
+          } else if (scope.row.type === 4) {
+            query.type = '6';
+          }
+        }
         this.$router.push({
-          path: '/company/account/all/' + scope.row._id,
-          query: {
-            payName: this.payName,
-            activeName: this.activeName,
-            show: 'true',
-            titleType: this.table_js[this.payName].type,
-            check: scope.row.check
-          }
-        })
-        // if (!scope.row.check) {
-        //   if (this.table_js[this.payName].type === 'invoice') {
-        //     this.goInvoCheck(scope);
-        //   } else {
-        //     this.resMethods(scope, true);
-        //   }
-        // } else {
-        //   if (this.table_js[this.payName].type === 'invoice') {
-        //     this.goInvoCheck(scope);
-        //   } else {
-        //     this.resMethods(scope);
-        //   }
-        // }
-      },
-      changUser(scope) {
-        let op = {
-          user: {
-            name: scope.row.toUser ? scope.row.toUser.name : '',
-            type: 'success',
-            userType: '用户'
-          },
-          company: {
-            name: scope.row.toCompany ? scope.row.toCompany.name : '',
-            type: 'warning',
-            userType: '公司'
-          },
-          mobile: {
-            name: scope.row.toMobile ? scope.row.toMobile : '',
-            type: undefined,
-            userType: '手机号'
-          }
-        }
-        return op[scope.row.toType];
-      },
-      getUser(val) {
-        let data = {};
-        if (val.payUserType === 'user') {
-          this.$set(data, 'user', val.toUser.name);
-          this.$set(data, 'type', 'info');
-        } else if (val.payUserType === 'company') {
-          this.$set(data, 'user', val.toCompany.name);
-          this.$set(data, 'type', 'success');
-        } else {
-          data = val.mobile;
-          this.$set(data, 'user', val.mobile);
-          this.$set(data, 'type', 'warning');
-        }
-        return data;
-      },
-      payUser(val) {
-        let data = {};
-        if (val.payUserType === 'user') {
-          this.$set(data, 'user', val.user.name);
-          this.$set(data, 'type', 'info');
-        } else if (val.payUserType === 'company') {
-          this.$set(data, 'user', val.company.name);
-          this.$set(data, 'type', 'success');
-        } else {
-          data = val.mobile;
-          this.$set(data, 'user', val.mobile);
-          this.$set(data, 'type', 'warning');
-        }
-        return data;
-      },
-      typeOption(val) {
-        let data = {
-          0: '',
-          1: 'success',
-          2: 'info',
-          3: 'warning',
-          4: 'danger',
-        };
-        return data[val];
-      },
+          path: '/company/account/account_edit/' + scope.row._id,
+          query
+        });
+      }
     },
     created() {
       this.newData = JSON.parse(JSON.stringify(this.data));
+      console.log(this.newData);
     }
   }
 </script>
