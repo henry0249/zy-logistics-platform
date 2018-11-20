@@ -6,8 +6,10 @@
         <icon style="margin-right:5px" small v-if="item.icon">{{item.icon}}</icon>
         <div class="flex ac">
           {{item.name}}
-          <el-badge v-if="item.badge!==undefined && item.badge>0" :value="item.badge">
-          </el-badge>
+          <div style="width:5px">
+            <el-badge v-if="item.badge!==undefined && item.badge>0" is-dot :value="item.badge">
+            </el-badge>
+          </div>
         </div>
       </div>
     </div>
@@ -79,9 +81,9 @@ export default {
     },
     $route() {
       this.setNav();
-      this.$store.dispatch("getOrderBadge");
+      this.$store.dispatch("getHeaderBadge");
     },
-    orderBadge: {
+    headerBadge: {
       handler: function(val) {
         this.setHeaderBadge();
       },
@@ -132,7 +134,7 @@ export default {
       } else {
         this.nav = [
           {
-            name: "贸易订单管理",
+            name: "订单管理",
             path: "/order",
             icon: "icon-daichulidingdan"
           },
@@ -176,29 +178,11 @@ export default {
     },
     setHeaderBadge() {
       this.nav.forEach((item, index) => {
-        if (item.path === "/order") {
-          item.badge =
-            this.orderBadge.salesman +
-            this.orderBadge.salesmanManager +
-            this.orderBadge.tradeClerk;
-          this.$set(this.nav, index, item);
-        }
-        if (item.path === "/dispatch") {
-          item.badge =
-            this.orderBadge.dispatcher +
-            this.orderBadge.dispatcherManager +
-            this.orderBadge.logisticsClerk +
-            this.orderBadge.logistics.dispatcher +
-            this.orderBadge.logistics.dispatcherManager +
-            this.orderBadge.logistics.logisticsClerk;
-          this.$set(this.nav, index, item);
-        }
-        if (item.path === "/settle") {
-          item.badge =
-            this.orderBadge.documentClerk +
-              this.orderBadge.documentClerkManager || 0;
-          this.$set(this.nav, index, item);
-        }
+        if (item.path === "/order") item.badge = this.headerBadge.order;
+        if (item.path === "/dispatch") item.badge = this.headerBadge.dispatch;
+        if (item.path === "/logistics") item.badge = this.headerBadge.logistics;
+        if (item.path === "/settle") item.badge = this.headerBadge.settle;
+        this.$set(this.nav, index, item);
       });
     }
   },

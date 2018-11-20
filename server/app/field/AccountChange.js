@@ -16,7 +16,7 @@ module.exports = {
     },
     default: ""
   },
-  payUserType: {
+  relationType: {
     name: '付款用户类型',
     type: 'String',
     option: {

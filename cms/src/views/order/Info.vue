@@ -35,7 +35,7 @@
         </div>
         <!-- <common-select style="width:24%" title="选择送货地址" label="送货地址" border :data.sync="order.area" type="area" @change="areaChange"></common-select> -->
       </div>
-      <my-form-item width="100%" style="margin:15px 0" input v-model="order.address" label="详细地址">
+      <my-form-item width="100%" style="margin:15px 0" input v-model="order.areaInfo" label="详细地址">
       </my-form-item>
       <my-form-item width="100%" input type="textarea" v-model="order.remark" autosize label="订单备注">
       </my-form-item>
@@ -90,7 +90,7 @@ export default {
         contactName: "",
         contactNumber: "",
         area: {},
-        address: "",
+        areaInfo: "",
         remark: "",
         goods: {},
         count: 0,
@@ -155,7 +155,7 @@ export default {
       this.order.type = val;
     },
     areaChange(val) {
-      this.order.address = this.area2name(val) + " ";
+      this.order.areaInfo = this.area2name(val) + " ";
     },
     check() {
       let order = this.order;
@@ -196,6 +196,19 @@ export default {
         return;
       }
       return true;
+    },
+    getRequestData() {
+      let res = {};
+      for (const key in this.order) {
+        let item = this.order[key];
+        if (item.constructor === Object) {
+          if (item._id) res[key] = item._id;
+        } else {
+          res[key] = item;
+        }
+      }
+      res.handle = this.company._id;
+      return res;
     }
   },
   created() {

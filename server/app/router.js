@@ -32,13 +32,16 @@ module.exports = app => {
     .post('/company/receivables', checkToken(), 'company.receivables') //公司收款详细数据
     //区域接口
     //商品接口
+    //badge接口
+    .all('/badge/header', checkToken(), 'badge.getHeaderBadge') //头部badge标识
+    .post('/badge/sub/header', checkToken(), 'badge.getSubHeaderBadge') //sub头部badge标识
     //订单接口
-    .get('/order/badge', checkToken(), 'order.badge') //订单标记
     .post('/order/company/badge', checkToken(), 'order.companyBadge') //公司订单标记
     .get('/order/info/:_id', checkToken(), 'order.getOrderById') //根据id获取订单信息
     .post('/order/transfer', checkToken(), 'order.transfer') //转单
     .post('/order/dispatch', checkToken(), 'order.dispatch') //订单提交配送
     .post('/order/mutilUpdate', checkToken(), 'order.mutilUpdate') //批量修改订单信息
+    .post('/order/check', checkToken(), 'order.check') //审核订单
     .post('/order/checkFail', checkToken(), 'order.checkFail') //订单审核失败
     .all('/order/pending/:state', checkToken(), 'order.pending') //获取待处理订单
     //物流单接口

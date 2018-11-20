@@ -59,5 +59,9 @@ module.exports = {
     name: '关联的商品', //物流单付款方为运费承担方,收款方为司机关联的物流公司或司机自己
     type: 'ObjectId',
     ref: 'Goods'
-  }
+  },
+  isChildren: {
+    name: '子账单/子流水 标识',
+    type: 'Boolean'
+  },
 }

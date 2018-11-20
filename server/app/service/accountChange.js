@@ -6,18 +6,18 @@ class AccountChangeService extends Service {
     const ctx = this.ctx;
     if (!body.handle) ctx.throw(422, '操作公司必填');
     if (Number(body.value) <= 0) ctx.throw(422, '金额必须大于0');
-    if (!field.payUserType.option[body.payUserType]) ctx.throw(422, '付款用户类型错误');
+    if (!field.relationType.option[body.relationType]) ctx.throw(422, '付款用户类型错误');
     if (!field.type.option[body.type]) ctx.throw(422, '流水类型错误');
-    if (body.payUserType === 'user' && !body.user) ctx.throw(422, '付款人必填');
-    if (body.payUserType === 'company' && !body.company) ctx.throw(422, '付款公司必填');
-    if (body.payUserType === 'mobile' && !body.mobile) ctx.throw(422, '付款方手机号必填');
+    if (body.relationType === 'user' && !body.user) ctx.throw(422, '付款人必填');
+    if (body.relationType === 'company' && !body.company) ctx.throw(422, '付款公司必填');
+    if (body.relationType === 'mobile' && !body.mobile) ctx.throw(422, '付款方手机号必填');
     if (!body.remittanceTime) ctx.throw(422, '转账时间必填');
     if (!body.accountingTime) ctx.throw(422, '到账时间必填');
-    if (body.payUserType === 'user') {
+    if (body.relationType === 'user') {
       let hasUser = await ctx.model.User.findById(body.user);
       if (!hasUser) ctx.throw(404, '付款人不存在');
     }
-    if (body.payUserType === 'company') {
+    if (body.relationType === 'company') {
       let hasCompany = await ctx.model.Company.findById(body.company);
       if (!hasCompany) ctx.throw(404, '付款公司不存在');
     }
@@ -40,21 +40,15 @@ class AccountChangeService extends Service {
     delete body.isChildren;
     delete body.children;
     delete body.settleRelation;
-    if (body.payUserType === 'user' || body.payUserType === 'company') {
+    if (body.relationType === 'user' || body.relationType === 'company') {
       let accountBody = {
-        type: body.payUserType,
-        company: body.toCompany
+        type: body.relationType,
+        company: body.toCompany,
+        relationType: body.relationType
       };
-      if (body.payUserType === 'user') {
-        accountBody.relationUser = body.user;
-      }
-      if (body.payUserType === 'company') {
-        accountBody.relationCompany = body.company;
-      }
-      let account = await ctx.service.account.set({
-        ...accountBody,
-        payUserType: body.payUserType
-      });
+      if (body.relationType === 'user') accountBody.relationUser = body.user;
+      if (body.relationType === 'company') accountBody.relationCompany = body.company;
+      let account = await ctx.service.account.set(accountBody);
       body.account = account._id;
     }
     let accountChange = new ctx.model.AccountChange(body);

@@ -30,8 +30,8 @@ Vue.mixin({
     globalLoading() {
       return this.$store.state.globalLoading;
     },
-    orderBadge() {
-      return this.$store.state.orderBadge;
+    headerBadge() {
+      return this.$store.state.headerBadge;
     },
     role() {
       return this.$store.state.role;

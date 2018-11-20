@@ -1,13 +1,8 @@
 const Service = require('egg').Service;
 
 class InvoiceService extends Service {
-  async setSettleRelation(forKey, setType) {
-    const ctx = this.ctx;
-    let req = ctx.request.body;
-    return await ctx.service.settleRelation.mutilSet(req.settleRelation);
-  }
-  async add() {
-    return await this.set();
+  async add(param) {
+    return await this.set(param);
   }
   async set(param) {
     const ctx = this.ctx;
@@ -38,6 +33,7 @@ class InvoiceService extends Service {
     if (body.toType === 'user') invoiceBody.toUser = body.toUser;
     if (body.toType === 'company') invoiceBody.toCompany = body.toCompany;
     if (body.toType === 'mobile') invoiceBody.toMobile = body.toMobile;
+    await ctx.service.settleRelation.mutilSetCheck(body.settleRelation);
     if (body._id) {
       await ctx.model.Invoice.update({
         _id: body._id
@@ -45,10 +41,12 @@ class InvoiceService extends Service {
         ...invoiceBody,
         checkFail: ''
       });
+      await ctx.service.settleRelation.mutilSet(body.settleRelation, body._id);
       return body._id;
     } else {
       let invoiceModel = new ctx.model.Invoice(invoiceBody);
       await invoiceModel.save();
+      await ctx.service.settleRelation.mutilSet(body.settleRelation, invoiceModel._id);
       return invoiceModel._id;
     }
   }

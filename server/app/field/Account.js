@@ -32,6 +32,15 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
+  relationType: {
+    name: '关联类型',
+    type: 'String',
+    default: 'company',
+    option: {
+      user: '个人',
+      company: '公司'
+    }
+  },
   relationCompany: {
     name: '关联公司',
     type: 'ObjectId',

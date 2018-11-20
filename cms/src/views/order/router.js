@@ -8,7 +8,7 @@ export default [{
   path: '/order',
   component: App,
   redirect: '/order/create',
-  name: '贸易订单管理',
+  name: '订单管理',
   meta: {
     keepAlive: true // 需要被缓存
   },

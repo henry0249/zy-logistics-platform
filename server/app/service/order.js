@@ -11,19 +11,72 @@ const areaPopulate = [{
 }, {
   path: 'street'
 }];
-const baseState = {
-  salesman: '业务员审核', //业务员审核
-  salesmanManager: '业务经理审核', //业务经理审核
-  tradeClerk: '贸易文员审核', //添加物流链
-  dispatcher: '调度专员调度', //添加物流链,提交配送,确认配送完成
-  dispatcherManager: '调度经理审核', //审核物流单,调度全部结束后进行一次订单审核
-  logisticsClerk: '物流文员审核', //审核物流单,调度全部结束后进行一次订单审核
-  documentClerk: '单据文员审核', //添加贸易链,物流链的结算价格,数量等
-  documentClerkManager: '单据主管审核', //审核单据文员操作,进入结算环节
-  // financial: '财务文员预审', //在此状态财务文员能进行批量修改贸易链结算价格,恢复贸易链价格等
-};
+// const orderBadgeState = {
+//   salesman: '业务员审核', //业务员审核
+//   salesmanManager: '业务经理审核', //业务经理审核
+//   tradeClerk: '贸易文员审核', //添加物流链
+//   dispatcher: '调度专员调度', //添加物流链,提交配送,确认配送完成
+//   dispatcherManager: '调度经理审核', //审核物流单,调度全部结束后进行一次订单审核
+//   logisticsClerk: '物流文员审核', //审核物流单,调度全部结束后进行一次订单审核
+// };
+const orderBadgeState = ['salesman', 'salesmanManager', 'tradeClerk'];
+const dispatchBadgeState = ['dispatcher', 'dispatcherManager', 'logisticsClerk'];
+const logisticsBadgeState = ['dispatcher', 'dispatcherManager', 'logisticsClerk'];
+const settleBadgeState = ['documentClerk', 'documentClerkManager', 'financial', 'settle', 'financialManager'];
 
 class OrderService extends Service {
+  async getModelBody(param) {
+    const ctx = this.ctx;
+    let req = param || ctx.request.body;
+    if (!req) ctx.throw(422, '订单信息未填', req);
+    if (!req.state) ctx.throw(422, '未选择订单状态', req);
+    if (!orderField.settlementMethod.option[req.settlementMethod]) ctx.throw(422, '非法的结算方式', req);
+    if (!orderField.transportModel.option[req.transportModel]) ctx.throw(422, '非法的运输方式', req);
+    if (!orderField.invoiceType.option[req.invoiceType]) ctx.throw(422, '非法的发票类型', req);
+    if (!orderField.state.option[req.state]) ctx.throw(422, '非法的订单状态', req);
+    if (!orderField.type.option[req.type]) ctx.throw(422, '非法的订单类型', req);
+    if (req.type === 'user' && !req.user) ctx.throw(422, "未选择下单用户", req);
+    if (req.type === 'company' && !req.company) ctx.throw(422, "未选择下单公司", req);
+    if (!req.handle) ctx.throw(422, "处理公司获取失败", req);
+    if (!req.contactName) ctx.throw(422, '未填写收货人', req);
+    if (!req.contactNumber) ctx.throw(422, '未填写收货人联系电话', req);
+    if (!req.area) ctx.throw(422, '未选择送货地址', req);
+    if (!req.goods) ctx.throw(422, '未选择商品', req);
+    let goods = await ctx.model.Goods.findById(req.goods);
+    if (!goods) ctx.throw(422, '商品不存在', req);
+    if (Number(req.count) <= 0) ctx.throw(422, '商品数量必须大于0', req);
+    if (Number(req.factory) <= 0) ctx.throw(422, '商品出厂单价必须大于0', req);
+    if (Number(req.sell) <= 0) ctx.throw(422, '商品销售单价必须大于0', req);
+    let modelBody = {
+      state: req.state,
+      type: req.type,
+      [req.type]: req[req.type],
+      handle: req.handle,
+      contactName: req.contactName,
+      contactNumber: req.contactNumber,
+      area: req.area,
+      areaInfo: req.areaInfo,
+      goods: req.goods,
+      count: req.count,
+      factory: req.factory,
+      sell: req.sell,
+      transport: Number(req.transport) > 0 && req.transport,
+      remark: req.remark,
+      deliveryTime: req.deliveryTime || new Date(),
+      finishTime: req.finishTime || new Date(),
+      settlementMethod: req.settlementMethod,
+      transportModel: req.transportModel,
+      invoiceType: req.invoiceType,
+    };
+    if (!req._id) modelBody.no = await ctx.helper.no(req.goods, req[req.type], 1);
+    if (req._id) {
+      let oldData = await ctx.model.Order.findById(req._id);
+      if (!oldData) ctx.throw(404, '订单不存在', req);
+      if (oldData.handle !== req.handle) ctx.throw(422, '处理公司已经发生变化,请返回重试', req);
+      if (oldData.state !== req.state) await this.stateChangeCheck(oldData);
+    }
+    return modelBody;
+  }
   async stateChangeCheck(order, msg) {
     if (order.state === 'salesman') {
       return true;
@@ -40,110 +93,6 @@ class OrderService extends Service {
       financial: ['documentClerkManager'], //在此状态财务文员能进行批量修改贸易链结算价格,恢复贸易链价格等
     };
     return await ctx.service.check.role(statePower[order.state], order.handle, msg, 400);
-  }
-  async setOrderInfo(payload) {
-    const ctx = this.ctx;
-    let body = ctx.request.body;
-    let info = JSON.parse(JSON.stringify(payload));
-    this.obj2id(info);
-    if (!info) ctx.throw(422, '订单信息未填', body);
-    if (!info.state) ctx.throw(422, '未选择订单状态', info);
-    if (!orderField.state.option[info.state]) ctx.throw(422, '非法的订单状态', info);
-    if (info.type === 'company' || info.type === 'user') {
-      if (info.type === 'company') delete info.user;
-      if (info.type === 'user') delete info.company;
-      if (!info[info.type]) ctx.throw(422, "未选择订单客户", info);
-    } else {
-      ctx.throw(422, "未选择订单客户", info);
-    }
-    if (!info.contactName) ctx.throw(422, '未填写收货人', info);
-    if (!info.contactNumber) ctx.throw(422, '未填写收货人联系电话', info);
-    if (!info.area) ctx.throw(422, '未选择送货地址', info);
-    if (!info.goods) ctx.throw(422, '未选择商品', info);
-    if (Number(info.count) <= 0) ctx.throw(422, '商品数量必须大于0', info);
-    if (Number(info.factory) <= 0) ctx.throw(422, '商品出厂单价必须大于0', info);
-    if (Number(info.sell) <= 0) ctx.throw(422, '商品销售单价必须大于0', info);
-    // if (Number(info.transport) <= 0) {
-    //   ctx.throw(422, '商品运输单价必须大于0', info);
-    // }
-    let goods = await ctx.model.Goods.findById(info.goods);
-    if (!goods) ctx.throw(422, '商品不存在', info);
-    info.handle = goods.company;
-    if (info._id) {
-      let update = JSON.parse(JSON.stringify(info));
-      await this.stateChangeCheck(update);
-      if (update.state === 'dispatcher') {
-        if (!(body.businessTrains instanceof Array && body.businessTrains.length > 0)) {
-          ctx.throw(422, '贸易链未添加', info);
-        }
-      }
-      if (update.state === 'dispatcherManager') {
-        if (body.transportTrains instanceof Array && body.transportTrains.length > 0) {
-          body.transportTrains.forEach((item) => {
-            if (Number(item.type) !== 2) {
-              if (body.transportTrains instanceof Array && item.logistics.length > 0) {
-                item.logistics.forEach((logisticsItem) => {
-                  if (logisticsItem.checkFail) {
-                    ctx.throw(422, '有物流单未通过审核', info);
-                  }
-                  if (Number(logisticsItem.state) !== 5) {
-                    ctx.throw(422, '存在未完成的物流单', info);
-                  }
-                });
-              } else {
-                ctx.throw(422, '物流单未全部完成,或有物流链节点未添加物流单', info);
-              }
-            }
-          });
-        } else {
-          ctx.throw(422, '物流链未添加', info);
-        }
-      }
-      if (update.state === 'documentClerkManager') {
-        if (body.transportTrains instanceof Array && body.transportTrains.length > 0) {
-          body.transportTrains.forEach((item) => {
-            if (Number(item.type) !== 2) {
-              if (body.transportTrains instanceof Array && item.logistics.length > 0) {
-                item.logistics.forEach((logisticsItem) => {
-                  if (Number(logisticsItem.balancePrice) <= 0) {
-                    ctx.throw(422, '物流单结算价格必须大于0', info);
-                  }
-                  if (Number(logisticsItem.balanceCount) <= 0) {
-                    ctx.throw(422, '物流单结算数量必须大于0', info);
-                  }
-                  if (Number(logisticsItem.loss) > Number(logisticsItem.landed)) {
-                    ctx.throw(422, '物流单损耗数量不能大于卸货数量', info);
-                  }
-                  if (Number(logisticsItem.loss) > 0 && !logisticsItem.lossCompany) {
-                    ctx.throw(422, '损耗数量大于0时,损耗承担方必填', info);
-                  }
-                  if (!logisticsItem.balanceCompany) {
-                    ctx.throw(422, '运费承担方必填', info);
-                  }
-                });
-              } else {
-                ctx.throw(422, '物流单未全部完成,或有物流链节点未添加物流单', info);
-              }
-            }
-          });
-        } else {
-          ctx.throw(422, '物流链未添加', info);
-        }
-      }
-      delete update._id;
-      delete update.createdAt;
-      delete update.updatedAt;
-      update.checkFail = "";
-      await ctx.model.Order.update({
-        _id: info._id
-      }, update);
-      return await ctx.model.Order.findById(info._id);
-    } else {
-      info.no = ctx.helper.no(info.goods, ctx.user._id, 1);
-      let order = new ctx.model.Order(info);
-      await order.save();
-      return order;
-    }
   }
   async setStock(order, businessTrains, nextBusinessTrains) {
     const ctx = this.ctx;
@@ -375,15 +324,26 @@ class OrderService extends Service {
     }
     return obj;
   }
-  async set() {
+  async set(param) {
     const ctx = this.ctx;
-    let body = ctx.request.body;
-    if (body.state) {
-      body.order.state = body.state;
+    let req = param || ctx.request.body;
+    let modelBody = await this.getModelBody(req);
+    let order;
+    if (req._id) {
+      modelBody.$unset = {
+        checkFail: 1
+      };
+      await ctx.model.Order.update({
+        _id: req._id
+      }, modelBody);
+      order = await ctx.model.Order.findById(req._id);
+    } else {
+      order = new ctx.model.Order(modelBody);
+      await order.save();
     }
-    let order = await this.setOrderInfo(body.order);
-    await this.setBusinessTrainsData(order, body.businessTrains);
-    await this.setTransportTrainsData(order, body.transportTrains);
+    // await ctx.service.businessTrains.mutilSet(req.businessTrains, order);
+    // await this.setBusinessTrainsData(order, body.businessTrains);
+    // await this.setTransportTrainsData(order, body.transportTrains);
     return 'ok';
   }
 
@@ -420,6 +380,34 @@ class OrderService extends Service {
     }
     return 'ok';
   }
+  //审核订单
+  async check() {
+    const ctx = this.ctx;
+    let req = ctx.request.body;
+    let newState = req.state;
+    if (!req._id) ctx.throw(422, '订单信息获取失败');
+    if (newState) ctx.throw(422, '审核状态获取失败');
+    if (!orderField.state.option(newState)) ctx.throw(422, '审核状态不合法');
+    let order = await ctx.model.Order.findById(req._id);
+    if (!order) ctx.throw(422, '订单不存在');
+    if (newState === order.state) ctx.throw(422, '订单已是当前审核状态,请勿重复审核');
+    let hasRole = await ctx.model.Role.findOne({
+      company: order.handle,
+      user: ctx.user._id,
+      type: newState
+    });
+    if (!hasRole) ctx.throw(400, '您的权限不足');
+    if (newState === 'dispatcher') await ctx.service.businessTrains.mutilSet(req.businessTrains, order);
+    if (newState === 'dispatcherManager') {
+      //校验物流链是否全部完成
+    };
+    await order.update({
+      state: newState
+    });
+    return 'ok';
+  }
+
+  //订单审核失败
   async checkFail() {
     const ctx = this.ctx;
     let checkFailState = {
@@ -469,85 +457,6 @@ class OrderService extends Service {
     return 'ok';
   }
 
-  async badge() {
-    const ctx = this.ctx;
-    let res = {};
-    for (const key in baseState) {
-      let role = await ctx.model.Role.find({
-        user: ctx.user._id,
-        type: key
-      });
-      let companySet = new Set();
-      role.forEach(item => {
-        if (item.company) {
-          companySet.add(item.company);
-        }
-      });
-      res[key] = await ctx.model.Order.count({
-        handle: {
-          $in: [...companySet]
-        },
-        state: key,
-      });
-    }
-    let logisticsRole = {
-      dispatcher: '调度专员', //添加物流链,提交配送,确认配送完成
-      dispatcherManager: '调度经理', //审核物流单
-      logisticsClerk: '物流文员', //审核物流单
-    };
-    res.logistics = {};
-    for (const key in logisticsRole) {
-      let roleList = await ctx.model.Role.find({
-        type: key,
-        user: ctx.user._id
-      });
-      let mySet = new Set();
-      for (let i = 0; i < roleList.length; i++) {
-        let item = roleList[i];
-        if (item.company) {
-          mySet.add(item.company.toString());
-        }
-      }
-      let companyArr = [...mySet];
-      res.logistics[key] = 0;
-      for (let i = 0; i < companyArr.length; i++) {
-        let findBody = {
-          state: {
-            $nin: [5]
-          },
-          handle: companyArr[i],
-          checkFail: '',
-          price: {
-            $gt: 0
-          },
-          $or: [{
-            ship: {
-              $exists: true
-            }
-          }, {
-            truck: {
-              $exists: true
-            }
-          }]
-        }
-        if (key === 'dispatcher') {
-          findBody.dispatcherManagerCheck = true;
-          findBody.logisticsClerkCheck = true;
-        }
-        if (key === 'dispatcherManager') {
-          findBody.dispatcherManagerCheck = false;
-          findBody.logisticsClerkCheck = false;
-        }
-        if (key === 'logisticsClerk') {
-          findBody.dispatcherManagerCheck = true;
-          findBody.logisticsClerkCheck = false;
-        }
-        let count = await ctx.model.Logistics.count(findBody);
-        res.logistics[key] += count;
-      }
-    }
-    return res;
-  }
   async companyBadge() {
     const ctx = this.ctx;
     let body = ctx.request.body;
@@ -557,9 +466,7 @@ class OrderService extends Service {
     }).populate([{
       path: 'company'
     }]);
-    if (!body.handle) {
-      ctx.throw(422, '当前公司信息必填');
-    }
+    if (!body.handle) ctx.throw(422, '当前公司信息必填');
     let appendAcitiveCompany = true;
     let companySet = new Set();
     role.forEach(item => {

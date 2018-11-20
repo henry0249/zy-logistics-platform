@@ -14,7 +14,7 @@ const store = new Vuex.Store({
     company: {},
     loginInfo: {},
     field: {},
-    orderBadge: {},
+    headerBadge: {},
     baseUrl: window.location.protocol + '//' + window.location.host,
     role: {},
   },
@@ -41,8 +41,8 @@ const store = new Vuex.Store({
     setRole(state, data) {
       state.role = data || {};
     },
-    setOrderBadge(state, data) {
-      state.orderBadge = data || {};
+    setHeaderBadge(state, data) {
+      state.headerBadge = data || {};
     },
     setToken(state, data) {
       if (data) {
@@ -81,8 +81,8 @@ const store = new Vuex.Store({
           });
           context.commit('setRole', roleInfo);
         }
-        let orderBadgeRes = await ajax('/order/badge');
-        context.commit('setOrderBadge', orderBadgeRes);
+        let headerBadgeRes = await ajax('/badge/header');
+        context.commit('setHeaderBadge', headerBadgeRes);
       } catch (error) {
         router.replace('/');
       }
@@ -91,9 +91,9 @@ const store = new Vuex.Store({
       let res = await ajax.get('/field');
       context.commit('setField', res);
     },
-    async getOrderBadge(context, payload) {
-      let res = await ajax.get('/order/badge');
-      context.commit('setOrderBadge', res);
+    async getHeaderBadge(context, payload) {
+      let res = await ajax.get('/badge/header');
+      context.commit('setHeaderBadge', res);
     },
     async getRole(context, payload) {
       let res = await ajax.post('/rolePower', {
@@ -101,11 +101,11 @@ const store = new Vuex.Store({
       });
       context.commit('setRole', res);
     },
-    async orderBadgeNotify(context, payload) {
-      let oldBadge = JSON.parse(JSON.stringify(context.state.orderBadge));
-      let res = await ajax.get('/order/badge');
+    async headerBadgeNotify(context, payload) {
+      let oldBadge = JSON.parse(JSON.stringify(context.state.headerBadge));
+      let res = await ajax.get('/badge/header');
       let newBadge = res;
-      context.commit('setOrderBadge', res);
+      context.commit('setHeaderBadge', res);
       return {
         newBadge,
         oldBadge

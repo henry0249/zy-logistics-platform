@@ -2,7 +2,7 @@ const Service = require('egg').Service;
 const businessTrainsField = require('../field/BusinessTrains');
 
 class BusinessTrainsService extends Service {
-  formaterField(param) {
+  getModelBody(param) {
     const ctx = this.ctx;
     let req = param;
     if (!req) return;
@@ -30,7 +30,7 @@ class BusinessTrainsService extends Service {
       req.balanceType = 'company';
       req.balanceCompany = req.company;
     }
-    let initBody = {
+    let modelBody = {
       customerType: req.customerType,
       type: req.type,
       order: req.order,
@@ -46,23 +46,23 @@ class BusinessTrainsService extends Service {
       prePrepaid: req.prePrepaid,
       preInvoiced: req.preInvoiced
     };
-    if (req._id) initBody._id = req._id;
-    if (req.balanceUser) initBody.balanceUser = req.balanceUser;
-    if (req.balanceCompany) initBody.balanceCompany = req.balanceCompany;
+    if (req._id) modelBody._id = req._id;
+    if (req.balanceUser) modelBody.balanceUser = req.balanceUser;
+    if (req.balanceCompany) modelBody.balanceCompany = req.balanceCompany;
     if (req.type === 'supplier' || req.type === 'pool') {
       if (req.supplyCount <= 0) ctx.throw(422, '供货数量不能小于0', req);
       if (req.supplyPrice <= 0) ctx.throw(422, '供货价格不能小于0', req);
-      initBody.supplyCount = req.supplyCount;
-      initBody.supplyPrice = req.supplyPrice;
+      modelBody.supplyCount = req.supplyCount;
+      modelBody.supplyPrice = req.supplyPrice;
     }
-    return initBody;
+    return modelBody;
   }
 
   async set(param, last) {
     const ctx = this.ctx;
     let req = param || ctx.request.body;
     if (!req) return {};
-    let modelBody = this.formaterField(req);
+    let modelBody = this.getModelBody(req);
     if (!modelBody) return {};
     if (last) {
       if (last.type === 'supplier' || last.type === 'pool') {
@@ -88,12 +88,17 @@ class BusinessTrainsService extends Service {
     await this.set(param, last);
   }
 
-  async mutilSet(param) {
+  async mutilSet(param, orderInfo) {
     const ctx = this.ctx;
     let req = param || ctx.request.body;
-    if (!req) return;
-    if (!(req instanceof Array)) return;
+    if (!req) ctx.throw(422, '贸易链尚未添加', req);
+    if (!(req instanceof Array)) ctx.throw(422, '贸易链必须是数组', req);
     if (req.length < 2) ctx.throw(422, '贸易链至少两个节点', req);
+    if (req.length < 2) ctx.throw(422, '贸易链至少两个节点', req);
+    if (!orderInfo) ctx.throw(422, '贸易节点订单信息获取失败', req);
+    if (!orderInfo._id) ctx.throw(422, '贸易节点订单信息获取失败', req);
+    if (!orderInfo.goods) ctx.throw(422, '贸易节点商品信息获取失败', req);
+    if (!orderInfo.handle) ctx.throw(422, '贸易节点处理公司获取失败', req);
     let res = [];
     for (let i = 0; i < req.length; i++) {
       let item = req[i];
@@ -104,12 +109,15 @@ class BusinessTrainsService extends Service {
       } else {
         item.type = 'pool';
       }
+      item.order = orderInfo._id;
+      item.handle = orderInfo.handle;
+      item.goods = orderInfo.goods;
     }
     for (let i = 0; i < req.length; i++) {
-      let item = this.formaterField(req[i]);
+      let item = this.getModelBody(req[i]);
       let last;
       if (i > 0) {
-        last = this.formaterField(req[i - 1]);
+        last = this.getModelBody(req[i - 1]);
       }
       let data = await this.set(item, last);
       res.push(data._id);
@@ -123,22 +131,34 @@ class BusinessTrainsService extends Service {
         update.last = res[i - 1];
       } else {
         update.last = res[i - 1];
-        update.last = res[i + 1];
+        update.next = res[i + 1];
       }
       await ctx.model.BusinessTrains.update({
         _id: item
       }, update);
+      if (update.next) {
+        let accountBody = {
+          type: 'company',
+          relationType:'company',
+          relationCompany: update.next.company
+        };
+        if (update.next.customerType && update.next.customerType === 'user') {
+          accountBody = {
+            type:'user',
+            relationType:'user',
+            relationUser: update.next.user
+          }
+        }
+        await ctx.service.account.set(accountBody)
+      }
     }
+    await ctx.model.Order.update({
+      _id: orderId
+    }, {
+      businessTrains: res
+    });
     return res;
   }
-
-  // async settle(param) {
-  //   const ctx = this.ctx;
-  //   let req = param || ctx.request.body;
-  //   if (!req._id) ctx.throw(422, '贸易节点信息获取失败', req);
-  //   let businessTrains = ctx.model.BusinessTrains.findById(req._id);
-  //   if (!businessTrains) ctx.throw(404, '贸易节点不存在', req);
-  // }
 
   async delete() {
     const ctx = this.ctx;

@@ -45,8 +45,7 @@ module.exports = {
       documentClerk: '单据文员审核未通过',
       documentClerkManager: '单据主管审核未通过',
       financial: '财务文员预审未通过'
-    },
-    default: ""
+    }
   },
   handle: {
     name: '处理公司',
@@ -77,8 +76,8 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Area'
   },
-  address: {
-    name: '详细地址',
+  areaInfo: {
+    name: '地址字符串',
     type: 'String',
   },
   contactName: {

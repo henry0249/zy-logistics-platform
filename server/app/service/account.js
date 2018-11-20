@@ -1,44 +1,52 @@
 const Service = require('egg').Service;
 
 class CompanyService extends Service {
-  async add() {
-    return await this.set();
-  }
-  async set(data) {
+  async checkExisit(param, model, tip) {
     const ctx = this.ctx;
-    let body = data || ctx.request.body;
-    let res = {};
-    if (body._id) {
-      return body;
+    if (!param) ctx.throw(422, `${tip}获取失败`);
+    let hasData = await ctx.model[model].findById(param);
+    if (!hasData) ctx.throw(404, `${tip}不存在`);
+    return true;
+  }
+  async getModelBody(param) {
+    const ctx = this.ctx;
+    let req = param || ctx.request.body;
+    console.log(param);
+    let modelBody = {};
+    if (!(req.type === 'user' || req.type === 'company')) ctx.throw('422', '账户类型错误');
+    if (req.type === 'company') {
+      await this.checkExisit(req.company, 'Company', '公司');
+      modelBody.company = req.company;
     }
-    if (!(body.type === 'user' || body.type === 'company')) ctx.throw('422', '账户类型错误');
-    if (!body.company) ctx.throw('422', '公司信息必填');
-    if (body.type === 'user' && !body.relationUser) ctx.throw('422', '关联信息错误');
-    if (body.type === 'company' && !body.relationCompany) ctx.throw('422', '关联信息错误');
-    if (body.relationUser && body.relationCompany) ctx.throw('422', '不能同时关联公司和用户');
-    let findBody = {
-      type: body.type,
-      company: body.company
-    };
-    if (body.payUserType === 'user') {
-      let hasUser = await ctx.model.User.findById(body.user);
-      if (!hasUser) ctx.throw(404, '付款人不存在');
-      findBody.relationUser = body.relationUser;
+    if (req.type === 'user') modelBody.user = ctx.user._id;
+    modelBody.type = req.type;
+
+    if (!(req.relationType === 'user' || req.relationType === 'company')) ctx.throw('422', '账户关联类型错误');
+    if (req.relationUser && req.relationCompany) ctx.throw('422', '不能同时关联公司和用户');
+    if (req.relationType === 'user') {
+      await this.checkExisit(req.relationUser, 'User', '关联用户');
+      modelBody.relationUser = req.relationUser;
     }
-    if (body.payUserType === 'company') {
-      let hasCompany = await ctx.model.Company.findById(body.company);
-      if (!hasCompany)
-        findBody.relationCompany = body.relationCompany;
-      if (body.relationCompany === body.company) return {};
+    if (req.relationType === 'company') {
+      await this.checkExisit(req.relationCompany, 'Company', '关联公司');
+      modelBody.relationCompany = req.relationCompany;
     }
-    let hasAccount = await ctx.model.Account.findOne(findBody);
-    if (hasAccount) {
-      return hasAccount;
-    }
-    let model = new ctx.model.Account(body);
+    modelBody.relationType = req.relationType;
+    if (req.name) modelBody.name = req.name;
+    return modelBody;
+  }
+  async add(param) {
+    return await this.set(param);
+  }
+  async set(param) {
+    const ctx = this.ctx;
+    let req = param || ctx.request.body;
+    let modelBody = await this.getModelBody(req);
+    let hasAccount = await ctx.model.Account.findOne(modelBody);
+    if (hasAccount) return hasAccount;
+    let model = new ctx.model.Account(modelBody);
     await model.save();
-    res = await ctx.model.Account.findById(model._id);
-    return res;
+    return model;
   }
 
   async relationTab() {
@@ -50,55 +58,40 @@ class CompanyService extends Service {
     let res = [];
     let accountData = await ctx.model.Account.find({
       company: company._id,
-      $or: [{
-          relationCompany: {
-            $exists: true
-          }
-        },
-        {
-          relationUser: {
-            $exists: true
-          }
-        }
-      ]
     }).populate([{
       path: 'relationUser'
     }, {
       path: 'relationCompany'
     }]);
     for (let i = 0; i < accountData.length; i++) {
-      const item = accountData[i];
-      let resItem = {
-        value: item.value,
-        prepaid: item.prepaid
-      };
+      let item = JSON.parse(JSON.stringify(accountData[i]));
       if (item.relationCompany && item.relationCompany._id) {
-        resItem._id = item.relationCompany._id;
-        resItem.name = item.relationCompany.name || item.relationCompany.nick || item.relationCompany.code || item.relationCompany.mobile;
+        item.relationCompany = {
+          _id: item.relationCompany._id,
+          name: item.relationCompany.name || item.relationCompany.nick || item.relationCompany.code || item.relationCompany.mobile
+        };
       }
       if (item.relationUser && item.relationUser._id) {
-        resItem.isUser = true;
-        resItem._id = item.relationUser._id;
-        resItem.name = item.relationUser.name || item.relationUser.nick || item.relationUser.mobile;
+        item.relationUser = {
+          _id: item.relationUser._id,
+          name: item.relationUser.name || item.relationUser.nick || item.relationUser.mobile
+        };
       }
-      let findBody = {
-        company: company._id,
-        relationType: item.type,
-        withoutList: true
-      };
-      if (findBody.relationType === 'company') findBody.relationCompany = item.relationCompany._id;
-      if (findBody.relationType === 'user') findBody.relationUser = item.relationUser._id;
-      resItem.waitingForInvoice = await this.waitingForInvoice(findBody);
-      res.push(resItem);
+      item.invoiceData = await this.settleList({
+        ...item,
+        withoutList: true,
+        modelType: 'invoice'
+      });
+      res.push(item);
     }
     return res;
   }
 
-  async waitingForInvoice(params) {
+  async settleList(params) {
     const ctx = this.ctx;
     let req = params || ctx.request.body;
     if (!req.company) ctx.throw(422, '公司信息获取失败');
-    if (!req.relationType) ctx.throw(422, '收方类型获取失败');
+    if (!req.relationType) ctx.throw(422, '关联类型获取失败');
     if (['user', 'company'].indexOf(req.relationType) < 0) ctx.throw(422, '关联类型错误');
     if (req.relationType === 'company' && !req.relationCompany) ctx.throw(422, '关联公司信息获取失败');
     if (req.relationType === 'user' && !req.relationUser) ctx.throw(422, '关联用户信息获取失败');
@@ -142,14 +135,14 @@ class CompanyService extends Service {
       });
       for (let i = 0; i < data.length; i++) {
         let item = JSON.parse(JSON.stringify(data[i]));
-        if (modelName === 'BusinessTrains') item.isBusinessTrains = true;
-        if (modelName === 'Logistics') item.isLogistics = true;
-        let invoicedLess = item.balancedSettlement + item.balancedPrepaid - item.invoiced - item.preInvoiced;
-        if (req.withoutInvoiced) { //修改发票时,preInvoiced排除
-          invoicedLess += item.preInvoiced;
-        }
-        total += invoicedLess;
-        if (invoicedLess > 0) list.push(item);
+        if (modelName === 'BusinessTrains') item.dataType = 'businessTrains';
+        if (modelName === 'Logistics') item.dataType = 'logistics';
+        let less = await ctx.service.settleRelation.getSettleLess({
+          dataType: item.dataType,
+          [item.dataType]: item._id,
+          modelType: req.modelType
+        });
+        if (less !== undefined && less > 0) list.push(item);
       }
     }
     let res = {
@@ -320,7 +313,10 @@ class CompanyService extends Service {
           .find(item.find)
           .populate(populate)
           .limit(limit)
-          .skip(skip);
+          .skip(skip)
+          .sort({
+            createdAt: -1
+          });
         for (let j = 0; j < listData.length; j++) {
           let listDataItem = listData[j];
           if (listDataItem.checkFail) {

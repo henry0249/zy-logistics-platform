@@ -34,12 +34,12 @@ export default {
     async createOrder() {
       this.loadingText = "创建中...";
       try {
-        let body = {
-          order: this.order,
+        let req = this.$refs.orderInfo.getRequestData();
+        await this.$ajax.post("/order/add", {
+          ...req,
           state: "salesman"
-        };
-        await this.$ajax.post("/order/set", body);
-        await this.$store.dispatch("orderBadgeNotify");
+        });
+        await this.$store.dispatch("getHeaderBadge");
         this.$message.success("成功创建订单");
         this.loadingText = "正在刷新";
         this.show = false;
