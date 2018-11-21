@@ -125,9 +125,7 @@
               }
             }
           }
-        } catch (error) {
-          console.log(error);
-        }
+        } catch (error) {}
         this.loadingText = '';
         await this.getData();
       },

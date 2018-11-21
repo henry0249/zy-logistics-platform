@@ -143,7 +143,6 @@
         return await this.$ajax.post('/account/relation/list', data);
       },
       check(scope) {
-        console.log(scope);
         let query = {
           activeName: this.activeName,
           payName: this.payName,
@@ -170,7 +169,6 @@
     },
     created() {
       this.newData = JSON.parse(JSON.stringify(this.data));
-      console.log(this.newData);
     }
   }
 </script>

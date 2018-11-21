@@ -96,9 +96,7 @@
               update
             })
             await this.getCompany();
-          } catch (error) {
-            console.log(error);
-          }
+          } catch (error) {}
           this.loadingText = '';
         }
       },
@@ -133,8 +131,6 @@
           this.$set(this.transportTrainsRelation, 'transportTrainsRelationCompany', this.initData.transportTrainsRelationCompany);
           this.$set(this.businessRelation, 'relationCode', '');
           this.$set(this.businessRelation, 'businessRelationCompany', this.initData.businessRelationCompany);
-          console.log(this.businessRelation);
-          console.log(this.transportTrainsRelation);
         } catch (error) {}
         this.loadingText = '';
       }

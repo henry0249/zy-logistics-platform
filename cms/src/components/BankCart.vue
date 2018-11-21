@@ -40,9 +40,6 @@
       };
     },
     watch: {
-      allDisabled(val) {
-        console.log('out', val);
-      },
       initData: {
         handler(val) {
           this.form = val;
@@ -65,7 +62,7 @@
     },
     created() {
       this.form = JSON.parse(JSON.stringify(this.initData));
-      console.log('222',this.allDisabled);
+      console.log('object', this.initData);
     }
   };
 </script>

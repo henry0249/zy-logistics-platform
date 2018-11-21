@@ -62,7 +62,7 @@
           this.loadingText = '加载中';
           let path = this.$route.query.titleType === 'isReceive' ? '/accountChange/findOne' : '/invoice/findOne'
           this.data = await this.$ajax.post(path, {
-            _id: this.$route.query._id,
+            _id: this.$route.params._id,
             populate: [{
               path: 'company'
             }, {

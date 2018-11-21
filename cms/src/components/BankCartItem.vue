@@ -5,10 +5,18 @@
         <slot name="header">
           <div class="jb">
             <div class="jc js">
-              <common-select-by-code v-if="isFrom && !isInvoice" width="300px" :userType.sync="data.from.userType" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未选择" label="付款方"></common-select-by-code>
-              <common-select-by-code v-if="!isFrom && !isInvoice" width="300px" :userType.sync="data.to.userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收款方"></common-select-by-code>
-              <common-select-by-code v-if="isFrom && isInvoice" width="300px" :userType.sync="data.from.userType" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未注册公司或用户" label="开票方"></common-select-by-code>
-              <common-select-by-code v-if="!isFrom && isInvoice" width="300px" :userType.sync="data.to.userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未注册公司或用户" label="收票方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom && !isInvoice && data.from.userType === 'company'" width="300px" :userType.sync="data.from.userType" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未选择" label="付款方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom && !isInvoice && data.from.userType === 'user'" width="300px" :userType.sync="data.from.userType" :disabled="data.from.disabled" user check :data.sync="data.user" size="mini" placeholder="未选择" label="付款方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom && !isInvoice && data.from.userType === 'mobile'" width="300px" :userType.sync="data.from.userType" :disabled="data.from.disabled" mobile check :data.sync="data.mobile" size="mini" placeholder="未注册公司或用户" label="付款方"></common-select-by-code>
+              <common-select-by-code v-if="!isFrom && !isInvoice && data.to.userType === 'company'" width="300px" :userType.sync="data.to.userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未选择" label="收款方"></common-select-by-code>
+              <common-select-by-code v-if="!isFrom && !isInvoice && data.to.userType === 'user'" width="300px" :userType.sync="data.to.userType" :disabled="data.to.disabled" user check :data.sync="data.toUser" size="mini" placeholder="未选择" label="收款方"></common-select-by-code>
+              <common-select-by-code v-if="!isFrom && !isInvoice && data.to.userType === 'mobile'" width="300px" :userType.sync="data.to.userType" :disabled="data.to.disabled" mobile check :data.sync="data.toMobile" size="mini" placeholder="未注册公司或用户" label="收款方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom && isInvoice && data.from.userType === 'company'" width="300px" :userType.sync="data.from.userType" :disabled="data.from.disabled" company check :data.sync="data.company" size="mini" placeholder="未选择" label="开票方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom && isInvoice && data.from.userType === 'user'" width="300px" :userType.sync="data.from.userType" :disabled="data.from.disabled" user check :data.sync="data.user" size="mini" placeholder="未选择" label="开票方"></common-select-by-code>
+              <common-select-by-code v-if="isFrom && isInvoice && data.from.userType === 'mobile'" width="300px" :userType.sync="data.from.userType" :disabled="data.from.disabled" mobile check :data.sync="data.mobile" size="mini" placeholder="未注册公司或用户" label="开票方"></common-select-by-code>
+              <common-select-by-code v-if="!isFrom && isInvoice && data.to.userType === 'company'" width="300px" :userType.sync="data.to.userType" :disabled="data.to.disabled" company check :data.sync="data.toCompany" size="mini" placeholder="未选择" label="收票方"></common-select-by-code>
+              <common-select-by-code v-if="!isFrom && isInvoice && data.to.userType === 'user'" width="300px" :userType.sync="data.to.userType" :disabled="data.to.disabled" user check :data.sync="data.toUser" size="mini" placeholder="未选择" label="收票方"></common-select-by-code>
+              <common-select-by-code v-if="!isFrom && isInvoice && data.to.userType === 'mobile'" width="300px" :userType.sync="data.to.userType" :disabled="data.to.disabled" mobile check :data.sync="data.toMobile" size="mini" placeholder="未注册公司或用户" label="收票方"></common-select-by-code>
             </div>
             <div class="jc js">
               <my-form-item number :controls="!numberDis" :disabled="numberDis" :min="0" width="200px" size="mini" :label="numberText" v-model.number="data.value"></my-form-item>
@@ -17,7 +25,7 @@
           <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
           <div class="jb" v-if="isInvoice">
             <div class="jc js">
-              <my-form-item width="300px" :controls="allDisabled?true:isfrom" :disabled="taxRateDisabled" number :min="0" size="mini" v-model="data.taxRate" label="税率" placeholder="请输入税率"></my-form-item>
+              <my-form-item width="300px" :controls="taxRateControls" :disabled="taxRateDisabled" number :min="0" size="mini" v-model="data.taxRate" label="税率" placeholder="请输入税率"></my-form-item>
             </div>
             <div class="jc js">
               <my-form-item width="200px" :disabled="taxRateDisabled" select :options="field.Invoice.type.option" size="mini" v-model="data.type" label="发票类型" placeholder="请选择"></my-form-item>
@@ -153,14 +161,10 @@
         if (this.allDisabled) {
           return true;
         } else {
-          if (this.isInvoice) {
-            return true;
+          if (this.isFrom) {
+            return false;
           } else {
-            if (this.isFrom) {
-              return false;
-            } else {
-              return true;
-            }
+            return true;
           }
         }
       },
@@ -181,6 +185,9 @@
         }
         return data;
       },
+      taxRateControls() {
+        return this.allDisabled || this.isFrom;
+      },
       type() {
         for (const key in this.$attrs) {
           if (key === 'from') {
@@ -192,6 +199,7 @@
         }
       },
       isFrom() {
+        console.log('1111', this.type === 'from');
         return this.type === 'from';
       }
     },
@@ -328,11 +336,7 @@
         }
       }
     },
-    created() {
-      if (this.allDisabled) {
-        console.log('23333');
-      }
-    }
+    created() {}
   }
 </script>
 

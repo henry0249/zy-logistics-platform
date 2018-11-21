@@ -34,6 +34,11 @@
       }
     },
     watch: {
+      $route: {
+        handler(val) {
+          this.$store.dispatch('getRole', this.company._id);
+        }
+      },
       async routeShow(val) {
         if (!val) {
           try {
@@ -49,9 +54,7 @@
               this.isUser = this.payArr[0].isUser;
               this.payName = this.payArr[0].type;
             }
-          } catch (error) {
-            console.log(error);
-          }
+          } catch (error) {}
           this.loadingText = '';
         }
       }
@@ -80,6 +83,7 @@
           await this.getTabsData();
           this.obj = this.accountData[val.index];
           this.activeName = val.name;
+          this.payName = 'received';
           await this.getData(this.obj, 'received');
           this.tableData = this.payArr[val.index].list;
           this.isUser = this.payArr[val.index].isUser;
@@ -120,6 +124,7 @@
       },
     },
     async created() {
+      this.$store.dispatch('getRole', this.company._id);
       if (!this.routeShow) {
         try {
           this.loadingText = '加载中';

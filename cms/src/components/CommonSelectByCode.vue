@@ -63,10 +63,10 @@
           </div>
           <el-table @cell-click="cellClick" v-if="dialogTableVisible" border stripe size="mini" :data="tableData">
             <template v-for="(item, key) in thead">
-                                      <el-table-column v-if="key === 'type'" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
-                                        <template slot-scope="scope">
-                                          <el-tag size="mini" v-for="v in scope.row.type" :key="v.id">{{field.Company.type.option[v]}}</el-tag>
-</template>
+              <el-table-column v-if="key === 'type'" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
+                <div slot-scope="scope">
+                  <el-tag size="mini" v-for="v in scope.row.type" :key="v.id">{{field.Company.type.option[v]}}</el-tag>
+                </div>
               </el-table-column>
               <el-table-column v-else show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
               </el-table-column>

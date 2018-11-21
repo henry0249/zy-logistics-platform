@@ -53,7 +53,6 @@
       company: {
         handler(val) {
           // this.getRole();
-          console.log(val);
           this.$router.push({
             path: '/company/edit'
           })

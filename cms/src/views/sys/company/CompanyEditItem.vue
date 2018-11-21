@@ -18,10 +18,10 @@
       <my-form-item input width="100%" v-model="companyData.areaInfo" ref="addressInput" filterable label="详细地址"></my-form-item>
     </div>
     <div class="flex jb" style="margin-top:15px;">
-      <common-select-by-code label="贸易链关联公司" type="businessRelationCompany" :data.sync="business.businessRelationCompany" title="贸易链关联公司选择" company size="mini"></common-select-by-code>
+      <common-select-by-code label="贸易链关联公司" type="businessRelationCompany" userType="company" :data.sync="business.businessRelationCompany" title="贸易链关联公司选择" company size="mini"></common-select-by-code>
     </div>
     <div class="flex jb" style="margin-top:15px;">
-      <common-select-by-code label="物流链关联公司" border type="transportTrainsRelationCompany" :data.sync="transport.transportTrainsRelationCompany" title="物流链关联公司选择" company size="mini"></common-select-by-code>
+      <common-select-by-code label="物流链关联公司" border type="transportTrainsRelationCompany" userType="company" :data.sync="transport.transportTrainsRelationCompany" title="物流链关联公司选择" company size="mini"></common-select-by-code>
     </div>
   </my-form>
 </template>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <bank-cart :allDisabled="boo" :data.sync="newData" :initData="initData" style="width:100%">
+    <bank-cart :allDisabled="boo" :isInvoice="isInvoice" :data.sync="newData" :initData="initData" style="width:100%">
     </bank-cart>
   </div>
 </template>
@@ -37,15 +37,7 @@
     },
     computed: {
       isInvoice() {
-        if (!this.$route.params._id) {
-          return false;
-        } else {
-          if (this.$route.query.payName === 'received' || this.$route.query.payName === 'invoice') {
-            return false;
-          } else {
-            return true;
-          }
-        }
+        return this.$route.query.titleType === 'isInvoice';
       },
     },
     created() {
