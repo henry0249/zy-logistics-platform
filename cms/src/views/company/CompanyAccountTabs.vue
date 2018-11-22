@@ -1,5 +1,5 @@
 <template>
-  <loading-box v-model="loadingText">
+  <loading-box v-loading.fullscreen.lock="loadingText">
     <el-tabs v-model="activeName" @tab-click="tabClick">
       <el-tab-pane v-for="item in data" :name="item.relationCompany._id" :key="item.relationCompany.id" :label="item.relationType === 'user'?item.relationCompany.name + '(个人)' : item.relationCompany.name">
         <div class="col-flex tab-height">
@@ -7,7 +7,7 @@
             <div class="jc js">
               <span>结算款：<span style="margin-right:30px;" class="blue">{{item.value}}</span> 预付款：<span class="danger">{{item.prepaid}}</span></span>
               <div class="marginRight" style="font-size:13px;margin:0 30px;">可开票总金额：<span class="blue"> {{item.invoiceData.total}}</span></div>
-              <el-button :disabled="item.invoiceData.total === 0" type="success" size="mini" @click="setInvoice">去开票</el-button>
+              <el-button type="success" size="mini" @click="setInvoice">去开票</el-button>
             </div>
             <div class="js">
               <el-button @click="goAccountChange('5',activeName)" size="mini">收款</el-button>
@@ -32,6 +32,10 @@
   import table_js from './CompanyAccount.js';
   export default {
     props: {
+      loadingText: {
+        type: String,
+        default: ''
+      },
       dataJs: {
         type: Object,
         default () {
@@ -57,11 +61,15 @@
       initPayName: {
         type: String,
         default: ''
-      }
+      },
+      isUser: {
+        type: Boolean,
+        default: false
+      },
     },
     data() {
       return {
-        loadingText: '',
+        // loadingText: '',
         activeName: '',
         payName: '',
         table_js
@@ -77,8 +85,8 @@
             activeName: _id,
             show: 'true',
             titleType: 'isReceive',
-            relationType: 'company',
-            toUserType: 'company'
+            relationType: this.isUser ? 'user' : 'company',
+            toUserType: this.$attrs.userType
           }
         })
       },
@@ -94,7 +102,18 @@
           index: val.index
         });
       },
-      setInvoice() {},
+      setInvoice() {
+        this.$router.push({
+          path: '/company/account/invoice',
+          query: {
+            activeName: this.activeName,
+            show: 'true',
+            titleType: 'isInvoice',
+            relationType: this.$attrs.userType,
+            toUserType: this.isUser ? 'user' : 'company'
+          }
+        })
+      },
       badge(val) {
         if (val.type === 'receivedCheck' || val.type === 'receivedEditCheck' || val.type === 'invoiceCheck' || val.type === 'invoiceEditCheck') {
           if (val.count) {

@@ -6,9 +6,9 @@
       </div>
       <div v-if="!loadingText">
         <common-alert style="margin:15px 0">{{isInvoice?'发票信息':'流水信息'}}</common-alert>
-        <all-cart :data.sync="cartData" :init-data="initCartData"></all-cart>
+        <all-cart :isUser="isUser" :data.sync="cartData" :init-data="initCartData"></all-cart>
         <common-alert v-if="showTable" style="margin:15px 0">运单或者订单信息</common-alert>
-        <all-table v-if="showTable" :data.sync="tableData" :init-data="initTableData"></all-table>
+        <all-table :isUser="isUser" v-if="showTable" :data.sync="tableData" :init-data="initTableData"></all-table>
       </div>
       <div v-if="isShow">
         <common-alert style="margin:15px 0">下方是申请修改的数据（可以选择替换数据，然后点击审核通过按钮通过审核，也可以直接审核通过）</common-alert>
@@ -48,6 +48,10 @@
         }
       },
       edit: {
+        type: Boolean,
+        default: false
+      },
+      isUser: {
         type: Boolean,
         default: false
       }
@@ -101,7 +105,7 @@
         return this.data.children;
       },
       isShow() {
-        if (this.showChild) {
+        if (this.showChild && this.$route.query.payName === 'invoiceCheck') {
           return this.hasChild;
         } else {
           return false;
@@ -202,16 +206,14 @@
             obj.relationType = obj.from.userType;
             obj.toType = obj.to.userType;
             if (obj.to.userType === 'user') {
-              obj.toUser = this.user._id;
+              obj.toUser = this.cartData.toUser._id;
             } else if (obj.to.userType === 'company') {
-              obj.toCompany = this.company._id;
+              obj.toCompany = this.cartData.toCompany._id;
             }
             if (obj.from.userType === 'user') {
-              obj.user = this.$route.query.activeName;
-            } else if (obj.to.userType === 'company') {
-              obj.company = this.$route.query.activeName;
-            } else {
-              obj.mobile = this.$route.query.activeName;
+              obj.user = this.cartData.user._id;
+            } else if (obj.from.userType === 'company') {
+              obj.company = this.cartData.company._id;
             }
             if (this.hasChild) {
               obj.value = this.data.children.value;
@@ -235,12 +237,14 @@
             } else if (this.$route.query.toUserType === "user") {
               obj.toUser = this.cartData.toUser._id;
             }
-            if (this.$route.query.type === "5") {
-              obj.type = 1;
-            } else if (this.$route.query.type === "6") {
-              obj.type = 4;
-            } else {
-              obj.type = this.$route.query.type;
+            if (this.$route.query.titleType === 'isReceive') {
+              if (this.$route.query.type === "5") {
+                obj.type = 1;
+              } else if (this.$route.query.type === "6") {
+                obj.type = 4;
+              } else {
+                obj.type = this.$route.query.type;
+              }
             }
             this.$set(obj, "_id", this.$route.params._id);
             this.$set(obj, "handle", this.company._id);
@@ -268,61 +272,48 @@
           }
         }
         if (this.cartData.value === 0) {
-          this.$message.warn("付款金额不能为0");
-          return (check = false);
+          this.$message.warn(`付款金额不能为0`);
+          return
         }
-        if (this.$route.query.relationType === "company") {
-          if (Object.keys(this.cartData.company).length === 0) {
+        if (this.cartData.from.userType === "company") {
+          if (Object.keys(this.cartData.company).length === 0 || !this.cartData.company) {
             this.$message.warn("付款公司必填");
-            return (check = false);
+            return
           }
-        } else if (Object.keys(this.cartData.user).length === 0) {
+        } else if (Object.keys(this.cartData.user).length === 0 || !this.cartData.user) {
           this.$message.warn("付款用户必填");
-          return (check = false);
+          return
         }
-        if (this.$route.query.toUserType === "company") {
+        if (this.cartData.to.userType === "company") {
           if (Object.keys(this.cartData.toCompany).length === 0) {
             this.$message.warn("收款公司必填");
-            return (check = false);
+            return
           }
-        } else if (Object.keys(this.cartData.user).length === 0) {
+        } else if (Object.keys(this.cartData.toUser).length === 0 || !this.cartData.toUser) {
           this.$message.warn("收款用户必填");
-          return (check = false);
+          return
         }
-        if (!this.cartData.remittanceTime) {
+        if (!this.cartData.remittanceTime && this.$route.query.titleType === 'isReceive') {
           this.$message.warn("汇款时间必填");
-          return (check = false);
+          return
         }
-        if (!this.cartData.accountingTime) {
+        if (!this.cartData.accountingTime && this.$route.query.titleType === 'isReceive') {
           this.$message.warn("到账时间必填");
-          return (check = false);
+          return
+        }
+        if (!this.cartData.billingDate && this.$route.query.titleType === 'isInvoice') {
+          this.$message.warn("开票日期必填");
+          return
+        }
+        if (!this.cartData.address && this.$route.query.titleType === 'isInvoice') {
+          this.$message.warn("地址必填");
+          return
+        }
+        if (!this.cartData.contactNumber && this.$route.query.titleType === 'isInvoice') {
+          this.$message.warn("联系必填");
+          return
         }
         return check;
-      },
-      async setReceive() {
-        try {
-          this.loadingText = "添加中";
-          let data = {};
-        } catch (error) {}
-        this.loadingText = "";
-      },
-      invoice() {},
-      receive() {
-        let type = this.$route.query.type;
-        if (this.edit) {
-          let data = {};
-          for (const key in this.initCartData) {
-            if (this.initCartData.hasOwnProperty(key)) {
-              this.$set(data, key, this.data[key]);
-            }
-          }
-          this.initCartData = data;
-          this.$set(this.initCartData.from, "disabled", true);
-        } else {}
-        if (type === "5" || type === "6") {
-          this.$set(this.initCartData, "toCompany", this.company);
-          this.$set(this.initCartData.to, "disabled", true);
-        }
       },
       async getRelator() {
         let isUser = this.$route.query.relationType === "user";

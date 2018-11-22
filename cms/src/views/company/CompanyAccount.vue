@@ -2,8 +2,10 @@
   <loading-box v-if="!routeShow" v-model="loadingText">
     <div class="g-order-create" v-if="!loadingText && accountData.length > 0">
       <div class="tab-box">
-        <company-account-tabs :initActiveName.sync="activeName" :initPayName.sync="payName" :payArr="payArr" :data="accountData" :data-js="data" @tab-click="tabClick" @tab-pay-click="tabPayClick"></company-account-tabs>
-        <company-account-table :isUser="isUser" :data="tableData" :activeName="activeName" :pay-name="payName"></company-account-table>
+        <company-account-tabs :loadingText.sync="tabsLoadingText" :userType="userType" :isUser="isUser" :initActiveName.sync="activeName" :initPayName.sync="payName" :payArr="payArr" :data="accountData" :data-js="data" @tab-click="tabClick" @tab-pay-click="tabPayClick"></company-account-tabs>
+        <loading-box v-model="tableLoadingText" style="height:calc(100vh - 50px - 70px - 138px - 1vh)">
+          <company-account-table v-if="!tableLoadingText" :userType="userType" :isUser="isUser" :data="tableData" :activeName="activeName" :pay-name="payName"></company-account-table>
+        </loading-box>
       </div>
     </div>
     <div v-else class="tab-height noData jc">
@@ -22,9 +24,17 @@
       CompanyAccountTabs,
       CompanyAccountTable
     },
+    props: {
+      userType: {
+        type: String,
+        default: 'company'
+      },
+    },
     data() {
       return {
         loadingText: '',
+        tableLoadingText: '',
+        tabsLoadingText: '',
         activeName: '',
         payName: '',
         data,
@@ -53,6 +63,8 @@
               this.tableData = this.payArr[0].list;
               this.isUser = this.payArr[0].isUser;
               this.payName = this.payArr[0].type;
+            } else {
+              this.isUser = false;
             }
           } catch (error) {}
           this.loadingText = '';
@@ -79,7 +91,7 @@
       },
       async tabClick(val) {
         try {
-          this.loadingText = '加载中';
+          this.tabsLoadingText = '加载中';
           await this.getTabsData();
           this.obj = this.accountData[val.index];
           this.activeName = val.name;
@@ -88,17 +100,17 @@
           this.tableData = this.payArr[val.index].list;
           this.isUser = this.payArr[val.index].isUser;
         } catch (error) {}
-        this.loadingText = '';
+        this.tabsLoadingText = '';
       },
       async tabPayClick(val) {
         try {
-          this.loadingText = '加载中';
+          this.tableLoadingText = '加载中';
           this.payName = val.name;
           await this.getData(this.obj, val.name);
           this.tableData = this.payArr[val.index].list;
           this.isUser = this.payArr[val.index].isUser;
         } catch (error) {}
-        this.loadingText = '';
+        this.tableLoadingText = '';
       },
       async getTabsData() {
         this.accountData = await this.$ajax.post('/account/relation/tab', {
@@ -107,16 +119,15 @@
       },
       async getData(obj, type) {
         let data = {
-          company: this.company._id,
-          limit: 10
+          limit: 10,
+          relationType: obj.relationType
         };
-        if (obj.isUser) {
-          data.relationType = 'user';
-          data.relationUser = obj.relationUser._id;
-        } else {
-          data.relationType = 'company';
+        data[obj.type] = obj[obj.type];
+        if (obj.relationType === 'company') {
           data.relationCompany = obj.relationCompany._id;
-        };
+        } else if (obj.relationType === 'user') {
+          data.relationUser = obj.relationUser._id;
+        }
         if (type) {
           data.listType = type;
         }
@@ -138,6 +149,8 @@
             this.tableData = this.payArr[0].list;
             this.isUser = this.payArr[0].isUser;
             this.payName = this.payArr[0].type;
+          }else{
+            this.isUser = false;
           }
         } catch (error) {}
         this.loadingText = '';

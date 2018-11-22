@@ -93,9 +93,9 @@
           }
         };
         return {
-          type: data[val.relationType].type,
-          typeText: data[val.relationType].typeText,
-          name: val[data[val.relationType].key].name
+          type: data[val.to.userType].type,
+          typeText: data[val.to.userType].typeText,
+          name: val[data[val.to.userType].key].name
         }
       },
       payUser(val) {
@@ -117,9 +117,9 @@
           }
         };
         return {
-          type: data[val.relationType].type,
-          typeText: data[val.relationType].typeText,
-          name: val[data[val.relationType].key].name
+          type: data[val.from.userType].type,
+          typeText: data[val.from.userType].typeText,
+          name: val[data[val.from.userType].key].name
         }
       },
       async loadmore() {
@@ -147,10 +147,9 @@
           activeName: this.activeName,
           payName: this.payName,
           show: 'true',
-          relationType: scope.row.relationType,
+          relationType: scope.row.from.userType,
           toUserType: scope.row.toType,
           titleType: this.table_js[this.payName].type,
-          // type: this.table_js[this.payName].type === 'isReceive' ? scope.row.type
         }
         if (this.isInvo) {
           query.type = scope.row.type;

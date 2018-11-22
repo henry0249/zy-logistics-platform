@@ -180,8 +180,6 @@ export default {
         remark: "",
         disabled: true
       },
-      recordDate: "",
-      openDate: "",
       toCompany: {},
       company: {},
       type: 0,

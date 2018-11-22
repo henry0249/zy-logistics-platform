@@ -19,7 +19,7 @@
               <common-select-by-code v-if="!isFrom && isInvoice && data.to.userType === 'mobile'" width="300px" :userType.sync="data.to.userType" :disabled="data.to.disabled" mobile check :data.sync="data.toMobile" size="mini" placeholder="未注册公司或用户" label="收票方"></common-select-by-code>
             </div>
             <div class="jc js">
-              <my-form-item number :controls="!numberDis" :disabled="numberDis" :min="0" width="200px" size="mini" :label="numberText" v-model.number="data.value"></my-form-item>
+              <my-form-item number :controls="!numberDis" :disabled="numberDis" :min="0" width="200px" size="mini" label="金额" v-model.number="data.value"></my-form-item>
             </div>
           </div>
           <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
@@ -36,12 +36,12 @@
       <slot>
         <div class="jb" v-if="isInvoice">
           <my-form-item :disabled="allDisabled" v-if="isFrom" size="mini" v-model="data.from.name" label="开票名称" placeholder="请输入开票名称"></my-form-item>
-          <my-form-item v-else size="mini" disabled v-model="data.to.name" label="开票名称" placeholder="请输入开票名称"></my-form-item>
+          <my-form-item v-else size="mini" disabled v-model="data.from.name" label="开票名称" placeholder="请输入开票名称"></my-form-item>
         </div>
         <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
         <div class="jb" v-if="isInvoice">
           <my-form-item :disabled="allDisabled" v-if="isFrom" size="mini" v-model="data.from.taxNumber" label="纳税号" placeholder="请输入纳税号"></my-form-item>
-          <my-form-item disabled v-else size="mini" v-model="data.to.taxNumber" label="纳税号" placeholder="请输入纳税号"></my-form-item>
+          <my-form-item :disabled="allDisabled" v-else size="mini" v-model="data.to.taxNumber" label="纳税号" placeholder="请输入纳税号"></my-form-item>
         </div>
         <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
         <div class="jb" v-if="isInvoice">
@@ -167,23 +167,6 @@
             return true;
           }
         }
-      },
-      numberText() {
-        let data = '';
-        if (this.isFrom) {
-          if (this.isInvoice) {
-            data = '发票金额';
-          } else {
-            data = '付款金额';
-          }
-        } else {
-          if (this.isInvoice) {
-            data = '收票金额';
-          } else {
-            data = '收款金额';
-          }
-        }
-        return data;
       },
       taxRateControls() {
         return this.allDisabled || this.isFrom;
