@@ -25,7 +25,7 @@
       <div>
         <el-button size="small" @click="back">返 回</el-button>
         <el-button v-if="isShow" size="small" @click="replaceData">替换数据</el-button>
-        <el-button size="small" type="primary" @click="sub">{{edit?js[$route.query.payName].subText:'添 加'}}</el-button>
+        <el-button size="small" type="primary" @click="sub">{{subText}}</el-button>
       </div>
     </div>
   </loading-box>
@@ -70,6 +70,17 @@
       };
     },
     computed: {
+      subText() {
+        if (this.edit) {
+          if (this.hasChild && this.$route.query.payName !== 'invoiceEditCheck') {
+            return '审核通过并修改'
+          } else {
+            return this.js[this.$route.query.payName].subText
+          }
+        } else {
+          return '添加'
+        }
+      },
       showTable() {
         if (this.show) {
           return true;
@@ -253,6 +264,7 @@
             table: this.tableData,
             cartData: obj
           };
+          if (this.hasChild && this.$route.query.payName !== 'invoiceEditCheck') data.hasChild = true;
           this.$emit("sub", data);
         }
       },

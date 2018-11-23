@@ -120,13 +120,14 @@
     },
     methods: {
       goAccount() {
-        let path = '/sys/company/account';
-        this.$router.push({
-          path,
-          query: {
-            company: this.startCompanyArr._id,
-          }
-        });
+        // let path = '/sys/company/account';
+        // this.$router.push({
+        //   path,
+        //   query: {
+        //     company: this.$route.params._id,
+        //     company_name: this.startCompanyArr.name
+        //   }
+        // });
       },
       myAlert(str) {
         this.$message.warn(str);

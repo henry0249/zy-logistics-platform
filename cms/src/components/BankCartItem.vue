@@ -31,27 +31,33 @@
               <my-form-item width="200px" :disabled="taxRateDisabled" select :options="field.Invoice.type.option" size="mini" v-model="data.type" label="发票类型" placeholder="请选择"></my-form-item>
             </div>
           </div>
+          <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
+          <div class="jb" v-if="isInvoice">
+            <div class="jc js">
+              <my-form-item width="300px" :disabled="taxRateDisabled" size="mini" v-model="data.from.name" label="开票名称" placeholder="请输入开票名称"></my-form-item>
+            </div>
+            <div class="jc js">
+              <my-form-item width="200px" :disabled="taxRateDisabled" size="mini" v-model="data.contactNumber" label="联系电话" placeholder="请输入联系电话"></my-form-item>
+            </div>
+          </div>
+          <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
+          <div class="jb" v-if="isInvoice">
+            <div class="jc js" style="width:100%;">
+              <my-form-item width="100%" :disabled="taxRateDisabled" size="mini" v-model="data.address" label="地址" placeholder="请输入地址"></my-form-item>
+            </div>
+          </div>
+          <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
+          <div class="jb">
+            <div class="jc js" style="width:100%;">
+              <my-form-item :disabled="taxRateDisabled" size="mini" input type="textarea" autosize v-model="data.remark" placeholder="请输入备注" label="备注"></my-form-item>
+            </div>
+          </div>
         </slot>
       </div>
       <slot>
         <div class="jb" v-if="isInvoice">
-          <my-form-item :disabled="allDisabled" v-if="isFrom" size="mini" v-model="data.from.name" label="开票名称" placeholder="请输入开票名称"></my-form-item>
-          <my-form-item v-else size="mini" disabled v-model="data.from.name" label="开票名称" placeholder="请输入开票名称"></my-form-item>
-        </div>
-        <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
-        <div class="jb" v-if="isInvoice">
           <my-form-item :disabled="allDisabled" v-if="isFrom" size="mini" v-model="data.from.taxNumber" label="纳税号" placeholder="请输入纳税号"></my-form-item>
           <my-form-item :disabled="allDisabled" v-else size="mini" v-model="data.to.taxNumber" label="纳税号" placeholder="请输入纳税号"></my-form-item>
-        </div>
-        <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
-        <div class="jb" v-if="isInvoice">
-          <my-form-item :disabled="allDisabled" v-if="isFrom" size="mini" v-model="data.contactNumber" label="联系电话" placeholder="请输入联系电话"></my-form-item>
-          <my-form-item disabled v-else size="mini" v-model="data.contactNumber" label="联系电话" placeholder="请输入联系电话"></my-form-item>
-        </div>
-        <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
-        <div class="jb" v-if="isInvoice">
-          <my-form-item :disabled="allDisabled" v-if="isFrom" size="mini" v-model="data.address" label="地址" placeholder="请输入地址"></my-form-item>
-          <my-form-item disabled v-else size="mini" v-model="data.address" label="地址" placeholder="请输入地址"></my-form-item>
         </div>
         <span v-if="isInvoice" class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
         <div class="jb">
@@ -76,15 +82,8 @@
           </my-form-item>
           <my-form-item :disabled="allDisabled" v-if="isFrom && isInvoice" size="mini" label="开票日期" date v-model="data.billingDate" type="date" placeholder="选择日期" :picker-options="pickerOptions">
           </my-form-item>
-          <my-form-item :disabled="allDisabled" v-if="!isFrom && isInvoice" size="mini" label="录单日期" date v-model="data.to.recordDate" type="date" placeholder="选择日期" :picker-options="pickerOptions">
+          <my-form-item disabled v-if="!isFrom && isInvoice" size="mini" label="录单日期" date v-model="data.createdAt" type="date" placeholder="选择日期" :picker-options="pickerOptions">
           </my-form-item>
-        </div>
-        <span class="danger" style="font-size:12px;margin:1px 0 1px 60px;"></span>
-        <div class="jb">
-          <my-form-item :disabled="allDisabled" v-if="isFrom && !isInvoice" size="mini" input type="textarea" autosize v-model="data.from.remark" placeholder="请输入付款备注" label="备注"></my-form-item>
-          <my-form-item :disabled="allDisabled" v-if="!isFrom && !isInvoice" size="mini" input type="textarea" autosize v-model="data.to.remark" placeholder="请输入收款备注" label="备注"></my-form-item>
-          <my-form-item :disabled="allDisabled" v-if="isFrom && isInvoice" size="mini" input type="textarea" autosize v-model="data.remark" placeholder="请输入备注" label="备注"></my-form-item>
-          <my-form-item disabled v-if="!isFrom && isInvoice" size="mini" input type="textarea" autosize v-model="data.remark" placeholder="请输入备注" label="备注"></my-form-item>
         </div>
       </slot>
     </el-card>
@@ -121,9 +120,7 @@
       }
     },
     watch: {
-      testComputed(val) {
-        console.log('object', val);
-      },
+      testComputed(val) {},
       'data.from.account' (val) {
         if (val) {
           if (this.isFrom) {
@@ -139,7 +136,6 @@
         }
       },
       allDisabled(val) {
-        console.log('222', val);
         if (val) {
           this.$set(this.data.from, 'disabled', true);
           this.$set(this.data.to, 'disabled', true);
@@ -182,7 +178,6 @@
         }
       },
       isFrom() {
-        console.log('1111', this.type === 'from');
         return this.type === 'from';
       }
     },

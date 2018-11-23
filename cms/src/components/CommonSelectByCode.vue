@@ -63,14 +63,14 @@
           </div>
           <el-table @cell-click="cellClick" v-if="dialogTableVisible" border stripe size="mini" :data="tableData">
             <template v-for="(item, key) in thead">
-              <el-table-column v-if="key === 'type'" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
-                <div slot-scope="scope">
-                  <el-tag size="mini" v-for="v in scope.row.type" :key="v.id">{{field.Company.type.option[v]}}</el-tag>
-                </div>
-              </el-table-column>
-              <el-table-column v-else show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
-              </el-table-column>
-            </template>
+                      <el-table-column v-if="key === 'type'" show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
+                        <div slot-scope="scope">
+                          <el-tag size="mini" v-for="v in scope.row.type" :key="v.id">{{field.Company.type.option[v]}}</el-tag>
+                        </div>
+                      </el-table-column>
+                      <el-table-column v-else show-overflow-tooltip :prop="key" :label="is('json',item)?item.name:item" :width="''+(item.width||'')" :key="key">
+                      </el-table-column>
+</template>
           </el-table>
         </div>
       </loading-box>
@@ -279,7 +279,6 @@
         this.$emit('update:data', this.checkData);
       },
       cellClick(row, column, cell, event) {
-        console.log(row);
         let io = true;
         this.checkData.forEach(item => {
           if (row._id === item._id) {
@@ -297,9 +296,7 @@
           }
         }
       },
-      inputChange(val) {
-        console.log(val);
-      },
+      inputChange(val) {},
       mobileChange(val) {},
       duplication(val) {
         let data = val;

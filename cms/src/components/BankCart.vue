@@ -61,8 +61,11 @@
       }
     },
     created() {
-      this.form = JSON.parse(JSON.stringify(this.initData));
-      console.log('object', this.initData);
+      let form = JSON.parse(JSON.stringify(this.initData));
+      if (!form.createdAt) {
+        this.$set(form, 'createdAt', new Date());
+      }
+      this.form = form;
     }
   };
 </script>

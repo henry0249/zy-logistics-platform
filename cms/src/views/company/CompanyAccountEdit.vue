@@ -48,6 +48,8 @@
       async postData(val) {
         try {
           this.loadingText = '操作中';
+          let path = this.js[this.$route.query.payName].postPath;
+          if (val.hasChild && this.$route.query.payName !== 'invoiceEditCheck') path = '';
           await this.$ajax.post(this.js[this.$route.query.payName].postPath, { ...val.cartData
           });
           this.$message.success('操作成功');
