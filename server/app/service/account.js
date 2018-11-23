@@ -11,7 +11,6 @@ class CompanyService extends Service {
   async getModelBody(param) {
     const ctx = this.ctx;
     let req = param || ctx.request.body;
-    console.log(param);
     let modelBody = {};
     if (!(req.type === 'user' || req.type === 'company')) ctx.throw('422', '账户类型错误');
     if (req.type === 'company') {
@@ -38,6 +37,7 @@ class CompanyService extends Service {
   async add(param) {
     return await this.set(param);
   }
+  
   async set(param) {
     const ctx = this.ctx;
     let req = param || ctx.request.body;
@@ -191,7 +191,7 @@ class CompanyService extends Service {
       accountChangeFind.user = req.relationUser;
       accountChangeFind.toCompany = req.company;
       invoiceFind.toUser = req.relationUser;
-      invoiceFind.company = req.company;
+      invoiceFind.user = req.user;
     }
     let listTab = [{
       name: '付款流水',
@@ -222,7 +222,9 @@ class CompanyService extends Service {
           $in: [1, 4]
         },
         check: false,
-        checkFail: '',
+        checkFail: {
+          $exists: false
+        },
         ...accountChangeFind
       }
     }, {
@@ -238,7 +240,7 @@ class CompanyService extends Service {
         },
         check: false,
         checkFail: {
-          $in: ['financialManager']
+          $exists: true
         },
         ...accountChangeFind
       }
@@ -262,7 +264,9 @@ class CompanyService extends Service {
       role: ['financialManager', 'cashier', 'invoiceCleck', 'companyAdmin'],
       find: {
         check: false,
-        checkFail: '',
+        checkFail: {
+          $exists: false
+        },
         ...invoiceFind
       }
     }, {
@@ -275,12 +279,12 @@ class CompanyService extends Service {
       find: {
         check: false,
         checkFail: {
-          $nin: ['']
+          $exists: true
         },
         ...invoiceFind
       }
     }];
-    let listType = 'received';
+    let listType;
     listTab.forEach((item) => {
       if (item.type === req.listType) {
         listType = item.type

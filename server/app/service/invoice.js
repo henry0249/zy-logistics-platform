@@ -13,7 +13,6 @@ class InvoiceService extends Service {
       type: body.type,
       company: body.company,
       handle: body.company,
-      check: false,
       toType: body.toType,
       from: body.from,
       to: body.to,
@@ -21,6 +20,8 @@ class InvoiceService extends Service {
       address: body.address,
       billingDate: new Date(body.billingDate)
     };
+    if (body.isChildren) invoiceBody.isChildren = body.isChildren;
+    if (body.remark) invoiceBody.remark = body.remark;
     if (!invoiceBody.company) ctx.throw(400, '开票公司获取失败');
     if (invoiceBody.value === 0) ctx.throw(400, '开票金额不能为0');
     if (['user', 'company', 'mobile'].indexOf(invoiceBody.toType) < 0) ctx.throw(400, '收票方类型错误');
@@ -39,7 +40,9 @@ class InvoiceService extends Service {
         _id: body._id
       }, {
         ...invoiceBody,
-        checkFail: ''
+        $unset: {
+          checkFail: 1
+        }
       });
       await ctx.service.settleRelation.mutilSet(body.settleRelation, body._id);
       return body._id;
@@ -64,12 +67,13 @@ class InvoiceService extends Service {
       company: invoice.handle || invoice.company
     });
     if (isFinancialManager) {
-      await this.set();
+      await this.set(body);
     } else {
       body.isChildren = true;
       delete body._id;
       let childrenId = await this.set(body);
       await invoice.update({
+        check: false,
         children: childrenId
       });
     }
@@ -83,17 +87,18 @@ class InvoiceService extends Service {
     let invoice = await ctx.model.Invoice.findById(body._id);
     if (!invoice) ctx.throw(404, '发票不存在');
     if (invoice.check) ctx.throw(422, '此发票已经审核请勿重新审核');
+    if (invoice.isChildren) ctx.throw(422, '该发票不能审核,仅做修改备份');
     if (invoice.children) {
       await ctx.service.curd.delete(ctx.model.Invoice, {
         _id: invoice.children
       });
     }
-    await this.set({
-      ...body,
+    await this.set(body);
+    await invoice.update({
       check: true,
-      checkFail: '',
       $unset: {
-        children: 1
+        children: 1,
+        checkFail: 1
       }
     });
     return 'ok';
@@ -127,15 +132,19 @@ class InvoiceService extends Service {
     let invoice = await ctx.model.Invoice.findById(body._id);
     if (!invoice) ctx.throw(404, '发票不存在');
     if (invoice.check) ctx.throw(404, '发票已经审核,不能删除');
-    await ctx.service.curd.delete(ctx.model.Invoice, {
-      _id: invoice.children
-    });
-    await ctx.service.curd.delete(ctx.model.SettleRelation, {
-      _id: {
-        $in: [invoice.settleRelation]
-      },
-      mutil: true
-    });
+    if (invoice.children) {
+      await ctx.service.curd.delete(ctx.model.Invoice, {
+        _id: invoice.children
+      });
+    }
+    if (invoice.settleRelation.length > 0) {
+      await ctx.service.curd.delete(ctx.model.SettleRelation, {
+        _id: {
+          $in: invoice.settleRelation
+        },
+        mutil: true
+      });
+    }
     await ctx.service.curd.delete(ctx.model.Invoice, {
       _id: body._id
     });

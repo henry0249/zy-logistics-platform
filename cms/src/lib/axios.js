@@ -5,18 +5,6 @@ import {
   MessageBox
 } from 'element-ui';
 
-function getCookie(name) {
-  var strcookie = document.cookie; //获取cookie字符串
-  var arrcookie = strcookie.split("; "); //分割
-  //遍历匹配
-  for (var i = 0; i < arrcookie.length; i++) {
-    var arr = arrcookie[i].split("=");
-    if (arr[0] == name) {
-      return arr[1];
-    }
-  }
-  return "";
-}
 // 创建一个axios实例
 const baseURL = process.env.NODE_ENV === 'development' ? '/api' : '';
 const ajax = axios.create({
@@ -33,7 +21,6 @@ ajax.interceptors.request.use(async config => {
       config.headers['Authorization'] = localStorage.token;
     }
   }
-  // config.headers['csrfToken'] = getCookie('csrfToken');
   return config;
 }, err => {
   return Promise.reject(err)

@@ -39,7 +39,7 @@ module.exports = {
       salesman: '业务员审核未通过',
       salesmanManager: '业务经理审核未通过',
       tradeClerk: '贸易文员审核未通过',
-      dispatcher: '调度专员调度未通过',
+      dispatcher: '调度专员审核未通过',
       dispatcherManager: '调度经理审核未通过',
       logisticsClerk: '物流文员审核未通过',
       documentClerk: '单据文员审核未通过',

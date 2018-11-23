@@ -1,8 +1,68 @@
 const Service = require('egg').Service;
-const logisticsField = require('../field/Logistics');
+const field = require('../field/Logistics');
 const roleList = ['sysDispatcher', 'dispatcher', 'logisticsClerk', 'dispatcherManager'];
 
 class LogisticsService extends Service {
+  async getModelBody(param){
+    const ctx = this.ctx;
+    let req = param || ctx.request.body;
+    let modelBody = {};
+    if (!req.order) ctx.throw(422, '订单信息获取失败', req);
+    modelBody.order = req.order;
+    if (!req.goods) ctx.throw(422, '商品信息获取失败', req);
+    modelBody.goods = req.goods;
+    if (!req.handle) ctx.throw(422, '处理公司获取失败', req);
+    modelBody.handle = req.handle;
+    if (Number(req.transportationLoad)<=0) ctx.throw(422, '需求载荷必须大于0', req);
+    if(!field.transportation.type[req.transportation]) ctx.throw(422, '运输方式不合法', req);
+    if(req[req.transportation]) modelBody[req.transportation] = req[req.transportation];
+    if(!field.customerType.type[req.customerType]) ctx.throw(422, '收货客户类型错误', req);
+    if(req[req.customerType]) modelBody[req.customerType] = req[req.customerType];
+    if(Number(req.loading)>0) modelBody.loading = req.loading;
+    if(Number(req.landed)>0) modelBody.landed = req.landed;
+    if(Number(req.price)>0) modelBody.price = req.price;
+    if(Number(req.balancePrice)>0) modelBody.balancePrice = req.balancePrice;
+    if(Number(req.balanceCount)>0) modelBody.balanceCount = req.balanceCount;
+    if(Number(req.balancedSettlement)>0) modelBody.balancedSettlement = req.balancedSettlement;
+    if(Number(req.balancedPrepaid)>0) modelBody.balancedPrepaid = req.balancedPrepaid;
+    if(Number(req.invoiced)>0) modelBody.invoiced = req.invoiced;
+    if (req.balanceType) {
+      if(!field.balanceType.type[req.balanceType]) ctx.throw(422, '运费承担方类型不合法', req);
+      modelBody.balanceType = req.balanceType;
+      if(req.balanceType === 'user')modelBody.balanceUser = req.balanceUser;
+      if(req.balanceType === 'company')modelBody.balanceCompany = req.balanceCompany;
+    }
+    if (req.receivedType) {
+      if(!field.receivedType.type[req.receivedType]) ctx.throw(422, '收款方类型不合法', req);
+      modelBody.receivedType = req.receivedType;
+      if(req.balanceType === 'user')modelBody.receivedUser = req.receivedUser;
+      if(req.balanceType === 'company')modelBody.receivedCompany = req.receivedCompany;
+    }
+    if (Number(req.loss)>0) {
+      if(!req.lossCompany)ctx.throw(422, '收款方类型不合法', req);
+      modelBody.lossCompany = req.lossCompany;
+    }
+    
+    if (!field.areaType.option[req.areaType]) ctx.throw(422, '地址类型错误', req);
+    modelBody.areaType = req.areaType;
+    if (req.areaType === 0) {
+      if (!(req.areaArr && req.areaArr instanceof Array && req.areaArr.length > 0)) ctx.throw(422, '地址未选择', req);
+      modelBody.areaArr = req.areaArr;
+    }
+    if (req.areaType === 1) {
+      if (!req.area) ctx.throw(422, '地址信息获取失败', req);
+      modelBody.area = req.area;
+    }
+    if(req.contactName) modelBody.contactName = req.contactName;
+    if(req.contactNumber) modelBody.contactNumber = req.contactNumber;
+    if(req.areaInfo) modelBody.areaInfo = req.areaInfo;
+    if(req.startAt) modelBody.startAt = new Date(req.startAt);
+    if(req.distributionAt) modelBody.distributionAt = new Date(req.distributionAt);
+    if(req.finishAt) modelBody.finishAt = new Date(req.finishAt);
+    if(req.stock) modelBody.stock = req.stock;
+    if(req.businessTrains) modelBody.businessTrains = req.businessTrains;
+    return modelBody;
+  }
   obj2id(obj) {
     for (const key in obj) {
       if (JSON.stringify(obj[key]) === '{}') {

@@ -14,6 +14,8 @@
   </div>
 </template>
 
+
+
 <script>
 import CenterNav from "../views/common/CenterNav";
 export default {

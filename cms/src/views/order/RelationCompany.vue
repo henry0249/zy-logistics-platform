@@ -39,11 +39,6 @@ export default {
       currentCompany: ""
     };
   },
-  watch: {
-    append(val) {
-      console.log(val);
-    }
-  },
   methods: {
     setlist() {
       if (!(this.order._id && this.order.handle && this.order.handle._id)) {
@@ -117,6 +112,7 @@ export default {
       } else {
         this.currentCompany = this.data;
       }
+      console.log(this.currentCompany)
     }
     this.setlist();
   }

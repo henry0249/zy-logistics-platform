@@ -9,10 +9,19 @@
       <Info :val="order" :data.sync="orderAsync"></Info>
       <div class="common-margin"></div>
       <goods-table :order="orderAsync"></goods-table>
+      <div class="common-margin"></div>
+      <div v-if="infoEditAble && order && order._id" class="flex ac" style="margin-top:10px">
+        <div class="info">
+          <i class="el-icon-info"></i> 提交将更新并且保存订单基础信息
+        </div>
+        <div class="f1"></div>
+        <el-button size="small" type="success" @click="update('info')">提交订单信息</el-button>
+      </div>
       <div v-if="business" class="common-margin"></div>
-      <business-trains v-if="business" :val="order.businessTrains" :order="orderAsync" :data.sync="update.businessTrains" :settle="businessSettle"></business-trains>
+      <business-trains @update="update" v-if="business  && orderAsync.goods && orderAsync.goods._id" :val="order.businessTrains" :order="orderAsync" :data.sync="businessTrainsData" :settle="businessSettle" :editAble="businessEditAble">
+      </business-trains>
       <div v-if="transport" class="common-margin"></div>
-      <transport-trains v-if="transport && orderAsync.area && orderAsync.area._id && transport" :val="order.transportTrains" :order="orderAsync" :data.sync="update.transportTrains" :settle="transportSettle" @reflesh="reflesh"></transport-trains>
+      <transport-trains @update="update" v-if="transport && orderAsync.area && orderAsync.area._id" :editAble="transportEditAble" :val="order.transportTrains" :order="orderAsync" :data.sync="transportTrainsData" :settle="transportSettle" @reflesh="reflesh"></transport-trains>
     </div>
     <el-alert v-if="alert" style="margin-top:15px" :title="alert" type="info" center show-icon :closable="false">
     </el-alert>
@@ -70,6 +79,18 @@ export default {
     transportSettle: {
       type: Boolean,
       default: false
+    },
+    infoEditAble: {
+      type: Boolean,
+      default: true
+    },
+    businessEditAble: {
+      type: Boolean,
+      default: true
+    },
+    transportEditAble: {
+      type: Boolean,
+      default: true
     }
   },
   components: {
@@ -83,10 +104,8 @@ export default {
       loadingText: "加载中",
       show: false,
       orderAsync: {},
-      update: {
-        businessTrains: [],
-        transportTrains: []
-      },
+      businessTrainsData: [],
+      transportTrainsData: [],
       order: {}
     };
   },
@@ -105,30 +124,57 @@ export default {
         this.show = true;
       }, 200);
     },
-    getSubmitData() {
-      let data = {
-        state: this.newState,
-        order: this.orderAsync
-      };
-      for (const key in this.update) {
-        data[key] = this.update[key];
+    object2id(obj) {
+      if (obj && obj.constructor === Object && obj._id) {
+        return obj._id;
+      } else {
+        return obj;
       }
-      return data;
+    },
+    async update(type) {
+      this.loadingText = "正在提交";
+      let update = {};
+      if (type === "info") update = { ...this.orderAsync };
+      if (type === "businessTrains") {
+        update._id = this.order._id;
+        update.businessTrains = [];
+        this.businessTrainsData.map(item => {
+          let pushItem = {};
+          for (const key in item) {
+            pushItem[key] = this.object2id(item[key]);
+          }
+          update.businessTrains.push(pushItem);
+        });
+      }
+      if (type === "transportTrains") {
+        update._id = this.order._id;
+        update.transportTrains = [];
+        this.transportTrainsData.map(item => {
+          let pushItem = {};
+          for (const key in item) {
+            pushItem[key] = this.object2id(item[key]);
+          }
+          update.transportTrains.push(pushItem);
+        });
+      }
+      try {
+        await this.$ajax.post(`/order/update/${type}`, update);
+        this.$message.success(`提交成功,正在更新`);
+        await this.getOrderInfo();
+      } catch (error) {}
+      this.loadingText = "";
     },
     async submit() {
       if (!this.newState) {
-        this.$message.error(`非法的订单状态`);
-        return;
-      }
-      let update = this.getSubmitData();
-      if (this.business && update.businessTrains.length === 0) {
-        this.$message.error(`必须添加贸易链`);
+        this.$message.error(`非法的审核状态`);
         return;
       }
       this.loadingText = "正在提交";
       try {
-        update.state = this.newState;
-        await this.$ajax.post("/order/set", update);
+        await this.$ajax.post("/order/check", {
+          _id: this.order._id,
+          state: this.newState
+        });
         this.back();
       } catch (error) {}
       this.loadingText = "";
@@ -144,7 +190,7 @@ export default {
           this.loadingText = "提交中";
           try {
             await this.$ajax.post("/order/checkFail", {
-              order: this.order._id,
+              _id: this.order._id,
               text: value
             });
             this.back();

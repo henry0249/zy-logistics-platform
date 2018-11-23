@@ -6,7 +6,7 @@
     <el-alert v-if="alert" title="订单信息" type="info" :closable="false" style="margin:15px 0">
       <span>&nbsp;&nbsp;({{order.type==='company'?'公司订单':'个人订单'}})</span>
     </el-alert>
-    <my-form size="mini" width="24%" :edit="edit" v-if="!loadingText">
+    <my-form size="mini" width="24%" v-if="!loadingText">
       <div class="flex ac jb">
         <div style="width:24%">
           <my-select :type.sync="order.type" :data.sync="customer" label="下单客户" placeholder="请选择客户" @change="customerChange"></my-select>
@@ -44,191 +44,193 @@
 </template>
 
 <script>
-import { goods } from "./field";
-export default {
-  props: {
-    alert: {
-      type: Boolean,
-      default: true
-    },
-    selectType: {
-      type: Boolean,
-      default: false
-    },
-    title: {
-      type: String,
-      default: ""
-    },
-    val: {
-      type: Object,
-      default() {
-        return {};
+  import {
+    goods
+  } from "./field";
+  export default {
+    props: {
+      alert: {
+        type: Boolean,
+        default: true
+      },
+      selectType: {
+        type: Boolean,
+        default: false
+      },
+      title: {
+        type: String,
+        default: ""
+      },
+      val: {
+        type: Object,
+        default () {
+          return {};
+        }
+      },
+      data: {
+        type: Object,
+        default () {
+          return {};
+        }
+      },
+      editAble: {
+        type: Boolean,
+        default: true
       }
     },
-    data: {
-      type: Object,
-      default() {
-        return {};
-      }
+    data() {
+      return {
+        customer: {},
+        order: {
+          type: "company",
+          user: {},
+          company: {},
+          settlementMethod: 1,
+          transportModel: 0,
+          deliveryTime: "",
+          invoiceType: 0,
+          contactName: "",
+          contactNumber: "",
+          area: {},
+          areaInfo: "",
+          remark: "",
+          goods: {},
+          count: 0,
+          factory: 0,
+          sell: 0,
+          transport: 0
+        },
+        loadingText: "",
+        companyUserCascaderLoaidng: "加载中...",
+        companyUserCascader: []
+      };
     },
-    edit: {
-      type: Boolean,
-      default: true
-    }
-  },
-  data() {
-    return {
-      customer: {},
+    watch: {
       order: {
-        type: "company",
-        user: {},
-        company: {},
-        settlementMethod: 1,
-        transportModel: 0,
-        deliveryTime: "",
-        invoiceType: 0,
-        contactName: "",
-        contactNumber: "",
-        area: {},
-        areaInfo: "",
-        remark: "",
-        goods: {},
-        count: 0,
-        factory: 0,
-        sell: 0,
-        transport: 0
-      },
-      loadingText: "",
-      companyUserCascaderLoaidng: "加载中...",
-      companyUserCascader: []
-    };
-  },
-  watch: {
-    order: {
-      handler: function(val) {
-        this.$emit("update:data", val);
-      },
-      deep: true
-    }
-  },
-  methods: {
-    orderTypeChange(val) {
-      this.order.user = {};
-      this.order.company = {};
-      if (val) {
-        this.order.type = "company";
-      } else {
-        this.order.type = "user";
+        handler: function(val) {
+          this.$emit("update:data", val);
+        },
+        deep: true
       }
     },
-    async showCompanyUserCascader() {
-      if (this.order.type === "company" && this.order.company._id) {
-        this.companyUserCascaderLoaidng = "加载中...";
-        try {
-          this.companyUserCascader = await this.$ajax(
-            "/company/user/cascader?company=" + this.order.company._id
-          );
-        } catch (error) {}
-        this.companyUserCascaderLoaidng = "";
-      } else {
-        this.companyUserCascaderLoaidng = "";
-      }
-    },
-    companyUserCascaderChange(val) {
-      if (val) {
-        if (val.name) {
-          this.order.contactName = val.name;
-        }
-        if (val.mobile || val.tel) {
-          this.order.contactNumber = val.mobile || val.tel;
-        }
-      }
-    },
-    customerChange(val) {
-      this.order[this.order.type] = val;
-      if (this.order.type === "user") {
-        this.order.contactName = val.name || "";
-        this.order.contactNumber = val.mobile || "";
-      }
-    },
-    customerTypeChange(val) {
-      this.order.type = val;
-    },
-    areaChange(val) {
-      this.order.areaInfo = this.area2name(val) + " ";
-    },
-    check() {
-      let order = this.order;
-      if (!order[order.type]._id) {
-        this.$message.error("未选择客户");
-        return;
-      }
-      if (!order.contactName) {
-        this.$message.error("未填写收货人");
-        return;
-      }
-      if (!order.contactNumber) {
-        this.$message.error("未填写收货人联系电话");
-        return;
-      }
-      if (!order.area._id) {
-        this.$message.error("未选择送货地址");
-        return;
-      }
-      if (!order.goods._id) {
-        this.$message.error("未选择商品");
-        return;
-      }
-      if (Number(order.count) <= 0) {
-        this.$message.error("商品数量必须大于0");
-        return;
-      }
-      if (Number(order.factory) <= 0) {
-        this.$message.error("商品出厂单价必须大于0");
-        return;
-      }
-      if (Number(order.sell) <= 0) {
-        this.$message.error("商品销售单价必须大于0");
-        return;
-      }
-      if (Number(order.transport) <= 0) {
-        this.$message.error("商品运输单价必须大于0");
-        return;
-      }
-      return true;
-    },
-    getRequestData() {
-      let res = {};
-      for (const key in this.order) {
-        let item = this.order[key];
-        if (item.constructor === Object) {
-          if (item._id) res[key] = item._id;
+    methods: {
+      orderTypeChange(val) {
+        this.order.user = {};
+        this.order.company = {};
+        if (val) {
+          this.order.type = "company";
         } else {
-          res[key] = item;
+          this.order.type = "user";
         }
+      },
+      async showCompanyUserCascader() {
+        if (this.order.type === "company" && this.order.company._id) {
+          this.companyUserCascaderLoaidng = "加载中...";
+          try {
+            this.companyUserCascader = await this.$ajax(
+              "/company/user/cascader?company=" + this.order.company._id
+            );
+          } catch (error) {}
+          this.companyUserCascaderLoaidng = "";
+        } else {
+          this.companyUserCascaderLoaidng = "";
+        }
+      },
+      companyUserCascaderChange(val) {
+        if (val) {
+          if (val.name) {
+            this.order.contactName = val.name;
+          }
+          if (val.mobile || val.tel) {
+            this.order.contactNumber = val.mobile || val.tel;
+          }
+        }
+      },
+      customerChange(val) {
+        this.order[this.order.type] = val;
+        if (this.order.type === "user") {
+          this.order.contactName = val.name || "";
+          this.order.contactNumber = val.mobile || "";
+        }
+      },
+      customerTypeChange(val) {
+        this.order.type = val;
+      },
+      areaChange(val) {
+        this.order.areaInfo = this.area2name(val) + " ";
+      },
+      check() {
+        let order = this.order;
+        if (!order[order.type]._id) {
+          this.$message.error("未选择客户");
+          return;
+        }
+        if (!order.contactName) {
+          this.$message.error("未填写收货人");
+          return;
+        }
+        if (!order.contactNumber) {
+          this.$message.error("未填写收货人联系电话");
+          return;
+        }
+        if (!order.area._id) {
+          this.$message.error("未选择送货地址");
+          return;
+        }
+        if (!order.goods._id) {
+          this.$message.error("未选择商品");
+          return;
+        }
+        if (Number(order.count) <= 0) {
+          this.$message.error("商品数量必须大于0");
+          return;
+        }
+        if (Number(order.factory) <= 0) {
+          this.$message.error("商品出厂单价必须大于0");
+          return;
+        }
+        if (Number(order.sell) <= 0) {
+          this.$message.error("商品销售单价必须大于0");
+          return;
+        }
+        if (Number(order.transport) <= 0) {
+          this.$message.error("商品运输单价必须大于0");
+          return;
+        }
+        return true;
+      },
+      getRequestData() {
+        let res = {};
+        for (const key in this.order) {
+          let item = this.order[key];
+          if (item.constructor === Object) {
+            if (item._id) res[key] = item._id;
+          } else {
+            res[key] = item;
+          }
+        }
+        res.handle = this.company._id;
+        return res;
       }
-      res.handle = this.company._id;
-      return res;
+    },
+    created() {
+      this.loadingText = "加载中";
+      setTimeout(() => {
+        if (this.val._id) {
+          this.customer = this.val[this.val.type];
+          this.order = JSON.parse(JSON.stringify(this.val));
+        } else {
+          this.$emit("update:data", JSON.parse(JSON.stringify(this.order)));
+        }
+        this.loadingText = "";
+      }, 200);
     }
-  },
-  created() {
-    this.loadingText = "加载中";
-    setTimeout(() => {
-      if (this.val._id) {
-        this.customer = this.val[this.val.type];
-        this.order = JSON.parse(JSON.stringify(this.val));
-      } else {
-        this.$emit("update:data", JSON.parse(JSON.stringify(this.order)));
-      }
-      this.loadingText = "";
-    }, 200);
-  }
-};
+  };
 </script>
 
 <style scoped>
-.order-title {
-  font-size: 20px;
-  text-align: center;
-}
+  .order-title {
+    font-size: 20px;
+    text-align: center;
+  }
 </style>

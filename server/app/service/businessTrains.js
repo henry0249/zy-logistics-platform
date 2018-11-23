@@ -6,9 +6,9 @@ class BusinessTrainsService extends Service {
     const ctx = this.ctx;
     let req = param;
     if (!req) return;
-    if (!businessTrainsField.type.option[req.type]) ctx.throw(422, '贸易节点错误', req);
+    if (!businessTrainsField.type.option[req.type]) ctx.throw(422, '贸易节点类型错误', req);
     if (req.type === 'customer') {
-      if (!businessTrainsField.type.option[req.customerType]) ctx.throw(422, '客户类型不合法', req);
+      if (!businessTrainsField.customerType.option[req.customerType]) ctx.throw(422, '客户类型不合法', req);
       if (req.customerType === 'user' && !req.user) ctx.throw(422, '下单用户获取失败', req);
       if (req.customerType === 'company' && !req.company) ctx.throw(422, '下单公司获取失败', req);
     } else {
@@ -18,25 +18,11 @@ class BusinessTrainsService extends Service {
     if (!req.order) ctx.throw(422, '贸易节点订单信息获取失败', req);
     if (!req.goods) ctx.throw(422, '贸易节点商品信息获取失败', req);
     if (!req.handle) ctx.throw(422, '贸易节点处理公司获取失败', req);
-    if (req.type === 'customer') {
-      if (req.customerType === 'user') {
-        req.balanceType = 'user';
-        req.balanceUser = req.user;
-      } else {
-        req.balanceType = 'company';
-        req.balanceCompany = req.company;
-      }
-    } else {
-      req.balanceType = 'company';
-      req.balanceCompany = req.company;
-    }
     let modelBody = {
-      customerType: req.customerType,
       type: req.type,
       order: req.order,
       goods: req.goods,
       handle: req.handle,
-      balanceType: req.balanceType,
       receive: req.receive,
       loss: req.loss,
       preBalancePrice: req.preBalancePrice,
@@ -46,12 +32,23 @@ class BusinessTrainsService extends Service {
       prePrepaid: req.prePrepaid,
       preInvoiced: req.preInvoiced
     };
-    if (req._id) modelBody._id = req._id;
-    if (req.balanceUser) modelBody.balanceUser = req.balanceUser;
-    if (req.balanceCompany) modelBody.balanceCompany = req.balanceCompany;
-    if (req.type === 'supplier' || req.type === 'pool') {
+    if (req.type === 'customer') {
+      modelBody.customerType = req.customerType;
+      if (req.customerType === 'user') {
+        modelBody.user = req.user;
+        modelBody.balanceType = 'user';
+        modelBody.balanceUser = req.user;
+      } else {
+        modelBody.company = req.company;
+        modelBody.balanceType = 'company';
+        modelBody.balanceCompany = req.company;
+      }
+    } else {
       if (req.supplyCount <= 0) ctx.throw(422, '供货数量不能小于0', req);
       if (req.supplyPrice <= 0) ctx.throw(422, '供货价格不能小于0', req);
+      modelBody.company = req.company;
+      modelBody.balanceType = 'company';
+      modelBody.balanceCompany = req.company;
       modelBody.supplyCount = req.supplyCount;
       modelBody.supplyPrice = req.supplyPrice;
     }
@@ -70,18 +67,20 @@ class BusinessTrainsService extends Service {
         modelBody.receivedCompany = last.balanceCompany;
       }
     }
-    if (modelBody._id) {
-      let update = JSON.parse(JSON.stringify(modelBody));
-      delete update._id;
+    if (req._id) {
       await ctx.model.BusinessTrains.update({
-        _id: modelBody._id
-      }, update);
-      return modelBody;
+        _id: req._id
+      }, modelBody);
+      return await ctx.model.BusinessTrains.findById(req._id);
     } else {
       let businessTrains = new ctx.model.BusinessTrains(modelBody);
       await businessTrains.save();
       return businessTrains;
     }
+  }
+
+  async update(param, last) {
+    return await this.set(param, last);
   }
 
   async add(param, last) {
@@ -94,70 +93,105 @@ class BusinessTrainsService extends Service {
     if (!req) ctx.throw(422, '贸易链尚未添加', req);
     if (!(req instanceof Array)) ctx.throw(422, '贸易链必须是数组', req);
     if (req.length < 2) ctx.throw(422, '贸易链至少两个节点', req);
-    if (req.length < 2) ctx.throw(422, '贸易链至少两个节点', req);
     if (!orderInfo) ctx.throw(422, '贸易节点订单信息获取失败', req);
     if (!orderInfo._id) ctx.throw(422, '贸易节点订单信息获取失败', req);
     if (!orderInfo.goods) ctx.throw(422, '贸易节点商品信息获取失败', req);
     if (!orderInfo.handle) ctx.throw(422, '贸易节点处理公司获取失败', req);
-    let res = [];
+    let hasHandle = false;
+    let companySet = new Set();
     for (let i = 0; i < req.length; i++) {
       let item = req[i];
       if (i === 0) {
         item.type = 'supplier';
       } else if (i === req.length - 1) {
         item.type = 'customer';
+        item.customerType = orderInfo.type;
       } else {
         item.type = 'pool';
       }
+      if (item.company && companySet.has(item.company)) ctx.throw(422, '贸易链不能含有重复公司', req);
+      companySet.add(item.company);
+      if (item.company === orderInfo.handle.toString()) hasHandle = true;
       item.order = orderInfo._id;
       item.handle = orderInfo.handle;
       item.goods = orderInfo.goods;
     }
+    if (!hasHandle) ctx.throw(422, '未包含当前处理公司', req);
+    let res = [],
+      res_id = [];
     for (let i = 0; i < req.length; i++) {
       let item = this.getModelBody(req[i]);
+      if (req[i]._id) item._id = req[i]._id;
       let last;
-      if (i > 0) {
-        last = this.getModelBody(req[i - 1]);
-      }
+      if (i > 0) last = this.getModelBody(req[i - 1]);
       let data = await this.set(item, last);
-      res.push(data._id);
+      res_id.push(data._id);
+      res.push(data);
     }
     for (let i = 0; i < res.length; i++) {
       let item = res[i];
-      let update = {};
+      let last, next;
       if (i === 0) {
-        update.next = res[i + 1];
+        next = res[i + 1];
       } else if (i === res.length - 1) {
-        update.last = res[i - 1];
+        last = res[i - 1];
       } else {
-        update.last = res[i - 1];
-        update.next = res[i + 1];
+        last = res[i - 1];
+        next = res[i + 1];
       }
+      let update = {};
+      if (last) update.last = last._id;
+      if (next) update.next = next._id;
       await ctx.model.BusinessTrains.update({
-        _id: item
+        _id: item._id
       }, update);
-      if (update.next) {
-        let accountBody = {
-          type: 'company',
-          relationType:'company',
-          relationCompany: update.next.company
-        };
-        if (update.next.customerType && update.next.customerType === 'user') {
-          accountBody = {
-            type:'user',
-            relationType:'user',
-            relationUser: update.next.user
-          }
+      if (!next) continue;
+
+      //增加account关联
+      let accountBody = {
+        company: item.company,
+        type: 'company',
+        relationType: 'company',
+        relationCompany: next.company
+      };
+      if (next.customerType === 'user') {
+        accountBody = {
+          company: item.company,
+          type: 'user',
+          relationType: 'user',
+          relationUser: next.user
         }
-        await ctx.service.account.set(accountBody)
       }
+      await ctx.service.account.set(accountBody);
+
+      //增加库存单关联
+      let date = ctx.helper.formatTime(new Date(), "YYYY年MM月DD日A");
+      date = date.replace("AM", "上午");
+      date = date.replace("PM", "下午");
+      let stockBody = {
+        type: 'out',
+        company: item.company,
+        order: item.order,
+        businessTrains: item._id,
+        name: '贸易链产生出库单 ' + date,
+        goods: item.goods,
+        num: item.supplyCount
+      };
+      if (next.customerType === 'user') {
+        stockBody.toType = 'user';
+        stockBody.toUser = next.user;
+      } else {
+        stockBody.toType = 'company';
+        stockBody.toCompany = next.company;
+      }
+      await ctx.service.stock.set(stockBody);
     }
     await ctx.model.Order.update({
-      _id: orderId
+      _id: orderInfo._id
     }, {
-      businessTrains: res
+      businessTrains: res_id
     });
-    return res;
+    return res_id;
   }
 
   async delete() {
@@ -170,144 +204,36 @@ class BusinessTrainsService extends Service {
     await ctx.service.curd.delete(ctx.model.Stock, {
       businessTrains: body._id,
       multi: true,
-      state: 'ready'
+      check: false
     });
     return 'ok';
   }
-  async multiUpdateCheck(body) {
+  async updateBalancePrice(param, justCheck) {
     const ctx = this.ctx;
-    let newState = body.newSettleState;
-    if (!body.company) ctx.throw(422, '公司信息必填', body);
-    if (!businessTrainsField.settleState.option[newState]) ctx.throw(422, '非法的状态', body);
-    let businessTrains = body.businessTrains || [];
-    if (businessTrains.length === 0) ctx.throw(422, '尚未选择', body);
-    let company = await ctx.model.Company.findById(body.company);
-    if (!company) ctx.throw(404, '公司信息未找到', body);
+    let req = param || ctx.request.body;
+    if (!req._id) ctx.throw('贸易节点信息获取失败');
+    if (!(req.balancePrice !== undefined && Number(req.balancePrice) > 0)) ctx.throw('结算价格必须大于0');
+    if (justCheck) return;
+    await ctx.model.BusinessTrains.update({
+      _id: req._id
+    }, {
+      balancePrice: item.balancePrice
+    });
+    return 'ok';
   }
-  async multiUpdate() {
+  async mutilUpdateBalancePrice(param) {
     const ctx = this.ctx;
-    let body = ctx.request.body;
-    await this.multiUpdateCheck(body);
-    let newState = body.newSettleState;
-    let account;
-    if (newState === 'financialManager' || newState === 'finish') {
-      if (!body.account) ctx.throw(422, '账户信息获取失败', body);
-      account = await ctx.model.Account.findById(body.account);
-      if (!account) ctx.throw(404, '账户不存在', body);
+    let req = param || ctx.request.body;
+    if (!(req && req instanceof Array && req.length > 0));
+    for (const item of req) {
+      await this.updateBalancePrice(item, true);
     }
-    let roleType = {
-      settle: 'financial',
-      financialManager: 'settle',
-      finish: 'financialManager'
-    }
-    let hasRole = await ctx.model.Role.findOne({
-      user: ctx.user._id,
-      company: body.company,
-      type: roleType[newState]
-    });
-    if (!hasRole) ctx.throw(400, '您无操作权限', body);
-
-    let businessTrains = body.businessTrains;
-    let preSettlementCount = 0;
-    let prePrepaidCount = 0;
-    businessTrains.forEach((item) => {
-      let balanceTotal =
-        item.balancePrice * item.balanceCount -
-        item.balancedSettlement -
-        item.balancedPrepaid;
-      if (newState === 'settle') {
-        if (item.balancePrice <= 0) ctx.throw(400, '结算金额必须大于0', body);
-      }
-      if (newState === 'financialManager' || newState === 'finish') {
-        if (item.preSettlement + item.prePrepaid <= 0) ctx.throw(400, '结算总额必须大于0', body);
-        if (item.preSettlement + item.prePrepaid > balanceTotal) ctx.throw(400, '总结算金额不能大于待结算金额', body);
-      }
-      preSettlementCount += item.preSettlement;
-      prePrepaidCount += item.prePrepaid;
-    });
-    if (newState === 'financialManager' || newState === 'finish') {
-      if (body.arrears !== true) {
-        if (account.value < preSettlementCount) ctx.throw(400, '账户结算款余额不足', body);
-        if (account.prepaid < prePrepaidCount) ctx.throw(400, '账户预付款余额不足', body);
-      }
-    }
-    for (let i = 0; i < businessTrains.length; i++) {
-      const item = businessTrains[i];
-      let update = {
-        settleState: newState,
-        stateCheckFail: ""
-      };
-      if (newState === 'settle') {
-        update.balancePrice = Number(item.balancePrice);
-      }
-      if (newState === 'financialManager') {
-        update.preSettlement = Number(item.preSettlement);
-        update.prePrepaid = Number(item.prePrepaid);
-      }
-      if (newState === 'finish') {
-        update.balancedSettlement = Number(item.preSettlement) + Number(item.balancedSettlement);
-        update.balancedPrepaid = Number(item.prePrepaid) + Number(item.balancedPrepaid)
-        if ((update.balancedSettlement + update.balancedPrepaid) !== item.balancePrice * item.balanceCount) {
-          update.settleState = 'settle';
-          update.preSettlement = 0;
-          update.prePrepaid = 0;
-        }
-        await account.update({
-          $inc: {
-            value: -(item.preSettlement * item.balanceCount),
-            prepaid: -(item.prePrepaid * item.balanceCount),
-          }
-        });
-      }
-      await ctx.model.BusinessTrains.update({
-        _id: {
-          $in: item._id
-        }
-      }, update);
+    for (let i = 0; i < req.length; i++) {
+      const item = req[i];
+      await this.updateBalancePrice(item);
     }
     return 'ok';
   }
-
-  async multiCheckFail() {
-    const ctx = this.ctx;
-    let body = ctx.request.body;
-    await this.multiUpdateCheck(body);
-    if (!body.text) ctx.throw(422, '审核失败原因必填');
-    let newState = body.newSettleState;
-    let roleType = {
-      financial: 'settle',
-      settle: 'financialManager'
-    }
-    if (!roleType[newState]) ctx.throw(422, '非法的状态', body);
-    let hasRole = await ctx.model.Role.findOne({
-      user: ctx.user._id,
-      company: body.company,
-      type: roleType[newState]
-    });
-    if (!hasRole) ctx.throw(400, '您无操作权限', body);
-    let businessTrains = body.businessTrains;
-    for (let i = 0; i < businessTrains.length; i++) {
-      const item = businessTrains[i];
-      let update = {
-        settleState: newState,
-        stateCheckFail: roleType[newState]
-      };
-      await ctx.model.BusinessTrains.update({
-        _id: {
-          $in: item._id
-        }
-      }, update);
-      let curdLog = new ctx.model.CurdLog({
-        type: 'businessTrainsCheckFail',
-        user: ctx.user._id,
-        company: body.company,
-        businessTrains: item._id,
-        remark: body.text
-      });
-      await curdLog.save();
-    }
-  }
-
 
 }
 module.exports = BusinessTrainsService;

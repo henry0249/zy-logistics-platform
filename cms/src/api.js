@@ -1,41 +1,53 @@
 import Vue from 'vue'
-
+import {
+  MessageBox
+} from 'element-ui';
 import ajaxLib from './lib/axios'
-const ajax = ajaxLib.ajax
+const ajax = ajaxLib.ajax;
 
-class Api {
+function error(msg) {
+  MessageBox.confirm(msg, '提示', {
+    showCancelButton: false,
+    confirmButtonText: '确定',
+    type: 'error',
+    center: true
+  });
+  throw new Error(msg);
+};
+
+let Api = {
   //获取地址栏参数
-  static getQueryString(name) {
+  getQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i")
     var r = window.location.search.substr(1).match(reg)
     if (r != null) return unescape(r[2])
     return null
-  }
-  static async quickReg(data) {
+  },
+  async quickReg(data) {
     return ajax.post('/reg/mobile', data)
-  }
-  static async login_local(data) {
+  },
+  async login_local(data) {
     return ajax.post('/login/local', data)
-  }
-  static async login_sys(data) {
+  },
+  async login_sys(data) {
     return ajax.post('/login/sys', data)
-  }
-  static async register_phone(data) {
+  },
+  async register_phone(data) {
     return ajax.post('/register/mobile', data)
-  }
-  static async psw(data) {
+  },
+  async psw(data) {
     return ajax.post('/psw', data)
-  }
-  static async sendSms(data) {
+  },
+  async sendSms(data) {
     return ajax.post('/sms/send', data)
-  }
-  static async vdSms(data) {
+  },
+  async vdSms(data) {
     return ajax.post('/sms/vd', data)
-  }
-  // static async getArea() {
+  },
+  // async getArea() {
   //   return ajax('/area/cascader')
   // }
-  static async curd(data) {
+  async curd(data) {
     let {
       model,
       curdType
@@ -43,8 +55,8 @@ class Api {
     delete data.model;
     delete data.curdType;
     return ajax.post(`/${model}/${curdType}`, data);
-  }
-  static async sql(url, data) {
+  },
+  async sql(url, data) {
     let urlArr = url.split('/');
     let model, curdType;
     if (urlArr.length === 2 || urlArr.length === 3) {
@@ -62,10 +74,20 @@ class Api {
         return ajax(`/${model}/${curdType}`, data);
       }
     }
-  }
-  static async logout() {
+  },
+  async logout() {
     return ajax.post('/logout')
   }
 }
-Vue.prototype.$api = Api
+
+let docs = require.context('./views', true, /api\.js$/);
+docs.keys().forEach(item => {
+  let name = item.replace('./', '').replace('/api.js', '');
+  let docsItem = docs(item).default;
+  let data = docsItem(ajax, error);
+  Api[name] = data;
+});
+
+Vue.prototype.$api = Api;
+
 export default Api

@@ -1,4 +1,8 @@
 module.exports = {
+  no: {
+    type: 'String',
+    name: '单号',
+  },
   check: {
     name: '是否已审核',
     type: 'Boolean',
@@ -14,7 +18,6 @@ module.exports = {
     option: {
       financialManager: '财务经理审核未通过',
     },
-    default: ""
   },
   relationType: {
     name: '付款用户类型',

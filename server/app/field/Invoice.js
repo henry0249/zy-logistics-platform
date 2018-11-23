@@ -9,8 +9,7 @@ module.exports = {
     name: '审核未通过状态',
     option: {
       financialManager: '财务经理审核未通过',
-    },
-    default: ""
+    }
   },
   value: {
     name: '金额',

@@ -1,7 +1,7 @@
 <template>
   <div>
     <List v-if="!$route.params._id" state="dispatcherManager"></List>
-    <Edit v-if="$route.params._id" new-state="logisticsClerk" business transport>
+    <Edit v-if="$route.params._id" new-state="logisticsClerk" business transport :businessAddNode="false">
     </Edit>
   </div>
 </template>

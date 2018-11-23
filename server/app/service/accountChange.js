@@ -51,6 +51,8 @@ class AccountChangeService extends Service {
       let account = await ctx.service.account.set(accountBody);
       body.account = account._id;
     }
+    if (body.relationType === 'user') body.no = await ctx.helper.no(body.account, body.user, 8);
+    if (body.relationType === 'company') body.no = await ctx.helper.no(body.account, body.company, 8);
     let accountChange = new ctx.model.AccountChange(body);
     await accountChange.save();
     await this.setBalanced(accountChange._id, body.settleList);
@@ -89,7 +91,9 @@ class AccountChangeService extends Service {
     });
     await this.checkField(body);
     body.author = ctx.user._id;
-    body.checkFail = '';
+    body.$unset = {
+      checkFail: 1
+    };
     delete body._id;
     delete body.check;
     delete body.auditor;
@@ -158,7 +162,9 @@ class AccountChangeService extends Service {
     if (accountChange.check) ctx.throw(422, '账单已经审核,请勿重复操作');
     body.auditor = ctx.user._id;
     body.check = true;
-    body.checkFail = '';
+    body.$unset = {
+      checkFail: 1
+    };
     delete body._id;
     delete body.handle;
     delete body.children;

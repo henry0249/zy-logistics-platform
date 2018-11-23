@@ -2,6 +2,40 @@ const Service = require('egg').Service;
 const stockField = require('../field/Stock');
 
 class StockService extends Service {
+  async getModelBody(param) {
+    const ctx = this.ctx;
+    let req = param || ctx.request.body;
+    if (!stockField.type.option[req.type]) ctx.throw(422, '库存类型错误', req);
+    if (!req.company) ctx.throw(422, '公司信息获取失败', req);
+    let company = await ctx.model.Company.findById(req.company);
+    if (!company) ctx.throw(422, '公司不存在', req);
+    if (!req.goods) ctx.throw(422, '商品信息获取失败', req);
+    let goods = await ctx.model.Goods.findById(req.goods);
+    if (!goods) ctx.throw(422, '商品不存在', req);
+    if (req.type === 'out' || req.type === 'decrease') {
+      if (Number(req.num) > Number(goods.stock)) ctx.throw(422, '不能超出当前商品库存', req);
+    } else {
+      if (Number(req.num) < 0) ctx.throw(422, '修改数量不能小于0', req);
+    }
+    let modelBody = {
+      type: req.type,
+      num: Number(req.num),
+      company: req.company,
+      goods: req.goods
+    };
+    if (req.remark) modelBody.remark = req.remark;
+    if (req.order) modelBody.order = req.order;
+    if (req.businessTrains) modelBody.businessTrains = req.businessTrains;
+    if (req.logistics) modelBody.logistics = req.logistics;
+    if (stockField.toType.option[req.toType]) {
+      modelBody.toType = req.toType;
+      if (req.toType === 'user' && !req.toUser) ctx.throw(422, '去往用户获取失败', req);
+      if (req.toType === 'user' && req.toUser) modelBody.toUser = req.toUser;
+      if (req.toType === 'company' && !req.toCompany) ctx.throw(422, '去往公司获取失败', req);
+      if (req.toType === 'company' && req.toCompany) modelBody.toCompany = req.toCompany;
+    }
+    return modelBody;
+  }
   async multi() {
     const ctx = this.ctx;
     let body = ctx.request.body;
@@ -10,62 +44,111 @@ class StockService extends Service {
     }
     for (let i = 0; i < body.length; i++) {
       const item = body[i];
-      await this.add(item);
+      await this.set(item);
     }
     return 'ok';
   }
-  async add(data) {
+  async multiSet(param) {
     const ctx = this.ctx;
-    let body = data || ctx.request.body;
-    if (!body.goods) {
-      ctx.throw(422, '商品信息必填', body);
+    let req = param || ctx.request.body;
+    if (!(req && req instanceof Array && req.length > 0)) ctx.throw(422, '批量操作失败,未接收到操作数据', req);
+    for (let i = 0; i < body.length; i++) {
+      const item = body[i];
+      await this.set(item);
     }
-    let goods = await ctx.model.Goods.findById(body.goods);
-    if (!goods) {
-      ctx.throw(422, '商品不存在', body);
+    return 'ok';
+  }
+  async set(param) {
+    const ctx = this.ctx;
+    let req = param || ctx.request.body;
+    let modelBody = await this.getModelBody(req);
+    let hasStock = false;
+    if (modelBody.type === 'out' && modelBody.order && modelBody.businessTrains) {
+      hasStock = await ctx.model.Stock.findOne({
+        type: 'out',
+        order: modelBody.order,
+        businessTrains: modelBody.businessTrains
+      });
+      if (hasStock) return hasStock;
     }
-    if (!stockField.type.option[body.type]) {
-      ctx.throw(422, '库存修改类型不存在', body);
+    if (!hasStock) {
+      modelBody.no = await ctx.helper.no(modelBody.goods, modelBody.company, 2);
+      let stockModel = new ctx.model.Stock(modelBody);
+      await stockModel.save();
+      return stockModel;
     }
-
-    if (body.type === 'out' || body.type === 'decrease') {
-      if (Number(body.num) > Number(goods.stock)) {
-        ctx.throw(422, '不能超出当前商品库存', body);
-      }
-    } else {
-      if (Number(body.num) < 0) {
-        ctx.throw(422, '修改数量不能小于0', body);
-      }
-    }
+  }
+  async add(param) {
+    return await this.set(param);
+  }
+  async update(param) {
+    let req = param || ctx.request.body;
+    if (!req._id) ctx.throw(422, '库存单获取失败');
+    let stock = await ctx.model.Stock.findById(req._id);
+    if (!stock) ctx.throw(404, '库存单不存在');
+    if (stock.check) ctx.throw(422, '库存单已经审核');
+    let modelBody = this.getModelBody(req);
+    modelBody.$unset = {
+      checkFail: 1
+    };
+    await stock.update(modelBody);
+  }
+  async check(param) {
+    const ctx = this.ctx;
+    let req = param || ctx.request.body;
+    if (!req._id) ctx.throw(422, '库存单获取失败');
+    let stock = await ctx.model.Stock.findById(req._id).populate([{
+      path: 'goods'
+    }]);
+    if (!stock) ctx.throw(404, '库存单不存在');
+    if (stock.check) ctx.throw(404, '库存单已经审核,请勿重新审核');
+    if (!stock.goods) ctx.throw(404, '商品不存在');
+    let goods = stock.goods;
     let newStock = 0;
-    if (body.state === 'finish') {
-      if (body.type === 'in' || body.type === 'increase') {
-        newStock = Number(goods.stock) + Number(body.num);
-      }
-      if (body.type === 'out' || body.type === 'decrease') {
-        newStock = Number(goods.stock) - Number(body.num);
-      }
-      if (body.type === 'check') {
-        newStock = Number(body.num);
-      }
-    } else {
-      newStock = Number(goods.stock);
+    if (stock.type === 'in' || stock.type === 'increase') {
+      newStock = goods.stock + stock.num;
     }
-    let stockModel = new ctx.model.Stock({
-      ...body,
-      company: goods.company,
+    if (stock.type === 'out' || stock.type === 'decrease') {
+      newStock = goods.stock - stock.num;
+    }
+    if (stock.type === 'check') newStock = stock.num;
+    let goodsUpdate = {
       old: goods.stock,
       new: newStock,
-      dv: newStock - Number(goods.stock)
-    });
-    await stockModel.save();
-    await goods.update({
+      dv: newStock - goods.stock,
       stock: newStock
+    }
+    await ctx.model.Goods.update({
+      _id: goods._id
+    }, goodsUpdate);
+    await stock.update({
+      check: true,
+      $unset: {
+        checkFail: 1
+      }
     });
     return 'ok';
   }
-  async set() {
-    return await this.add();
+  async checkFail(param) {
+    let req = param || ctx.request.body;
+    if (!req._id) ctx.throw(422, '库存单获取失败');
+    if (!req.text) ctx.throw(422, '审核失败原因必填');
+    let stock = await ctx.model.Stock.findById(req._id);
+    if (!stock) ctx.throw(404, '库存单不存在');
+    if (stock.check) ctx.throw(422, '库存单已经审核');
+    await stock.update({
+      check: false,
+      checkFail: 'stockAdmin'
+    });
+    let curdLog = new ctx.model.CurdLog({
+      type: 'stockCheckFail',
+      user: ctx.user._id,
+      company: stock.company,
+      stock: stock._id,
+      remark: req.text
+    });
+    await curdLog.save();
+    return 'ok';
   }
   async chart() {
     const ctx = this.ctx;
@@ -136,7 +219,7 @@ class StockService extends Service {
             $exists: false
           }
         }],
-        goods:goods._id,
+        goods: goods._id,
         company: company._id,
         createdAt: {
           // $gte: minDate,
@@ -198,7 +281,7 @@ class StockService extends Service {
       }
     };
     let lastStock = await ctx.model.Stock.findOne({
-      goods:goods._id,
+      goods: goods._id,
       company: company._id,
       state: "finish"
     }).sort({
@@ -211,7 +294,7 @@ class StockService extends Service {
     //累计入库
     let stockInData = await ctx.model.Stock.find({
       type: 'in',
-      goods:goods._id,
+      goods: goods._id,
       company: company._id,
       state: "finish"
     });
@@ -222,7 +305,7 @@ class StockService extends Service {
     //累计出库
     let stockOutData = await ctx.model.Stock.find({
       type: 'out',
-      goods:goods._id,
+      goods: goods._id,
       company: company._id,
       state: "finish"
     });
@@ -232,13 +315,13 @@ class StockService extends Service {
     });
     res.check.num = await ctx.model.Stock.count({
       type: 'check',
-      goods:goods._id,
+      goods: goods._id,
       company: company._id,
       state: "finish"
     });
     let lastStockCheck = await ctx.model.Stock.findOne({
       type: 'check',
-      goods:goods._id,
+      goods: goods._id,
       company: company._id,
       state: "finish",
     }).sort({

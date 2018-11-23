@@ -11,17 +11,26 @@
 //       cashier: '出纳专员',
 //       invoiceCleck: '发票专员',
 //       financialManager: '财务经理', //流水审核
+//       financialManager: '财务经理', //流水审核
+//       stockClerk: '仓库文员', //新增库存单
+//       stockAdmin: '仓库管理员', //审核库存记录
 module.exports = {
+  '/stock/set': ['stockClerk','stockAdmin'],
+  '/stock/add': ['stockClerk','stockAdmin'],
+  '/stock/mutilSet': ['stockClerk','stockAdmin'],
+  '/stock/check': ['stockAdmin'],
+  '/stock/checkFail': ['stockAdmin'],
   '/accoutChange/set': ['cashier'],
   '/accoutChange/add': ['cashier'],
-  '/accoutChange/update': ['settle','cashier','financialManager'],
-  '/accoutChange/delete': ['cashier','financialManager'],
+  '/accoutChange/check': ['financialManager'],
+  '/accoutChange/update': ['settle', 'cashier', 'financialManager'],
+  '/accoutChange/delete': ['cashier', 'financialManager'],
   '/accoutChange/checkFail': ['financialManager'],
   '/invoice/add': ['invoiceCleck'],
   '/invoice/set': ['invoiceCleck'],
   '/invoice/update': ['invoiceCleck'],
   '/invoice/check': ['financialManager'],
   '/invoice/checkFail': ['financialManager'],
-  '/invoice/update': ['invoiceCleck','financialManager'],
-  '/invoice/delete': ['invoiceCleck','financialManager'],
-}
+  '/invoice/update': ['invoiceCleck', 'financialManager'],
+  '/invoice/delete': ['invoiceCleck', 'financialManager'],
+};

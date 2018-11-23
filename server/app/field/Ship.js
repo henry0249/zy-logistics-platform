@@ -12,6 +12,16 @@ module.exports = {
       2: '大型'
     }
   },
+  load: {
+    name: '荷载',
+    type: 'Number',
+    default: 0
+  },
+  weight: {
+    name: '自重', //kg
+    type: 'Number',
+    default: 0
+  },
   name: {
     name: '名称',
     type: 'String',

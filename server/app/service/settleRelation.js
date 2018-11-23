@@ -173,8 +173,8 @@ class SettleRelationService extends Service {
     if (item.modelType === 'invoice') {
       res = data.balancedSettlement + data.balancedPrepaid - data.invoiced;
     }
-    let settleRelationData = await ctx.model.SettleRelationData({
-      [dataType]: item[item.dataType],
+    let settleRelationData = await ctx.model.SettleRelation.find({
+      [item.dataType]: item[item.dataType],
       $or: [{
         isChildren: false
       }, {

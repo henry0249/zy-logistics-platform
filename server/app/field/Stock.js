@@ -1,12 +1,18 @@
 module.exports = {
-  state: {
-    name: '状态',
+  no: {
+    name: '库存单号',
     type: 'String',
-    default: 'finish',
+  },
+  check: {
+    name: '审核标识',
+    type: 'Boolean',
+    default: false
+  },
+  checkFail: {
+    type: 'String',
+    name: '审核未通过状态',
     option: {
-      ready: '待处理',
-      checked: '已处理',
-      finish: '完成',
+      stockAdmin: '仓库管理员审核未通过',
     }
   },
   type: {
@@ -16,7 +22,7 @@ module.exports = {
       out: '出库',
       increase: '增益',
       decrease: '损耗',
-      check: '盘点'
+      check: '盘点',
     }
   },
   name: {
@@ -68,6 +74,14 @@ module.exports = {
     name: '关联的物流单',
     type: 'ObjectIdArray',
     ref: 'Logistics'
+  },
+  toType: {
+    name: '去往类型',
+    type: 'String',
+    option: {
+      user: '用户',
+      company: '公司'
+    }
   },
   toCompany: {
     name: '去往公司',

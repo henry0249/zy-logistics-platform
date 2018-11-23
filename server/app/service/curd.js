@@ -10,7 +10,7 @@ class CurdService extends Service {
     } = ctx;
     let acceptObj = {
       'GET': ['find', 'findOne', 'findById'],
-      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete', 'aggregate', 'chart', 'count', 'multi'],
+      'POST': ['add', 'set', 'update', 'find', 'findOne', 'findById', 'delete', 'aggregate', 'chart', 'count', 'multi', 'check', 'checkFail'],
       'PUT': ['update'],
       'DELETE': ['delete']
     }
@@ -233,6 +233,7 @@ class CurdService extends Service {
     let multi = param.multi || false;
     delete param.multi;
     let ctx = this.ctx;
+
     function p() {
       return new Promise((res, rej) => {
         model.remove(param, function (err, docs) {

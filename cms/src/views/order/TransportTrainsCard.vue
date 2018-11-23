@@ -89,10 +89,10 @@ export default {
     }
   },
   watch: {
-    "data.areaType"() {
-      this.data.company = "";
-      this.data.area = {};
-      this.data.areaArr = [];
+    "data.areaType"(val) {
+      this.$set(this.data, "company", "");
+      this.$set(this.data, "area", {});
+      this.$set(this.data, "areaArr", []);
     },
     "data.area"() {
       let areaInfo = this.areaInfo(this.data);
@@ -131,6 +131,7 @@ export default {
     },
     companyChange(val) {
       this.data.area = val.area;
+      this.$set(this.data, "company", val._id);
     },
     remove() {
       this.$emit("remove", this.data);

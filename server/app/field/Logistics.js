@@ -31,8 +31,24 @@ module.exports = {
     option: {
       dispatcherManager: '调度经理审核未通过',
       logisticsClerk: '物流文员审核未通过',
-    },
-    default: ""
+    }
+  },
+  settleState: {
+    type: 'String',
+    name: '结算状态',
+    option: {
+      financial: '待预审',
+      settle: '待结算',
+      settleFinish: '结算完成',
+      invoiceFinish: '开票完成',
+    }
+  },
+  settleStateCheckFail: {
+    type: 'String',
+    name: '结算审核未通过状态',
+    option: {
+      settle: '结算专员审核未通过'
+    }
   },
   order: {
     type: 'ObjectId',
@@ -59,12 +75,23 @@ module.exports = {
     type: 'ObjectId',
     ref: 'Company'
   },
+  transportationLoad: {
+    name: '需求荷载',
+    type: 'Number',
+    default: 0
+  },
+  transportationType: {
+    name: '需求类型',
+    type: 'Array'
+  },
   transportation: {
     type: 'String',
-    name: '交通工具',
+    name: '运输方式',
     option: {
-      truck: '车',
-      ship: '船',
+      truck: '公路',
+      ship: '水路',
+      // train: '铁路',
+      // plane: '空运'
     }
   },
   truck: {
@@ -141,16 +168,6 @@ module.exports = {
     name: '收款人',
     ref: 'User'
   },
-  preSettlement: {
-    name: '用结算款结算金额', //仅做记录
-    type: 'Number',
-    default: 0
-  },
-  prePrepaid: {
-    name: '用预付款结算金额', //仅做记录
-    type: 'Number',
-    default: 0
-  },
   balancedSettlement: {
     name: '已用结算款结算金额', //真实记录
     type: 'Number',
@@ -161,17 +178,8 @@ module.exports = {
     type: 'Number',
     default: 0
   },
-  balancedArr: {
-    name: '已结算金额数组', //一个accountChange的_id对应一个金额,因为一次结算,不一定付完
-    type: 'Object'
-  },
-  preInvoiced: {
-    name: '等待开票金额', //仅做记录
-    type: 'Number',
-    default: 0
-  },
   invoiced: {
-    name: '已开票金额',
+    name: '已开票金额', //真实记录
     type: 'Number',
     default: 0
   },
@@ -184,6 +192,15 @@ module.exports = {
     name: '损耗承担公司',
     type: 'ObjectId',
     ref: 'Company'
+  },
+  customerType: {
+    name: '收货方类型',
+    type: 'String',
+    option: {
+      company: '公司',
+      user: '用户',
+    },
+    default: 'company'
   },
   user: {
     type: 'ObjectId',

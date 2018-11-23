@@ -1,8 +1,8 @@
 <template>
   <loading-box v-model="loadingText">
     <div class="flex ac jb" style="color:#909399;padding-left:25px;background:#f4f4f5;font-size:13px;margin-bottom:15px;border-radius:4px">
-      <div class="f1" style="margin-right:20px">物流链</div>
-      <div @click="add" class="success pointer" style="padding:10px">
+      <div class="f1" style="margin-right:20px;padding:10px">物流链</div>
+      <div v-if="editAble" @click="add" class="success pointer" style="padding:10px">
         物流节点<i class="el-icon-plus"></i>
       </div>
     </div>
@@ -24,15 +24,15 @@
           </div>
         </div>
       </div>
-      <div v-for="(item,index) in trains" :key="'table'+index">
+      <div v-for="(item,index) in trains" :key="'table'+(item._id || item.template_id)">
         <div v-if="showIndex === index">
           <div class="flex ac jb brtl brtr" style="color:#909399;padding-left:10px;background:#f4f4f5;font-size:13px">
-            <div class="f1 ac jb">
+            <div class="f1 ac jb" style="padding:10px">
               <el-input size="mini" v-model="item.areaInfo" placeholder="请输入起送地点详情"></el-input>
               <i style="margin:0 15px" class="el-icon-d-arrow-right success"></i>
               <el-input size="mini" v-model="trains[index + 1].areaInfo" placeholder="请输入送达地点详情"></el-input>
             </div>
-            <div class="success pointer" style="padding:10px" @click="addLogistics(item.logistics,index)">
+            <div v-if="editAble" class="success pointer" style="padding:10px" @click="addLogistics(item.logistics,index)">
               物流单<i class="el-icon-plus"></i>
             </div>
           </div>
@@ -98,13 +98,12 @@
           </div>
         </div>
       </div>
-      <div class="flex ac" style="margin-top:15px">
+      <div v-if="editAble" class="flex ac" style="margin-top:15px">
         <div class="info">
-          <i class="el-icon-info"></i> 提交将更新并且保存物流链所有信息,新增的物流单会进入审核流程
+          <i class="el-icon-info"></i> 提交将更新并且保存物流链信息,新增的物流单会进入审核流程
         </div>
         <div class="f1"></div>
-        <div class="info" style="padding:0 10px">此次新增 <strong><span class="success">{{newLogisticsCount}}</span></strong> 张物流单</div>
-        <el-button size="small" type="success" @click="dispatch">提交物流链信息</el-button>
+        <el-button size="small" type="success" @click="$emit('update','transportTrains')">提交物流链信息</el-button>
       </div>
     </div>
   </loading-box>
@@ -146,6 +145,10 @@ export default {
       type: Boolean,
       default: false
     },
+    editAble: {
+      type: Boolean,
+      default: true
+    }
   },
   computed: {
     statistics() {
@@ -156,8 +159,8 @@ export default {
         count: 0,
         average: 0
       };
-      this.trains.forEach(item => {
-        if (item.logistics) {
+      this.trains.forEach((item, index) => {
+        if (item.logistics && this.showIndex === index) {
           item.logistics.forEach(logisticsItem => {
             res.count++;
             res.loading += Number(logisticsItem.loading) || 0;
@@ -169,26 +172,6 @@ export default {
       if (res.count > 0) {
         res.average = (res.totalPrice / res.count).toFixed(1);
       }
-      return res;
-    },
-    companySelectList() {
-      let transportTrainsRelationCompany =
-        this.order.handle.transportTrainsRelationCompany || [];
-      let businessRelationCompany =
-        this.order.handle.businessRelationCompany || [];
-      return [...transportTrainsRelationCompany, ...businessRelationCompany];
-    },
-    newLogisticsCount() {
-      let res = 0;
-      this.trains.forEach(item => {
-        if (item.logistics) {
-          item.logistics.forEach(logisticsItem => {
-            if (!logisticsItem.no) {
-              res++;
-            }
-          });
-        }
-      });
       return res;
     }
   },
@@ -321,8 +304,7 @@ export default {
             _id: item._id
           });
           logistics.splice(index, 1);
-        } catch (error) {
-        }
+        } catch (error) {}
         this.loadingText = "";
       } else {
         logistics.splice(index, 1);
@@ -337,18 +319,6 @@ export default {
       if (val === 0) {
         logisticsItem[logisticsItem.transportation] = {};
       }
-    },
-    async dispatch() {
-      this.loadingText = "物流链信息提交中";
-      try {
-        await this.$ajax.post("/order/dispatch", {
-          order: this.order._id,
-          transportTrains: this.trains
-        });
-        this.$message.success("物流链信息更新成功");
-        this.$emit("reflesh");
-      } catch (error) {}
-      this.loadingText = "";
     },
     toDetail(item) {
       if (item._id) {

@@ -1,3 +1,6 @@
+const roleConfig = require('./role');
+const roleField = require('../field/Role');
+
 module.exports = () => {
   return async function jwtVerify(ctx, next) {
     let tokenData = await ctx.service.jwt.verify();
@@ -10,19 +13,22 @@ module.exports = () => {
   };
 };
 
-let roleConfig = require('./role');
 
 async function authentication(ctx, user_id) {
   let path = ctx.request.path;
   if (roleConfig[path]) {
-    let hasPower = await ctx.model.Role.findOne({
+    let hasRole = await ctx.model.Role.findOne({
       type: {
         $in: roleConfig[path]
       },
       user: user_id
     });
-    if (!hasPower) {
-      ctx.throw(400, '您的权限不足');
+    if (!hasRole) {
+      let roleNameArr = [];
+      roleConfig[path].map((item)=>{
+        roleNameArr.push(roleField.type.option[item]);
+      });
+      ctx.throw(400, `您的权限不足,需要${roleNameArr.join('、')}权限`);
     }
   }
 }

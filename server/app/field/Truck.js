@@ -15,11 +15,21 @@ module.exports = {
       5: '重型'
     }
   },
+  load: {
+    name: '荷载',
+    type: 'Number',
+    default: 0
+  },
+  weight: {
+    name: '自重', //kg
+    type: 'Number',
+    default: 0
+  },
   name: {
     name: '名称',
     type: 'String',
   },
-  info:{
+  info: {
     name: '信息',
     type: 'Array',
   },

@@ -2,7 +2,7 @@
   <loading-box v-model="loadingText">
     <div class="g-business-trains">
       <div class="flex ac jb" style="color:#909399;padding-left:25px;background:#f4f4f5;font-size:13px;margin:15px 0;border-radius:4px">
-        <div style="margin-right:20px">贸易链</div>
+        <div style="margin-right:20px;padding:10px">贸易链</div>
         <div>{{titleTip}}</div>
         <div class="f1"></div>
         <div v-if="order.goods && order.goods._id" class="flex ac jb">
@@ -11,10 +11,10 @@
           <div class="goods-info-padding">规格：{{order.goods.spec}}</div>
           <div class="goods-info-padding">库存：{{order.goods.stock}} {{order.goods.unit}}</div>
         </div>
-        <div @click="addToStart" class="warning pointer" style="padding:10px">
+        <div v-if="editAble" @click="addToStart" class="warning pointer" style="padding:10px">
           源头供应商<i class="el-icon-plus"></i>
         </div>
-        <div @click="add" class="success pointer" style="padding:10px">
+        <div v-if="editAble" @click="add" class="success pointer" style="padding:10px">
           贸易节点<i class="el-icon-plus"></i>
         </div>
       </div>
@@ -22,13 +22,20 @@
         <div class="hor-scroll" v-getHeight="getHeight">
           <div class="hor-scroll-item" style="margin-bottom:10px" v-for="(item,index) in data" :key="item._id || item.template_id">
             <div class="flex ac">
-              <business-trains-card :settle="settle" :order="order" :index="index" :last.sync="index>0?data[index-1]:undefined" :next.sync="data[index+1]?data[index+1]:undefined" :title="businessTrainsTitle(index)" :data.sync="item" @remove="remove($event,index)"></business-trains-card>
+              <business-trains-card :settle="settle" :order="order" :index="index" :length="data.length" :last.sync="index>0?data[index-1]:undefined" :next.sync="data[index+1]?data[index+1]:undefined" :data.sync="item" @remove="remove($event,index)"></business-trains-card>
               <div class="tc" v-if="index!==data.length-1" style="width:50px">
                 <i class="el-icon-d-arrow-right success"></i>
               </div>
             </div>
           </div>
         </div>
+      </div>
+      <div v-if="editAble && data.length>0" class="flex ac" style="margin-top:10px">
+        <div class="info">
+          <i class="el-icon-info"></i> 提交将更新并且保存贸易链信息
+        </div>
+        <div class="f1"></div>
+        <el-button size="small" type="success" @click="$emit('update','businessTrains')">提交贸易链信息</el-button>
       </div>
     </div>
   </loading-box>
@@ -68,6 +75,10 @@ export default {
     settle: {
       type: Boolean,
       default: false
+    },
+    editAble: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -90,36 +101,6 @@ export default {
     getHeight(val) {
       this.height = val;
     },
-    businessTrainsTitle(index) {
-      if (index === 0) {
-        return "供货商";
-      } else if (index === this.data.length - 1) {
-        return "客户";
-      } else {
-        return "联营商" + index;
-      }
-    },
-    trainsType(index) {
-      let length = this.data.length;
-      if (length === 1) {
-        return 0;
-      }
-      if (length === 2) {
-        if (index === 0) {
-          return 1;
-        }
-        return 3;
-      }
-      if (length > 2) {
-        if (index === 0) {
-          return 1;
-        }
-        if (index === length - 1) {
-          return 3;
-        }
-        return 2;
-      }
-    },
     addToStart() {
       if (this.data.length === 0) {
         this.$message.warn(`物流链尚未添加`);
@@ -133,11 +114,7 @@ export default {
         this.$message.warn(`节点中有公司未选择`);
         return;
       }
-      let data0 = this.data[0];
-      data0.type = "pool";
-      this.$set(this.data, 0, data0);
       this.data.unshift({
-        type: "supplier",
         company: "",
         supplyPrice: this.data[0].supplyPrice,
         supplyCount: this.data[0].supplyCount,
@@ -170,12 +147,6 @@ export default {
       this.pushItem();
     },
     async remove(item, index) {
-      let handle_id = this.order.handle._id || this.order.handle;
-      let current_id = item.company._id || item.company;
-      if (handle_id === current_id) {
-        this.$message.warn(`不能删除主导公司`);
-        return;
-      }
       if (this.data.length > 2) {
         if (item.type === "customer") {
           this.$message.warn(`不能删除客户`);
@@ -220,34 +191,25 @@ export default {
       if (this.data.length === 0) {
         this.data.push({
           ...body,
-          type: "supplier",
           template_id: new Date().getTime(),
           company: this.order.goods.company
         });
-        // this.data.push({
-        //   ...body,
-        //   type: "pool",
-        //   company: {}
-        // });
         this.data.push({
           ...body,
           template_id: new Date().getTime() + 1,
-          type: "customer",
-          [this.order.type]: this.order[this.order.type],
-          customerType: this.order.type
+          [this.order.type]: this.order[this.order.type]
         });
       } else {
         if (!this.data[0].company) {
-          this.$message.warn(`节点中有公司未选择`);
+          this.$message.warn(`源头供应公司未选择`);
           return;
         }
         if (!this.data[this.data.length - 1 - 1].company) {
-          this.$message.warn(`节点中有公司未选择`);
+          this.$message.warn(`联营商公司未选择`);
           return;
         }
         this.data.splice(this.data.length - 1, 0, {
           ...body,
-          type: "pool",
           company: "",
           supplyPrice: this.data[this.data.length - 1 - 1].supplyPrice,
           supplyCount: this.data[this.data.length - 1 - 1].supplyCount,
@@ -256,14 +218,13 @@ export default {
           template_id: new Date().getTime()
         });
       }
-    },
-    removeAll() {
-      this.data = [];
     }
   },
   created() {
     if (this.val && this.val.length > 0) {
       this.data = JSON.parse(JSON.stringify(this.val));
+    } else {
+      this.pushItem();
     }
   }
 };

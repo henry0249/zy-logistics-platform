@@ -39,11 +39,12 @@ module.exports = app => {
     .post('/order/company/badge', checkToken(), 'order.companyBadge') //公司订单标记
     .get('/order/info/:_id', checkToken(), 'order.getOrderById') //根据id获取订单信息
     .post('/order/transfer', checkToken(), 'order.transfer') //转单
-    .post('/order/dispatch', checkToken(), 'order.dispatch') //订单提交配送
-    .post('/order/mutilUpdate', checkToken(), 'order.mutilUpdate') //批量修改订单信息
     .post('/order/check', checkToken(), 'order.check') //审核订单
     .post('/order/checkFail', checkToken(), 'order.checkFail') //订单审核失败
     .all('/order/pending/:state', checkToken(), 'order.pending') //获取待处理订单
+    .post('/order/update/info', checkToken(), 'order.updateInfo') //更新订单基础信息
+    .post('/order/update/businessTrains', checkToken(), 'order.updateBusinessTrains') //更新贸易链信息
+    .post('/order/update/transportTrains', checkToken(), 'order.updateTransportTrains') //更新物流链信息
     //物流单接口
     .get('/logistics/company/badge', checkToken(), 'logistics.companyBadge') //公司运单标记
     .post('/logistics/company/badge', checkToken(), 'logistics.companyBadge') //公司运单标记
@@ -55,10 +56,7 @@ module.exports = app => {
     .post('/stock/multi', checkToken(), 'stock.multi') //批量添加库存单
     .post('/stock/simpleStatistics', checkToken(), 'stock.simpleStatistics') //简单的库存统计
     //贸易链接口
-    .post('/businessTrains/multi/update', checkToken(), 'businessTrains.multiUpdate') //结算流程
-    .post('/businessTrains/multi/checkFail', checkToken(), 'businessTrains.multiCheckFail') //结算流程
-    // .post('/businessTrains/invoice/summary', checkToken(), 'businessTrains.getInvoiceSummary') //待开票列表总计
-    // .post('/businessTrains/invoice/list', checkToken(), 'businessTrains.getInvoiceList') //待开票列表
+    .post('/businessTrains/multi/update/balancePrice', checkToken(), 'businessTrains.mutilUpdateBalancePrice') //批量更新贸易节点结算价格
     //结算接口
     // .post('/settle/businessTrains/tab', checkToken(), 'settle.getBusinessTrainsTab') //获取贸易链相关公司,准备展示结算列表
     //账户接口
@@ -69,9 +67,6 @@ module.exports = app => {
     .post('/accountChange/check', checkToken(), 'accountChange.check') //账单流水审核
     .post('/accountChange/checkFail', checkToken(), 'accountChange.checkFail') //账单流水审核失败
     //发票接口
-    // .post('/invoice/wait/summary', checkToken(), 'invoice.waitSummary') //获取发票统计信息
-    // .post('/invoice/wait/tab', checkToken(), 'invoice.getWaitInvoiceTab') //获取发票关联公司
-    // .post('/invoice/wait/list', checkToken(), 'invoice.getWaitInvoiceList') //获取可开票列表
     .post('/invoice/check', checkToken(), 'invoice.check') //发票审核
     .post('/invoice/checkFail', checkToken(), 'invoice.checkFail') //发票打回
     //页面接口

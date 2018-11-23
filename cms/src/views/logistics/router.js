@@ -25,7 +25,7 @@ export default [{
   }, {
     path: '/logistics/dispatcher_manager',
     component: TransportTrains,
-    name: '调度经理审核',
+    name: '调度经理审核运单',
     meta: {
       nav: true,
       desc: '调度专员新增物流单之后,调度经理可在此审核',
@@ -33,7 +33,7 @@ export default [{
   }, {
     path: '/logistics/logistics_clerk',
     component: TransportTrains,
-    name: '物流文员审核',
+    name: '物流文员审核运单',
     meta: {
       nav: true,
       desc: '调度经理审核物流单后,物流文员可在此审核',

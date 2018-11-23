@@ -33,6 +33,15 @@ export default {
       }
     }
   },
+  watch: {
+    $route(val) {
+      let res;
+      if (val.matched && val.matched.length > 0) {
+        res = val.matched[0].path;
+      }
+      this.$emit("change", res);
+    }
+  },
   methods: {
     navClick(item) {
       if (!item.path) {
@@ -40,11 +49,6 @@ export default {
         return;
       }
       this.$router.push(item.path);
-      let res;
-      if (this.$route.matched && this.$route.matched.length > 0) {
-        res = this.$route.matched[0].path;
-      }
-      this.$emit("change", res);
     }
   },
   computed: {

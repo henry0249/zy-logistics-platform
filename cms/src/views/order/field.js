@@ -2,7 +2,7 @@ module.exports = {
   table: {
     no: {
       name: '订单号',
-      width: "100",
+      width: "110",
       slot: true,
     },
     customer: {

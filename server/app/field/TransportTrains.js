@@ -13,6 +13,16 @@ module.exports = {
       2: '目的地',
     }
   },
+  company: {
+    type: 'ObjectId',
+    name: '节点公司',
+    ref: 'Company'
+  },
+  // user: {
+  //   type: 'ObjectId',
+  //   name: '节点用户',
+  //   ref: 'User'
+  // },
   areaType: {
     type: 'String',
     name: '地址类型',
@@ -36,21 +46,21 @@ module.exports = {
     type: 'String',
     name: '地址详情'
   },
+  nextAreaInfo: {
+    type: 'String',
+    name: '去往地址详情'
+  },
   order: {
     type: 'ObjectId',
-    name: '所属订单',
+    name: '关联订单',
     ref: 'Order'
   },
-  company: {
+  goods: {
     type: 'ObjectId',
-    name: '节点公司',
-    ref: 'Company'
+    name: '关联商品',
+    ref: 'Goods'
   },
-  user: {
-    type: 'ObjectId',
-    name: '节点用户',
-    ref: 'User'
-  },
+  
   handle: {
     name: '处理公司',
     type: 'ObjectId',
@@ -58,7 +68,7 @@ module.exports = {
   },
   carrierCompany: {
     name: '承运公司',
-    type: 'ObjectId',
+    type: 'ObjectIdArray',
     ref: 'Company'
   },
   last: {

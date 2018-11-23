@@ -8,7 +8,8 @@ module.exports = {
       logisticsCheckFail: '物流单审核失败记录',
       businessTrainsCheckFail: '贸易链审核失败记录',
       accountChangeCheckFail: '账户流水审核失败记录',
-      invoiceCheckFail: '发票审核失败记录'
+      invoiceCheckFail: '发票审核失败记录',
+      stockCheckFail: '库存单审核失败记录'
     },
     default: 'default'
   },
@@ -44,6 +45,11 @@ module.exports = {
   },
   invoice: {
     name: '关联的发票',
+    type: 'ObjectId',
+    ref: 'Invoice'
+  },
+  stock: {
+    name: '关联的库存单',
     type: 'ObjectId',
     ref: 'Invoice'
   },

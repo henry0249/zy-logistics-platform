@@ -2,7 +2,6 @@ import App from './App.vue';
 import Dispatcher from './Dispatcher.vue';
 import DispatcherManager from './DispatcherManager.vue';
 import LogisticsClerk from './LogisticsClerk.vue';
-import Logistics from './Logistics.vue';
 
 export default [{
   path: '/dispatch',
@@ -29,7 +28,7 @@ export default [{
   },{
     path: '/dispatch/dispatcherManager',
     component: DispatcherManager,
-    name: '调度经理审核',
+    name: '调度经理审核订单',
     meta: {
       nav: true,
       desc: '',
@@ -43,7 +42,7 @@ export default [{
   },{
     path: '/dispatch/logisticsClerk',
     component: LogisticsClerk,
-    name: '物流文员审核',
+    name: '物流文员审核订单',
     meta: {
       nav: true,
       desc: '',
@@ -53,20 +52,6 @@ export default [{
       path: '/dispatch/logisticsClerk/edit/:_id',
       component: LogisticsClerk,
       name: '物流文员审核订单详情'
-    }]
-  },{
-    path: '/dispatch/logistics',
-    component: Logistics,
-    name: '物流单管理',
-    meta: {
-      nav: true,
-      desc: '',
-      state: 'logistics'
-    },
-    children: [{
-      path: '/dispatch/logistics/edit/:_id',
-      component: Logistics,
-      name: '物流单详情'
     }]
   }]
 }]

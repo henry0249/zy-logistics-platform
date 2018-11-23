@@ -2,7 +2,6 @@ module.exports = {
   settleState: {
     type: 'String',
     name: '结算状态',
-    default: 'financial',
     option: {
       financial: '待预审',
       settle: '待结算',
@@ -11,14 +10,13 @@ module.exports = {
       invoiceFinish: '开票完成',
     }
   },
-  stateCheckFail: {
+  settleStateCheckFail: {
     type: 'String',
     name: '结算审核未通过状态',
     option: {
       settle: '结算专员审核未通过',
       financialManager: '财务经理审核未通过',
-    },
-    default: ""
+    }
   },
   type: {
     type: 'String',
@@ -32,7 +30,6 @@ module.exports = {
   customerType: {
     type: 'String',
     name: '客户类型',
-    default: 'company',
     option: {
       user: '用户',
       company: '公司'

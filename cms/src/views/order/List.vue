@@ -31,8 +31,9 @@
         </div>
       </div>
       <div slot-scope="scope">
-        <div class="link" v-if="scope.prop==='no'" @click="toDetail(scope.row,scope.index)">
-          {{scope.row.no}}
+        <div class="flex ac" v-if="scope.prop==='no'" @click="toDetail(scope.row,scope.index)">
+          <span class="link">{{scope.row.no}}</span>
+          <i v-if="scope.row.checkFail" class="el-icon-error danger" style="margin-bottom:2px;margin-left:5px"></i>
         </div>
         <div v-if="scope.prop==='customer'">
           <el-tag v-if="scope.row.user" size="mini" style="margin-right:5px" type="warning">个人</el-tag>
