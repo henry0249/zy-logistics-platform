@@ -1,8 +1,9 @@
 <template>
-  <loading-box class="g-order-create">
+  <loading-box class="edit-box">
     <my-nav :active-name.sync="activeName" @select="select" :options="options"></my-nav>
     <loading-box class="g-order" v-model="loadingText">
       <company-edit-item v-if="activeName === 'information' && !loadingText" :data.sync="infoData" :startData="initInfoData" :business-relation.sync="businessRelation" :transport-trains-relation.sync="transportTrainsRelation"></company-edit-item>
+      <div></div>
     </loading-box>
   </loading-box>
 </template>
@@ -53,6 +54,17 @@
         },
       };
     },
+    watch: {
+      async activeName(val) {
+        try {
+          this.loadingText = '加载中';
+          await this[this.options[val].get]();
+        } catch (error) {
+          console.log(error);
+        }
+        this.loadingText = '';
+      }
+    },
     methods: {
       select(val) {},
       async getCompany() {
@@ -87,8 +99,7 @@
     async created() {
       try {
         this.loadingText = '加载中';
-        // await this[this.options[this.activeName].get]();
-        await this.getCompany();
+        await this[this.options[this.activeName].get]();
       } catch (error) {
         console.log(error);
       }
@@ -98,10 +109,12 @@
 </script>
 
 <style scoped>
+  .edit-box {}
   .g-order-create {
     padding: 0 1% 1% 1%;
   }
   .g-order {
-    max-height: calc(100vh - 50px - 35px - 35px - 57px);
+    max-height: calc(100vh - 50px - 35px - 35px - 57px - 25px);
+    margin-top: 25px;
   }
 </style>
