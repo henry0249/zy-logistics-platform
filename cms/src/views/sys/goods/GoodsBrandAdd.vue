@@ -25,13 +25,14 @@
     },
     methods: {
       async getCategory() {
-        this.categoryArr = await this.$api.curd({
-          model: "category",
-          curdType: "find",
+        let data = {
+          limit: 0,
           populate: [{
             path: "company"
           }]
-        });
+        }
+        if(!this.sys) data.company = this.comapny._id;
+        this.categoryArr = await this.$api.sys.getCategory(data);
       },
       confirmation(val) {
         let returnIo = true;
@@ -49,8 +50,6 @@
           try {
             this.loadingText = "添加中";
             let data = {
-              model: "brand",
-              curdType: "set",
               name: val.name,
               type: val.type,
               tag: val.tag,
@@ -61,7 +60,7 @@
             } else {
               delete data.company;
             }
-            let res = await this.$api.curd(data);
+            let res = await this.$api.sys.addBrand(data);
             this.$message.success("添加成功");
             let path = this.sys ? '/sys/goods/brand' : '/goods/brand'
             this.$router.push({

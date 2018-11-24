@@ -124,7 +124,7 @@
       async remove(val) {
         try {
           this.loadingText = "删除中...";
-          let del = await this.$ajax.post("/relationCode/delete", {
+          let del = await this.$api.company.deleteRelationCode({
             _id: val.row._id
           });
         } catch (error) {}
@@ -172,7 +172,7 @@
                 new Date(row.expirationAt).getTime() -
                 new Date(row.createdAt).getTime()
               );
-              await this.$ajax.post("/relationCode/update", {
+              await this.$api.company.updateRelationCode({
                 find: {
                   _id: row._id
                 },
@@ -189,7 +189,7 @@
       async getRelationCode() {
         try {
           this.loadingText = "加载中...";
-          let res = await this.$ajax.post("/relationCode/find", {
+          let res = await this.$api.company.getRelationCode({
             company: this.company._id
           });
           let data = [];
@@ -212,7 +212,7 @@
         try {
           this.dialogTableVisible = false;
           this.loadingText = "添加中...";
-          let res = await this.$ajax.post("/relationCode/set", {
+          let res = await this.$api.company.addRelationCode({
             company: this.company._id,
             type: this.setDate.type,
             expiration: new Date(

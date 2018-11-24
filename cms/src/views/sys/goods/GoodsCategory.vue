@@ -126,14 +126,13 @@
       },
       async getParentCategory() {
         let data = {
-          model: 'category',
-          curdType: 'find',
           limit: 0,
           parent: {
             $exists: false
           }
         };
-        this.categoryArr = await this.$api.curd(data);
+        if(!this.sys) data.company = this.company._id;
+        this.categoryArr = await this.$api.sys.getCategory(data);
       }
     },
     async created() {

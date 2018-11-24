@@ -140,7 +140,7 @@
           data.relationType = 'company';
           data.relationCompany = this.activeName;
         };
-        return await this.$ajax.post('/account/relation/list', data);
+        return await this.$api.company.getAccountRelationList(data);
       },
       check(scope) {
         let query = {

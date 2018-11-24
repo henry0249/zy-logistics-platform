@@ -21,7 +21,7 @@
         try {
           this.loadingText = '添加中';
           if (val.table.length > 0) {} else {}
-          await this.$ajax.post('/invoice/set', { ...val.cartData,
+          await this.$api.company.addInvoice({ ...val.cartData,
             toType: val.cartData.to.userType,
           });
           this.$message.success('添加成功!');

@@ -19,10 +19,10 @@
       };
     },
     watch: {
-      company:{
-        handler(val){
+      company: {
+        handler(val) {
           this.loadingText = '加载中';
-          this.$nextTick(()=>{
+          this.$nextTick(() => {
             this.loadingText = '';
           })
         }
@@ -32,15 +32,16 @@
       async submit(data) {
         try {
           this.loadingText = '加载中';
-          let setStock = await this.$ajax.post('/stock/multi',data);
+          let setStock = await this.$api.stock.stockMulti(data);
           this.$message.success('操作成功');
-          this.$router.push({path:'/stock/home'});
+          this.$router.push({
+            path: '/stock/home'
+          });
         } catch (error) {}
         this.loadingText = '';
       }
     },
-    created() {
-    }
+    created() {}
   };
 </script>
 

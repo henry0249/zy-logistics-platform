@@ -89,7 +89,7 @@
             });
             this.$set(update, 'transportTrainsRelationCompany', transportData);
             this.$set(update, 'businessRelationCompany', businessData);
-            let updateCompany = await this.$ajax.post('/company/update', {
+            let updateCompany = await this.$api.company.updateCompany({
               find: {
                 _id: this.company._id
               },
@@ -103,9 +103,7 @@
       async getCompany() {
         try {
           this.loadingText = '加载中..';
-          this.initData = await this.$api.curd({
-            model: "company",
-            curdType: "findOne",
+          this.initData = await this.$api.company.getCompanyFindOne({
             _id: this.company._id,
             populate: [{
                 path: "area",

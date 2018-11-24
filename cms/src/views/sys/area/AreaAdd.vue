@@ -22,62 +22,61 @@
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      loadingText: "",
-      areaLoading:"",
-      type: 3,
-      area: [],
-      options: [
-        {
-          label: "省",
-          value: 0
-        },
-        {
-          label: "市",
-          value: 1
-        },
-        {
-          label: "县",
-          value: 2
-        },
-        {
-          label: "乡",
-          value: 3
-        }
-      ]
-    };
-  },
-  methods: {
-    typeChange(val) {
-      this.loadingText = "加载中...";
-      this.areaLoading = true;
-      setTimeout(() => {
-        this.areaLoading = false;
-        this.loadingText = "";
-      }, 200);
+  export default {
+    data() {
+      return {
+        loadingText: "",
+        areaLoading: "",
+        type: 3,
+        area: [],
+        options: [{
+            label: "省",
+            value: 0
+          },
+          {
+            label: "市",
+            value: 1
+          },
+          {
+            label: "县",
+            value: 2
+          },
+          {
+            label: "乡",
+            value: 3
+          }
+        ]
+      };
     },
-    async addArea() {
-      this.loadingText = "正在添加...";
-      try {
-        await this.$ajax.post("/area/add", {
-          type: this.type,
-          data: this.area
-        });
-        this.$message.success("添加成功!");
-      } catch (error) {}
-      this.loadingText = "";
+    methods: {
+      typeChange(val) {
+        this.loadingText = "加载中...";
+        this.areaLoading = true;
+        setTimeout(() => {
+          this.areaLoading = false;
+          this.loadingText = "";
+        }, 200);
+      },
+      async addArea() {
+        this.loadingText = "正在添加...";
+        try {
+          await this.$ajax.sys.addArea({
+            type: this.type,
+            data: this.area
+          });
+          this.$message.success("添加成功!");
+        } catch (error) {}
+        this.loadingText = "";
+      }
     }
-  }
-};
+  };
 </script>
 
 <style scoped>
-.g-area-add {
-  margin: 2%;
-  border: 1px solid #eee;
-  padding: 2% 15%;
-  border-radius: 4px;
-}
+  .g-area-add {
+    margin: 2%;
+    border: 1px solid #eee;
+    padding: 2% 15%;
+    border-radius: 4px;
+  }
 </style>

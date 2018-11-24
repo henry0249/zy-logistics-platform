@@ -164,6 +164,9 @@
       }
       this.business = JSON.parse(JSON.stringify(this.businessRelation));
       this.transport = JSON.parse(JSON.stringify(this.transportTrainsRelation));
+      console.log('transportTrainsRelation',this.transportTrainsRelation);
+      console.log('businessRelation',this.businessRelation);
+      console.log('companyData',this.companyData);
     }
   };
 </script>

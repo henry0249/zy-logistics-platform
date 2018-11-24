@@ -36,7 +36,7 @@
               </my-form-item>
               <my-form-item width="49%" switch v-model="goods.freeDelivery" label="包配送费"></my-form-item>
             </div>
-              <my-form-item width="24%" number size="mini" v-model="goods.recommenderBonus" :min="0" :max="100" label="推荐人提成"></my-form-item>
+            <my-form-item width="24%" number size="mini" v-model="goods.recommenderBonus" :min="0" :max="100" label="推荐人提成"></my-form-item>
             <!-- <div style="width:24%"></div> -->
             <div style="width:24%"></div>
           </div>
@@ -69,9 +69,9 @@
             </div>
           </div>
           <template slot-scope="scope">
-            <my-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" company></my-select>
-            <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
-          </template>
+                        <my-select v-if="scope.column.property === 'area'" :disabled="scope.row[scope.column.property]._id?true:false" :data.sync="scope.row[scope.column.property]" company></my-select>
+                        <el-input-number v-if="scope.column.property === 'factory'||scope.column.property === 'transport'||scope.column.property === 'sell'" v-model="scope.row[scope.column.property]" controls-position="right" size="mini" :min="1"></el-input-number>
+</template>
         </my-table>
       </div>
       <div class="tr" style="margin-top:30px">
@@ -137,13 +137,12 @@
           tag: [],
           company: {},
           detail: "",
-          recommenderBonus:0
+          recommenderBonus: 0
         },
         inputVisible: false,
         inputValue: "",
         categoryArr: [],
         brandArr: [],
-        companyArr: [],
         priceChange: false,
         goodsChange: false
       };
@@ -225,9 +224,7 @@
             } else {
               this.$set(update, 'manufacturer', this.goods.manufacturer._id);
             }
-            let goods = await this.$api.curd({
-              model: "goods",
-              curdType: "update",
+            let goods = await this.$api.sys.updateGoods({
               find: {
                 _id: this.$route.params._id
               },
@@ -235,9 +232,7 @@
             });
             if (this.priceChange) {
               for (let index = 0; index < this.tableList.length; index++) {
-                let price = await this.$api.curd({
-                  model: "price",
-                  curdType: "add",
+                let price = await this.$api.sys.addPrice({
                   goods: this.$route.params._id,
                   area: this.tableList[index].area._id,
                   sell: Number(this.tableList[index].sell),
@@ -292,40 +287,32 @@
       },
       async getBrand() {
         try {
-          this.brandArr = await this.$api.curd({
-            model: "brand",
-            curdType: "find"
-          });
-        } catch (error) {}
-      },
-      async getCompany() {
-        try {
-          this.companyArr = await this.$api.curd({
-            model: "company",
-            curdType: "find",
-          });
+          let data = {
+            limit: 0
+          }
+          if (!this.sys) data.comapny = this.company._id
+          this.brandArr = await this.$api.sys.getBrand(data);
         } catch (error) {}
       },
       async getCategory() {
         try {
-          this.categoryArr = await this.$api.curd({
-            model: "category",
-            curdType: "find"
-          });
+          let data = {
+            limit: 0
+          }
+          this.categoryArr = await this.$api.sys.getCategory(data);
         } catch (error) {}
       },
       async getGoods() {
         try {
-          let res = await this.$api.curd({
-            model: "goods",
-            curdType: "findOne",
+          let data = {
             _id: this.$route.params._id,
             populate: [{
               path: "company"
             }, {
               path: "manufacturer"
             }]
-          });
+          }
+          let res = await this.$api.sys.getGoodsFindOne(data);
           let goods = {};
           for (const key in this.goods) {
             goods[key] = res[key];
@@ -335,9 +322,7 @@
       },
       async getPrice() {
         try {
-          let res = await this.$api.curd({
-            model: "price",
-            curdType: "find",
+          let res = await this.$api.sys.getPrice({
             goods: this.$route.params._id
           });
           let areaArr = [];
@@ -348,9 +333,7 @@
           let arr = [...newAreaArr];
           let tableList = [];
           for (let index = 0; index < arr.length; index++) {
-            let price = await this.$api.curd({
-              model: "price",
-              curdType: "findOne",
+            let price = await this.$api.sys.getPriceFindOne({
               area: arr[index],
               sort: {
                 updatedAt: -1
@@ -370,7 +353,6 @@
       await this.getCategory();
       await this.getGoods();
       await this.getBrand();
-      await this.getCompany();
       await this.getPrice();
       if (!this.sys) {
         this.companyDisabled = true;

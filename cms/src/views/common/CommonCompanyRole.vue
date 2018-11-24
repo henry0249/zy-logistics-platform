@@ -1,18 +1,18 @@
 <template>
-  <loading-box style=" position: relative">
+  <loading-box style=" position: relative" v-model="loadingText">
     <el-tabs v-model="activeName">
       <el-tab-pane v-for="(value,key,index) in type" :name="key" :key="index" :label="value">
-        <my-table max-height="300" :thead="thead" :data.sync="changeData" size="mini" border index op opWidth="45">
-          <div slot="op" slot-scope="scope" class="jc">
-            <remove-check @remove="remove(scope)"></remove-check>
-          </div>
-          <div slot-scope="scope">
-            <my-select v-if="scope.prop === 'area'" area :data.sync="scope.row[scope.prop]" multi size="mini"></my-select>
-            <my-form-item number v-if="scope.prop === 'bonus'" :min="0" :max="100" v-model="scope.row[scope.prop]" size="mini"></my-form-item>
-          </div>
-        </my-table>
       </el-tab-pane>
     </el-tabs>
+    <my-table max-height="300" :thead="thead" :data.sync="changeData" size="mini" border index op opWidth="45">
+      <div slot="op" slot-scope="scope" class="jc">
+        <remove-check @remove="remove(scope)"></remove-check>
+      </div>
+      <div slot-scope="scope">
+        <my-select v-if="scope.prop === 'area'" area :data.sync="scope.row[scope.prop]" multi size="mini"></my-select>
+        <my-form-item number v-if="scope.prop === 'bonus'" :min="0" :max="100" v-model="scope.row[scope.prop]" size="mini"></my-form-item>
+      </div>
+    </my-table>
     <div class="jc" style="height:40px;position: absolute;top:-33.5px;right:0;transform: translate(0,-50%);">
       <el-tooltip class="item" effect="dark" content="快速添加所有管理人员" placement="top">
         <el-button style="padding:5px" type="warning" icon="el-icon-info" size="mini" @click="fastAdd">快速初始化</el-button>
@@ -71,6 +71,7 @@
     },
     data() {
       return {
+        loadingText: '',
         fastIo: false,
         currentValue: {},
         input: "",
@@ -100,6 +101,9 @@
       };
     },
     watch: {
+      async activeName(val) {
+        this.getRole(val);
+      },
       innerVisible(val) {
         if (!val) {
           this.area = [];
@@ -175,6 +179,37 @@
       }
     },
     methods: {
+      async getRole(activeName) {
+        try {
+          this.loadingText = '加载中';
+          let res = await this.$api.common.getRole({
+            company: this.$route.params._id ? this.$route.params._id : this.company._id,
+            limit: 0,
+            type: activeName,
+            populate: [{
+              path: "user"
+            }, {
+              path: "area"
+            }]
+          });
+          for (const item of this.newData) {
+            for (const resItem of res) {
+              if (item._id === resItem._id) {
+                res.splice(res.indexOf(resItem), 1);
+              }
+            }
+          };
+          for (const item of this.removeList) {
+            for (const resItem of res) {
+              if (item === resItem._id) {
+                res.splice(res.indexOf(resItem), 1);
+              }
+            }
+          }
+          this.newData = [...this.newData, ...res];
+        } catch (error) {}
+        this.loadingText = '';
+      },
       cancel() {
         this.innerVisible = false;
         this.area = [];
@@ -258,16 +293,17 @@
         }]);
       },
       remove(scope) {
-        this.newData.forEach((item, index) => {
-          if (item.type === this.activeName && item._id === scope.row._id) {
-            this.newData.splice(index, 1);
-          }
-        });
-        if (scope.row._id) {
-          let arr = [];
-          arr.push(scope.row._id);
-          this.$emit('update:removeList', arr);
-        }
+        console.log(scope);
+        // this.newData.forEach((item, index) => {
+        //   if (item.type === this.activeName && item._id === scope.row._id) {
+        //     this.newData.splice(index, 1);
+        //   }
+        // });
+        // if (scope.row._id) {
+        //   let arr = [];
+        //   arr.push(scope.row._id);
+        //   this.$emit('update:removeList', arr);
+        // }
       },
       addUser() {
         this.dialogTableVisible = true;
@@ -275,7 +311,7 @@
     },
     created() {
       if (this.startData.length > 0) {
-        this.newData = JSON.parse(JSON.stringify(this.startData));
+        // this.newData = JSON.parse(JSON.stringify(this.startData));
       }
     }
   };

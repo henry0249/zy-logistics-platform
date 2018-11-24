@@ -12,9 +12,8 @@
           <my-form-item multiple collapse-tags select v-model="startData.city" label="市" :options="cityArr"></my-form-item>
           <my-form-item multiple collapse-tags select v-model="startData.county" label="县" :options="countyArr"></my-form-item>
         </div>
-         <div class="flex jb" style="margin-top:15px;">
-           
-         </div>
+        <div class="flex jb" style="margin-top:15px;">
+        </div>
       </my-form>
     </div>
     <div class="tr" style="margin-top:30px">
@@ -53,9 +52,9 @@
           county: "",
           name: ""
         },
-        provinceArr:[],
-        cityArr:[],
-        countyArr:[],
+        provinceArr: [],
+        cityArr: [],
+        countyArr: [],
       };
     },
     methods: {
@@ -63,9 +62,7 @@
         this.$emit("sub", this.areaData);
       },
       async getAreaByType(type) {
-        return await this.$api.curd({
-          model: "area",
-          curdType: "find",
+        return await this.$api.sys.getArea({
           type,
           populate: [{
               path: "province"
@@ -85,9 +82,7 @@
         this.provinceArr = await this.getAreaByType('province');
         this.cityArr = await this.getAreaByType('city');
         this.countyArr = await this.getAreaByType('county');
-      } catch (error) {
-        
-      }
+      } catch (error) {}
     }
   };
 </script>

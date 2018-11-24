@@ -163,7 +163,7 @@
               if (value) {
                 try {
                   this.loadingText = '打回中';
-                  await this.$ajax.post(this.js[payName].leftPath, { ...data,
+                  await this.$api.company[this.js[payName].leftPath]({ ...data,
                     text: value
                   });
                   this.$message.success('回退成功');
@@ -187,7 +187,7 @@
             }).then(async() => {
               try {
                 this.loadingText = '删除中';
-                await this.$ajax.post(this.js[payName].leftPath, {
+                await this.$api.company[this.js[payName].leftPath]({
                   _id: data._id
                 })
                 this.$message.success('删除成功');
@@ -329,11 +329,11 @@
       },
       async getRelator() {
         let isUser = this.$route.query.relationType === "user";
-        let path = "/user/findOne";
+        let path = "getUserFindOne";
         if (this.$route.query.titleType === 'isReceive') {
-          if (!isUser) path = "/company/findOne";
+          if (!isUser) path = "getCompanyFindOne";
         } else {
-          if (this.$route.query.toUserType === 'company') path = "/company/findOne";
+          if (this.$route.query.toUserType === 'company') path = "getCompanyFindOne";
         }
         let res = await this.$ajax.post(path, {
           _id: this.$route.query.activeName

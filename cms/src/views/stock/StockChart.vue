@@ -75,7 +75,7 @@
           });
         }
         try {
-          let data = await this.$ajax.post("/stock/chart", {
+          let data = await this.$api.stock.stockChart({
             company: this.company._id,
             type: this.stockDateType,
             goods: this.goods
@@ -202,17 +202,17 @@
 </script>
 
 <style scoped>
-.chartBox{
-  position: relative;
-  width:100%;
-  height: 100%;
-}
-.noDataText{
-  position: absolute;
-  top:50%;
-  right:50%;
-  transform: translate(-50%,-50%);
-  font-size: 15px;
-  color: #909399;
-}
+  .chartBox {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  .noDataText {
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 15px;
+    color: #909399;
+  }
 </style>

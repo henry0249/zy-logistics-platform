@@ -74,24 +74,20 @@
     methods: {
       async loadmore() {
         let data = {
-          model: 'role',
-          curdType: 'find',
           type: this.type,
           skip: this.data.length,
           populate: [{
             path: 'user'
           }]
         }
-        let res = await this.$api.curd(data);
+        let res = await this.$api.sys.getRole(data);
         return res;
       },
       async remove(scope) {
         if (scope.row._id) {
           this.loadingText = '删除中';
           try {
-            let del = await this.$api.curd({
-              model: 'role',
-              curdType: 'delete',
+            let del = await this.$api.sys.deleteRole({
               _id: scope.row._id
             })
             this.$message.success('删除成功！');
@@ -141,9 +137,7 @@
           }
           for (let index = 0; index < this.data.length; index++) {
             if (!this.data[index]._id) {
-              let setRole = await this.$api.curd({
-                model: 'role',
-                curdType: 'set',
+              let setRole = await this.$api.sys.addRole({
                 type: this.type,
                 user: this.data[index].user._id
               })
@@ -155,22 +149,39 @@
         this.loadingText = '';
       },
       go() {
-        this.$confirm(`是否添加${this.key[this.type]}？`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(async() => {
-          await this.addRole();
-        }).catch(() => {});
-        this.dialogTableVisible = false;
+        let data = [];
+        if (this.selectionArr.length > 0) {
+          for (const item of this.data) {
+            for (const select of this.selectionArr) {
+              console.log(item,select);
+              if (item.user._id === select._id) {
+                data.push({
+                  name: item.user.name,
+                  mobile: item.user.mobile
+                });
+                this.$message.warn(`${item.user.name || item.user.mobile}已在列表中`);
+              }
+            }
+          }
+          if (data.length === 0) {
+            this.$confirm(`是否添加${this.key[this.type]}？`, '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(async() => {
+              await this.addRole();
+            }).catch(() => {});
+            this.dialogTableVisible = false;
+          }
+        } else {
+          this.$message.warn('请先选择');
+        }
       },
       see(scope) {},
       async getData() {
         try {
           this.loadingText = '加载中';
-          this.data = await this.$api.curd({
-            model: 'role',
-            curdType: 'find',
+          this.data = await this.$api.sys.getRole({
             type: this.type,
             populate: [{
               path: 'user'

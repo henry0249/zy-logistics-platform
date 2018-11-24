@@ -278,9 +278,7 @@
         this.addCheck = false;
       },
       async getGoodsByComapny() {
-        let res = await this.$api.curd({
-          model: "goods",
-          curdType: "find",
+        let res = await this.$api.stock.getGoods({
           company: this.company._id,
           limit: 0
         });
@@ -292,7 +290,7 @@
         });
       },
       async getGoodsCount() {
-        this.allCount = await this.$ajax.post('/goods/count', {
+        this.allCount = await this.$api.stock.getGoodsCount('/goods/count', {
           company: this.company._id
         })
       }

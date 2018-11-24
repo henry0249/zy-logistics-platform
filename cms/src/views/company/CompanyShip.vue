@@ -50,9 +50,9 @@
                 for (let index = 0; index < updateArr.length; index++) {
                   for (let i = 0; i < this.shipObj[key].length; i++) {
                     if (this.shipObj[key][i]._id === updateArr[index]._id) {
-                      let res = await this.$api.curd({
-                        model: key,
-                        curdType: "update",
+                      let name = 'updateShip';
+                      if (key === 'truck') name = 'updateTruck';
+                      let res = await this.$api.company[name]({
                         find: {
                           _id: this.shipObj[key][i]._id
                         },
@@ -90,17 +90,19 @@
               } else {
                 if (this.data[key].length > 0) {
                   for (let index = 0; index < this.data[key].length; index++) {
-                    let res = await this.$ajax.post(
-                      "/" + key + "/delete?_id=" + this.data[key][index]._id
-                    );
+                    let name = 'deleteTruck';
+                    if (key === 'ship') name = 'deleteShip';
+                    let res = await this.$api.company[name]({
+                      _id: this.data[key][index]._id
+                    });
                   }
                 }
               }
               for (let index = 0; index < this.shipObj[key].length; index++) {
                 if (!this.shipObj[key][index]._id) {
-                  let addShip = await this.$api.curd({
-                    model: key,
-                    curdType: "set",
+                  let name = 'addTruck';
+                  if (key === 'ship') name = 'addShip';
+                  let addShip = await this.$api.company[name]({
                     name: this.shipObj[key][index].name,
                     no: this.shipObj[key][index].no,
                     owner: this.shipObj[key][index].owner,
@@ -112,9 +114,9 @@
             } else {
               if (this.shipObj[key].length > 0) {
                 for (let index = 0; index < this.shipObj[key].length; index++) {
-                  let res = await this.$api.curd({
-                    model: key,
-                    curdType: "set",
+                  let name = 'addTruck';
+                  if (key === 'ship') name = 'addShip';
+                  let res = await this.$api.company[name]({
                     name: this.shipObj[key][index].name,
                     no: this.shipObj[key][index].no,
                     owner: this.shipObj[key][index].owner,
@@ -131,9 +133,7 @@
       },
       async getTruc() {
         let _id = this.sys ? this.$route.params._id : this.company._id;
-        let truckData = await this.$api.curd({
-          model: "truck",
-          curdType: "find",
+        let truckData = await this.$api.company.getTruck({
           limit: 0,
           company: _id,
           populate: [{
@@ -152,9 +152,7 @@
       },
       async getShip() {
         let _id = this.sys ? this.$route.params._id : this.company._id;
-        let shipData = await this.$api.curd({
-          model: "ship",
-          curdType: "find",
+        let shipData = await this.$api.company.getShip({
           limit: 0,
           company: _id,
           populate: [{

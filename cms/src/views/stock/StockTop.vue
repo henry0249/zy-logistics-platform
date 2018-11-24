@@ -165,9 +165,7 @@
         this.$emit('update:loadingText', '');
       },
       async getStock() {
-        let stock = await this.$api.curd({
-          model: 'stock',
-          curdType: 'find',
+        let stock = await this.$api.stock.getStock({
           company: this.company._id,
           sort: {
             createdAt: -1
@@ -200,7 +198,7 @@
         return result;
       },
       async getStockByDate(type) {
-        this.stockObj = await this.$ajax.post('stock/chart', {
+        this.stockObj = await this.$api.stock.stockChart({
           type,
           company: this.company._id
         });

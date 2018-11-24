@@ -14,7 +14,7 @@
       return {
         loadingText: '',
         data: {},
-        logisticsTrajectory:[],
+        logisticsTrajectory: [],
       }
     },
     methods: {
@@ -30,9 +30,7 @@
       async sub(val) {
         try {
           this.loadingText = '修改中';
-          let updateStock = await this.$api.curd({
-            model: 'stock',
-            curdType: 'update',
+          let updateStock = await this.$api.stock.updateStock({
             find: {
               _id: this.$route.query._id
             },
@@ -40,9 +38,7 @@
               state: 'checked'
             }
           })
-          let setStock = await this.$api.curd({
-            model: 'stock',
-            curdType: 'set',
+          let setStock = await this.$api.stock.addStock({
             goods: val[0].goods,
             name: val[0].name,
             num: val[0].num,
@@ -59,9 +55,7 @@
         this.loadingText = '';
       },
       async getStockById() {
-        this.data = await this.$api.curd({
-          model: 'stock',
-          curdType: 'findOne',
+        this.data = await this.$api.stock.getStockFindOne({
           _id: this.$route.query._id,
           populate: [{
             path: 'goods',
@@ -92,17 +86,17 @@
         })
         this.$set(this.data, 'state', 'finish');
       },
-      async getLogisticsTrajectory(){
+      async getLogisticsTrajectory() {
         let data = [];
         this.data.businessTrains.logistics.forEach(item => {
           data.push(item._id);
         });
-        this.logisticsTrajectory = await this.$ajax.post('/logisticsTrajectory/find',{
-          logistics:{
-            $in:data
+        this.logisticsTrajectory = await this.$api.stock.getLogisticsTrajectory({
+          logistics: {
+            $in: data
           },
-          sort:{
-            createdAt:-1
+          sort: {
+            createdAt: -1
           }
         })
       }

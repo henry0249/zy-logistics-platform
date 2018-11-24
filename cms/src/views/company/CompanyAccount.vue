@@ -113,7 +113,7 @@
         this.tableLoadingText = '';
       },
       async getTabsData() {
-        this.accountData = await this.$ajax.post('/account/relation/tab', {
+        this.accountData = await this.$api.company.getAccountRelationTab({
           company: this.company._id
         });
       },
@@ -131,7 +131,7 @@
         if (type) {
           data.listType = type;
         }
-        this.payArr = await this.$ajax.post('/account/relation/list', data);
+        this.payArr = await this.$api.company.getAccountRelationList(data);
       },
     },
     async created() {
@@ -149,7 +149,7 @@
             this.tableData = this.payArr[0].list;
             this.isUser = this.payArr[0].isUser;
             this.payName = this.payArr[0].type;
-          }else{
+          } else {
             this.isUser = false;
           }
         } catch (error) {}

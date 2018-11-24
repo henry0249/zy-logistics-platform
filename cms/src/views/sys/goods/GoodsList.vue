@@ -10,8 +10,8 @@
         </div>
       </div>
       <template slot-scope="scope" v-if="scope.prop === 'tag'||scope.prop === 'name'">
-          <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
-          <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see({type:'read',value:scope})">{{setName(scope)}}</div>
+                        <el-tag v-if="scope.prop === 'tag'" :type="tagType(index,scope.row['tag'])" style="margin-right:10px;" size="mini" v-for="(item,index) in scope.row['tag']" :key="item.id">{{item}}</el-tag>
+                        <div title="点击查看详情" class="pointer name-txt" v-if="scope.prop === 'name'" @click="see({type:'read',value:scope})">{{setName(scope)}}</div>
 </template>
     </common-table>
     <router-view v-else></router-view>
@@ -162,21 +162,19 @@
       async getBrand() {
         try {
           let data = {
-            model: "brand",
-            curdType: "find"
+            limit: 0
           }
-          if (!this.sys) {
-            this.$set(data, 'company', this.company._id);
-          }
-          this.brandArr = await this.$api.curd(data);
+          if (!this.sys) this.$set(data, 'company', this.company._id);
+          this.brandArr = await this.$api.sys.getBrand(data);
         } catch (error) {}
       },
       async getCategory() {
         try {
-          this.categoryArr = await this.$api.curd({
-            model: "category",
-            curdType: "find"
-          });
+          let data = {
+            limit: 0
+          }
+          if (!this.sys) data.company = this.company._id;
+          this.categoryArr = await this.$api.sys.getCategory(data);
         } catch (error) {}
       }
     },

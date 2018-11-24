@@ -50,7 +50,7 @@
           this.loadingText = '操作中';
           let path = this.js[this.$route.query.payName].postPath;
           if (val.hasChild && this.$route.query.payName !== 'invoiceEditCheck') path = '';
-          await this.$ajax.post(this.js[this.$route.query.payName].postPath, { ...val.cartData
+          await this.$api.company[this.js[this.$route.query.payName].postPath]({ ...val.cartData
           });
           this.$message.success('操作成功');
           this.$router.push({
@@ -62,8 +62,8 @@
       async getData() {
         try {
           this.loadingText = '加载中';
-          let path = this.$route.query.titleType === 'isReceive' ? '/accountChange/findOne' : '/invoice/findOne'
-          this.data = await this.$ajax.post(path, {
+          let path = this.$route.query.titleType === 'isReceive' ? 'getAccountChangeFIndOne' : 'getInvoiceFIndOne'
+          this.data = await this.$api.company[path]({
             _id: this.$route.params._id,
             populate: [{
               path: 'company'

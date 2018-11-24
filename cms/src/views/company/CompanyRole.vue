@@ -70,9 +70,7 @@
         }
         try {
           this.loadingText = '加载中...';
-          this.roleStartData = await this.$api.curd({
-            model: "role",
-            curdType: "find",
+          this.roleStartData = await this.$api.company.getRole({
             limit: 0,
             type: {
               $in: data
@@ -102,9 +100,7 @@
           try {
             this.loadingText = '修改中...';
             for (let index = 0; index < this.removeList.length; index++) {
-              let delRole = await this.$api.curd({
-                model: 'role',
-                curdType: 'delete',
+              let delRole = await this.$api.company.deleteRole({
                 _id: this.removeList[index],
               })
             }
@@ -123,7 +119,7 @@
               }
               data.push(obj);
             });
-            let res = await this.$ajax.post('/role/multi', data);
+            let res = await this.$api.company.roleMulti(data);
           } catch (error) {}
           this.loadingText = '';
           await this.getRole();

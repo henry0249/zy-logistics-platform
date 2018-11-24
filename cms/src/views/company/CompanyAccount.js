@@ -74,7 +74,7 @@ export default {
     type: 'isReceive',
     subText: '修改',
     operatText: '查看详情',
-    postPath: '/accountChange/update',
+    postPath: 'updateAccountChange',
   },
   receivedCheck: {
     thead: thead1,
@@ -82,8 +82,8 @@ export default {
     type: 'isReceive',
     operatText: '审核付款流水',
     leftText: '打回流水',
-    leftPath: '/accountChange/checkFail',
-    postPath: '/accountChange/check',
+    leftPath: 'accountChangeCheckFail',
+    postPath: 'accountChangeCheck',
     subText: '审核通过',
   },
   receivedEditCheck: {
@@ -91,8 +91,8 @@ export default {
     type: 'isReceive',
     title: '未通过审核付款流水',
     leftText: '删除',
-    leftPath: '/accountChange/delete',
-    postPath: '/accountChange/update',
+    leftPath: 'deleteAccountChange',
+    postPath: 'updateAccountChange',
     subText: '回退',
     operatText: '查看未通过审核付款流水',
     thead: { ...thead1,
@@ -117,8 +117,8 @@ export default {
     operatText: '审核开票记录',
     title: '审核开票记录',
     leftText: '打回开票',
-    leftPath: '/invoice/checkFail',
-    postPath: '/invoice/check',
+    leftPath: 'invoiceCheckFail',
+    postPath: 'invoiceCheck',
     subText: '审核通过',
   },
   invoiceEditCheck: {
@@ -132,8 +132,8 @@ export default {
     operatText: '查看未通过审核开票记录',
     subText: '回退',
     leftText: '删除',
-    leftPath: '/accountChange/delete',
-    postPath: '/invoice/update',
+    leftPath: 'deleteInvoice',
+    postPath: 'updateInvoice',
     title: '未通过审核开票记录'
   },
   isReceive: {

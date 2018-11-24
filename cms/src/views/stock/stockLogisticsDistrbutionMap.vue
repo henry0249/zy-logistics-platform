@@ -78,7 +78,7 @@
         let item = JSON.parse(JSON.stringify(this.points[index]));
         this.mapLoading = "正在解析地址";
         try {
-          let res = await this.$ajax.post("/map/geocoder", e.point);
+          let res = await this.$api.stock.mapGeocoder(e.point);
           item.address = res.formatted_address + " " + res.sematic_description;
           item.addressComponent = res.addressComponent;
           item.sematic_description = res.sematic_description;

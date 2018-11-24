@@ -6,72 +6,69 @@
 </template>
 
 <script>
-import GoodsCategoryEditItem from "./GoodsCategoryEditItem.vue";
-export default {
-  components: {
-    GoodsCategoryEditItem
-  },
-  props: {
-    sys: {
-      type: Boolean,
-      default:true
+  import GoodsCategoryEditItem from "./GoodsCategoryEditItem.vue";
+  export default {
+    components: {
+      GoodsCategoryEditItem
     },
-  },
-  data() {
-    return {
-      loadingText: "",
-      parentCategoryArr:[]
-    };
-  },
-  methods: {
-    async sub(val) {
-      this.loadingText = "添加中";
-      try {
-        let op = {
-          model: "category",
-          curdType: "set"
-        };
-        Object.assign(op, {
-          name: val.name,
-          desc: val.desc,
-          remark: val.remark
-        });
-        if (val.parent) {
-          this.$set(op, "parent", val.parent);
-        } else {
-          delete op.parent;
-        }
-        let res = await this.$api.curd(op);
-        this.$message.success("添加成功！");
-        let path = "/sys/goods/category";
-        if (this.sys) {
-          path = '/goods/category'
-        }
-        this.$router.push({
-          path
-        });
-      } catch (error) {}
-      this.loadingText = "";
+    props: {
+      sys: {
+        type: Boolean,
+        default: true
+      },
     },
-    async getParentCategory() {
-      this.loadingText = "加载中";
-      try {
-        this.parentCategoryArr = await this.$api.curd({
-          model: "category",
-          curdType: "find",
-          parent: {
-            $exists: false
+    data() {
+      return {
+        loadingText: "",
+        parentCategoryArr: []
+      };
+    },
+    methods: {
+      async sub(val) {
+        this.loadingText = "添加中";
+        try {
+          let op = {};
+          Object.assign(op, {
+            name: val.name,
+            desc: val.desc,
+            remark: val.remark
+          });
+          if (val.parent) {
+            this.$set(op, "parent", val.parent);
+          } else {
+            delete op.parent;
           }
-        });
-      } catch (error) {}
-      this.loadingText = "";
+          if (!this.sys) op.company = this.company._id;
+          let res = await this.$api.sys.addCategory(op);
+          this.$message.success("添加成功！");
+          let path = "/sys/goods/category";
+          if (this.sys) path = '/goods/category';
+          this.$router.push({
+            path
+          });
+        } catch (error) {}
+        this.loadingText = "";
+      },
+      async getParentCategory() {
+        try {
+          this.loadingText = "加载中";
+          let data = {
+            parent: {
+              $exists: false
+            }
+          }
+          if(!this.sys) data.company = this.company._id;
+          this.parentCategoryArr = await this.$api.sys.getCategory(data);
+        } catch (error) {}
+        this.loadingText = "";
+      }
+    },
+    async created() {
+      await this.getParentCategory();
     }
-  },
-  async created() {
-    await this.getParentCategory();
-  }
-};
+  };
 </script>
 
 <style scoped>
+
 </style>

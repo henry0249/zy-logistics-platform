@@ -9,7 +9,7 @@
         </slot>
         <el-alert title="库存单类型" type="info" :closable="false"></el-alert>
         <div class="flex ac jb" style="margin-top:15px">
-          <div class="pointer" v-for="(val,key) in field.Stock.type.option" :key="key" @click="changeKey(key)">
+          <div v-if="field.Stock" class="pointer" v-for="(val,key) in stockTypeOption" :key="key" @click="changeKey(key)">
             <el-card :shadow="form.type === key?'always':'hover'" class="info" :class="{activeType:form.type === key,cursorNotAllowed:$route.query._id?true:false}" style="padding:0 20px;font-size:13px">
               {{val}}单
             </el-card>
@@ -18,7 +18,7 @@
         <goods-list style="margin-top:15px;" :isCheck="isCheck" :type="form.type" :addCheck.sync="addCheck" :data.sync="goodsData"></goods-list>
         <el-alert style="margin-top:15px" title="库存单信息" type="info" :closable="false">
         </el-alert>
-        <my-form size="small" width="49%">
+        <my-form v-if="field.Stock &&field.Stock.state && field.Stock.state.option" size="small" width="49%">
           <div class="flex ac jb" style="margin-top:15px">
             <my-form-item label="名称" v-model="form.name"></my-form-item>
             <my-form-item label="状态" v-model="form.state" select :options="field.Stock.state.option"></my-form-item>
@@ -41,7 +41,7 @@
         </slot>
         <div class="f1"></div>
         <slot name="right">
-          <div v-if="$route.query._id && val.businessTrains" style="margin-right:15px;font-size:13px;">实际{{field.Stock.type.option[form.type]}}数量：<span class="blue">{{count || 0}}</span></div>
+          <div v-if="$route.query._id && val.businessTrains && field.Stock" style="margin-right:15px;font-size:13px;">实际{{stockTypeOption[form.type]}}数量：<span class="blue">{{count || 0}}</span></div>
           <el-button :disabled="subDisabled" type="primary" size="small" @click="submit">{{submitText}}</el-button>
         </slot>
       </div>
@@ -145,6 +145,10 @@
       }
     },
     computed: {
+      stockTypeOption(){
+        if(this.field.Stock && this.field.Stock.type && this.field.Stock.type.option) return this.field.Stock.type.option;
+        return {};
+      },
       count() {
         let count = 0;
         this.val.businessTrains.logistics.forEach(item => {
@@ -156,7 +160,8 @@
         return this.form.type === 'check';
       },
       typeText() {
-        return this.field.Stock.type.option[this.form.type] || "未知类型";
+        if(!this.field.Stock) return '未知类型';
+        return this.stockTypeOption[this.form.type] || "未知类型";
       },
     },
     methods: {
@@ -167,7 +172,7 @@
         if (this.$route.query._id) {
           try {
             this.loadingText = '删除中';
-            let del = await this.$ajax.post('/stock/delete', {
+            let del = await this.$api.stock.deleteStock({
               _id: this.$route.query._id
             });
           } catch (error) {}
@@ -224,7 +229,9 @@
             check = false;
           }
           if (!item.key) {
-            this.$message.warn(`${this.field.Stock.type.option[this.form.type]}数量必须大于0`);
+            if(!this.field.Stock){
+              this.$message.warn(`${this.stockTypeOption[this.form.type]}数量必须大于0`);
+            }
             check = false;
           }
         });
@@ -238,7 +245,7 @@
         if (!this.form.name) {
           this.setName();
         }
-        if (this.$route.query.type && this.field.Stock.type.option[this.$route.query.type]) {
+        if (this.$route.query.type && this.field.Stock && this.stockTypeOption[this.$route.query.type]) {
           this.form.type = this.$route.query.type
         }
       }

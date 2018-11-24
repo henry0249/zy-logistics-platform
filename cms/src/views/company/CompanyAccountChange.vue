@@ -22,7 +22,7 @@
           this.loadingText = '添加中';
           let data = {};
           if (val.table.length > 0) {} else {}
-          await this.$ajax.post('/accountChange/set', { ...val.cartData,
+          await this.$api.company.addAccountChange({ ...val.cartData,
             handle: this.company._id,
             relationType: this.$route.query.relationType,
             toType: this.$route.query.toUserType,

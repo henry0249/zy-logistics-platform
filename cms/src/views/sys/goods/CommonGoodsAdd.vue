@@ -97,9 +97,9 @@
         disabled: true,
         value: "",
         tableList: [],
-        preOption:{
-          type:{
-            $in:['manufacturer']
+        preOption: {
+          type: {
+            $in: ['manufacturer']
           }
         },
         thead: {
@@ -132,7 +132,7 @@
           brand: "",
           saleState: 1,
           manufacturer: {},
-          packingType:'bag',
+          packingType: 'bag',
           selfDeliverySupport: false,
           freeDelivery: false,
           tag: [],
@@ -243,18 +243,13 @@
         try {
           this.value = "更新中";
           let io = true;
-          let goodsOp = {
-            model: "goods",
-            curdType: "add"
-          };
+          let goodsOp = {};
           for (const key in this.goods) {
             goodsOp[key] = this.goods[key];
           }
-          let goods = await this.$api.curd(goodsOp);
+          let goods = await this.$api.sys.addGoods(goodsOp);
           for (let index = 0; index < this.tableList.length; index++) {
-            let price = await this.$api.curd({
-              model: "price",
-              curdType: "add",
+            let price = await this.$api.sys.addPrice({
               sell: this.tableList[index].sell,
               factory: this.tableList[index].factory,
               transport: this.tableList[index].transport,
@@ -278,23 +273,19 @@
       async getBrand() {
         try {
           let data = {
-            model: "brand",
-            curdType: "find",
             limit: 0
           }
-          if (!this.sys) {
-            this.$set(data, 'company', this.company._id);
-          }
-          this.brandArr = await this.$api.curd(data);
+          if (!this.sys) data.company = this.company._id;
+          this.brandArr = await this.$api.sys.getBrand(data);
         } catch (error) {}
       },
       async getCategory() {
         try {
-          this.categoryArr = await this.$api.curd({
-            model: "category",
-            curdType: "find",
-            limit: 0
-          });
+          let data = {
+            limit: 0,
+          }
+          if (!this.sys) data.company = this.company._id;
+          this.categoryArr = await this.$api.sys.getCategory(data);
         } catch (error) {}
       }
     },

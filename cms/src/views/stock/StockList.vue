@@ -36,9 +36,7 @@
       async remove(val) {
         try {
           this.loadingText = '删除中';
-          let del = await this.$api.curd({
-            model: 'stock',
-            curdType: 'delete',
+          let del = await this.$api.stock.deleteStock({
             _id: val.row._id
           })
           this.$message.success('删除成功！');

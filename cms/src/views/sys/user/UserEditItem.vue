@@ -63,7 +63,7 @@
           superior: {},
           parent: {},
           tag: [],
-          company:{}
+          company: {}
         }
       };
     },
@@ -95,10 +95,7 @@
       async sub() {
         if (this.checkMethods()) {
           try {
-            let op = {
-              model: "user",
-              curdType: "update"
-            };
+            let op = {};
             if (this.type === "add") {
               this.$emit("input", "添加中");
             } else if (this.type === "edit") {
@@ -163,17 +160,13 @@
                 update
               });
             }
-            let res = await this.$api.curd(op);
+            let res = await this.$api.sys.updateUser(op);
             this.$message.success(`${this.type === 'add'?'添加成功':'更新成功'}`);
             let path = '/sys/user/list';
-            if (this.sys) {
-              path = '/sys/user/list';
-            } else {
-              path = '/sys/user/list';
-            }
-            // this.$router.push({
-            //   path
-            // });
+            // if (!this.sys) path = '/user/list';
+            this.$router.push({
+              path
+            });
           } catch (error) {
             console.log(error);
           }

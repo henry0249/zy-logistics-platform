@@ -67,12 +67,12 @@
     },
     methods: {
       async getGoods() {
-        this.goodsData = await this.$ajax.post('/goods/find', {
+        this.goodsData = await this.$api.stock.getGoods({
           company: this.company._id
         })
       },
       async getLastStock(val) {
-        this.data = await this.$ajax.post("/stock/simpleStatistics", {
+        this.data = await this.$api.stock.stockSimpleStatistics("/stock/simpleStatistics", {
           company: this.company._id,
           goods: this.goods
         });

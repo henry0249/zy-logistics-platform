@@ -103,32 +103,34 @@
             }
             let res = await this.$api.curd(companyOp);
             for (let index = 0; index < this.removeList.length; index++) {
-              let delRole = await this.$api.curd({
+              let delRole = await this.$api.sys.deleteRole({
                 model: 'role',
                 curdType: 'delete',
                 _id: this.removeList[index]
               })
             }
             for (let index = 0; index < this.roleArr.length; index++) {
-              let setRole = await this.$api.curd({
-                model: 'role',
-                curdType: 'set',
+              let setRole = await this.$api.sys.addRole({
                 company: res._id,
                 type: this.roleArr[index].type,
                 user: this.roleArr[index].user._id
               })
             }
-            for (const key in this.shipObj) {
-              for (let index = 0; index < this.shipObj[key].length; index++) {
-                let set = await this.$api.curd({
-                  model: key,
-                  curdType: 'set',
-                  no: this.shipObj[key][index].no,
-                  owner: this.shipObj[key][index].owner._id,
-                  no: this.shipObj[key][index].no,
-                  company: res._id
-                })
-              }
+            for (let index = 0; index < this.shipObj.ship.length; index++) {
+              let set = await this.$api.sys.addShip({
+                no: this.shipObj.ship[index].no,
+                owner: this.shipObj.ship[index].owner._id,
+                no: this.shipObj.ship[index].no,
+                company: res._id
+              })
+            }
+            for (let index = 0; index < this.shipObj.truck.length; index++) {
+              let set = await this.$api.sys.addTruck({
+                no: this.shipObj.truck[index].no,
+                owner: this.shipObj.truck[index].owner._id,
+                no: this.shipObj.truck[index].no,
+                company: res._id
+              })
             }
             this.$message.success("添加成功！");
             this.$router.go('/sys/company');
