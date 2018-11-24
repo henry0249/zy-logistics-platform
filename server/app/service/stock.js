@@ -288,9 +288,13 @@ class StockService extends Service {
       createdAt: -1
     });
     res.stock = {
-      num: lastStock.new,
-      createdAt: lastStock.createdAt
+      num: 0,
+      createdAt: new Date()
     };
+    if (lastStock) {
+      res.stock.new = lastStock.new;
+      res.stock.createdAt = lastStock.createdAt;
+    }
     //累计入库
     let stockInData = await ctx.model.Stock.find({
       type: 'in',
